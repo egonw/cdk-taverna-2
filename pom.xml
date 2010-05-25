@@ -17,7 +17,7 @@
 		<repository>
 			<id>CDKTaverna2-repository</id>
 			<name>CDK-Taverna 2 Repository</name>
-			<url>https://cdktaverna2.svn.sourceforge.net/svnroot/cdktaverna2/files/release_repository</url>
+			<url>file:///P:/Repositories/maven/release_repository</url>
 		</repository>
 	</distributionManagement>
 
