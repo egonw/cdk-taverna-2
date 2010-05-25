@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openscience.cdk.applications.taverna</groupId>
 		<artifactId>cdk-taverna2</artifactId>
-		<version>0.1</version>
+		<version>0.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>cdk-taverna-2-activity-ui</artifactId>
 	<name>CDK-Taverna 2 activity UI bindings</name>
