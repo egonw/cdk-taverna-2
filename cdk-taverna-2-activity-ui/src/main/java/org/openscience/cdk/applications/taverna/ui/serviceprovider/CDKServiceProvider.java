@@ -60,7 +60,7 @@ public class CDKServiceProvider implements ServiceDescriptionProvider {
 	 * provider'
 	 */
 	public String getName() {
-		return "My example service";
+		return "CDK Taverna 2";
 	}
 
 	@Override
