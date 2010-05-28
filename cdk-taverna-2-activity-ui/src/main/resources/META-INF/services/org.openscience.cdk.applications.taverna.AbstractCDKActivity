@@ -1,0 +1,9 @@
+org.openscience.cdk.applications.taverna.io.MDLMolFileReaderActivity
+org.openscience.cdk.applications.taverna.io.MDLMolFileWriterActivity
+org.openscience.cdk.applications.taverna.io.MDLRXNFileReaderActivity
+org.openscience.cdk.applications.taverna.io.MDLRXNFileWriterActivity
+org.openscience.cdk.applications.taverna.io.MDLSDFileReaderActivity
+org.openscience.cdk.applications.taverna.io.MDLSDFileWriterActivity
+org.openscience.cdk.applications.taverna.io.SMILESFileReaderActivity
+org.openscience.cdk.applications.taverna.io.SMILESFileWriterActivity
+org.openscience.cdk.applications.taverna.reactionenumerator.ReactionEnumeratorActivity

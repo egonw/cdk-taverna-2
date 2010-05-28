@@ -7,13 +7,13 @@ import javax.swing.Icon;
 
 import net.sf.taverna.t2.servicedescriptions.ServiceDescription;
 import net.sf.taverna.t2.servicedescriptions.ServiceDescriptionProvider;
-import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityConfigurationPanel;
+import net.sf.taverna.t2.spi.SPIRegistry;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
-import org.openscience.cdk.applications.taverna.CDKClassGrabber;
-import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 
 public class CDKServiceProvider implements ServiceDescriptionProvider {
+
+	private SPIRegistry<AbstractCDKActivity> cdkActivityRegistry = new SPIRegistry<AbstractCDKActivity>(AbstractCDKActivity.class);
 
 	/**
 	 * Do the actual search for services. Return using the callBack parameter.
@@ -25,19 +25,16 @@ public class CDKServiceProvider implements ServiceDescriptionProvider {
 		// callBack.status("Resolving example services");
 		try {
 			List<ServiceDescription> results = new ArrayList<ServiceDescription>();
-			List<Class> classes = CDKClassGrabber.getClassessOfSuperclass("org.openscience.cdk.applications.taverna",
-					AbstractCDKActivity.class);
 			// Register activities
-			for (Class<? extends AbstractCDKActivity> activityClass : classes) {
-				AbstractCDKActivity activity = activityClass.newInstance();
-				service = new CDKServiceDescriptor(activityClass);
-				service.setActivityName(activity.getActivityName());
-				service.setFolderName(activity.getFolderName());
+			for (AbstractCDKActivity cdkActivity : cdkActivityRegistry.getInstances()) {
+				service = new CDKServiceDescriptor(cdkActivity.getClass());
+				service.setActivityName(cdkActivity.getActivityName());
+				service.setFolderName(cdkActivity.getFolderName());
 				// TODO set description
-				service.setDescription(activity.getDescription());
-				service.setConfigurationPanelClass(CDKClassGrabber.getClassByName("org.openscience.cdk.applications.taverna",
-						activity.getConfigurationPanelClass()));
-				service.setAdditionalProperties(activity.getAdditionalProperties());
+				service.setDescription(cdkActivity.getDescription());
+				// service.setConfigurationPanelClass(CDKClassGrabber.getClassByName("org.openscience.cdk.applications.taverna",
+				// activity.getConfigurationPanelClass()));
+				service.setAdditionalProperties(cdkActivity.getAdditionalProperties());
 				results.add(service);
 			}
 			// partialResults() can also be called several times from inside
