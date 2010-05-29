@@ -35,6 +35,7 @@ import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.applications.taverna.io.MDLMolFileReaderActivity;
 import org.openscience.cdk.io.MDLRXNReader;
 
@@ -44,7 +45,7 @@ import org.openscience.cdk.io.MDLRXNReader;
  * @author Andreas Truzskowski
  * 
  */
-public class MDLRXNFileReaderActivity extends AbstractCDKActivity {
+public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFileReader {
 
 	public static final String RXN_FILE_READER_ACTIVITY = "RXN file reader";
 	public static final String RESULT_PORT = "RXN file Port String";
@@ -92,11 +93,6 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity {
 		properties.put(Constants.PROPERTY_FILE_EXTENSION, ".rxn");
 		properties.put(Constants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL RXN file");
 		return properties;
-	}
-
-	@Override
-	public String getConfigurationPanelClass() {
-		return "MDLFileReaderConfigurationPanel";
 	}
 
 	@Override

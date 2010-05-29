@@ -32,8 +32,6 @@ public class CDKServiceProvider implements ServiceDescriptionProvider {
 				service.setFolderName(cdkActivity.getFolderName());
 				// TODO set description
 				service.setDescription(cdkActivity.getDescription());
-				// service.setConfigurationPanelClass(CDKClassGrabber.getClassByName("org.openscience.cdk.applications.taverna",
-				// activity.getConfigurationPanelClass()));
 				service.setAdditionalProperties(cdkActivity.getAdditionalProperties());
 				results.add(service);
 			}

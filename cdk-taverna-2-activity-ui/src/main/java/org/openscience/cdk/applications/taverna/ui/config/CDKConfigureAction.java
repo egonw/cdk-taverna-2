@@ -13,9 +13,11 @@ import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 @SuppressWarnings("serial")
 public class CDKConfigureAction extends ActivityConfigurationAction<AbstractCDKActivity, CDKActivityConfigurationBean> {
 
-	public CDKConfigureAction(AbstractCDKActivity activity, Frame owner) {
-		super(activity);
+	private ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> configurationPanel = null;
 
+	public CDKConfigureAction(AbstractCDKActivity activity, Frame owner, ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> configurationPanel) {
+		super(activity);
+		this.configurationPanel = configurationPanel;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -26,18 +28,9 @@ public class CDKConfigureAction extends ActivityConfigurationAction<AbstractCDKA
 			currentDialog.toFront();
 			return;
 		}
-		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> panel;
-		try {
-			panel = (ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean>) getActivity()
-					.getConfiguration().getConfigurationPanelClass().getConstructor(AbstractCDKActivity.class).newInstance(
-							getActivity());
-			ActivityConfigurationDialog<AbstractCDKActivity, CDKActivityConfigurationBean> dialog = new ActivityConfigurationDialog<AbstractCDKActivity, CDKActivityConfigurationBean>(
-					getActivity(), panel);
-			ActivityConfigurationAction.setDialog(getActivity(), dialog);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-
+		ActivityConfigurationDialog<AbstractCDKActivity, CDKActivityConfigurationBean> dialog = new ActivityConfigurationDialog<AbstractCDKActivity, CDKActivityConfigurationBean>(
+				getActivity(), this.configurationPanel);
+		ActivityConfigurationAction.setDialog(getActivity(), dialog);
 	}
 
 }

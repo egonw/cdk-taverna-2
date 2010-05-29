@@ -126,11 +126,6 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 	}
 
 	@Override
-	public String getConfigurationPanelClass() {
-		return "ReactionEnumeratorConfigurationPanel";
-	}
-
-	@Override
 	public String getDescription() {
 		return "Description: " + ReactionEnumeratorActivity.REACTION_ENUMERATOR_ACTIVITY;
 	}

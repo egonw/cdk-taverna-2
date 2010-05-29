@@ -44,9 +44,10 @@ import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 
-public class MDLSDFileReaderActivity extends AbstractCDKActivity{
+public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFileReader{
 
 	public static final String SD_FILE_READER_ACTIVITY = "SDfile reader";
 	public static final String RESULT_PORT = "SDfile Port String";
@@ -104,11 +105,6 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity{
 		properties.put(Constants.PROPERTY_FILE_EXTENSION, ".sdf");
 		properties.put(Constants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL SDFile");
 		return properties;
-	}
-
-	@Override
-	public String getConfigurationPanelClass() {
-		return "MDLFileReaderConfigurationPanel";
 	}
 
 	@Override

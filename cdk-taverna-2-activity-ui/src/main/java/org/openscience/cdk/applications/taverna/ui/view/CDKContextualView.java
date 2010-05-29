@@ -8,6 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.taverna.t2.workbench.ui.views.contextualviews.ContextualView;
+import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityConfigurationPanel;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
@@ -28,15 +29,15 @@ public class CDKContextualView extends ContextualView {
 	@Override
 	public JComponent getMainFrame() {
 		JPanel jPanel = new JPanel();
-		jPanel.add(description);
-		jPanel.add(info);
+		jPanel.add(this.description);
+		jPanel.add(this.info);
 		refreshView();
 		return jPanel;
 	}
 
 	@Override
 	public String getViewTitle() {
-		CDKActivityConfigurationBean configuration = activity.getConfiguration();
+		CDKActivityConfigurationBean configuration = this.activity.getConfiguration();
 		return Constants.CDK_TAVERNA_FOLDER_NAME + " - " + configuration.getActivityName();
 	}
 
@@ -45,8 +46,8 @@ public class CDKContextualView extends ContextualView {
 	 */
 	@Override
 	public void refreshView() {
-		CDKActivityConfigurationBean configuration = activity.getConfiguration();
-		description.setText(Constants.CDK_TAVERNA_FOLDER_NAME + " " + configuration.getFolderName() + " - " + configuration.getActivityName());
+		CDKActivityConfigurationBean configuration = this.activity.getConfiguration();
+		description.setText(Constants.CDK_TAVERNA_FOLDER_NAME + " - " + configuration.getFolderName() + " - " + configuration.getActivityName());
 	}
 
 	/**
@@ -60,7 +61,8 @@ public class CDKContextualView extends ContextualView {
 
 	@Override
 	public Action getConfigureAction(final Frame owner) {
-		return new CDKConfigureAction(activity, owner);
+		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> configurationPanel = CDKConfigurationPanelFactory.getConfigurationPanel(this.activity);
+		return new CDKConfigureAction(activity, owner, configurationPanel);
 	}
 
 }

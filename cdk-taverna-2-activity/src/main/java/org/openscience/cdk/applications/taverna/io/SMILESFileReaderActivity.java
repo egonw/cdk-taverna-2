@@ -38,6 +38,7 @@ import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.io.SMILESReader;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
@@ -48,7 +49,7 @@ import org.openscience.cdk.layout.StructureDiagramGenerator;
  * @author Andreas Truzskowski
  * 
  */
-public class SMILESFileReaderActivity extends AbstractCDKActivity{
+public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFileReader{
 
 	public static final String SMILES_FILE_READER_ACTIVITY = "SMILES file reader";
 	public static final String RESULT_PORT = "SDfile Port String";
@@ -107,11 +108,6 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity{
 		properties.put(Constants.PROPERTY_FILE_EXTENSION, "");
 		properties.put(Constants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "Any SMILES file");
 		return properties;
-	}
-
-	@Override
-	public String getConfigurationPanelClass() {
-		return "MDLFileReaderConfigurationPanel";
 	}
 
 	@Override

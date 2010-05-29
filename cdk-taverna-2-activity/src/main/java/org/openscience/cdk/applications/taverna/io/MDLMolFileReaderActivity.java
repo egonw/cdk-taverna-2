@@ -36,6 +36,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLReader;
 
 /**
@@ -44,7 +45,7 @@ import org.openscience.cdk.io.MDLReader;
  * @author Andreas Truzskowski
  * 
  */
-public class MDLMolFileReaderActivity extends AbstractCDKActivity{
+public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFileReader{
 	
 	public static final String MOL_FILE_READER_ACTIVITY = "Molfile reader";
 	public static final String RESULT_PORT = "Molfile Port String";
@@ -92,11 +93,6 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity{
 		properties.put(Constants.PROPERTY_FILE_EXTENSION, ".mol");
 		properties.put(Constants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL Molfile");
 		return properties;
-	}
-
-	@Override
-	public String getConfigurationPanelClass() {
-		return "MDLFileReaderConfigurationPanel";
 	}
 
 	@Override

@@ -39,6 +39,8 @@ import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
+import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
+import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
 import org.openscience.cdk.applications.taverna.io.MDLMolFileReaderActivity;
 import org.openscience.cdk.io.MDLWriter;
 
@@ -48,7 +50,7 @@ import org.openscience.cdk.io.MDLWriter;
  * @author Andreas Truzskowski
  * 
  */
-public class MDLMolFileWriterActivity extends AbstractCDKActivity {
+public class MDLMolFileWriterActivity extends AbstractCDKActivity  implements IFileWriter{
 
 	public static final String MOL_FILE_WRITER_ACTIVITY = "Molfile writer";
 	public static final String INPUT_PORT = "Molfile Port String";
@@ -105,11 +107,6 @@ public class MDLMolFileWriterActivity extends AbstractCDKActivity {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
 		properties.put(Constants.PROPERTY_FILE_EXTENSION, ".mol");
 		return properties;
-	}
-
-	@Override
-	public String getConfigurationPanelClass() {
-		return "MDLFileWriterConfigurationPanel";
 	}
 
 	@Override

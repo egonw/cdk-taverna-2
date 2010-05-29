@@ -121,8 +121,6 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 
 	public abstract String getDescription();
 
-	public abstract String getConfigurationPanelClass();
-
 	public abstract HashMap<String, Object> getAdditionalProperties();
 
 }

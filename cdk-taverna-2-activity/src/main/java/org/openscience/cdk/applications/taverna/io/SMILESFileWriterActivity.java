@@ -39,6 +39,7 @@ import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
+import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
 import org.openscience.cdk.io.SMILESWriter;
 
 /**
@@ -47,7 +48,7 @@ import org.openscience.cdk.io.SMILESWriter;
  * @author Andreas Truzskowski
  * 
  */
-public class SMILESFileWriterActivity extends AbstractCDKActivity{
+public class SMILESFileWriterActivity extends AbstractCDKActivity implements IFileWriter{
 
 	public static final String SMILES_FILE_WRITER_ACTIVITY = "SMILES file writer";
 	public static final String INPUT_PORT = "Structures";
@@ -98,11 +99,6 @@ public class SMILESFileWriterActivity extends AbstractCDKActivity{
 		HashMap<String, Object> properties = new HashMap<String, Object>();
 		properties.put(Constants.PROPERTY_FILE_EXTENSION, ".smiles");
 		return properties;
-	}
-
-	@Override
-	public String getConfigurationPanelClass() {
-		return "MDLFileWriterConfigurationPanel";
 	}
 
 	@Override

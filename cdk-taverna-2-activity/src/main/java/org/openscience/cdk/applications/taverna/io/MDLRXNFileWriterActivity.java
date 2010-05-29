@@ -38,6 +38,7 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
+import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
 import org.openscience.cdk.io.MDLRXNWriter;
 
 /**
@@ -46,7 +47,7 @@ import org.openscience.cdk.io.MDLRXNWriter;
  * @author Andreas Truzskowski
  * 
  */
-public class MDLRXNFileWriterActivity extends AbstractCDKActivity{
+public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFileWriter{
 
 	public static final String RXN_FILE_WRITER_ACTIVITY = "RXN file writer";
 	public static final String INPUT_PORT = "RXN file Port String";
@@ -99,11 +100,6 @@ public class MDLRXNFileWriterActivity extends AbstractCDKActivity{
 		HashMap<String, Object> properties = new HashMap<String, Object>();
 		properties.put(Constants.PROPERTY_FILE_EXTENSION, ".rxn");
 		return properties;
-	}
-
-	@Override
-	public String getConfigurationPanelClass() {
-		return "MDLFileWriterConfigurationPanel";
 	}
 
 	@Override
