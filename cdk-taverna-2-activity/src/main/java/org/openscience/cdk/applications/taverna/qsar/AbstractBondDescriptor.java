@@ -24,19 +24,23 @@ import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 public abstract class AbstractBondDescriptor extends AbstractCDKActivity {
 
-	private static final String INPUT_PORT = "Structures";
-	private static final String[] RESULT_PORTS = { "Calculated Structures", "NOT Calculated Structures" };
 	private IBondDescriptor descriptor;
 
+	public AbstractBondDescriptor() {
+		super();
+		this.INPUT_PORTS = new String[] { "Structures" };
+		this.RESULT_PORTS = new String[] { "Calculated Structures", "NOT Calculated Structures" };
+	}
+	
 	@Override
 	protected void addInputPorts() {
-		addInput(AbstractBondDescriptor.INPUT_PORT, 1, true, null, byte[].class);
+		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
 	}
 
 	@Override
 	protected void addOutputPorts() {
-		for (String name : AbstractBondDescriptor.RESULT_PORTS) {
-			addOutput(name, 0);
+		for (String name : this.RESULT_PORTS) {
+			addOutput(name, 1);
 		}
 	}
 
@@ -71,7 +75,7 @@ public abstract class AbstractBondDescriptor extends AbstractCDKActivity {
 		List<CMLChemFile> inputList = new ArrayList<CMLChemFile>();
 		List<CMLChemFile> calculatedList = new ArrayList<CMLChemFile>();
 		List<CMLChemFile> notCalculatedList = new ArrayList<CMLChemFile>();
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(INPUT_PORT), byte[].class, context);
+		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class, context);
 		for (byte[] data : dataArray) {
 			Object obj;
 			try {
@@ -123,7 +127,7 @@ public abstract class AbstractBondDescriptor extends AbstractCDKActivity {
 				}
 			}
 			T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
-			outputs.put(AbstractBondDescriptor.RESULT_PORTS[0], containerRef);
+			outputs.put(this.RESULT_PORTS[0], containerRef);
 			dataArray = new ArrayList<byte[]>();
 			if (!notCalculatedList.isEmpty()) {
 				for (CMLChemFile c : notCalculatedList) {
@@ -131,7 +135,7 @@ public abstract class AbstractBondDescriptor extends AbstractCDKActivity {
 				}
 			}
 			containerRef = referenceService.register(dataArray, 1, true, context);
-			outputs.put(AbstractBondDescriptor.RESULT_PORTS[1], containerRef);
+			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
 			e.printStackTrace();
 			// TODO exception handling

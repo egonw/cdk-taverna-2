@@ -43,6 +43,9 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<CDKActivityConfigurationBean> implements
 		AsynchronousActivity<CDKActivityConfigurationBean> {
 
+	protected String[] INPUT_PORTS;
+	protected String[] RESULT_PORTS;
+	
 	private CDKActivityConfigurationBean configBean;
 
 	public AbstractCDKActivity() {
@@ -122,5 +125,13 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 	public abstract String getDescription();
 
 	public abstract HashMap<String, Object> getAdditionalProperties();
+
+	public String[] getINPUT_PORTS() {
+		return INPUT_PORTS;
+	}
+
+	public String[] getRESULT_PORTS() {
+		return RESULT_PORTS;
+	}
 
 }

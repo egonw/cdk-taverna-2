@@ -50,11 +50,14 @@ import org.openscience.cdk.io.SDFWriter;
 public class MDLSDFileWriterActivity extends AbstractCDKActivity implements IFileWriter{
 
 	public static final String SD_FILE_WRITER_ACTIVITY = "SDfile writer";
-	public static final String INPUT_PORT = "SDfile Port String";
 
+	public MDLSDFileWriterActivity() {
+		this.INPUT_PORTS = new String[] { "Structures" };
+	}
+	
 	@Override
 	protected void addInputPorts() {
-		addInput(INPUT_PORT, 1, true, null, byte[].class);
+		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
 	}
 
 	@Override
@@ -68,7 +71,7 @@ public class MDLSDFileWriterActivity extends AbstractCDKActivity implements IFil
 		ReferenceService referenceService = context.getReferenceService();
 		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
 		try {
-			List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(INPUT_PORT), byte[].class,
+			List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
 					context);
 			for (byte[] data : dataArray) {
 				chemFileList.add((CMLChemFile) CDKObjectHandler.getObject(data));

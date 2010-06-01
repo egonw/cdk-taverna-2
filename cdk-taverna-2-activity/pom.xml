@@ -11,6 +11,11 @@
 	<name>CDK-Taverna 2 activity</name>
 
 	<dependencies>
+	<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.0.4</version>
+		</dependency>
 		<dependency>
 			<groupId>net.sf.taverna.t2.core</groupId>
 			<artifactId>workflowmodel-api</artifactId>

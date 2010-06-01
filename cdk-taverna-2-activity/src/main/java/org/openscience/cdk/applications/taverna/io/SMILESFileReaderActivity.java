@@ -49,10 +49,13 @@ import org.openscience.cdk.layout.StructureDiagramGenerator;
  * @author Andreas Truzskowski
  * 
  */
-public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFileReader{
+public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFileReader {
 
 	public static final String SMILES_FILE_READER_ACTIVITY = "SMILES file reader";
-	public static final String RESULT_PORT = "SDfile Port String";
+
+	public SMILESFileReaderActivity() {
+		this.RESULT_PORTS = new String[] { "Structures" };
+	}
 
 	@Override
 	protected void addInputPorts() {
@@ -61,7 +64,7 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(RESULT_PORT, 1);
+		addOutput(this.RESULT_PORTS[0], 1);
 	}
 
 	@Override
@@ -88,7 +91,7 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 				dataArray.add(CDKObjectHandler.getBytes(cmlChemFile));
 			}
 			T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
-			outputs.put(RESULT_PORT, containerRef);
+			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -96,7 +99,7 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 		// Return results
 		return outputs;
 	}
-	
+
 	@Override
 	public String getActivityName() {
 		return SMILESFileReaderActivity.SMILES_FILE_READER_ACTIVITY;

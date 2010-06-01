@@ -47,13 +47,12 @@ import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrappe
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 
-public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFileReader{
+public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFileReader {
 
 	public static final String SD_FILE_READER_ACTIVITY = "SDfile reader";
-	public static final String RESULT_PORT = "SDfile Port String";
 
 	public MDLSDFileReaderActivity() {
-		// empty
+		this.RESULT_PORTS = new String[] { "Structures" };
 	}
 
 	@Override
@@ -63,7 +62,7 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(RESULT_PORT, 1);
+		addOutput(this.RESULT_PORTS[0], 1);
 	}
 
 	@Override
@@ -85,7 +84,7 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 				dataList.add(CDKObjectHandler.getBytes(c));
 			}
 			T2Reference containerRef = referenceService.register(dataList, 1, true, context);
-			outputs.put(RESULT_PORT, containerRef);
+			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -93,7 +92,7 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 		// Return results
 		return outputs;
 	}
-	
+
 	@Override
 	public String getActivityName() {
 		return MDLSDFileReaderActivity.SD_FILE_READER_ACTIVITY;

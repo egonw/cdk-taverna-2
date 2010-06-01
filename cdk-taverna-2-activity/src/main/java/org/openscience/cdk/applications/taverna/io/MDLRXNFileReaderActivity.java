@@ -48,7 +48,10 @@ import org.openscience.cdk.io.MDLRXNReader;
 public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFileReader {
 
 	public static final String RXN_FILE_READER_ACTIVITY = "RXN file reader";
-	public static final String RESULT_PORT = "RXN file Port String";
+
+	public MDLRXNFileReaderActivity() {
+		this.RESULT_PORTS = new String[] { "Reactions" };
+	}
 
 	@Override
 	protected void addInputPorts() {
@@ -57,7 +60,7 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFi
 
 	@Override
 	protected void addOutputPorts() {
-		this.addOutput(MDLRXNFileReaderActivity.RESULT_PORT, 0);
+		this.addOutput(this.RESULT_PORTS[0], 0);
 	}
 
 	@Override
@@ -73,7 +76,7 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFi
 			reaction = (Reaction) reader.read(reaction);
 			// Congfigure output
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytes(reaction), 0, true, context);
-			outputs.put(RESULT_PORT, containerRef);
+			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

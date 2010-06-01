@@ -30,59 +30,87 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.embl.ebi.escience.baclava.DataThing;
-import org.openscience.cdk.applications.taverna.CDKTavernaConfig;
+import net.sf.taverna.t2.invocation.InvocationContext;
+import net.sf.taverna.t2.reference.ReferenceService;
+import net.sf.taverna.t2.reference.T2Reference;
+import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+
+import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
-import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
-import org.openscience.cdk.applications.taverna.scuflworkers.cdk.CDKLocalWorker;
+import org.openscience.cdk.applications.taverna.Constants;
+import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.qsar.descriptors.molecular.RuleOfFiveDescriptor;
 import org.openscience.cdk.qsar.result.IDescriptorResult;
 import org.openscience.cdk.qsar.result.IntegerResult;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
-import uk.ac.soton.itinnovation.taverna.enactor.entities.TaskExecutionException;
-
-public class RuleOfFiveFilter implements CDKLocalWorker {
+public class RuleOfFiveFilter extends AbstractCDKActivity {
 
 	private static RuleOfFiveDescriptor descriptor;
-	private String descriptorName = "RuleOfFive_Filter";
-	private String[] inputNames  = new String[] { "inputStructures" };
-	private String[] outputNames = new String[] { "matchingStructures", "otherStructures", "Comment" };
 
-	// Region: input and output definition
-
-	public String[] inputNames() {
-		return inputNames;
-	}
-	public String[] inputTypes() {
-		return new String[] {CDKLocalWorker.CMLChemFileList};
+	public RuleOfFiveFilter() {
+		this.INPUT_PORTS = new String[] { "Structures" };
+		this.RESULT_PORTS = new String[] { "matchingStructures", "otherStructures" };
 	}
 
-	public String[] outputNames() {
-		return outputNames;
-	}
-	public String[] outputTypes() {
-		return new String[] {CDKLocalWorker.CMLChemFileList, CDKLocalWorker.CMLChemFileList, CDKLocalWorker.STRING_ARRAY};
+	@Override
+	protected void addInputPorts() {
+		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
 	}
 
-	// End of region
+	@Override
+	protected void addOutputPorts() {
+		for (String name : this.RESULT_PORTS) {
+			addOutput(name, 1);
+		}
+	}
 
-	// Region: local worker execution
+	@Override
+	public String getActivityName() {
+		return this.getClass().getSimpleName();
+	}
+
+	@Override
+	public String getDescription() {
+		return "Descriptions: " + this.getClass().getSimpleName();
+	}
+
+	@Override
+	public HashMap<String, Object> getAdditionalProperties() {
+		return new HashMap<String, Object>();
+	}
+
+	@Override
+	public String getFolderName() {
+		return Constants.QSAR_ATOMIC_DESCRIPTOR_FOLDER_NAME;
+	}
+
 	@SuppressWarnings("unchecked")
-	public Map<String, DataThing> execute(Map<String, DataThing> inputs) throws TaskExecutionException {
-		FileNameGenerator fileNameGenerator = new FileNameGenerator();
-		List<CMLChemFile> inputList = null;
+	protected Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
+			throws CDKTavernaException {
+		InvocationContext context = callback.getContext();
+		ReferenceService referenceService = context.getReferenceService();
+		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
+		List<CMLChemFile> inputList = new ArrayList<CMLChemFile>();
 		List<CMLChemFile> matchedList = new ArrayList<CMLChemFile>();
 		List<CMLChemFile> unmatchedList = new ArrayList<CMLChemFile>();
-		List<String> comment = new ArrayList<String>();
-		String fileNameCalculated = descriptorName + "_Matched";
-		String fileNameNotCalculated = descriptorName + "_NOT_Matched";;
-		if (inputs.get(inputNames[0]) != null) {
-			inputList = CMLChemFileWrapper.getListOfCMLChemfileFromDataThing(inputs.get(inputNames[0]));
-		} else {
-			return null;
+		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
+				context);
+		for (byte[] data : dataArray) {
+			Object obj;
+			try {
+				obj = CDKObjectHandler.getObject(data);
+			} catch (Exception e) {
+				throw new CDKTavernaException(this.getConfiguration().getActivityName(), "Error while deserializing object");
+			}
+			if (obj instanceof CMLChemFile) {
+				inputList.add((CMLChemFile) obj);
+			} else {
+				throw new CDKTavernaException(this.getConfiguration().getActivityName(),
+						CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+			}
 		}
 		if (descriptor == null) {
 			descriptor = new RuleOfFiveDescriptor();
@@ -92,49 +120,70 @@ public class RuleOfFiveFilter implements CDKLocalWorker {
 				List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(file);
 				for (IAtomContainer molecules : moleculeList) {
 					try {
-						IDescriptorResult result = descriptor.calculate(
-								molecules).getValue();
-						if (result instanceof IntegerResult 
-								&& ((IntegerResult) result).intValue() == 0) {
-							file.setProperty(FileNameGenerator.FILENAME, fileNameGenerator.addFileNameToFileNameList(fileNameCalculated, (List<String>)file.getProperty(FileNameGenerator.FILENAME)));
+						IDescriptorResult result = descriptor.calculate(molecules).getValue();
+						if (result instanceof IntegerResult && ((IntegerResult) result).intValue() == 0) {
+							// file.setProperty(FileNameGenerator.FILENAME,
+							// fileNameGenerator.addFileNameToFileNameList(fileNameCalculated,
+							// (List<String>)file.getProperty(FileNameGenerator.FILENAME)));
 							matchedList.add(file);
-							comment.add("Matched Rule of Five;");
+							// comment.add("Matched Rule of Five;");
 							break;
-						}
-						else { 
-							file.setProperty(FileNameGenerator.FILENAME, fileNameGenerator.addFileNameToFileNameList(fileNameNotCalculated, (List<String>)file.getProperty(FileNameGenerator.FILENAME)));
+						} else {
+							// file.setProperty(FileNameGenerator.FILENAME,
+							// fileNameGenerator.addFileNameToFileNameList(fileNameNotCalculated,
+							// (List<String>)file.getProperty(FileNameGenerator.FILENAME)));
 							unmatchedList.add(file);
-							if(result instanceof IntegerResult) {
-								comment.add("NOT Matched Rule of Five within: " + String.valueOf(((IntegerResult) result).intValue()) + " rules");
-							} else {
-								comment.add("NOT Matched Rule of Five!");
-							}
+							// if(result instanceof IntegerResult) {
+							// comment.add("NOT Matched Rule of Five within: " + String.valueOf(((IntegerResult)
+							// result).intValue()) + " rules");
+							// } else {
+							// comment.add("NOT Matched Rule of Five!");
+							// }
 							break;
 						}
 					} catch (Exception e) {
-						file.setProperty(FileNameGenerator.FILENAME, fileNameGenerator.addFileNameToFileNameList(fileNameNotCalculated, (List<String>)file.getProperty(FileNameGenerator.FILENAME)));
+						// file.setProperty(FileNameGenerator.FILENAME,
+						// fileNameGenerator.addFileNameToFileNameList(fileNameNotCalculated,
+						// (List<String>)file.getProperty(FileNameGenerator.FILENAME)));
 						unmatchedList.add(file);
-						String molID = "";
-						if (file.getProperty(CDKTavernaConfig.DATABASEID) != null) {
-							molID += file.getProperty(CDKTavernaConfig.DATABASEID).toString() + " ;";
-						}
-						if (file.getProperty(CDKTavernaConfig.MOLECULEID) != null) {
-							molID += file.getProperty(CDKTavernaConfig.MOLECULEID) + " ;";
-						}
-						comment.add(molID + "Error, calculation of the Descriptor for this molecule caused an error!" + e);
+						// String molID = "";
+						// if (file.getProperty(CDKTavernaConfig.DATABASEID) != null) {
+						// molID += file.getProperty(CDKTavernaConfig.DATABASEID).toString() + " ;";
+						// }
+						// if (file.getProperty(CDKTavernaConfig.MOLECULEID) != null) {
+						// molID += file.getProperty(CDKTavernaConfig.MOLECULEID) + " ;";
+						// }
+						// comment.add(molID + "Error, calculation of the Descriptor for this molecule caused an error!" + e);
 					}
-					
-					
-				}	
+
+				}
 			}
 		} catch (Exception exception) {
-			throw new TaskExecutionException(exception);
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), exception.getMessage());
 		}
-		Map<String, DataThing> outputs = new HashMap<String, DataThing>();
-		outputs.put(outputNames[0], new DataThing(matchedList));
-		outputs.put(outputNames[1], new DataThing(unmatchedList));
-		outputs.put(outputNames[2], new DataThing(comment));
+		// Congfigure output
+		try {
+			dataArray = new ArrayList<byte[]>();
+			if (!matchedList.isEmpty()) {
+				for (CMLChemFile c : matchedList) {
+					dataArray.add(CDKObjectHandler.getBytes(c));
+				}
+			}
+			T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
+			outputs.put(this.RESULT_PORTS[0], containerRef);
+			dataArray = new ArrayList<byte[]>();
+			if (!unmatchedList.isEmpty()) {
+				for (CMLChemFile c : unmatchedList) {
+					dataArray.add(CDKObjectHandler.getBytes(c));
+				}
+			}
+			containerRef = referenceService.register(dataArray, 1, true, context);
+			outputs.put(this.RESULT_PORTS[1], containerRef);
+		} catch (Exception e) {
+			e.printStackTrace();
+			// TODO exception handling
+		}
 		return outputs;
 	}
-	// End of region
+
 }

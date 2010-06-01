@@ -50,11 +50,14 @@ import org.openscience.cdk.io.MDLRXNWriter;
 public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFileWriter{
 
 	public static final String RXN_FILE_WRITER_ACTIVITY = "RXN file writer";
-	public static final String INPUT_PORT = "RXN file Port String";
 
+	public MDLRXNFileWriterActivity() {
+		this.INPUT_PORTS = new String[] { "Reactions" };
+	}
+	
 	@Override
 	protected void addInputPorts() {
-		addInput(INPUT_PORT, 1, true, null, byte[].class);
+		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
 	}
 
 	@Override
@@ -68,7 +71,7 @@ public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFi
 		ReferenceService referenceService = context.getReferenceService();
 		List<Reaction> reactionList = new ArrayList<Reaction>();
 		try {
-			List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(INPUT_PORT), byte[].class,
+			List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
 					context);
 			for (byte[] data : dataArray) {
 				reactionList.add((Reaction) CDKObjectHandler.getObject(data));

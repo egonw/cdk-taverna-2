@@ -53,11 +53,14 @@ import org.openscience.cdk.io.MDLWriter;
 public class MDLMolFileWriterActivity extends AbstractCDKActivity  implements IFileWriter{
 
 	public static final String MOL_FILE_WRITER_ACTIVITY = "Molfile writer";
-	public static final String INPUT_PORT = "Molfile Port String";
 
+	public MDLMolFileWriterActivity() {
+		this.INPUT_PORTS = new String[] { "Structures" };
+	}
+	
 	@Override
 	protected void addInputPorts() {
-		addInput(INPUT_PORT, 1, true, null, byte[].class);
+		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
 	}
 
 	@Override
@@ -71,7 +74,7 @@ public class MDLMolFileWriterActivity extends AbstractCDKActivity  implements IF
 		ReferenceService referenceService = context.getReferenceService();
 		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
 		try {
-			List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(INPUT_PORT), byte[].class,
+			List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
 					context);
 			for (byte[] data : dataArray) {
 				Object obj = CDKObjectHandler.getObject(data);

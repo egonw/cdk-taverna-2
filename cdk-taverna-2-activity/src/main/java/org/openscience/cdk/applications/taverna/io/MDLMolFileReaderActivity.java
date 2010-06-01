@@ -48,8 +48,11 @@ import org.openscience.cdk.io.MDLReader;
 public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFileReader{
 	
 	public static final String MOL_FILE_READER_ACTIVITY = "Molfile reader";
-	public static final String RESULT_PORT = "Molfile Port String";
 
+	public MDLMolFileReaderActivity() {
+		this.RESULT_PORTS = new String[] { "Structure" };
+	}
+	
 	@Override
 	protected void addInputPorts() {
 		// Nothing to add
@@ -57,7 +60,7 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFi
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(RESULT_PORT, 0);
+		addOutput(this.RESULT_PORTS[0], 0);
 	}
 
 	@Override
@@ -73,7 +76,7 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFi
 			reader.read(cmlChemFile);
 			// Congfigure output
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytes(cmlChemFile), 0, true, context);
-			outputs.put(RESULT_PORT, containerRef);
+			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
