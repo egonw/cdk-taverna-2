@@ -33,6 +33,11 @@
 			<version>1.3.2.git</version>
 		</dependency>
 		<dependency>
+			<groupId>org.openscience.cdk</groupId>
+			<artifactId>jchempaint</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+		<dependency>
 			<groupId>org.openscience.reactionenumerator</groupId>
 			<artifactId>reactionenumerator</artifactId>
 			<version>1.0</version>

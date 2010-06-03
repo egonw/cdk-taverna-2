@@ -83,3 +83,5 @@ org.openscience.cdk.applications.taverna.qsar.descriptors.molecular.XLogP
 org.openscience.cdk.applications.taverna.qsar.descriptors.molecular.ZagrebIndex
 org.openscience.cdk.applications.taverna.qsar.descriptors.protein.TaeAminoAcid
 org.openscience.cdk.applications.taverna.reactionenumerator.ReactionEnumeratorActivity
+org.openscience.cdk.applications.taverna.renderer.WriteMoleculeAsPNGActivity
+org.openscience.cdk.applications.taverna.renderer.WriteMoleculeAsJPGActivity
