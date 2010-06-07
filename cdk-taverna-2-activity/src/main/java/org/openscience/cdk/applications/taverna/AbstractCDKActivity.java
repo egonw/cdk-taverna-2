@@ -21,13 +21,18 @@
  */
 package org.openscience.cdk.applications.taverna;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JOptionPane;
 
+import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.exception.CDKException;
 
+import net.sf.taverna.t2.invocation.InvocationContext;
+import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
@@ -45,6 +50,9 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 
 	protected String[] INPUT_PORTS;
 	protected String[] RESULT_PORTS;
+	protected static final String COMMENT_PORT = "Comment";
+	
+	protected List<String> comment = new ArrayList<String>();
 	
 	private CDKActivityConfigurationBean configBean;
 
@@ -73,6 +81,8 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 		removeOutputs();
 		this.addInputPorts();
 		this.addOutputPorts();
+		// Add always comment port
+		this.addOutput(AbstractCDKActivity.COMMENT_PORT, 1);
 	}
 
 	/**
@@ -93,14 +103,20 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 
 			public void run() {
 				// Do work
-				Map<String, T2Reference> outputs;
+				Map<String, T2Reference> outputs = null;
+				InvocationContext context = callback.getContext();
+				ReferenceService referenceService = context.getReferenceService();
 				try {
 					outputs = AbstractCDKActivity.this.work(inputs, callback);
 				} catch (CDKTavernaException e) {
 					e.printStackTrace();
-					JOptionPane.showMessageDialog(null, e.getMessage());
+					comment.add(e.getMessage());
 					callback.fail(e.getMessage());
-					return;
+					if(outputs == null) {
+						outputs = new HashMap<String, T2Reference>();
+					}
+					T2Reference containerRef = referenceService.register(AbstractCDKActivity.this.comment, 1, true, context);
+					outputs.put(AbstractCDKActivity.COMMENT_PORT, containerRef);
 				}
 				// return map of output data, with empty index array as this is
 				// the only and final result (this index parameter is used if
@@ -110,7 +126,7 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 		});
 	}
 
-	protected abstract Map<String, T2Reference> work(final Map<String, T2Reference> inputs,
+	public abstract Map<String, T2Reference> work(final Map<String, T2Reference> inputs,
 			final AsynchronousActivityCallback callback) throws CDKTavernaException;
 
 	@Override

@@ -64,7 +64,7 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFi
 	}
 
 	@Override
-	protected Map<String, T2Reference> work(final Map<String, T2Reference> inputs, final AsynchronousActivityCallback callback) throws CDKTavernaException {
+	public Map<String, T2Reference> work(final Map<String, T2Reference> inputs, final AsynchronousActivityCallback callback) throws CDKTavernaException {
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();

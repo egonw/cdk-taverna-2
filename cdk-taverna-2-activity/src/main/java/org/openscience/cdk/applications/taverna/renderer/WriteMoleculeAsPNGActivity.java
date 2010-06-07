@@ -70,7 +70,7 @@ public class WriteMoleculeAsPNGActivity extends AbstractCDKActivity implements I
 
 
 	@Override
-	protected Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
+	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();

@@ -202,6 +202,7 @@ public class CDKTavernaTestData {
 			}
 			pathToWriteInUnitTestFiles = pathToWriteInUnitTestFiles + File.separator + "original_Data.txt";
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new Exception("Test data could not be created: " + e);
 		}
 	}

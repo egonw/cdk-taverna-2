@@ -66,7 +66,7 @@ public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFi
 	}
 
 	@Override
-	protected Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback) {
+	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback) {
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<Reaction> reactionList = new ArrayList<Reaction>();

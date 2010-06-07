@@ -111,6 +111,7 @@ public class CDKIOReader {
 		CMLChemFile[] result = new CMLChemFile[numberOfChemModels];
 		for (int i = 0; i < cmlChemFile.getChemSequenceCount(); i++) {
 			IChemSequence sequence = cmlChemFile.getChemSequence(i);
+			result[chemModelNumber] = new CMLChemFile();
 			result[chemModelNumber].addChemSequence(sequence);
 			// result[chemModelNumber].setProperty(FileNameGenerator.FILENAME, fileNameGenerator.getNewFileNameList());
 			chemModelNumber++;

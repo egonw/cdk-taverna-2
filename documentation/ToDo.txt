@@ -1,0 +1,4 @@
+07.06.2010:
+- Add RuleOfFive filter to QSARDescriptorActivity
+- Check RuleOfFive filter test failure 
+- Add missing unit tests

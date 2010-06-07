@@ -6,10 +6,14 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
+import org.openscience.cdk.applications.taverna.jchempaint.JChemPaintActivity;
+import org.openscience.cdk.applications.taverna.qsar.QSARDescriptorActivity;
 import org.openscience.cdk.applications.taverna.reactionenumerator.ReactionEnumeratorActivity;
 import org.openscience.cdk.applications.taverna.ui.EmptyConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.io.MDLFileReaderConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.io.MDLFileWriterConfigurationPanel;
+import org.openscience.cdk.applications.taverna.ui.jchempaint.JChemPaintConfigurationPanel;
+import org.openscience.cdk.applications.taverna.ui.qsar.QSARDescriptorConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.reactionenumerator.ReactionEnumeratorConfigurationPanel;
 
 public class CDKConfigurationPanelFactory {
@@ -22,6 +26,10 @@ public class CDKConfigurationPanelFactory {
 			return new MDLFileWriterConfigurationPanel(activity);
 		} else if (activity instanceof ReactionEnumeratorActivity) {
 			return new ReactionEnumeratorConfigurationPanel(activity);
+		} else if (activity instanceof JChemPaintActivity) {
+			return new JChemPaintConfigurationPanel(activity);
+		} else if (activity instanceof QSARDescriptorActivity) {
+			return new QSARDescriptorConfigurationPanel(activity);
 		}
 		return new EmptyConfigurationPanel();
 	}

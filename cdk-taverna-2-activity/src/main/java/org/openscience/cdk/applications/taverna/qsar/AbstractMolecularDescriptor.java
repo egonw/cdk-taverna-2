@@ -65,12 +65,12 @@ public abstract class AbstractMolecularDescriptor extends AbstractCDKActivity {
 	}
 	
 	@Override
-	protected Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
+	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		List<CMLChemFile> inputList = null;
+		List<CMLChemFile> inputList = new ArrayList<CMLChemFile>();
 		List<CMLChemFile> calculatedList = new ArrayList<CMLChemFile>();
 		List<CMLChemFile> notCalculatedList = new ArrayList<CMLChemFile>();
 		List<String> comment = new ArrayList<String>();

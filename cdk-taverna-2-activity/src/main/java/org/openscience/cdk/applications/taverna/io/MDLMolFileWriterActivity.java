@@ -69,7 +69,7 @@ public class MDLMolFileWriterActivity extends AbstractCDKActivity  implements IF
 	}
 
 	@Override
-	protected Map<String, T2Reference> work(final Map<String, T2Reference> inputs, AsynchronousActivityCallback callback) {
+	public Map<String, T2Reference> work(final Map<String, T2Reference> inputs, AsynchronousActivityCallback callback) {
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();

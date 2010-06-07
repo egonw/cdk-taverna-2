@@ -113,7 +113,7 @@ public class MDLFileWriterConfigurationPanel extends
 
 	@Override
 	public boolean checkValues() {
-		if (this.file.exists()) {
+		if (this.file != null && this.file.exists()) {
 			return true;
 		}
 		JOptionPane.showMessageDialog(this, "Chosen directory is not valid!", "Invalid directory", JOptionPane.ERROR_MESSAGE);
