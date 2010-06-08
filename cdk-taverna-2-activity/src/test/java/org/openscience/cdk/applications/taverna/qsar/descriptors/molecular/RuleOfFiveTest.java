@@ -71,7 +71,7 @@ public class RuleOfFiveTest extends CDKTavernaTestCases {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void test_LocalWorkerRuleOfFive() throws CDKException, Exception {
+	public void executeAsnyc() throws CDKException, Exception {
 		List<byte[]> dataList = new ArrayList<byte[]>();
 		RuleOfFiveFilter test = new RuleOfFiveFilter();
 		inputList = new ArrayList<CMLChemFile>();
@@ -118,6 +118,16 @@ public class RuleOfFiveTest extends CDKTavernaTestCases {
 		// }
 		// assertFalse(hasFileNameAnError);
 		assertFalse(notCalculatedResults);
+	}
+
+	@Override
+	protected void executeTest() {
+		try {
+			this.executeAsnyc();
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertTrue(false);
+		}
 	}
 
 }

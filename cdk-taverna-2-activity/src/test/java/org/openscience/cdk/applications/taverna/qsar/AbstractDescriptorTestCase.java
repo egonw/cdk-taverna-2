@@ -97,6 +97,7 @@ public abstract class AbstractDescriptorTestCase extends CDKTavernaTestCases {
 		this.activityName = this.activity.getActivityName();
 	}
 
+	@Override
 	protected void executeTest() {
 		try {
 			getInputList();

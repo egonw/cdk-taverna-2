@@ -127,7 +127,6 @@ public class CDKTavernaTestData {
 	 * @throws Exception
 	 */
 	public static void loadDefaultDataForTests() throws Exception {
-
 		pathToWriteInUnitTestFiles = "target" + File.separator + "unit_tests";
 		createTestData();
 		defaultDataLoaded = true;

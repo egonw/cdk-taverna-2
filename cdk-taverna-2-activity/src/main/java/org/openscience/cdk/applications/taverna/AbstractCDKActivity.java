@@ -26,11 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JOptionPane;
-
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.exception.CDKException;
-
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
@@ -50,10 +45,10 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 
 	protected String[] INPUT_PORTS;
 	protected String[] RESULT_PORTS;
-	protected static final String COMMENT_PORT = "Comment";
-	
+	protected final String COMMENT_PORT = "Comment";
+
 	protected List<String> comment = new ArrayList<String>();
-	
+
 	private CDKActivityConfigurationBean configBean;
 
 	public AbstractCDKActivity() {
@@ -82,7 +77,7 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 		this.addInputPorts();
 		this.addOutputPorts();
 		// Add always comment port
-		this.addOutput(AbstractCDKActivity.COMMENT_PORT, 1);
+		this.addOutput(this.COMMENT_PORT, 1);
 	}
 
 	/**
@@ -112,12 +107,12 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 					e.printStackTrace();
 					comment.add(e.getMessage());
 					callback.fail(e.getMessage());
-					if(outputs == null) {
-						outputs = new HashMap<String, T2Reference>();
-					}
-					T2Reference containerRef = referenceService.register(AbstractCDKActivity.this.comment, 1, true, context);
-					outputs.put(AbstractCDKActivity.COMMENT_PORT, containerRef);
 				}
+				if (outputs == null) {
+					outputs = new HashMap<String, T2Reference>();
+				}
+				T2Reference containerRef = referenceService.register(AbstractCDKActivity.this.comment, 1, true, context);
+				outputs.put(AbstractCDKActivity.this.COMMENT_PORT, containerRef);
 				// return map of output data, with empty index array as this is
 				// the only and final result (this index parameter is used if
 				// pipelining output)
@@ -148,6 +143,10 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 
 	public String[] getRESULT_PORTS() {
 		return RESULT_PORTS;
+	}
+
+	public String getCOMMENT_PORT() {
+		return COMMENT_PORT;
 	}
 
 }

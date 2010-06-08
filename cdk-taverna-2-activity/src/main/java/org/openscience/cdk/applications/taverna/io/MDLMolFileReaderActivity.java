@@ -45,14 +45,14 @@ import org.openscience.cdk.io.MDLReader;
  * @author Andreas Truzskowski
  * 
  */
-public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFileReader{
-	
+public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFileReader {
+
 	public static final String MOL_FILE_READER_ACTIVITY = "Molfile reader";
 
 	public MDLMolFileReaderActivity() {
 		this.RESULT_PORTS = new String[] { "Structure" };
 	}
-	
+
 	@Override
 	protected void addInputPorts() {
 		// Nothing to add
@@ -64,23 +64,27 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFi
 	}
 
 	@Override
-	public Map<String, T2Reference> work(final Map<String, T2Reference> inputs, final AsynchronousActivityCallback callback) throws CDKTavernaException {
+	public Map<String, T2Reference> work(final Map<String, T2Reference> inputs, final AsynchronousActivityCallback callback)
+			throws CDKTavernaException {
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		CMLChemFile cmlChemFile = new CMLChemFile();
-		try {	
-			// Read mol file
-			File file = (File) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE);
+		// Read mol file
+		File file = (File) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE);
+		if (file == null) {
+			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
+		}
+		try {
 			MDLReader reader = new MDLReader(new FileReader(file));
 			reader.read(cmlChemFile);
 			// Congfigure output
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytes(cmlChemFile), 0, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CDKTavernaException(this.getActivityName(), "Error reading Mol file!");
 		}
+		comment.add("done");
 		// Return results
 		return outputs;
 	}

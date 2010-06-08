@@ -39,9 +39,7 @@ import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
-import org.openscience.cdk.applications.taverna.io.MDLMolFileReaderActivity;
 import org.openscience.cdk.io.MDLWriter;
 
 /**
@@ -50,14 +48,14 @@ import org.openscience.cdk.io.MDLWriter;
  * @author Andreas Truzskowski
  * 
  */
-public class MDLMolFileWriterActivity extends AbstractCDKActivity  implements IFileWriter{
+public class MDLMolFileWriterActivity extends AbstractCDKActivity implements IFileWriter {
 
 	public static final String MOL_FILE_WRITER_ACTIVITY = "Molfile writer";
 
 	public MDLMolFileWriterActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
 	}
-	
+
 	@Override
 	protected void addInputPorts() {
 		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
@@ -69,13 +67,14 @@ public class MDLMolFileWriterActivity extends AbstractCDKActivity  implements IF
 	}
 
 	@Override
-	public Map<String, T2Reference> work(final Map<String, T2Reference> inputs, AsynchronousActivityCallback callback) {
+	public Map<String, T2Reference> work(final Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
+			throws CDKTavernaException {
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
 		try {
-			List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
-					context);
+			List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]),
+					byte[].class, context);
 			for (byte[] data : dataArray) {
 				Object obj = CDKObjectHandler.getObject(data);
 				if (obj instanceof CMLChemFile) {
@@ -85,18 +84,31 @@ public class MDLMolFileWriterActivity extends AbstractCDKActivity  implements IF
 							CDKTavernaException.WRONG_INPUT_PORT_TYPE);
 				}
 			}
-			File directory = (File) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE);
-			String extension = (String) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE_EXTENSION);
-			for (CMLChemFile cmlChemFile : chemFileList) {
-				String filename = FileNameGenerator.getNewFile(directory.getPath(), extension);
+		} catch (Exception e) {
+			if (e instanceof CDKTavernaException) {
+				throw (CDKTavernaException) e;
+			} else {
+				throw new CDKTavernaException(this.getConfiguration().getActivityName(),
+						CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+			}
+		}
+		File directory = (File) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE);
+		if (directory == null) {
+			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
+		}
+		String extension = (String) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE_EXTENSION);
+		for (CMLChemFile cmlChemFile : chemFileList) {
+			String filename = FileNameGenerator.getNewFile(directory.getPath(), extension);
+			try {
 				MDLWriter writer = new MDLWriter(new FileWriter(new File(filename)));
 				writer.write(cmlChemFile);
 				writer.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+				comment.add("Error writing file: " + filename + "!");
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			// TODO Exception handling
 		}
+		comment.add("done");
 		return null;
 	}
 

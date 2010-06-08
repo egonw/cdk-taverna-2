@@ -29,7 +29,6 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.openscience.cdk.applications.taverna.qsar.AbstractDescriptorTestCase;
-import org.openscience.cdk.exception.CDKException;
 
 /**
  * Class with contains JUnit-Tests for the CDK-Taverna Project
@@ -37,8 +36,7 @@ import org.openscience.cdk.exception.CDKException;
  * @author Andreas Truszkowski
  * 
  */
-public class SigmaElectronegativityTest extends
-		AbstractDescriptorTestCase {
+public class SigmaElectronegativityTest extends AbstractDescriptorTestCase {
 
 	/**
 	 * Constructor which instantiate the testing processor
@@ -54,16 +52,6 @@ public class SigmaElectronegativityTest extends
 	 */
 	public static Test suite() {
 		return new TestSuite(SigmaElectronegativityTest.class);
-	}
-
-	/**
-	 * Method which executes the test
-	 * 
-	 * @throws CDKException
-	 * @throws Exception
-	 */
-	public void test_LocalWorker() throws CDKException, Exception {
-		executeTest();
 	}
 
 }

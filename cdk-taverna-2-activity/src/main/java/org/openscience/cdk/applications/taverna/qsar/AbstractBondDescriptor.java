@@ -18,7 +18,6 @@ import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.qsar.DescriptorValue;
-import org.openscience.cdk.qsar.IAtomicDescriptor;
 import org.openscience.cdk.qsar.IBondDescriptor;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 

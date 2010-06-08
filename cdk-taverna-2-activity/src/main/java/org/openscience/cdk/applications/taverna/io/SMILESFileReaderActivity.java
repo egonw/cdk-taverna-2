@@ -34,6 +34,7 @@ import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
@@ -68,34 +69,47 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 	}
 
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback) {
+	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
+			throws CDKTavernaException {
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		CMLChemFile cmlChemFile = new CMLChemFile();
 		List<byte[]> dataArray = new ArrayList<byte[]>();
 		// Read SMILES file
+		File file = (File) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE);
+		if (file == null) {
+			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
+		}
+		IMoleculeSet som = null;
 		try {
-			File file = (File) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE);
 			SMILESReader reader = new SMILESReader(new FileReader(file));
-			IMoleculeSet som = (IMoleculeSet) reader.read(new CMLChemFile().getBuilder().newMoleculeSet());
-			IMoleculeSet som2D = new CMLChemFile().getBuilder().newMoleculeSet();
-			StructureDiagramGenerator str = new StructureDiagramGenerator();
-			for (int i = 0; i < som.getMoleculeCount(); i++) {
+			som = (IMoleculeSet) reader.read(new CMLChemFile().getBuilder().newMoleculeSet());
+		} catch (Exception e) {
+			throw new CDKTavernaException(this.getActivityName(), "Error reading SMILES file!");
+		}
+		IMoleculeSet som2D = new CMLChemFile().getBuilder().newMoleculeSet();
+		StructureDiagramGenerator str = new StructureDiagramGenerator();
+		for (int i = 0; i < som.getMoleculeCount(); i++) {
+			try {
 				str.setMolecule(som.getMolecule(i));
 				str.generateCoordinates();
 				som2D.addMolecule(str.getMolecule());
+			} catch (Exception e) {
+				comment.add("Error generating 2D Coordinate!");
 			}
-			for (int i = 0; i < som2D.getMoleculeCount(); i++) {
+		}
+		for (int i = 0; i < som2D.getMoleculeCount(); i++) {
+			try {
 				cmlChemFile = CMLChemFileWrapper.wrapInChemModel(som2D.getMolecule(i));
 				dataArray.add(CDKObjectHandler.getBytes(cmlChemFile));
+			} catch (Exception e) {
+				throw new CDKTavernaException(this.getActivityName(), "Error creating output data!");
 			}
-			T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+		T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
+		outputs.put(this.RESULT_PORTS[0], containerRef);
+		comment.add("done");
 		// Return results
 		return outputs;
 	}

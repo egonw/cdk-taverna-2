@@ -102,7 +102,7 @@ public class CDKIOReader {
 	 * @return Array of cmlChemFiles
 	 */
 	public static CMLChemFile[] wrapInChemModelArray(CMLChemFile cmlChemFile) {
-		FileNameGenerator fileNameGenerator = new FileNameGenerator();
+		//FileNameGenerator fileNameGenerator = new FileNameGenerator();
 		int numberOfChemModels = 0;
 		int chemModelNumber = 0;
 		for (int i = 0; i < cmlChemFile.getChemSequenceCount(); i++) {

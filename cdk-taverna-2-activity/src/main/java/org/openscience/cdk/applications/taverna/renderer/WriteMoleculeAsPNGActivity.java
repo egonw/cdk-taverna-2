@@ -1,9 +1,7 @@
 package org.openscience.cdk.applications.taverna.renderer;
 
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,9 +21,7 @@ import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
-import org.openscience.cdk.applications.taverna.io.MDLMolFileWriterActivity;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.io.MDLWriter;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 public class WriteMoleculeAsPNGActivity extends AbstractCDKActivity implements IFileWriter {

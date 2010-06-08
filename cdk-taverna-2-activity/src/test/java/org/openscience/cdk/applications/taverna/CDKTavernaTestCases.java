@@ -27,40 +27,37 @@ package org.openscience.cdk.applications.taverna;
 
 import junit.framework.TestCase;
 
+import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.tools.LoggingTool;
 
 /**
- * Super class for <b>all</b> CDK-Taverna TestCase implementations that ensures that
- * the LoggingTool is configured.
- *
- *
+ * Super class for <b>all</b> CDK-Taverna TestCase implementations that ensures that the LoggingTool is configured.
+ * 
+ * 
  */
-public class CDKTavernaTestCases extends TestCase {
+public abstract class CDKTavernaTestCases extends TestCase {
 
-    static {
-        LoggingTool.configureLog4j();
-    }
-    
-    public CDKTavernaTestCases() {
-        super();
-    }
-    
-    public CDKTavernaTestCases(String name) {
-        super(name);
-    } 
-    
-    /**
-     * Determines of slow JUnit tests are to be run. You can set this
-     * from the command line when running Ant: 
-     * <pre>
-     *   ant -f build.xml -DrunSlowTests=false test-all
-     * </pre>
-     * 
-     * @return
-     */
-    public boolean runSlowTests() {
-    	if (System.getProperty("runSlowTests", "true").equals("false")) 
-    		return false;
-    	return true;
-    }     
+	static {
+		LoggingTool.configureLog4j();
+	}
+
+	public CDKTavernaTestCases() {
+		super();
+	}
+
+	public CDKTavernaTestCases(String name) {
+		super(name);
+	}
+
+	/**
+	 * Method which executes the test
+	 * 
+	 * @throws CDKException
+	 * @throws Exception
+	 */
+	public void test_TestCase() throws CDKException, Exception {
+		executeTest();
+	}
+
+	protected abstract void executeTest();
 }

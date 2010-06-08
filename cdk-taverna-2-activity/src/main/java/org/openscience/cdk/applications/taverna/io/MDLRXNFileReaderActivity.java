@@ -33,10 +33,10 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 
 import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
-import org.openscience.cdk.applications.taverna.io.MDLMolFileReaderActivity;
 import org.openscience.cdk.io.MDLRXNReader;
 
 /**
@@ -64,23 +64,27 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFi
 	}
 
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback) {
+	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
+			throws CDKTavernaException {
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		Reaction reaction = new Reaction();
+		// Read RXN file
+		File file = (File) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE);
+		if (file == null) {
+			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
+		}
 		try {
-			// Read RXN file
-			File file = (File) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE);
 			MDLRXNReader reader = new MDLRXNReader(new FileReader(file));
 			reaction = (Reaction) reader.read(reaction);
 			// Congfigure output
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytes(reaction), 0, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CDKTavernaException(this.getActivityName(), "Error reading RXN file!");
 		}
+		comment.add("done");
 		// Return results
 		return outputs;
 	}

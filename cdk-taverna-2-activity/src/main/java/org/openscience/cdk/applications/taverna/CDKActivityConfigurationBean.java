@@ -1,6 +1,5 @@
 package org.openscience.cdk.applications.taverna;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 

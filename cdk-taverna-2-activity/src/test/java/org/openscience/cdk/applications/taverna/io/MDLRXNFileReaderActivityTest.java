@@ -19,55 +19,76 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna;
+package org.openscience.cdk.applications.taverna.io;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.openscience.cdk.Reaction;
+import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
+import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
+import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.applications.taverna.io.MDLMolFileReaderActivity;
-import org.openscience.cdk.interfaces.IAtomContainer;
 
 /**
- * Test class for the MDL Mol file reader activity.
+ * Test class for the MDL RXN file reader activity.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class MDLMolFileReaderActivityTest {
+public class MDLRXNFileReaderActivityTest extends CDKTavernaTestCases {
 
 	private CDKActivityConfigurationBean configBean;
 
-	private AbstractCDKActivity activity = new MDLMolFileReaderActivity();
+	private AbstractCDKActivity activity = new MDLRXNFileReaderActivity();
 
-	@Before
+	public MDLRXNFileReaderActivityTest() {
+		super(MDLRXNFileReaderActivity.RXN_FILE_READER_ACTIVITY);
+	}
+
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
 		// TODO read resource
-		File molTestFile = new File("src\\test\\resources\\data\\mol\\molfile.mol");
-		configBean.addAdditionalProperty(Constants.PROPERTY_FILE, molTestFile);
-		configBean.setActivityName(MDLMolFileReaderActivity.MOL_FILE_READER_ACTIVITY);
+		File rxnTestFile = new File("src\\test\\resources\\data\\mol\\reaction.rxn");
+		configBean.addAdditionalProperty(Constants.PROPERTY_FILE, rxnTestFile);
+		configBean.setActivityName(MDLRXNFileReaderActivity.RXN_FILE_READER_ACTIVITY);
 	}
 
-	@Test
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
 		// leave empty. No ports used
 		Map<String, Object> inputs = new HashMap<String, Object>();
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-//		expectedOutputTypes.put(MDLMolFileReaderActivity.RESULT_PORT, byte[].class);
+		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
+		expectedOutputTypes.put(activity.getCOMMENT_PORT(), String.class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
-//		byte[] objectData = (byte[]) outputs.get(MDLMolFileReaderActivity.RESULT_PORT);
-	//	CMLChemFile chemFile = (CMLChemFile) CDKObjectHandler.getObject(objectData);
-	////		Assert.assertEquals(16, container.getAtomCount());
-//		Assert.assertEquals(17, container.getBondCount());
+		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
+		byte[] objectData = (byte[]) outputs.get(activity.getRESULT_PORTS()[0]);
+		Reaction reaction = (Reaction) CDKObjectHandler.getObject(objectData);
+		Assert.assertEquals(2, reaction.getReactantCount());
+		Assert.assertEquals(1, reaction.getProductCount());
+		List<String> comment = (List<String>) outputs.get(activity.getCOMMENT_PORT());
+		for (String c : comment) {
+			Assert.assertTrue(!c.toLowerCase().contains("error"));
+		}
+	}
+
+	@Override
+	protected void executeTest() {
+		try {
+			this.makeConfigBean();
+			this.executeAsynch();
+		} catch (Exception e) {
+			e.printStackTrace();
+			// This test causes an error
+			assertEquals(false, true);
+		}
 	}
 
 }

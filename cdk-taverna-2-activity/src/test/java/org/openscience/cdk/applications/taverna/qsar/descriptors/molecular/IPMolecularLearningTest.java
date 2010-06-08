@@ -30,7 +30,6 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.openscience.cdk.applications.taverna.qsar.AbstractDescriptorTestCase;
-import org.openscience.cdk.exception.CDKException;
 
 /**
  * Class with contains JUnit-Tests for the CDK-Taverna Project
@@ -54,16 +53,6 @@ public class IPMolecularLearningTest extends AbstractDescriptorTestCase {
 	 */
 	public static Test suite() {
 		return new TestSuite(IPMolecularLearningTest.class);
-	}
-
-	/**
-	 * Method which executes the test
-	 * 
-	 * @throws CDKException
-	 * @throws Exception
-	 */
-	public void test_LocalWorker() throws CDKException, Exception {
-		executeTest();
 	}
 
 }

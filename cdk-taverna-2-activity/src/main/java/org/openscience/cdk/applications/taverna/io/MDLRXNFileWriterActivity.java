@@ -35,6 +35,7 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 
 import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
@@ -47,14 +48,14 @@ import org.openscience.cdk.io.MDLRXNWriter;
  * @author Andreas Truzskowski
  * 
  */
-public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFileWriter{
+public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFileWriter {
 
 	public static final String RXN_FILE_WRITER_ACTIVITY = "RXN file writer";
 
 	public MDLRXNFileWriterActivity() {
 		this.INPUT_PORTS = new String[] { "Reactions" };
 	}
-	
+
 	@Override
 	protected void addInputPorts() {
 		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
@@ -66,33 +67,51 @@ public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFi
 	}
 
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback) {
+	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
+			throws CDKTavernaException {
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<Reaction> reactionList = new ArrayList<Reaction>();
 		try {
-			List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
-					context);
+			List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]),
+					byte[].class, context);
 			for (byte[] data : dataArray) {
-				reactionList.add((Reaction) CDKObjectHandler.getObject(data));
+				Object obj = CDKObjectHandler.getObject(data);
+				if (obj instanceof Reaction) {
+					reactionList.add((Reaction) obj);
+				} else {
+					throw new CDKTavernaException(this.getConfiguration().getActivityName(),
+							CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+				}
 			}
-			File directory = (File) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE);
-			String extension = (String) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE_EXTENSION);
-			for (Reaction reaction : reactionList) {
-				String filename = FileNameGenerator.getNewFile(directory.getPath(), extension);
+		} catch (Exception e) {
+			if (e instanceof CDKTavernaException) {
+				throw (CDKTavernaException) e;
+			} else {
+				throw new CDKTavernaException(this.getConfiguration().getActivityName(),
+						CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+			}
+		}
+		File directory = (File) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE);
+		if (directory == null) {
+			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
+		}
+		String extension = (String) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE_EXTENSION);
+		for (Reaction reaction : reactionList) {
+			String filename = FileNameGenerator.getNewFile(directory.getPath(), extension);
+			try {
 				MDLRXNWriter writer = new MDLRXNWriter(new FileWriter(new File(filename)));
 				writer.write(reaction);
 				writer.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+				comment.add("Error writing file: " + filename + "!");
 			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			// TODO Exception handling
 		}
-
+		comment.add("done");
 		return null;
 	}
-	
+
 	@Override
 	public String getActivityName() {
 		return MDLRXNFileWriterActivity.RXN_FILE_WRITER_ACTIVITY;

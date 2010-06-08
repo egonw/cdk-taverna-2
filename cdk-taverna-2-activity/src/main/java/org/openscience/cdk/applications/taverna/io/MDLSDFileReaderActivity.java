@@ -40,6 +40,7 @@ import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
@@ -66,7 +67,8 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 	}
 
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback) {
+	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
+			throws CDKTavernaException {
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
@@ -74,8 +76,11 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 		List<CMLChemFile> cmlChemFileList = null;
 		List<byte[]> dataList = new ArrayList<byte[]>();
 		// Read SDfile
+		File file = (File) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE);
+		if (file == null) {
+			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
+		}
 		try {
-			File file = (File) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE);
 			MDLV2000Reader tmpMDLReader = new MDLV2000Reader(new FileReader(file));
 			tmpMDLReader.read(cmlChemFile);
 			cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(cmlChemFile);
@@ -86,9 +91,9 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 			T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CDKTavernaException(this.getActivityName(), "Error reading RXN file!");
 		}
+		comment.add("done");
 		// Return results
 		return outputs;
 	}
