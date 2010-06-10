@@ -22,7 +22,7 @@ public class Draw2DStructure {
 	 *            Molecule to transform.
 	 * @param aPrefferedSize
 	 *            Size to fit.
-	 * @return Fitted molecule. 
+	 * @return Fitted molecule.
 	 */
 	public static IAtomContainer fitMoleculeGeometry(IAtomContainer aMolecule, Dimension aPrefferedSize) {
 		if (aMolecule == null) {

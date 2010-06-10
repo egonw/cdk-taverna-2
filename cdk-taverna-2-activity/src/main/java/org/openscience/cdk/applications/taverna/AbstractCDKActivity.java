@@ -121,6 +121,9 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 		});
 	}
 
+	/**
+	 * Abstract method with does the work.
+	 */
 	public abstract Map<String, T2Reference> work(final Map<String, T2Reference> inputs,
 			final AsynchronousActivityCallback callback) throws CDKTavernaException;
 
@@ -129,22 +132,43 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 		return this.configBean;
 	}
 
+	/**
+	 * @return The name of the activity.
+	 */
 	public abstract String getActivityName();
 
+	/**
+	 * @return The folder of the activity.
+	 */
 	public abstract String getFolderName();
 
+	/**
+	 * @return The description of the activity.
+	 */
 	public abstract String getDescription();
 
+	/**
+	 * @return Additional properties.
+	 */
 	public abstract HashMap<String, Object> getAdditionalProperties();
 
+	/**
+	 * @return Input port names/identifiers.
+	 */
 	public String[] getINPUT_PORTS() {
 		return INPUT_PORTS;
 	}
 
+	/**
+	 * @return Result port names/identifiers.
+	 */
 	public String[] getRESULT_PORTS() {
 		return RESULT_PORTS;
 	}
 
+	/**
+	 * @return Comment port name/identifier.
+	 */
 	public String getCOMMENT_PORT() {
 		return COMMENT_PORT;
 	}

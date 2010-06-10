@@ -26,8 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Class which provides methods for a centralized file name handling within the
- * cdk-taverna project
+ * Class which provides methods for a centralized file name handling within the cdk-taverna project
  * 
  * @author Andreas Truszkowski
  * 

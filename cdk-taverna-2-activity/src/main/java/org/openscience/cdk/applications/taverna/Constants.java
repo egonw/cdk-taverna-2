@@ -13,7 +13,7 @@ public class Constants {
 	public static final String QSAR_ATOMPAIR_DESCRIPTOR_FOLDER_NAME = "QSAR Atompair Descriptors";
 	public static final String QSAR_BOND_DESCRIPTOR_FOLDER_NAME = "QSAR Bond Descriptors";
 	public static final String QSAR_FOLDER_NAME = "QSAR";
-	//--------------------Properties-------------------------------------
+	// --------------------Properties-------------------------------------
 	public static final String PROPERTY_FILE = "FILE";
 	public static final String PROPERTY_FILE_EXTENSION = "FILE EXTENSION";
 	public static final String PROPERTY_FILE_EXTENSION_DESCRIPTION = "FILE EXTENSION DESCRIPTION";

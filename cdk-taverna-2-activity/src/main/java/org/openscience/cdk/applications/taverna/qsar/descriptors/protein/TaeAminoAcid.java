@@ -30,8 +30,7 @@ import org.openscience.cdk.applications.taverna.qsar.AbstractMolecularDescriptor
 import org.openscience.cdk.qsar.IMolecularDescriptor;
 
 /**
- * Class which provides the implementation for a cdk-taverna molecular qsar 
- * descriptor.
+ * Class which provides the implementation for a cdk-taverna molecular qsar descriptor.
  * 
  * @author Thomas Kuhn
  * 

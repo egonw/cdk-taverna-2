@@ -43,7 +43,7 @@ public class CDKIOWriter {
 		molWriter.write(file);
 		return writer.toString();
 	}
-	
+
 	/**
 	 * Converts the ChemFile into a CML string.
 	 * 
@@ -52,13 +52,13 @@ public class CDKIOWriter {
 	public static String convertChemFileToCMLString(CMLChemFile chemFile) throws Exception {
 		return chemFile.toCML();
 	}
-	
+
 	/**
 	 * Converts the CML string into a ChemFile.
 	 * 
 	 * @taverna.consume
 	 */
-	public static CMLChemFile convertCMLStringToChemFile(String cmlString) throws Exception {		
+	public static CMLChemFile convertCMLStringToChemFile(String cmlString) throws Exception {
 		return new CMLChemFile(cmlString);
-	}	
+	}
 }

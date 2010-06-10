@@ -60,10 +60,10 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		ArrayList<Class<? extends AbstractCDKActivity>> classes = (ArrayList<Class<? extends AbstractCDKActivity>>) this
 				.getConfiguration().getAdditionalProperty(Constants.PROPERTY_CHOSEN_QSARDESCRIPTORS);
-		if(classes == null || classes.isEmpty()) {
+		if (classes == null || classes.isEmpty()) {
 			throw new CDKTavernaException(this.getActivityName(), "No QSAR descriptors chosen!");
 		}
-		for(Class<? extends AbstractCDKActivity> clazz : classes) {
+		for (Class<? extends AbstractCDKActivity> clazz : classes) {
 			long timeStart = System.nanoTime();
 			AbstractCDKActivity descriptor = null;
 			try {
@@ -75,7 +75,7 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 				comment.add(e.getMessage() + " Descriptor: " + clazz.getSimpleName());
 				e.printStackTrace();
 			}
-			if(clazz != null) {
+			if (clazz != null) {
 				outputs = descriptor.work(inputs, callback);
 			}
 			long timeEnd = System.nanoTime();

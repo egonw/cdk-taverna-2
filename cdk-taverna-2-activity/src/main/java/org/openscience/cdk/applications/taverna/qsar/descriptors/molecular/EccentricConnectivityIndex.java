@@ -30,8 +30,7 @@ import org.openscience.cdk.qsar.IMolecularDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.EccentricConnectivityIndexDescriptor;
 
 /**
- * Class which provides the implementation for a cdk-taverna molecular qsar 
- * descriptor.
+ * Class which provides the implementation for a cdk-taverna molecular qsar descriptor.
  * 
  * @author Thomas Kuhn
  * 

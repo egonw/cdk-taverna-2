@@ -37,7 +37,7 @@ import org.openscience.cdk.tools.IDCreator;
 public class CMLChemFile extends ChemFile {
 
 	private static final long serialVersionUID = -5664142472726700883L;
-	
+
 	/**
 	 * Constructs an empty ChemFile.
 	 */

@@ -27,10 +27,11 @@ import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 public class WriteMoleculeAsPNGActivity extends AbstractCDKActivity implements IFileWriter {
 
 	private static final String WRITE_MOLECULE_AS_PNG_ACTIVITY = "Write Molecule As PNG";
+
 	public WriteMoleculeAsPNGActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
 	}
-	
+
 	@Override
 	protected void addInputPorts() {
 		this.addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
@@ -40,7 +41,6 @@ public class WriteMoleculeAsPNGActivity extends AbstractCDKActivity implements I
 	protected void addOutputPorts() {
 		// Nothing to add
 	}
-
 
 	@Override
 	public String getActivityName() {
@@ -64,7 +64,6 @@ public class WriteMoleculeAsPNGActivity extends AbstractCDKActivity implements I
 		return Constants.RENDERER_FOLDER_NAME;
 	}
 
-
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
@@ -72,8 +71,8 @@ public class WriteMoleculeAsPNGActivity extends AbstractCDKActivity implements I
 		ReferenceService referenceService = context.getReferenceService();
 		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
 		try {
-			List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
-					context);
+			List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]),
+					byte[].class, context);
 			for (byte[] data : dataArray) {
 				Object obj = CDKObjectHandler.getObject(data);
 				if (obj instanceof CMLChemFile) {

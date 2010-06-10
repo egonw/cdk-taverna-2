@@ -74,7 +74,8 @@ public abstract class AbstractAtomicDescriptor extends AbstractCDKActivity {
 		List<CMLChemFile> inputList = new ArrayList<CMLChemFile>();
 		List<CMLChemFile> calculatedList = new ArrayList<CMLChemFile>();
 		List<CMLChemFile> notCalculatedList = new ArrayList<CMLChemFile>();
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class, context);
+		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
+				context);
 		for (byte[] data : dataArray) {
 			Object obj;
 			try {

@@ -30,7 +30,7 @@ public abstract class AbstractMolecularDescriptor extends AbstractCDKActivity {
 		this.INPUT_PORTS = new String[] { "Structures" };
 		this.RESULT_PORTS = new String[] { "Calculated Structures", "NOT Calculated Structures" };
 	}
-	
+
 	@Override
 	protected void addInputPorts() {
 		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
@@ -62,7 +62,7 @@ public abstract class AbstractMolecularDescriptor extends AbstractCDKActivity {
 	public String getFolderName() {
 		return Constants.QSAR_MOLECULAR_DESCRIPTOR_FOLDER_NAME;
 	}
-	
+
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
@@ -73,7 +73,8 @@ public abstract class AbstractMolecularDescriptor extends AbstractCDKActivity {
 		List<CMLChemFile> calculatedList = new ArrayList<CMLChemFile>();
 		List<CMLChemFile> notCalculatedList = new ArrayList<CMLChemFile>();
 		List<String> comment = new ArrayList<String>();
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class, context);
+		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
+				context);
 		for (byte[] data : dataArray) {
 			Object obj;
 			try {
@@ -100,18 +101,16 @@ public abstract class AbstractMolecularDescriptor extends AbstractCDKActivity {
 				CMLChemFile file = iter.next();
 				List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(file);
 				IAtomContainer molecules;
-				for (Iterator<IAtomContainer> iterator = moleculeList.iterator(); iterator.hasNext();){
-					molecules= iterator.next();
+				for (Iterator<IAtomContainer> iterator = moleculeList.iterator(); iterator.hasNext();) {
+					molecules = iterator.next();
 					try {
-						DescriptorValue value = descriptor
-						.calculate(molecules);
-						molecules.setProperty(value.getSpecification(),
-								value);
+						DescriptorValue value = descriptor.calculate(molecules);
+						molecules.setProperty(value.getSpecification(), value);
 						calculatedList.add(file);
-						//comment.add("Calculation done;");
+						// comment.add("Calculation done;");
 					} catch (Exception e) {
 						notCalculatedList.add(file);
-						// TODO exception handling					
+						// TODO exception handling
 					}
 				}
 			}

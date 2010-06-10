@@ -30,10 +30,10 @@ import org.openscience.cdk.qsar.IAtomicDescriptor;
 import org.openscience.cdk.qsar.descriptors.atomic.AtomDegreeDescriptor;
 
 /**
- * Class which provides the implementation for a cdk-taverna atomic qsar descriptor. 
+ * Class which provides the implementation for a cdk-taverna atomic qsar descriptor.
  * 
  * @author Andreas Truszkowski
- *
+ * 
  */
 public class AtomDegree extends AbstractAtomicDescriptor {
 

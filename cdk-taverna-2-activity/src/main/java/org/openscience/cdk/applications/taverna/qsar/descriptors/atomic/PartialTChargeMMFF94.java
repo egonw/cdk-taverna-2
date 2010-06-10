@@ -30,14 +30,16 @@ import org.openscience.cdk.qsar.IAtomicDescriptor;
 import org.openscience.cdk.qsar.descriptors.atomic.PartialTChargeMMFF94Descriptor;
 
 /**
- * Class which provides the implementation for a cdk-taverna atomic qsar descriptor. 
+ * Class which provides the implementation for a cdk-taverna atomic qsar descriptor.
  * 
  * @author Thomas Kuhn
- *
+ * 
  */
 public class PartialTChargeMMFF94 extends AbstractAtomicDescriptor {
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.openscience.cdk.applications.taverna.qsar.descriptors.atomic.AbstractAtomicDescriptor#getDescriptor()
 	 */
 	protected IAtomicDescriptor getDescriptor() {

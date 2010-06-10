@@ -38,16 +38,14 @@ import org.openscience.cdk.math.RandomNumbersTool;
 
 public class CDKIOFileWriter {
 	/**
-	 * Method to write a CMLChemfile-Array to a file after it is converted to a
-	 * cml-string Mainly for debugging purpose
+	 * Method to write a CMLChemfile-Array to a file after it is converted to a cml-string Mainly for debugging purpose
 	 * 
 	 * @param cmlChemFile
 	 * @param fileName
 	 *            The name of the file in which the
 	 * @throws Exception
 	 */
-	public static void writeCMLChemFileToFile(CMLChemFile[] cmlChemFile,
-			String fileName) throws Exception {
+	public static void writeCMLChemFileToFile(CMLChemFile[] cmlChemFile, String fileName) throws Exception {
 		if (fileName == null || fileName.length() == 0) {
 			fileName = "NoFileNameAvailable";
 		}
@@ -60,8 +58,7 @@ public class CDKIOFileWriter {
 	}
 
 	/**
-	 * Method to write a List of CMLChemfiles to a file after it is converted to
-	 * a cml-string Mainly for debugging purpose
+	 * Method to write a List of CMLChemfiles to a file after it is converted to a cml-string Mainly for debugging purpose
 	 * 
 	 * @param List
 	 *            of CMLChemFiles
@@ -69,8 +66,7 @@ public class CDKIOFileWriter {
 	 *            The name of the file in which the
 	 * @throws Exception
 	 */
-	public static void writeListOfCMLChemFilesToFile(List<CMLChemFile> list,
-			String fileName, String path) throws Exception {
+	public static void writeListOfCMLChemFilesToFile(List<CMLChemFile> list, String fileName, String path) throws Exception {
 		if (fileName == null || fileName.length() == 0) {
 			fileName = "NoFileNameAvailable";
 		}
@@ -78,7 +74,7 @@ public class CDKIOFileWriter {
 		CMLChemFile cmlChemFile;
 		String[] cml = new String[list.size()];
 		for (int i = 0; i < list.size(); i++) {
-			cmlChemFile =  list.get(i);
+			cmlChemFile = list.get(i);
 			cml[i] = cmlChemFile.toCML();
 		}
 		writeFile(cml, fileName, path);
@@ -95,25 +91,22 @@ public class CDKIOFileWriter {
 	 *            Path which will contain the new file
 	 * @throws Exception
 	 */
-	public static void writeFile(String[] content, String fileName, String path)
-	throws Exception {
+	public static void writeFile(String[] content, String fileName, String path) throws Exception {
 		PrintWriter pw = null;
 		try {
 			// Splits the filename because it could contain directories
-			// FIXME Check for linux!!! 
+			// FIXME Check for linux!!!
 			String[] fileNameArray = fileName.split("\\\\");
 			// Loop not over the whole array => the last array position contains the file name
 			// The rest will be added to the path!
-			for (int i = 0; i < fileNameArray.length-1; i++) {
+			for (int i = 0; i < fileNameArray.length - 1; i++) {
 				path += File.separator + fileNameArray[i];
 			}
-			fileName = fileNameArray[fileNameArray.length-1];
+			fileName = fileNameArray[fileNameArray.length - 1];
 			checkPath(path);
-			String uniquifyFileName = "_" + System.currentTimeMillis() + "_"
-			+ RandomNumbersTool.randomInt(0, 100000);
-			fileName = fileName.substring(0, fileName.length() - 4)
-			+ uniquifyFileName
-			+ fileName.substring(fileName.length() - 4);
+			String uniquifyFileName = "_" + System.currentTimeMillis() + "_" + RandomNumbersTool.randomInt(0, 100000);
+			fileName = fileName.substring(0, fileName.length() - 4) + uniquifyFileName
+					+ fileName.substring(fileName.length() - 4);
 			Writer fw = new FileWriter(path + fileName);
 			Writer bw = new BufferedWriter(fw);
 			pw = new PrintWriter(bw);
@@ -130,14 +123,12 @@ public class CDKIOFileWriter {
 		}
 	}
 
-	public static void writeFile(String[] content, String fileName)throws Exception {
+	public static void writeFile(String[] content, String fileName) throws Exception {
 		PrintWriter pw = null;
 		try {
-			String uniquifyFileName = "_" + System.currentTimeMillis() + "_"
-			+ RandomNumbersTool.randomInt(0, 100000);
-			fileName = fileName.substring(0, fileName.length() - 4)
-			+ uniquifyFileName
-			+ fileName.substring(fileName.length() - 4);
+			String uniquifyFileName = "_" + System.currentTimeMillis() + "_" + RandomNumbersTool.randomInt(0, 100000);
+			fileName = fileName.substring(0, fileName.length() - 4) + uniquifyFileName
+					+ fileName.substring(fileName.length() - 4);
 			Writer fw = new FileWriter(fileName);
 			Writer bw = new BufferedWriter(fw);
 			pw = new PrintWriter(bw);
@@ -155,8 +146,8 @@ public class CDKIOFileWriter {
 	}
 
 	/**
-	 * Method which checks if the path exists and if not if it is possible to
-	 * build. If it is possible to build the path it will be done.
+	 * Method which checks if the path exists and if not if it is possible to build. If it is possible to build the path it will
+	 * be done.
 	 * 
 	 * @param path
 	 *            Path which will be check
@@ -166,15 +157,14 @@ public class CDKIOFileWriter {
 		File file = new File(path);
 		if (!file.exists()) {
 			if (!file.mkdirs()) {
-				throw new Exception("Could not create the directory: "
-						+ file.getPath());
+				throw new Exception("Could not create the directory: " + file.getPath());
 			}
 		}
 	}
 
 	/**
-	 * Method which returns the absolute path. This method checks also whether the
-	 * given path is correct or not. If the path don't exist will it be created.
+	 * Method which returns the absolute path. This method checks also whether the given path is correct or not. If the path don't
+	 * exist will it be created.
 	 * 
 	 * @param path
 	 *            The relative path

@@ -30,7 +30,6 @@ import java.io.FileReader;
 
 import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.interfaces.IChemModel;
 import org.openscience.cdk.interfaces.IChemSequence;
 import org.openscience.cdk.interfaces.IMolecule;
@@ -102,7 +101,7 @@ public class CDKIOReader {
 	 * @return Array of cmlChemFiles
 	 */
 	public static CMLChemFile[] wrapInChemModelArray(CMLChemFile cmlChemFile) {
-		//FileNameGenerator fileNameGenerator = new FileNameGenerator();
+		// FileNameGenerator fileNameGenerator = new FileNameGenerator();
 		int numberOfChemModels = 0;
 		int chemModelNumber = 0;
 		for (int i = 0; i < cmlChemFile.getChemSequenceCount(); i++) {

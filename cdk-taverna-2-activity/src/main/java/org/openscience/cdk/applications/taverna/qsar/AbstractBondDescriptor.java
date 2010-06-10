@@ -30,7 +30,7 @@ public abstract class AbstractBondDescriptor extends AbstractCDKActivity {
 		this.INPUT_PORTS = new String[] { "Structures" };
 		this.RESULT_PORTS = new String[] { "Calculated Structures", "NOT Calculated Structures" };
 	}
-	
+
 	@Override
 	protected void addInputPorts() {
 		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
@@ -74,7 +74,8 @@ public abstract class AbstractBondDescriptor extends AbstractCDKActivity {
 		List<CMLChemFile> inputList = new ArrayList<CMLChemFile>();
 		List<CMLChemFile> calculatedList = new ArrayList<CMLChemFile>();
 		List<CMLChemFile> notCalculatedList = new ArrayList<CMLChemFile>();
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class, context);
+		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
+				context);
 		for (byte[] data : dataArray) {
 			Object obj;
 			try {

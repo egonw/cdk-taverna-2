@@ -30,14 +30,16 @@ import org.openscience.cdk.qsar.IBondDescriptor;
 import org.openscience.cdk.qsar.descriptors.bond.BondPartialTChargeDescriptor;
 
 /**
- * Class which provides the implementation for a cdk-taverna atomic qsar descriptor. 
+ * Class which provides the implementation for a cdk-taverna atomic qsar descriptor.
  * 
  * @author Thomas Kuhn
- *
+ * 
  */
 public class BondPartialTCharge extends AbstractBondDescriptor {
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.openscience.cdk.applications.taverna.qsar.descriptors.bond.AbstractBondDescriptor#getDescriptor()
 	 */
 	protected IBondDescriptor getDescriptor() {

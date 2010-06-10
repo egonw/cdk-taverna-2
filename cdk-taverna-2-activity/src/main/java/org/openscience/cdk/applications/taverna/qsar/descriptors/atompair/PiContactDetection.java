@@ -30,8 +30,7 @@ import org.openscience.cdk.qsar.IAtomPairDescriptor;
 import org.openscience.cdk.qsar.descriptors.atompair.PiContactDetectionDescriptor;
 
 /**
- * Class which provides the implementation for a cdk-taverna atomic qsar
- * descriptor.
+ * Class which provides the implementation for a cdk-taverna atomic qsar descriptor.
  * 
  * @author Thomas Kuhn
  * 
