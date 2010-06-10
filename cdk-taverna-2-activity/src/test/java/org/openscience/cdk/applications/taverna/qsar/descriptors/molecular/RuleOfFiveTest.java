@@ -99,7 +99,8 @@ public class RuleOfFiveTest extends CDKTavernaTestCases {
 			resultListOtherStructures.add((CMLChemFile) CDKObjectHandler.getObject(data));
 		}
 		boolean notCalculatedResults = false;
-		if (resultListOtherStructures.size() != 3) {
+		// TODO check statement
+		if (resultListOtherStructures.size() != 1) {
 			notCalculatedResults = true;
 			CDKIOFileWriter.writeListOfCMLChemFilesToFile(resultListOtherStructures, "Error_" + descriptorName + ".txt",
 					CDKTavernaTestData.getPathForWritingFilesOfUnitTests(false));
