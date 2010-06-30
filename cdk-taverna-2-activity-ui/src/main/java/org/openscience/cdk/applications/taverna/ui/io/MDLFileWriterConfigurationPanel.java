@@ -92,7 +92,8 @@ public class MDLFileWriterConfigurationPanel extends
 			this.filePathField.setPreferredSize(new Dimension(250, 25));
 			filePanel.add(this.filePathField);
 			JButton fileChooserButton = new JButton(this.chooseFileAction);
-			URL url = ClassLoader.getSystemResource("icons/open.gif");
+			ClassLoader cld = getClass().getClassLoader();
+			URL url = cld.getResources("icons/open.gif").nextElement();
 			ImageIcon icon = new ImageIcon(url);
 			fileChooserButton.setPreferredSize(new Dimension(25, 25));
 			fileChooserButton.setIcon(icon);
