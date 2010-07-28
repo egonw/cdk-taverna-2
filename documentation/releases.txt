@@ -1,0 +1,18 @@
+0.1
+- Added basic IO activities
+- Added JChempaint activity
+- Added renderer activities
+- Added Reaction enumerator activity
+- Added QSAR activities
+
+0.1.1
+- Fixed class loader bug  
+
+0.1.2
+- Added IsomorphismTesterActivity/SubgraphIsomorphismFilterActivity 
+- Added QSAR vector generator
+- Updated CDK to 1.3.5
+- Updated Reaction Enumerator to CDK 1.3.5
+- Updated JChemPaint to 3.1.2
+- Added PDF writer activity
+- Added art2a classification library

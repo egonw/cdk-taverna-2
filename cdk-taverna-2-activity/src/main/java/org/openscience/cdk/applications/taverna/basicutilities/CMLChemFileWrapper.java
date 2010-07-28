@@ -26,7 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.ChemModel;
 import org.openscience.cdk.ChemSequence;
+import org.openscience.cdk.MoleculeSet;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemModel;
@@ -63,6 +65,26 @@ public class CMLChemFileWrapper {
 	}
 
 	/**
+	 * Method which converts an CMLChemfile array to a CMLChemFile array with only one molecule per CMLChemFile.
+	 * 
+	 * @param atomContainer
+	 * @return CMLChemFile which contains the information of the atomContainer
+	 * @throws Exception
+	 */
+	public static CMLChemFile[] wrapChemModelArrayInResolvedChemModelArray(CMLChemFile[] cmlChemFiles) throws Exception {
+		ArrayList<CMLChemFile> chemFiles = new ArrayList<CMLChemFile>();
+		for (CMLChemFile file : cmlChemFiles) {
+			if (file != null) {
+				List<CMLChemFile> cfs = wrapInChemModelList(file);
+				chemFiles.addAll(cfs);
+			}
+		}
+		CMLChemFile[] fileArray = new CMLChemFile[chemFiles.size()];
+		chemFiles.toArray(fileArray);
+		return fileArray;
+	}
+
+	/**
 	 * Method which converts an atomContainer to a CMLChemFile
 	 * 
 	 * @param atomContainer
@@ -70,9 +92,9 @@ public class CMLChemFileWrapper {
 	 */
 	public static CMLChemFile wrapAtomContainerInChemModel(IAtomContainer atomContainer) {
 		CMLChemFile file = new CMLChemFile();
-		IChemModel model = atomContainer.getBuilder().newChemModel();
-		IChemSequence sequence = atomContainer.getBuilder().newChemSequence();
-		IMoleculeSet moleculeSet = atomContainer.getBuilder().newMoleculeSet();
+		IChemModel model = new ChemModel();
+		IChemSequence sequence = new ChemSequence();
+		IMoleculeSet moleculeSet = new MoleculeSet();
 		moleculeSet.addAtomContainer(atomContainer);
 		model.setMoleculeSet(moleculeSet);
 		sequence.addChemModel(model);
@@ -94,6 +116,60 @@ public class CMLChemFileWrapper {
 			cmlChemfile[i] = wrapAtomContainerInChemModel(atomContainer[i]);
 		}
 		return cmlChemfile;
+	}
+
+	/**
+	 * Method which converts a atomContainer list to a CMLChemFile array
+	 * 
+	 * @param atomContainer
+	 *            List which will be converted
+	 * @return CMLChemFileArray which contains the atomContainers
+	 */
+	public static CMLChemFile[] wrapAtomContainerListInChemModel(List<IAtomContainer> atomContainers) {
+		CMLChemFile[] cmlChemfile = new CMLChemFile[atomContainers.size()];
+		for (int i = 0; i < atomContainers.size(); i++) {
+			cmlChemfile[i] = wrapAtomContainerInChemModel(atomContainers.get(i));
+		}
+		return cmlChemfile;
+	}
+
+	/**
+	 * Method which adds an atomContainer to a CMLChemFile
+	 * 
+	 * @param atomContainer
+	 * @return CMLChemFile which contains the information of the atomContainer
+	 */
+	public static CMLChemFile addAtomContainerToChemModel(CMLChemFile chemFile, IAtomContainer atomContainer) {
+		IMoleculeSet moleculeSet = chemFile.getChemSequence(0).getChemModel(0).getMoleculeSet();
+		moleculeSet.addAtomContainer(atomContainer);
+		return chemFile;
+	}
+
+	/**
+	 * Method which adds all atomContainer in a CMLChemfile to a CMLChemFile
+	 * 
+	 * @param chemFileSource
+	 *            Source of the atomContainers
+	 * @param chemFileTarget
+	 *            Gets the atomContainers
+	 * @return modified CMLChemFile
+	 */
+	public static CMLChemFile wrapChemModelAtomContainerInChemModel(CMLChemFile chemFileSource, CMLChemFile chemFileTarget) {
+		if (chemFileTarget.getChemSequence(0) == null) {
+			chemFileTarget.addChemSequence(new ChemSequence());
+			chemFileTarget.getChemSequence(0).addChemModel(new ChemModel());
+			chemFileTarget.getChemSequence(0).getChemModel(0).setMoleculeSet(new MoleculeSet());
+		}
+		IMoleculeSet moleculeSet = chemFileTarget.getChemSequence(0).getChemModel(0).getMoleculeSet();
+		for (int i = 0; i < chemFileSource.getChemSequenceCount(); i++) {
+			IChemSequence sequence = chemFileSource.getChemSequence(i);
+			for (int j = 0; j < sequence.getChemModelCount(); j++) {
+				IChemModel model = sequence.getChemModel(j);
+				IMoleculeSet set = model.getMoleculeSet();
+				moleculeSet.add(set);
+			}
+		}
+		return chemFileTarget;
 	}
 
 	/**
@@ -129,9 +205,9 @@ public class CMLChemFileWrapper {
 	public static CMLChemFile wrapInChemModel(IMolecule molecule) {
 		// FileNameGenerator fileNameGenerator = new FileNameGenerator();
 		CMLChemFile file = new CMLChemFile();
-		IChemModel model = molecule.getBuilder().newChemModel();
-		IChemSequence sequence = molecule.getBuilder().newChemSequence();
-		IMoleculeSet moleculeSet = molecule.getBuilder().newMoleculeSet();
+		IChemModel model = new ChemModel();
+		IChemSequence sequence = new ChemSequence();
+		IMoleculeSet moleculeSet = new MoleculeSet();
 		moleculeSet.addMolecule(molecule);
 		model.setMoleculeSet(moleculeSet);
 		sequence.addChemModel(model);
@@ -173,7 +249,7 @@ public class CMLChemFileWrapper {
 	}
 
 	/**
-	 * Method which converts a cmlChemFile which contains multiple molecules to an List of cmlChemFiles which contains only one
+	 * Method which converts a cmlChemFile which contains multiple molecules to a list of cmlChemFiles which contains only one
 	 * molecule
 	 * 
 	 * @param cmlChemFile
@@ -181,21 +257,22 @@ public class CMLChemFileWrapper {
 	 * @return List of cmlChemFiles
 	 */
 	public static List<CMLChemFile> wrapInChemModelList(CMLChemFile cmlChemFile) {
-		// FileNameGenerator fileNameGenerator = new FileNameGenerator();
-
 		List<CMLChemFile> cmlList = new ArrayList<CMLChemFile>();
-		CMLChemFile chemFile;
-		for (int i = 0; i < cmlChemFile.getChemSequenceCount(); i++) {
-			for (int j = 0; j < cmlChemFile.getChemSequence(i).getChemModelCount(); j++) {
-				IChemModel chemModel = cmlChemFile.getChemSequence(i).getChemModel(j);
-				chemFile = new CMLChemFile();
-				IChemSequence sequence = new ChemSequence();
-				sequence.addChemModel(chemModel);
-				chemFile.addChemSequence(sequence);
-				// chemFile.setProperty(FileNameGenerator.FILENAME,
-				// fileNameGenerator.getNewFileNameList());
-				cmlList.add(chemFile);
-			}
+		List<IAtomContainer> containers = ChemFileManipulator.getAllAtomContainers(cmlChemFile);
+		if (containers.size() == 1) {
+			cmlList.add(cmlChemFile);
+			return cmlList;
+		}
+		for (IAtomContainer container : containers) {
+			CMLChemFile chemFile = new CMLChemFile();
+			IMoleculeSet set = new MoleculeSet();
+			set.addAtomContainer(container);
+			IChemModel model = new ChemModel();
+			model.setMoleculeSet(set);
+			IChemSequence seq = new ChemSequence();
+			seq.addChemModel(model);
+			chemFile.addChemSequence(seq);
+			cmlList.add(chemFile);
 		}
 		return cmlList;
 	}

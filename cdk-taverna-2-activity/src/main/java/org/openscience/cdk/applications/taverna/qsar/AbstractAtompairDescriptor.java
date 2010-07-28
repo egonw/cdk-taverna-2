@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ReferenceService;
@@ -12,9 +13,9 @@ import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.qsar.DescriptorValue;
@@ -62,9 +63,10 @@ public abstract class AbstractAtompairDescriptor extends AbstractCDKActivity {
 
 	@Override
 	public String getFolderName() {
-		return Constants.QSAR_ATOMPAIR_DESCRIPTOR_FOLDER_NAME;
+		return CDKTavernaConstants.QSAR_ATOMPAIR_DESCRIPTOR_FOLDER_NAME;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
@@ -76,19 +78,10 @@ public abstract class AbstractAtompairDescriptor extends AbstractCDKActivity {
 		List<CMLChemFile> notCalculatedList = new ArrayList<CMLChemFile>();
 		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
 				context);
-		for (byte[] data : dataArray) {
-			Object obj;
-			try {
-				obj = CDKObjectHandler.getObject(data);
-			} catch (Exception e) {
-				throw new CDKTavernaException(this.getConfiguration().getActivityName(), "Error while deserializing object");
-			}
-			if (obj instanceof CMLChemFile) {
-				inputList.add((CMLChemFile) obj);
-			} else {
-				throw new CDKTavernaException(this.getConfiguration().getActivityName(),
-						CDKTavernaException.WRONG_INPUT_PORT_TYPE);
-			}
+		try {
+			inputList = CDKObjectHandler.getChemFileList(dataArray);
+		} catch (Exception e) {
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		if (descriptor == null) {
 			descriptor = getDescriptor();
@@ -101,23 +94,27 @@ public abstract class AbstractAtompairDescriptor extends AbstractCDKActivity {
 			for (Iterator<CMLChemFile> iter = inputList.iterator(); iter.hasNext();) {
 				CMLChemFile file = iter.next();
 				List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(file);
-				for (IAtomContainer molecules : moleculeList) {
+				for (IAtomContainer molecule : moleculeList) {
 					try {
-						for (int j = 0; j < molecules.getAtomCount(); j++) {
-							for (int i = 0; i < molecules.getAtomCount(); i++) {
-								DescriptorValue value = descriptor.calculate(molecules.getAtom(j), molecules.getAtom(i),
-										molecules);
-								molecules.setProperty(value.getSpecification(), value);
+						if (molecule.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
+							UUID uuid = UUID.randomUUID();
+							molecule.setProperty(CDKTavernaConstants.MOLECULEID, uuid);
+						}
+						for (int j = 0; j < molecule.getAtomCount(); j++) {
+							for (int i = 0; i < molecule.getAtomCount(); i++) {
+								DescriptorValue value = descriptor.calculate(molecule.getAtom(j), molecule.getAtom(i), molecule);
+								molecule.setProperty(value.getSpecification(), value);
 							}
 						}
 						calculatedList.add(file);
-						// comment.add("Calculation done;");
+
 					} catch (Exception e) {
 						notCalculatedList.add(file);
 						// TODO exception handling
 					}
 				}
 			}
+			comment.add("Calculation done;");
 		} catch (Exception exception) {
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), exception.getMessage());
 		}

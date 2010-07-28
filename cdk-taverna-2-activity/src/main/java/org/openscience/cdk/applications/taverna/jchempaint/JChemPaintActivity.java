@@ -11,9 +11,9 @@ import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 
@@ -52,7 +52,7 @@ public class JChemPaintActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getFolderName() {
-		return Constants.JCHEMPAINT_FOLDER_NAME;
+		return CDKTavernaConstants.JCHEMPAINT_FOLDER_NAME;
 	}
 
 	@Override
@@ -65,7 +65,8 @@ public class JChemPaintActivity extends AbstractCDKActivity {
 		List<byte[]> dataList = new ArrayList<byte[]>();
 		// Read ChemFile
 		try {
-			CMLChemFile chemFile = (CMLChemFile) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_CMLCHEMFILE);
+			CMLChemFile chemFile = (CMLChemFile) this.getConfiguration().getAdditionalProperty(
+					CDKTavernaConstants.PROPERTY_CMLCHEMFILE);
 			if (chemFile == null) {
 				throw new CDKTavernaException(JChemPaintActivity.JCHEMPAINT_ACTIVITY, "No molecules found!");
 			}

@@ -16,6 +16,6 @@ import net.sf.taverna.raven.launcher.Launcher;
  */
 public class TavernaWorkbenchWithExamplePlugin {
 	public static void main(String[] args) {
-		Launcher.main(args);
+		Launcher.main(args); 
 	}
 }

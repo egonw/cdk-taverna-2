@@ -33,8 +33,8 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 
 import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLRXNReader;
@@ -47,7 +47,7 @@ import org.openscience.cdk.io.MDLRXNReader;
  */
 public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFileReader {
 
-	public static final String RXN_FILE_READER_ACTIVITY = "RXN file reader";
+	public static final String RXN_FILE_READER_ACTIVITY = "RXN File Reader";
 
 	public MDLRXNFileReaderActivity() {
 		this.RESULT_PORTS = new String[] { "Reactions" };
@@ -71,7 +71,7 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFi
 		ReferenceService referenceService = context.getReferenceService();
 		Reaction reaction = new Reaction();
 		// Read RXN file
-		File file = (File) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE);
+		File file = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (file == null) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
 		}
@@ -97,8 +97,8 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFi
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(Constants.PROPERTY_FILE_EXTENSION, ".rxn");
-		properties.put(Constants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL RXN file");
+		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".rxn");
+		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL RXN file");
 		return properties;
 	}
 
@@ -109,6 +109,6 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFi
 
 	@Override
 	public String getFolderName() {
-		return Constants.IO_FOLDER_NAME;
+		return CDKTavernaConstants.IO_FOLDER_NAME;
 	}
 }

@@ -33,7 +33,7 @@ import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
-import org.openscience.cdk.applications.taverna.Constants;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 
 /**
@@ -56,7 +56,7 @@ public class MDLRXNFileReaderActivityTest extends CDKTavernaTestCases {
 		configBean = new CDKActivityConfigurationBean();
 		// TODO read resource
 		File rxnTestFile = new File("src\\test\\resources\\data\\mol\\reaction.rxn");
-		configBean.addAdditionalProperty(Constants.PROPERTY_FILE, rxnTestFile);
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, rxnTestFile);
 		configBean.setActivityName(MDLRXNFileReaderActivity.RXN_FILE_READER_ACTIVITY);
 	}
 

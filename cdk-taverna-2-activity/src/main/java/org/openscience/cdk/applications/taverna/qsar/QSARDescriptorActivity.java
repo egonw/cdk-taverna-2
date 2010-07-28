@@ -9,8 +9,8 @@ import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.Constants;
 
 public class QSARDescriptorActivity extends AbstractCDKActivity {
 
@@ -51,15 +51,16 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getFolderName() {
-		return Constants.QSAR_FOLDER_NAME;
+		return CDKTavernaConstants.QSAR_FOLDER_NAME;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		ArrayList<Class<? extends AbstractCDKActivity>> classes = (ArrayList<Class<? extends AbstractCDKActivity>>) this
-				.getConfiguration().getAdditionalProperty(Constants.PROPERTY_CHOSEN_QSARDESCRIPTORS);
+				.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_CHOSEN_QSARDESCRIPTORS);
 		if (classes == null || classes.isEmpty()) {
 			throw new CDKTavernaException(this.getActivityName(), "No QSAR descriptors chosen!");
 		}

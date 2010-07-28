@@ -12,7 +12,7 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
-import org.openscience.cdk.applications.taverna.Constants;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 
 public class CDKServiceDescriptor extends ServiceDescription<CDKActivityConfigurationBean> {
 
@@ -77,7 +77,7 @@ public class CDKServiceDescriptor extends ServiceDescription<CDKActivityConfigur
 	@Override
 	public List<String> getPath() {
 		// For deeper paths you may return several strings
-		return Arrays.asList(Constants.CDK_TAVERNA_FOLDER_NAME, this.folderName);
+		return Arrays.asList(CDKTavernaConstants.CDK_TAVERNA_FOLDER_NAME, this.folderName);
 	}
 
 	/**

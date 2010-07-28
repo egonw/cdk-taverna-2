@@ -28,6 +28,9 @@ package org.openscience.cdk.applications.taverna.io;
 import java.io.File;
 import java.io.FileReader;
 
+import org.openscience.cdk.ChemModel;
+import org.openscience.cdk.ChemSequence;
+import org.openscience.cdk.MoleculeSet;
 import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.interfaces.IChemModel;
@@ -57,8 +60,8 @@ public class CDKIOReader {
 	 */
 	public static CMLChemFile[] readFromSMILESFile(String filename) throws Exception {
 		SMILESReader reader = new SMILESReader(new FileReader(new File(filename)));
-		IMoleculeSet som = (IMoleculeSet) reader.read(new CMLChemFile().getBuilder().newMoleculeSet());
-		IMoleculeSet som2D = new CMLChemFile().getBuilder().newMoleculeSet();
+		IMoleculeSet som = (IMoleculeSet) reader.read(new MoleculeSet());
+		IMoleculeSet som2D = new MoleculeSet();
 		StructureDiagramGenerator str = new StructureDiagramGenerator();
 		for (int i = 0; i < som.getMoleculeCount(); i++) {
 			str.setMolecule(som.getMolecule(i));
@@ -81,9 +84,9 @@ public class CDKIOReader {
 	 */
 	public static CMLChemFile wrapInChemModel(IMolecule molecule) {
 		CMLChemFile file = new CMLChemFile();
-		IChemModel model = molecule.getBuilder().newChemModel();
-		IChemSequence sequence = molecule.getBuilder().newChemSequence();
-		IMoleculeSet moleculeSet = molecule.getBuilder().newMoleculeSet();
+		IChemModel model = new ChemModel();
+		IChemSequence sequence = new ChemSequence();
+		IMoleculeSet moleculeSet = new MoleculeSet();
 		moleculeSet.addMolecule(molecule);
 		model.setMoleculeSet(moleculeSet);
 		sequence.addChemModel(model);

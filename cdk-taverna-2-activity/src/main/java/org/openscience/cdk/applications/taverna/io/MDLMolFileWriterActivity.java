@@ -23,7 +23,6 @@ package org.openscience.cdk.applications.taverna.io;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,9 +33,9 @@ import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
@@ -50,7 +49,7 @@ import org.openscience.cdk.io.MDLWriter;
  */
 public class MDLMolFileWriterActivity extends AbstractCDKActivity implements IFileWriter {
 
-	public static final String MOL_FILE_WRITER_ACTIVITY = "Molfile writer";
+	public static final String MOL_FILE_WRITER_ACTIVITY = "Molfile Writer";
 
 	public MDLMolFileWriterActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
@@ -66,37 +65,25 @@ public class MDLMolFileWriterActivity extends AbstractCDKActivity implements IFi
 		// Nothing to add
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(final Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
-		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
+		List<CMLChemFile> chemFileList;
+		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
+				context);
 		try {
-			List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]),
-					byte[].class, context);
-			for (byte[] data : dataArray) {
-				Object obj = CDKObjectHandler.getObject(data);
-				if (obj instanceof CMLChemFile) {
-					chemFileList.add((CMLChemFile) obj);
-				} else {
-					throw new CDKTavernaException(this.getConfiguration().getActivityName(),
-							CDKTavernaException.WRONG_INPUT_PORT_TYPE);
-				}
-			}
+			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			if (e instanceof CDKTavernaException) {
-				throw (CDKTavernaException) e;
-			} else {
-				throw new CDKTavernaException(this.getConfiguration().getActivityName(),
-						CDKTavernaException.WRONG_INPUT_PORT_TYPE);
-			}
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
-		File directory = (File) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE);
+		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (directory == null) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
 		}
-		String extension = (String) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE_EXTENSION);
+		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 		for (CMLChemFile cmlChemFile : chemFileList) {
 			String filename = FileNameGenerator.getNewFile(directory.getPath(), extension);
 			try {
@@ -120,7 +107,7 @@ public class MDLMolFileWriterActivity extends AbstractCDKActivity implements IFi
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(Constants.PROPERTY_FILE_EXTENSION, ".mol");
+		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".mol");
 		return properties;
 	}
 
@@ -131,6 +118,6 @@ public class MDLMolFileWriterActivity extends AbstractCDKActivity implements IFi
 
 	@Override
 	public String getFolderName() {
-		return Constants.IO_FOLDER_NAME;
+		return CDKTavernaConstants.IO_FOLDER_NAME;
 	}
 }

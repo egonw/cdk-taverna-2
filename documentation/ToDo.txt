@@ -1,4 +1,10 @@
 07.06.2010:
 - Add RuleOfFive filter to QSARDescriptorActivity
 - Check RuleOfFive filter test failure 
-- Add missing unit tests
+- Add missing unit tests (Isomorphism, ...) -> Done
+
+19.07.2010
+- AnyAtom subgraph H matching problem 
+- Add vector generator unit test
+- Add CML IO unit test
+- Adapt enumerator lib to new cdk version (atom value, timeout, ..)

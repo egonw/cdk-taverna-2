@@ -32,9 +32,9 @@ import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLReader;
@@ -47,7 +47,7 @@ import org.openscience.cdk.io.MDLReader;
  */
 public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFileReader {
 
-	public static final String MOL_FILE_READER_ACTIVITY = "Molfile reader";
+	public static final String MOL_FILE_READER_ACTIVITY = "Molfile Reader";
 
 	public MDLMolFileReaderActivity() {
 		this.RESULT_PORTS = new String[] { "Structure" };
@@ -71,7 +71,7 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFi
 		ReferenceService referenceService = context.getReferenceService();
 		CMLChemFile cmlChemFile = new CMLChemFile();
 		// Read mol file
-		File file = (File) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE);
+		File file = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (file == null) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
 		}
@@ -97,8 +97,8 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFi
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(Constants.PROPERTY_FILE_EXTENSION, ".mol");
-		properties.put(Constants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL Molfile");
+		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".mol");
+		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL Molfile");
 		return properties;
 	}
 
@@ -109,7 +109,7 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFi
 
 	@Override
 	public String getFolderName() {
-		return Constants.IO_FOLDER_NAME;
+		return CDKTavernaConstants.IO_FOLDER_NAME;
 	}
 
 }

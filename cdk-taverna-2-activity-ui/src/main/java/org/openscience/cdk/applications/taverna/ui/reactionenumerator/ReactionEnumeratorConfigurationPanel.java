@@ -31,7 +31,7 @@ import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityCon
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
-import org.openscience.cdk.applications.taverna.Constants;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 
 /**
  * Configuration panel for the reaction enumerator activity.
@@ -91,7 +91,7 @@ public class ReactionEnumeratorConfigurationPanel extends
 	@Override
 	public boolean isConfigurationChanged() {
 		int numberOfPorts = Integer.parseInt(this.portTextField.getText());
-		int oldValue = (Integer) this.configBean.getAdditionalProperty(Constants.PROPERTY_REACTANT_PORTS);
+		int oldValue = (Integer) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_REACTANT_PORTS);
 		return !(numberOfPorts == oldValue);
 	}
 
@@ -99,7 +99,7 @@ public class ReactionEnumeratorConfigurationPanel extends
 	public void noteConfiguration() {
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
 		int numberOfPorts = Integer.parseInt(this.portTextField.getText());
-		this.configBean.addAdditionalProperty(Constants.PROPERTY_REACTANT_PORTS, new Integer(numberOfPorts));
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_REACTANT_PORTS, new Integer(numberOfPorts));
 	}
 
 	@Override

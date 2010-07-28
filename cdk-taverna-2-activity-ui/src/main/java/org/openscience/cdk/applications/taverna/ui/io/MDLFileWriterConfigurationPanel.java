@@ -41,7 +41,7 @@ import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityCon
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
-import org.openscience.cdk.applications.taverna.Constants;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 
 /**
  * Configuration panel for MDL file writing activities.
@@ -132,21 +132,21 @@ public class MDLFileWriterConfigurationPanel extends
 		if (this.file == null) {
 			return false;
 		}
-		File file = (File) configBean.getAdditionalProperty(Constants.PROPERTY_FILE);
+		File file = (File) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		return !this.file.equals(file);
 	}
 
 	@Override
 	public void noteConfiguration() {
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
-		this.configBean.addAdditionalProperty(Constants.PROPERTY_FILE, this.file);
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.file);
 		this.filePathField.setText(this.file.getPath());
 		this.filePathField.repaint();
 	}
 
 	@Override
 	public void refreshConfiguration() {
-		this.file = (File) configBean.getAdditionalProperty(Constants.PROPERTY_FILE);
+		this.file = (File) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (this.file != null) {
 			this.filePathField.setText(this.file.getAbsolutePath());
 			this.filePathField.repaint();

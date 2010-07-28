@@ -163,27 +163,26 @@ public class CDKTavernaTestData {
 					// fileNameGenerator.addFileNameToFileNameList(JUNITTESTINGFILENAME, fileNameGenerator.getNewFileNameList()));
 				}
 			}
-			path = "." + File.separator + "target" + File.separator + "test-classes" + File.separator + "data" + File.separator
-					+ "rxn" + File.separator + "reactionevaluation-reaction.rxn";
+			path = "src\\test\\resources\\data\\rxn\\reactionevaluation-reaction.rxn";
 			file = new File(path);
 			if (file.exists()) {
 				reactionEvaluationReaction = CDKIOReader.readRXNV2000File(path);
 			}
-			path = "." + File.separator + "target" + File.separator + "test-classes" + File.separator + "data" + File.separator
-					+ "sdf" + File.separator + "reactionevaluationedukt1a1-3.sdf";
+			path = "src\\test\\resources\\data\\sdf\\reactionevaluationedukt1a1-3.sdf";
 			file = new File(path);
 			if (file.exists()) {
 				reactionEvaluationEductOne = CDKIOReader.readFromSDV2000File(path);
-				for (int i = 0; i < reactionEvaluationEductOne.length; i++) {
+				reactionEvaluationEductOne = CMLChemFileWrapper.wrapChemModelArrayInResolvedChemModelArray(reactionEvaluationEductOne);
+		//		for (int i = 0; i < reactionEvaluationEductOne.length; i++) {
 					// reactionEvaluationEductOne[i].setProperty(FileNameGenerator.FILENAME,
 					// fileNameGenerator.addFileNameToFileNameList(JUNITTESTINGFILENAME, fileNameGenerator.getNewFileNameList()));
-				}
+			//	}
 			}
-			path = "." + File.separator + "target" + File.separator + "test-classes" + File.separator + "data" + File.separator
-					+ "sdf" + File.separator + "reactionevaluationedukt2B1-3.sdf";
+			path = "src\\test\\resources\\data\\sdf\\reactionevaluationedukt2B1-3.sdf";
 			file = new File(path);
 			if (file.exists()) {
 				reactionEvaluationEductTwo = CDKIOReader.readFromSDV2000File(path);
+				reactionEvaluationEductTwo = CMLChemFileWrapper.wrapChemModelArrayInResolvedChemModelArray(reactionEvaluationEductTwo);
 				for (int i = 0; i < reactionEvaluationEductTwo.length; i++) {
 					// reactionEvaluationEductTwo[i].setProperty(FileNameGenerator.FILENAME,
 					// fileNameGenerator.addFileNameToFileNameList(JUNITTESTINGFILENAME, fileNameGenerator.getNewFileNameList()));

@@ -35,7 +35,7 @@ import org.openscience.cdk.MoleculeSet;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.Constants;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.interfaces.IChemModel;
 import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.jchempaint.JChemPaintPanel;
@@ -67,7 +67,7 @@ public class JChemPaintConfigurationPanel extends ActivityConfigurationPanel<Abs
 			this.removeAll();
 			this.setLayout(new GridLayout());
 			this.setPreferredSize(new Dimension(800, 600));
-			this.file = (CMLChemFile) configBean.getAdditionalProperty(Constants.PROPERTY_CMLCHEMFILE);
+			this.file = (CMLChemFile) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_CMLCHEMFILE);
 			IChemModel model = null;
 			if (file == null) {
 				model = new ChemModel();
@@ -110,14 +110,14 @@ public class JChemPaintConfigurationPanel extends ActivityConfigurationPanel<Abs
 		if (this.file == null) {
 			return false;
 		}
-		CMLChemFile file = (CMLChemFile) configBean.getAdditionalProperty(Constants.PROPERTY_CMLCHEMFILE);
+		CMLChemFile file = (CMLChemFile) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_CMLCHEMFILE);
 		return !this.file.equals(file);
 	}
 
 	@Override
 	public void noteConfiguration() {
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
-		this.configBean.addAdditionalProperty(Constants.PROPERTY_CMLCHEMFILE, this.file);
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CMLCHEMFILE, this.file);
 	}
 
 	@Override

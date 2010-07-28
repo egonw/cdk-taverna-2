@@ -33,10 +33,11 @@ import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
+import org.openscience.cdk.MoleculeSet;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
@@ -52,7 +53,7 @@ import org.openscience.cdk.layout.StructureDiagramGenerator;
  */
 public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFileReader {
 
-	public static final String SMILES_FILE_READER_ACTIVITY = "SMILES file reader";
+	public static final String SMILES_FILE_READER_ACTIVITY = "SMILES File Reader";
 
 	public SMILESFileReaderActivity() {
 		this.RESULT_PORTS = new String[] { "Structures" };
@@ -77,18 +78,18 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 		CMLChemFile cmlChemFile = new CMLChemFile();
 		List<byte[]> dataArray = new ArrayList<byte[]>();
 		// Read SMILES file
-		File file = (File) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE);
+		File file = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (file == null) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
 		}
 		IMoleculeSet som = null;
 		try {
 			SMILESReader reader = new SMILESReader(new FileReader(file));
-			som = (IMoleculeSet) reader.read(new CMLChemFile().getBuilder().newMoleculeSet());
+			som = (IMoleculeSet) reader.read(new MoleculeSet());
 		} catch (Exception e) {
 			throw new CDKTavernaException(this.getActivityName(), "Error reading SMILES file!");
 		}
-		IMoleculeSet som2D = new CMLChemFile().getBuilder().newMoleculeSet();
+		IMoleculeSet som2D = new MoleculeSet();
 		StructureDiagramGenerator str = new StructureDiagramGenerator();
 		for (int i = 0; i < som.getMoleculeCount(); i++) {
 			try {
@@ -122,8 +123,8 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(Constants.PROPERTY_FILE_EXTENSION, "");
-		properties.put(Constants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "Any SMILES file");
+		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, "");
+		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "Any SMILES file");
 		return properties;
 	}
 
@@ -134,7 +135,7 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 
 	@Override
 	public String getFolderName() {
-		return Constants.IO_FOLDER_NAME;
+		return CDKTavernaConstants.IO_FOLDER_NAME;
 	}
 
 }

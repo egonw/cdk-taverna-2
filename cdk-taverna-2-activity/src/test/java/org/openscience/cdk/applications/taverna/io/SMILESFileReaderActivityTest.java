@@ -34,7 +34,7 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.Constants;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
@@ -59,7 +59,7 @@ public class SMILESFileReaderActivityTest extends CDKTavernaTestCases {
 		configBean = new CDKActivityConfigurationBean();
 		// TODO read resource
 		File smilesTestFile = new File("src\\test\\resources\\data\\smiles\\allstructures.smi");
-		configBean.addAdditionalProperty(Constants.PROPERTY_FILE, smilesTestFile);
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, smilesTestFile);
 		configBean.setActivityName(SMILESFileReaderActivity.SMILES_FILE_READER_ACTIVITY);
 	}
 

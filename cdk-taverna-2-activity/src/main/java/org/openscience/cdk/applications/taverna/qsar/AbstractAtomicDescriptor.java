@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ReferenceService;
@@ -12,9 +13,9 @@ import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.qsar.DescriptorValue;
@@ -27,13 +28,15 @@ public abstract class AbstractAtomicDescriptor extends AbstractCDKActivity {
 
 	public AbstractAtomicDescriptor() {
 		super();
-		this.INPUT_PORTS = new String[] { "Structures" };
+		this.INPUT_PORTS = new String[] { "Structures", "Query Structure" };
 		this.RESULT_PORTS = new String[] { "Calculated Structures", "NOT Calculated Structures" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
+		for (String name : this.INPUT_PORTS) {
+			addInput(name, 1, true, null, byte[].class);
+		}
 	}
 
 	@Override
@@ -42,8 +45,6 @@ public abstract class AbstractAtomicDescriptor extends AbstractCDKActivity {
 			addOutput(name, 1);
 		}
 	}
-
-	protected abstract IAtomicDescriptor getDescriptor();
 
 	@Override
 	public String getActivityName() {
@@ -62,9 +63,12 @@ public abstract class AbstractAtomicDescriptor extends AbstractCDKActivity {
 
 	@Override
 	public String getFolderName() {
-		return Constants.QSAR_ATOMIC_DESCRIPTOR_FOLDER_NAME;
+		return CDKTavernaConstants.QSAR_ATOMIC_DESCRIPTOR_FOLDER_NAME;
 	}
 
+	protected abstract IAtomicDescriptor getDescriptor();
+
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
@@ -76,19 +80,10 @@ public abstract class AbstractAtomicDescriptor extends AbstractCDKActivity {
 		List<CMLChemFile> notCalculatedList = new ArrayList<CMLChemFile>();
 		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
 				context);
-		for (byte[] data : dataArray) {
-			Object obj;
-			try {
-				obj = CDKObjectHandler.getObject(data);
-			} catch (Exception e) {
-				throw new CDKTavernaException(this.getConfiguration().getActivityName(), "Error while deserializing object");
-			}
-			if (obj instanceof CMLChemFile) {
-				inputList.add((CMLChemFile) obj);
-			} else {
-				throw new CDKTavernaException(this.getConfiguration().getActivityName(),
-						CDKTavernaException.WRONG_INPUT_PORT_TYPE);
-			}
+		try {
+			inputList = CDKObjectHandler.getChemFileList(dataArray);
+		} catch (Exception e) {
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		if (descriptor == null) {
 			descriptor = getDescriptor();
@@ -101,22 +96,27 @@ public abstract class AbstractAtomicDescriptor extends AbstractCDKActivity {
 			for (Iterator<CMLChemFile> iter = inputList.iterator(); iter.hasNext();) {
 				CMLChemFile file = iter.next();
 				List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(file);
-				for (IAtomContainer molecules : moleculeList) {
+				for (IAtomContainer molecule : moleculeList) {
 					try {
-						for (int j = 0; j < molecules.getAtomCount(); j++) {
-							DescriptorValue value = descriptor.calculate(molecules.getAtom(j), molecules);
-							molecules.getAtom(j).setProperty(value.getSpecification(), value);
+						if (molecule.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
+							UUID uuid = UUID.randomUUID();
+							molecule.setProperty(CDKTavernaConstants.MOLECULEID, uuid);
+						}
+						for (int j = 0; j < molecule.getAtomCount(); j++) {
+							DescriptorValue value = descriptor.calculate(molecule.getAtom(j), molecule);
+							molecule.getAtom(j).setProperty(value.getSpecification(), value);
 							// molecules.setProperty(value.getSpecification(),
 							// value);
 						}
 						calculatedList.add(file);
-						// comment.add("Calculation done;");
 					} catch (Exception e) {
+						e.printStackTrace();
 						notCalculatedList.add(file);
 						// TODO exception handling
 					}
 				}
 			}
+			comment.add("Calculation done;");
 		} catch (Exception exception) {
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), exception.getMessage());
 		}

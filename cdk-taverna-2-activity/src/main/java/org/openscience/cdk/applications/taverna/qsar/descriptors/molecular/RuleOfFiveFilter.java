@@ -36,9 +36,9 @@ import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.qsar.descriptors.molecular.RuleOfFiveDescriptor;
@@ -84,7 +84,7 @@ public class RuleOfFiveFilter extends AbstractCDKActivity {
 
 	@Override
 	public String getFolderName() {
-		return Constants.QSAR_ATOMIC_DESCRIPTOR_FOLDER_NAME;
+		return CDKTavernaConstants.QSAR_ATOMIC_DESCRIPTOR_FOLDER_NAME;
 	}
 
 	@SuppressWarnings("unchecked")

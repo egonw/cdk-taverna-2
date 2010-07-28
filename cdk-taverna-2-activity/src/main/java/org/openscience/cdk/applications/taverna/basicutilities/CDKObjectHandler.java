@@ -26,6 +26,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.openscience.cdk.Reaction;
+import org.openscience.cdk.applications.taverna.CDKTavernaException;
+import org.openscience.cdk.applications.taverna.CMLChemFile;
 
 /**
  * Class which serializes/deserializes objects into/from byte arrays.
@@ -50,6 +56,42 @@ public class CDKObjectHandler {
 	}
 
 	/**
+	 * Serializes an objects into a list of byte arrays.
+	 */
+	public static List<byte[]> getBytesList(List<Object> objs) throws IOException {
+		ArrayList<byte[]> list = new ArrayList<byte[]>();
+		for (Object obj : objs) {
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(bos);
+			oos.writeObject(obj);
+			oos.flush();
+			oos.close();
+			bos.close();
+			byte[] data = bos.toByteArray();
+			list.add(data);
+		}
+		return list;
+	}
+
+	/**
+	 * Serializes an objects into a list of byte arrays.
+	 */
+	public static List<byte[]> getBytesList(Object[] objs) throws IOException {
+		ArrayList<byte[]> list = new ArrayList<byte[]>();
+		for (Object obj : objs) {
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(bos);
+			oos.writeObject(obj);
+			oos.flush();
+			oos.close();
+			bos.close();
+			byte[] data = bos.toByteArray();
+			list.add(data);
+		}
+		return list;
+	}
+
+	/**
 	 * Deserializes a byte array into an object.
 	 */
 	public static Object getObject(byte[] data) throws Exception {
@@ -60,6 +102,43 @@ public class CDKObjectHandler {
 		ois.close();
 		bis.close();
 		return object;
+	}
+
+	public static List<CMLChemFile> getChemFileList(List<byte[]> dataArray) throws Exception {
+		ArrayList<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
+		for (byte[] data : dataArray) {
+			Object obj = null;
+			try {
+				obj = CDKObjectHandler.getObject(data);
+			} catch (Exception e) {
+				throw new Exception(CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+			}
+			if (obj instanceof CMLChemFile) {
+				List<CMLChemFile> list = CMLChemFileWrapper.wrapInChemModelList((CMLChemFile) obj);
+				chemFileList.addAll(list);
+			} else {
+				throw new Exception(CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+			}
+		}
+		return chemFileList;
+	}
+
+	public static List<Reaction> getReactionList(List<byte[]> dataArray) throws Exception {
+		ArrayList<Reaction> reactionList = new ArrayList<Reaction>();
+		for (byte[] data : dataArray) {
+			Object obj = null;
+			try {
+				obj = CDKObjectHandler.getObject(data);
+			} catch (Exception e) {
+				throw new Exception(CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+			}
+			if (obj instanceof Reaction) {
+				reactionList.add((Reaction) obj);
+			} else {
+				throw new Exception(CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+			}
+		}
+		return reactionList;
 	}
 
 }

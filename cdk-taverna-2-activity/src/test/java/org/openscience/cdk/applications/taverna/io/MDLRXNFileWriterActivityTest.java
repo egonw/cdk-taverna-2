@@ -35,7 +35,7 @@ import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.Constants;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 
 /**
@@ -61,8 +61,8 @@ public class MDLRXNFileWriterActivityTest extends CDKTavernaTestCases {
 		// TODO read resource
 		this.dir = new File(".\\Test\\");
 		this.dir.mkdir();
-		configBean.addAdditionalProperty(Constants.PROPERTY_FILE, this.dir);
-		configBean.addAdditionalProperty(Constants.PROPERTY_FILE_EXTENSION, ".rxn");
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.dir);
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".rxn");
 		configBean.setActivityName(MDLRXNFileWriterActivity.RXN_FILE_WRITER_ACTIVITY);
 	}
 

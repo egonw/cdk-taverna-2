@@ -41,7 +41,7 @@ import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityCon
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
-import org.openscience.cdk.applications.taverna.Constants;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKFileFilter;
 
 /**
@@ -66,9 +66,9 @@ public class MDLFileReaderConfigurationPanel extends
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser openDialog = new JFileChooser(new File("."));
 			String extension = (String) MDLFileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
-					Constants.PROPERTY_FILE_EXTENSION);
+					CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 			String description = (String) MDLFileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
-					Constants.PROPERTY_FILE_EXTENSION_DESCRIPTION);
+					CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION);
 			openDialog.addChoosableFileFilter(new CDKFileFilter(description, extension));
 			if (openDialog.showOpenDialog(MDLFileReaderConfigurationPanel.this) == JFileChooser.APPROVE_OPTION) {
 				MDLFileReaderConfigurationPanel.this.file = openDialog.getSelectedFile();
@@ -88,7 +88,7 @@ public class MDLFileReaderConfigurationPanel extends
 			this.removeAll();
 			this.setLayout(new GridLayout(2, 0, 1, 1));
 			String description = (String) MDLFileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
-					Constants.PROPERTY_FILE_EXTENSION_DESCRIPTION);
+					CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION);
 			JLabel label = new JLabel(description + ":");
 			this.add(label);
 			JPanel filePanel = new JPanel();
@@ -122,7 +122,7 @@ public class MDLFileReaderConfigurationPanel extends
 	@Override
 	public boolean checkValues() {
 		String extension = (String) MDLFileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
-				Constants.PROPERTY_FILE_EXTENSION);
+				CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 		if (this.file != null || this.file.exists()) {
 			if (this.file.getPath().endsWith(extension)) {
 				return true;
@@ -143,21 +143,21 @@ public class MDLFileReaderConfigurationPanel extends
 		if (this.file == null) {
 			return false;
 		}
-		File file = (File) configBean.getAdditionalProperty(Constants.PROPERTY_FILE);
+		File file = (File) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		return !this.file.equals(file);
 	}
 
 	@Override
 	public void noteConfiguration() {
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
-		this.configBean.addAdditionalProperty(Constants.PROPERTY_FILE, this.file);
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.file);
 		this.filePathField.setText(this.file.getPath());
 		this.filePathField.repaint();
 	}
 
 	@Override
 	public void refreshConfiguration() {
-		this.file = (File) configBean.getAdditionalProperty(Constants.PROPERTY_FILE);
+		this.file = (File) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (this.file != null) {
 			this.filePathField.setText(this.file.getAbsolutePath());
 			this.filePathField.repaint();

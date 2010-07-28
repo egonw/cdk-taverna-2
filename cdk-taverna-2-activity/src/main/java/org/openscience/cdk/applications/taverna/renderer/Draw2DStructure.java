@@ -45,18 +45,32 @@ public class Draw2DStructure {
 		return aMolecule;
 	}
 
-	public static BufferedImage drawMolecule(IAtomContainer molecule, int width, int height) {
+	public static BufferedImage drawMolecule(IAtomContainer molecule, int width, int height) throws Exception {
+		return drawMolecule(molecule, width, height, 1.0);
+	}
+
+	public static BufferedImage drawMolecule(IAtomContainer molecule, int width, int height, double scale) throws Exception {
 		// Init image
 		GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
 				.getDefaultConfiguration();
 		BufferedImage image = gc.createCompatibleImage(width, height);
 		// Init renderer
 		Renderer renderer = RendererFactory.getRendererInstance();
-		molecule = Draw2DStructure.fitMoleculeGeometry(molecule, new Dimension(width, height));
+
 		Graphics2D g2 = (Graphics2D) image.getGraphics().create();
 		g2.setColor(renderer.getRenderer2DModel().getBackColor());
 		g2.fillRect(0, 0, width, height);
-		renderer.paintMolecule(molecule, new AWTDrawVisitor(g2), new Rectangle(0, 0, width, height), true);
+		if (scale >= 1.0) {
+			molecule = Draw2DStructure.fitMoleculeGeometry(molecule, new Dimension(width, height));
+			renderer.paintMolecule(molecule, new AWTDrawVisitor(g2), new Rectangle(0, 0, width, height), true);
+		} else {
+			int x = (int) ((width * (1.0 - scale)) / 2);
+			int y = (int) ((height * (1.0- scale)) / 2);
+			int scaledWith = (int) (width * scale);
+			int scaledHeight = (int) (height * scale);
+			molecule = Draw2DStructure.fitMoleculeGeometry(molecule, new Dimension(scaledWith, scaledHeight));
+			renderer.paintMolecule(molecule, new AWTDrawVisitor(g2), new Rectangle(x, y, scaledWith, scaledHeight), true);
+		}
 		g2.dispose();
 		return image;
 	}

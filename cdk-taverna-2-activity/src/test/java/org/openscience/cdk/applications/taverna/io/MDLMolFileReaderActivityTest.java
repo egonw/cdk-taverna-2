@@ -33,7 +33,7 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.Constants;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
@@ -58,7 +58,7 @@ public class MDLMolFileReaderActivityTest extends CDKTavernaTestCases {
 		configBean = new CDKActivityConfigurationBean();
 		// TODO read resource
 		File molTestFile = new File("src\\test\\resources\\data\\mol\\molfile.mol");
-		configBean.addAdditionalProperty(Constants.PROPERTY_FILE, molTestFile);
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, molTestFile);
 		configBean.setActivityName(MDLMolFileReaderActivity.MOL_FILE_READER_ACTIVITY);
 	}
 

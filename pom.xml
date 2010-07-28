@@ -63,6 +63,7 @@
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
+					<forkMode>pertest</forkMode>
 					<systemProperties>
 						<property>
 							<name>java.awt.headless</name>

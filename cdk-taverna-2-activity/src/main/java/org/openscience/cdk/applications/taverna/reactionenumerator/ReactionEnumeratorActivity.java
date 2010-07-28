@@ -35,8 +35,9 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
+import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -59,7 +60,7 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addInputPorts() {
-		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_REACTANT_PORTS);
+		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_REACTANT_PORTS);
 		for (int i = 0; i < numberOfPorts; i++) {
 			addInput(ReactionEnumeratorActivity.REACTANT_PORT + " " + (i + 1), 1, true, null, byte[].class);
 		}
@@ -71,6 +72,7 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 		addOutput(ReactionEnumeratorActivity.RESULT_PORT, 1);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback) {
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
@@ -79,17 +81,22 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 		LinkedList<IAtomContainer[]> reactants = new LinkedList<IAtomContainer[]>();
 		IReaction reaction;
 		List<byte[]> dataList;
-		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_REACTANT_PORTS);
+		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_REACTANT_PORTS);
 		ReactionEnumerator enumerator = new ReactionEnumerator();
 		try {
 			// get reactants
 			for (int i = 0; i < numberOfPorts; i++) {
 				dataList = (List<byte[]>) referenceService.renderIdentifier(inputs.get(ReactionEnumeratorActivity.REACTANT_PORT
 						+ " " + (i + 1)), byte[].class, context);
-				IAtomContainer[] containerArray = new AtomContainer[dataList.size()];
-				for (int j = 0; j < dataList.size(); j++) {
-					containerArray[j] = CMLChemFileWrapper.wrapChemModelInAtomContainer((CMLChemFile) CDKObjectHandler
-							.getObject(dataList.get(j)));
+				List<CMLChemFile> list = null;
+				try {
+					list = CDKObjectHandler.getChemFileList(dataList);
+				} catch (Exception e) {
+					throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
+				}
+				IAtomContainer[] containerArray = new AtomContainer[list.size()];
+				for (int j = 0; j < list.size(); j++) {
+					containerArray[j] = CMLChemFileWrapper.wrapChemModelInAtomContainer(list.get(j));
 				}
 				reactants.add(containerArray);
 			}
@@ -121,7 +128,7 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(Constants.PROPERTY_REACTANT_PORTS, new Integer(2));
+		properties.put(CDKTavernaConstants.PROPERTY_REACTANT_PORTS, new Integer(2));
 		return properties;
 	}
 
@@ -132,7 +139,7 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getFolderName() {
-		return Constants.REACTION_ENUMERATOR_FOLDER_NAME;
+		return CDKTavernaConstants.REACTION_ENUMERATOR_FOLDER_NAME;
 	}
 
 }

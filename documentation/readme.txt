@@ -17,3 +17,7 @@ Deploying the plugin with maven
 		<connection>scm:svn:https://cdktaverna2.svn.sourceforge.net/svnroot/cdktaverna2/tags/</connection>
 		<developerConnection>scm:svn:https://cdktaverna2.svn.sourceforge.net/svnroot/cdktaverna2/tags/</developerConnection>
  	</scm>
+
+Debugging maven wth eclipse:
+1)  mvn -Dmaven.surefire.debug -Dtest=??? test
+2)  eclipse: debug-> debug configurations -> remote java application

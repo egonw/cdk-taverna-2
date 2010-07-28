@@ -24,7 +24,7 @@ import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityCon
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
-import org.openscience.cdk.applications.taverna.Constants;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 
 public class QSARDescriptorConfigurationPanel extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
@@ -113,7 +113,7 @@ public class QSARDescriptorConfigurationPanel extends
 				checkBox.setSelected(false);
 			}
 			ArrayList<Class<? extends AbstractCDKActivity>> classes = (ArrayList<Class<? extends AbstractCDKActivity>>) this.configBean
-					.getAdditionalProperty(Constants.PROPERTY_CHOSEN_QSARDESCRIPTORS);
+					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_CHOSEN_QSARDESCRIPTORS);
 			if (classes != null) {
 				for (Class<? extends AbstractCDKActivity> clazz : classes) {
 					JCheckBox checkBox = this.selectionMap.get(clazz);
@@ -185,7 +185,7 @@ public class QSARDescriptorConfigurationPanel extends
 	@Override
 	public void noteConfiguration() {
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
-		this.configBean.addAdditionalProperty(Constants.PROPERTY_CHOSEN_QSARDESCRIPTORS, this.getSelectedClasses());
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CHOSEN_QSARDESCRIPTORS, this.getSelectedClasses());
 	}
 
 	@Override

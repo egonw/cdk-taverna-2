@@ -35,8 +35,8 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 
 import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
@@ -50,7 +50,7 @@ import org.openscience.cdk.io.MDLRXNWriter;
  */
 public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFileWriter {
 
-	public static final String RXN_FILE_WRITER_ACTIVITY = "RXN file writer";
+	public static final String RXN_FILE_WRITER_ACTIVITY = "RXN File Writer";
 
 	public MDLRXNFileWriterActivity() {
 		this.INPUT_PORTS = new String[] { "Reactions" };
@@ -66,37 +66,25 @@ public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFi
 		// empty
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<Reaction> reactionList = new ArrayList<Reaction>();
+		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
+				context);
 		try {
-			List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]),
-					byte[].class, context);
-			for (byte[] data : dataArray) {
-				Object obj = CDKObjectHandler.getObject(data);
-				if (obj instanceof Reaction) {
-					reactionList.add((Reaction) obj);
-				} else {
-					throw new CDKTavernaException(this.getConfiguration().getActivityName(),
-							CDKTavernaException.WRONG_INPUT_PORT_TYPE);
-				}
-			}
+			reactionList = CDKObjectHandler.getReactionList(dataArray);
 		} catch (Exception e) {
-			if (e instanceof CDKTavernaException) {
-				throw (CDKTavernaException) e;
-			} else {
-				throw new CDKTavernaException(this.getConfiguration().getActivityName(),
-						CDKTavernaException.WRONG_INPUT_PORT_TYPE);
-			}
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
-		File directory = (File) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE);
+		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (directory == null) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
 		}
-		String extension = (String) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE_EXTENSION);
+		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 		for (Reaction reaction : reactionList) {
 			String filename = FileNameGenerator.getNewFile(directory.getPath(), extension);
 			try {
@@ -120,7 +108,7 @@ public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFi
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(Constants.PROPERTY_FILE_EXTENSION, ".rxn");
+		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".rxn");
 		return properties;
 	}
 
@@ -131,6 +119,6 @@ public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFi
 
 	@Override
 	public String getFolderName() {
-		return Constants.IO_FOLDER_NAME;
+		return CDKTavernaConstants.IO_FOLDER_NAME;
 	}
 }

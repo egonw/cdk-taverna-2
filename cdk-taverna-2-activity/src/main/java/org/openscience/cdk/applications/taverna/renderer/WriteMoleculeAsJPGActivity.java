@@ -15,9 +15,9 @@ import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.Constants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
@@ -50,7 +50,7 @@ public class WriteMoleculeAsJPGActivity extends AbstractCDKActivity implements I
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(Constants.PROPERTY_FILE_EXTENSION, ".jpg");
+		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".jpg");
 		return properties;
 	}
 
@@ -61,9 +61,10 @@ public class WriteMoleculeAsJPGActivity extends AbstractCDKActivity implements I
 
 	@Override
 	public String getFolderName() {
-		return Constants.RENDERER_FOLDER_NAME;
+		return CDKTavernaConstants.RENDERER_FOLDER_NAME;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
@@ -73,17 +74,14 @@ public class WriteMoleculeAsJPGActivity extends AbstractCDKActivity implements I
 		try {
 			List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]),
 					byte[].class, context);
-			for (byte[] data : dataArray) {
-				Object obj = CDKObjectHandler.getObject(data);
-				if (obj instanceof CMLChemFile) {
-					chemFileList.add((CMLChemFile) obj);
-				} else {
-					throw new CDKTavernaException(this.getConfiguration().getActivityName(),
-							CDKTavernaException.WRONG_INPUT_PORT_TYPE);
-				}
+			try {
+				chemFileList = CDKObjectHandler.getChemFileList(dataArray);
+			} catch (Exception e) {
+				throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 			}
-			File directory = (File) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE);
-			String extension = (String) this.getConfiguration().getAdditionalProperty(Constants.PROPERTY_FILE_EXTENSION);
+			File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+			String extension = (String) this.getConfiguration()
+					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 			for (CMLChemFile cmlChemFile : chemFileList) {
 				try {
 					String filename = FileNameGenerator.getNewFile(directory.getPath(), extension);

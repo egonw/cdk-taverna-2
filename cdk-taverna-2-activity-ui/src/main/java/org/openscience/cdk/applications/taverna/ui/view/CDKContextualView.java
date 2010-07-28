@@ -12,7 +12,7 @@ import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityCon
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
-import org.openscience.cdk.applications.taverna.Constants;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.ui.config.CDKConfigureAction;
 
 @SuppressWarnings("serial")
@@ -38,7 +38,7 @@ public class CDKContextualView extends ContextualView {
 	@Override
 	public String getViewTitle() {
 		CDKActivityConfigurationBean configuration = this.activity.getConfiguration();
-		return Constants.CDK_TAVERNA_FOLDER_NAME + " - " + configuration.getActivityName();
+		return CDKTavernaConstants.CDK_TAVERNA_FOLDER_NAME + " - " + configuration.getActivityName();
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class CDKContextualView extends ContextualView {
 	@Override
 	public void refreshView() {
 		CDKActivityConfigurationBean configuration = this.activity.getConfiguration();
-		description.setText(Constants.CDK_TAVERNA_FOLDER_NAME + " - " + configuration.getFolderName() + " - " + configuration.getActivityName());
+		description.setText(CDKTavernaConstants.CDK_TAVERNA_FOLDER_NAME + " - " + configuration.getFolderName() + " - " + configuration.getActivityName());
 	}
 
 	/**
