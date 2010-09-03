@@ -34,6 +34,10 @@ import org.openscience.cdk.io.CMLWriter;
 import org.openscience.cdk.libio.cml.QSARCustomizer;
 import org.openscience.cdk.tools.IDCreator;
 
+/**
+ * @author Egon Willighagen
+ *
+ */
 public class CMLChemFile extends ChemFile {
 
 	private static final long serialVersionUID = -5664142472726700883L;

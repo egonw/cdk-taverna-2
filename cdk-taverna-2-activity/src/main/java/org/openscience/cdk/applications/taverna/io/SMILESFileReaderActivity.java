@@ -78,34 +78,36 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 		CMLChemFile cmlChemFile = new CMLChemFile();
 		List<byte[]> dataArray = new ArrayList<byte[]>();
 		// Read SMILES file
-		File file = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (file == null) {
+		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+		if (files == null || files.length == 0) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
 		}
-		IMoleculeSet som = null;
-		try {
-			SMILESReader reader = new SMILESReader(new FileReader(file));
-			som = (IMoleculeSet) reader.read(new MoleculeSet());
-		} catch (Exception e) {
-			throw new CDKTavernaException(this.getActivityName(), "Error reading SMILES file!");
-		}
-		IMoleculeSet som2D = new MoleculeSet();
-		StructureDiagramGenerator str = new StructureDiagramGenerator();
-		for (int i = 0; i < som.getMoleculeCount(); i++) {
+		for (File file : files) {
+			IMoleculeSet som = null;
 			try {
-				str.setMolecule(som.getMolecule(i));
-				str.generateCoordinates();
-				som2D.addMolecule(str.getMolecule());
+				SMILESReader reader = new SMILESReader(new FileReader(file));
+				som = (IMoleculeSet) reader.read(new MoleculeSet());
 			} catch (Exception e) {
-				comment.add("Error generating 2D Coordinate!");
+				throw new CDKTavernaException(this.getActivityName(), "Error reading SMILES file!");
 			}
-		}
-		for (int i = 0; i < som2D.getMoleculeCount(); i++) {
-			try {
-				cmlChemFile = CMLChemFileWrapper.wrapInChemModel(som2D.getMolecule(i));
-				dataArray.add(CDKObjectHandler.getBytes(cmlChemFile));
-			} catch (Exception e) {
-				throw new CDKTavernaException(this.getActivityName(), "Error creating output data!");
+			IMoleculeSet som2D = new MoleculeSet();
+			StructureDiagramGenerator str = new StructureDiagramGenerator();
+			for (int i = 0; i < som.getMoleculeCount(); i++) {
+				try {
+					str.setMolecule(som.getMolecule(i));
+					str.generateCoordinates();
+					som2D.addMolecule(str.getMolecule());
+				} catch (Exception e) {
+					comment.add("Error generating 2D Coordinate!");
+				}
+			}
+			for (int i = 0; i < som2D.getMoleculeCount(); i++) {
+				try {
+					cmlChemFile = CMLChemFileWrapper.wrapInChemModel(som2D.getMolecule(i));
+					dataArray.addAll(CDKObjectHandler.getBytesList(CMLChemFileWrapper.wrapInChemModelList(cmlChemFile)));
+				} catch (Exception e) {
+					throw new CDKTavernaException(this.getActivityName(), "Error creating output data!");
+				}
 			}
 		}
 		T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
@@ -125,6 +127,7 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 		HashMap<String, Object> properties = new HashMap<String, Object>();
 		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, "");
 		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "Any SMILES file");
+		properties.put(CDKTavernaConstants.PROPERTY_SUPPORT_MULTI_FILE, true);
 		return properties;
 	}
 

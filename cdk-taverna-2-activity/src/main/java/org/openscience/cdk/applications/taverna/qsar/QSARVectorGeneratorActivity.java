@@ -40,6 +40,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
+import org.openscience.cdk.fingerprint.Fingerprinter;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -64,7 +65,7 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity implements 
 
 	public QSARVectorGeneratorActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
-		this.RESULT_PORTS = new String[] { "Descriptor Vector", "Structures" };
+		this.RESULT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
 	}
 
 	@Override
@@ -75,7 +76,7 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity implements 
 	@Override
 	protected void addOutputPorts() {
 		addOutput(this.RESULT_PORTS[0], 0);
-		addOutput(this.RESULT_PORTS[1], 1);
+		addOutput(this.RESULT_PORTS[1], 0);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -116,8 +117,8 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity implements 
 						for (Object key : keys) {
 							if (bond.getProperty(key) instanceof DescriptorValue) {
 								dValue = (DescriptorValue) bond.getProperty(key);
-								descriptorName = dValue.getSpecification().getSpecificationReference().split(
-										descriptorSpecificationSplitter)[1];
+								descriptorName = dValue.getSpecification().getSpecificationReference()
+										.split(descriptorSpecificationSplitter)[1];
 								descriptorName += "." + i;
 								result = dValue.getValue();
 								if (result instanceof DoubleResult) {
@@ -147,8 +148,8 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity implements 
 						for (Object key : keys) {
 							if (atom.getProperty(key) instanceof DescriptorValue) {
 								dValue = (DescriptorValue) atom.getProperty(key);
-								descriptorName = dValue.getSpecification().getSpecificationReference().split(
-										descriptorSpecificationSplitter)[1];
+								descriptorName = dValue.getSpecification().getSpecificationReference()
+										.split(descriptorSpecificationSplitter)[1];
 								result = dValue.getValue();
 								descriptorName += "." + i;
 								if (result instanceof DoubleResult) {
@@ -176,8 +177,8 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity implements 
 					for (Object key : keys) {
 						if (atomContainer.getProperty(key) instanceof DescriptorValue) {
 							dValue = (DescriptorValue) atomContainer.getProperty(key);
-							descriptorName = dValue.getSpecification().getSpecificationReference().split(
-									descriptorSpecificationSplitter)[1];
+							descriptorName = dValue.getSpecification().getSpecificationReference()
+									.split(descriptorSpecificationSplitter)[1];
 							result = dValue.getValue();
 							if (result instanceof DoubleResult) {
 								descriptorNames.add(descriptorName);
@@ -205,7 +206,8 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity implements 
 			byte[] vectorData = CDKObjectHandler.getBytes(vectorMap);
 			T2Reference containerRef = referenceService.register(vectorData, 0, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
-			containerRef = referenceService.register(dataArray, 1, true, context);
+			byte[] nameData = CDKObjectHandler.getBytes(descriptorNames);
+			containerRef = referenceService.register(nameData, 0, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 			comment.add("done");
 		} catch (Exception e) {

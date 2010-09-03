@@ -36,11 +36,10 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-
 /**
- * Implements a container class to create and store one or more ART2aClassificators. It classifies objects with an 
- * ART2a algorithm to a previously unknown number of classes. It also contains properties to get the results of the
- * classification. This class was ported from C# code.
+ * Implements a container class to create and store one or more ART2aClassificators. It classifies objects with an ART2a algorithm
+ * to a previously unknown number of classes. It also contains properties to get the results of the classification. This class was
+ * ported from C# code.
  * 
  * @author original C# code: Stefan Neumann, Gesellschaft fuer naturwissenschaftliche Informatik, stefan.neumann@gnwi.de<br>
  *         porting to Java: Christian Geiger, University of Applied Sciences Gelsenkirchen, 2007
@@ -74,10 +73,9 @@ public class Art2aCollection {
 	 * Creates a new Art2aCollection out of the data in the reader.
 	 * 
 	 * @param reader
-	 *            which contains the information of the collection. The current position of the reader hast to be the
-	 *            start element of the XML knod "CollectionData". This knod encloses the XML knods containing the data
-	 *            of the collection. At the end of the method the position of the reader is the end element of the
-	 *            "CollectionData" knod
+	 *            which contains the information of the collection. The current position of the reader hast to be the start
+	 *            element of the XML knod "CollectionData". This knod encloses the XML knods containing the data of the
+	 *            collection. At the end of the method the position of the reader is the end element of the "CollectionData" knod
 	 */
 	public Art2aCollection(XMLStreamReader reader) {
 		if (reader == null) {
@@ -87,14 +85,14 @@ public class Art2aCollection {
 	}
 
 	/**
-	 * Classifies the objects with a linear decrease of the "vigilance". This will reach to a different number of
-	 * detected classes. Remark: The vigilance paramter influences the number of classes.
+	 * Classifies the objects with a linear decrease of the "vigilance". This will reach to a different number of detected
+	 * classes. Remark: The vigilance paramter influences the number of classes.
 	 * 
 	 * @param objects
 	 *            Contains the objects to be classified.
 	 * @param numberOfClassificators
-	 *            The number "ART2aClassificators" which will be created. E.g. a value of 3 will create 3
-	 *            ART2aClassificators with a vigilance parameter of 0, 0.5 and 1.
+	 *            The number "ART2aClassificators" which will be created. E.g. a value of 3 will create 3 ART2aClassificators with
+	 *            a vigilance parameter of 0, 0.5 and 1.
 	 */
 	public Art2aCollection(FingerprintItem[] objects, int numberOfClassificators) {
 		if (objects == null) {
@@ -122,9 +120,9 @@ public class Art2aCollection {
 	}
 
 	/**
-	 * Classifies the objects with only one vigilance parameter. A vigilanceParameter near 1 forces a fine
-	 * classification and the number of detected classes will increase. On the other hand a value near 0 forces a 
-	 * coarse classification and decreases the number of detected classes.
+	 * Classifies the objects with only one vigilance parameter. A vigilanceParameter near 1 forces a fine classification and the
+	 * number of detected classes will increase. On the other hand a value near 0 forces a coarse classification and decreases the
+	 * number of detected classes.
 	 * 
 	 * @param objects
 	 *            Contains the objects to be classified.
@@ -161,13 +159,11 @@ public class Art2aCollection {
 		}
 		try {
 			if (vigilanceParameters == null)
-				throw new IllegalArgumentException(
-				"The array vigilanceParameters is not set to an instance of an object.");
+				throw new IllegalArgumentException("The array vigilanceParameters is not set to an instance of an object.");
 			else {
 				for (int i = 0; i < vigilanceParameters.length; i++) {
 					if (vigilanceParameters[i] < 0 || vigilanceParameters[i] > 1)
-						throw new IllegalArgumentException(
-						"The array vigilanceParameters contains at least one illegal value.");
+						throw new IllegalArgumentException("The array vigilanceParameters contains at least one illegal value.");
 				}
 			}
 			mNumberOfClassificators = vigilanceParameters.length;
@@ -178,9 +174,9 @@ public class Art2aCollection {
 	}
 
 	/**
-	 * Classifies the objects with vigilance parameters between the interval [upperVigilance - lowerVigilance]. The
-	 * value decreases linear. E.g.: upperVigilance = 0.5; lowerVigilance 0.3; numberOfClassificators = 5; This
-	 * configuration creates the results of 5 classifcations with the vigilance values of 0.5, 0.45, 0.4, 0.35, 0.3 .
+	 * Classifies the objects with vigilance parameters between the interval [upperVigilance - lowerVigilance]. The value
+	 * decreases linear. E.g.: upperVigilance = 0.5; lowerVigilance 0.3; numberOfClassificators = 5; This configuration creates
+	 * the results of 5 classifcations with the vigilance values of 0.5, 0.45, 0.4, 0.35, 0.3 .
 	 * 
 	 * @param objects
 	 *            Contains the objects to be classified.
@@ -222,9 +218,9 @@ public class Art2aCollection {
 	}
 
 	/**
-	 * Classifies the objects with vigilance parameters between the interval [upperVigilance - lowerVigilance]. The
-	 * value decreases linear. E.g.: upperVigilance = 0.5; lowerVigilance 0.3; numberOfClassificators = 5; This
-	 * configuration creates the results of 5 classifcations with the vigilance values of 0.5, 0.45, 0.4, 0.35, 0.3 .
+	 * Classifies the objects with vigilance parameters between the interval [upperVigilance - lowerVigilance]. The value
+	 * decreases linear. E.g.: upperVigilance = 0.5; lowerVigilance 0.3; numberOfClassificators = 5; This configuration creates
+	 * the results of 5 classifcations with the vigilance values of 0.5, 0.45, 0.4, 0.35, 0.3 .
 	 * 
 	 * @param objects
 	 *            Contains the objects to be classified.
@@ -235,10 +231,10 @@ public class Art2aCollection {
 	 * @param numberOfClassificators
 	 *            The number "ART2aClassificators" which will be created.
 	 * @param saveResultsToTempFiles
-	 * 			  True: each classification will be stored in a temporary file. This will reduce the memory consumption.
-	 * 			  To get the absolute file names use the method GetTemporaryFileNamesOfResults()  
+	 *            True: each classification will be stored in a temporary file. This will reduce the memory consumption. To get
+	 *            the absolute file names use the method GetTemporaryFileNamesOfResults()
 	 * @param maximumClassificationTime
-	 * 			  The maximum classification time for one epoch.           
+	 *            The maximum classification time for one epoch.
 	 */
 	public Art2aCollection(FingerprintItem[] objects, double upperVigilanceLimit, double lowerVigilanceLimit,
 			int numberOfClassificators, boolean saveResultsToTempFiles, int maximumClassificationTime) {
@@ -264,9 +260,9 @@ public class Art2aCollection {
 				vigilanceParameters[i] = Math.round((lowerVigilanceLimit + i * interval) * 100) / 100.0;
 			}
 			if (saveResultsToTempFiles) {
-				mTemporaryFileNames = createClassificatorsAndSaveResultsAsTempFiles(objects, vigilanceParameters, maximumClassificationTime);
-			}
-			else {
+				mTemporaryFileNames = createClassificatorsAndSaveResultsAsTempFiles(objects, vigilanceParameters,
+						maximumClassificationTime);
+			} else {
 				createClassificators(objects, vigilanceParameters);
 			}
 
@@ -277,16 +273,16 @@ public class Art2aCollection {
 	}
 
 	/**
-	 * Classifies the objects with a linear decrease of the "vigilance". This will reach to a different number of
-	 * detected classes. Remark: The vigilance paramter influences the number of classes.
+	 * Classifies the objects with a linear decrease of the "vigilance". This will reach to a different number of detected
+	 * classes. Remark: The vigilance paramter influences the number of classes.
 	 * 
 	 * @param dataMatrix
-	 *            The dataMatrix contains the fingerprintVectors of all objects which should be classified. Each row
-	 *            codes one fingerprintVector and each column codes an object property.<br>
+	 *            The dataMatrix contains the fingerprintVectors of all objects which should be classified. Each row codes one
+	 *            fingerprintVector and each column codes an object property.<br>
 	 *            IMPORTANT: ALL values of the matrix must be scaled to the interval [0,1].
 	 * @param numberOfClassificators
-	 *            The number "ART2aClassificators" which will be created. E.g. a value of 3 will create 3
-	 *            ART2aClassificators with a vigilance parameter of 0, 0.5 and 1.
+	 *            The number "ART2aClassificators" which will be created. E.g. a value of 3 will create 3 ART2aClassificators with
+	 *            a vigilance parameter of 0, 0.5 and 1.
 	 */
 	public Art2aCollection(double[][] dataMatrix, int numberOfClassificators) {
 		checkDataMatrix(dataMatrix);
@@ -312,13 +308,13 @@ public class Art2aCollection {
 	}
 
 	/**
-	 * Classifies the objects with only one vigilance parameter. A vigilanceParameter near 1 forces a fine
-	 * classification and the number of detected classes will increase. On the other hand a value near 0 forces a 
-	 * coarse classification and decreases the number of detected classes.
+	 * Classifies the objects with only one vigilance parameter. A vigilanceParameter near 1 forces a fine classification and the
+	 * number of detected classes will increase. On the other hand a value near 0 forces a coarse classification and decreases the
+	 * number of detected classes.
 	 * 
 	 * @param dataMatrix
-	 *            The dataMatrix contains the fingerprintVectors of all objects which should be classified. Each row
-	 *            codes one fingerprintVector and each column codes an object property.<br>
+	 *            The dataMatrix contains the fingerprintVectors of all objects which should be classified. Each row codes one
+	 *            fingerprintVector and each column codes an object property.<br>
 	 *            IMPORTANT: ALL values of the matrix must be scaled to the interval [0,1].
 	 * @param vigilanceParameter
 	 *            Parameter to influence the number of classes. 0 less than vigilanceParameter less than 1.
@@ -340,8 +336,8 @@ public class Art2aCollection {
 	 * Classifies the objects with different vigilance parameters defined in the array "vigilanceParameters".
 	 * 
 	 * @param dataMatrix
-	 *            The dataMatrix contains the fingerprintVectors of all objects which should be classified. Each row
-	 *            codes one fingerprintVector and each column codes an object property.<br>
+	 *            The dataMatrix contains the fingerprintVectors of all objects which should be classified. Each row codes one
+	 *            fingerprintVector and each column codes an object property.<br>
 	 *            IMPORTANT: ALL values of the matrix must be scaled to the interval [0,1].
 	 * @param vigilanceParameters
 	 *            Contains the vigilance parameters which influences the number of detected classes. 0 less than
@@ -351,13 +347,11 @@ public class Art2aCollection {
 		checkDataMatrix(dataMatrix);
 		try {
 			if (vigilanceParameters == null)
-				throw new IllegalArgumentException(
-				"The array vigilanceParameters is not set to an instance of an object.");
+				throw new IllegalArgumentException("The array vigilanceParameters is not set to an instance of an object.");
 			else {
 				for (int i = 0; i < vigilanceParameters.length; i++) {
 					if (vigilanceParameters[i] < 0 || vigilanceParameters[i] > 1)
-						throw new IllegalArgumentException(
-						"The array vigilanceParameters contains at least one illegal value.");
+						throw new IllegalArgumentException("The array vigilanceParameters contains at least one illegal value.");
 				}
 			}
 			mNumberOfClassificators = vigilanceParameters.length;
@@ -368,13 +362,13 @@ public class Art2aCollection {
 	}
 
 	/**
-	 * Classifies the objects with vigilance parameters between the intervall [upperVigilance - lowerVigilance]. The
-	 * value decreases linear. E.g.: upperVigilance = 0.5; lowerVigilance 0.3; numberOfClassificators = 5; This
-	 * configuration creates the results of 5 classifcations with the vigilance values of 0.5, 0.45, 0.4, 0.35, 0.3 .
+	 * Classifies the objects with vigilance parameters between the intervall [upperVigilance - lowerVigilance]. The value
+	 * decreases linear. E.g.: upperVigilance = 0.5; lowerVigilance 0.3; numberOfClassificators = 5; This configuration creates
+	 * the results of 5 classifcations with the vigilance values of 0.5, 0.45, 0.4, 0.35, 0.3 .
 	 * 
 	 * @param dataMatrix
-	 *            The dataMatrix contains the fingerprintVectors of all objects which should be classified. Each row
-	 *            codes one fingerprintVector and each column codes an object property.<br>
+	 *            The dataMatrix contains the fingerprintVectors of all objects which should be classified. Each row codes one
+	 *            fingerprintVector and each column codes an object property.<br>
 	 *            IMPORTANT: ALL values of the matrix must be scaled to the interval [0,1].
 	 * @param lowerVigilanceLimit
 	 *            The lower limit of the vigilance parameters.
@@ -416,8 +410,8 @@ public class Art2aCollection {
 	// region PUBLIC METHODS
 
 	/**
-	 * Adds a new classificator to the collection. The new classificator gets its data to classify from the first
-	 * classificator in the array of classificators.
+	 * Adds a new classificator to the collection. The new classificator gets its data to classify from the first classificator in
+	 * the array of classificators.
 	 * 
 	 * @param vigilanceParameter
 	 *            The vigilance parameter of the new classificator
@@ -425,8 +419,7 @@ public class Art2aCollection {
 	public void addClassificator(double vigilanceParameter) {
 		if (vigilanceParameter < 0 || vigilanceParameter > 1)
 			throw new IllegalArgumentException("The value of the parameter is out of boundaries.");
-		Art2aClassificator newClassificator = new Art2aClassificator(mART2aClassificators[0].mObjectArray,
-				vigilanceParameter);
+		Art2aClassificator newClassificator = new Art2aClassificator(mART2aClassificators[0].mObjectArray, vigilanceParameter);
 		newClassificator.classify();
 		mNumberOfClassificators = mNumberOfClassificators + 1;
 		mART2aClassificators = Arrays.copyOf(this.mART2aClassificators, mNumberOfClassificators);
@@ -437,10 +430,9 @@ public class Art2aCollection {
 	 * Gets all information of the collection from a XmlReader
 	 * 
 	 * @param reader
-	 *            which contains the information of the collection. The current position of the reader hast to be the
-	 *            start element of the XML knod "CollectionData". This knod encloses the XML knods containing the data
-	 *            of the collection. At the end of the method the position of the reader is the end element of the
-	 *            "CollectionData" knod
+	 *            which contains the information of the collection. The current position of the reader hast to be the start
+	 *            element of the XML knod "CollectionData". This knod encloses the XML knods containing the data of the
+	 *            collection. At the end of the method the position of the reader is the end element of the "CollectionData" knod
 	 * @throws RuntimeException
 	 *             when the information of the classificator cannot be loaded from the xml-reader.
 	 * 
@@ -482,7 +474,7 @@ public class Art2aCollection {
 	public void removeClassificator(int index) throws IllegalStateException, IllegalArgumentException {
 		if (mNumberOfClassificators < 2) {
 			throw new IllegalStateException(
-			"Removing of classificator not possible. The collection has to contain at least one classificator.");
+					"Removing of classificator not possible. The collection has to contain at least one classificator.");
 		}
 		if (index < 0 || index >= mNumberOfClassificators) {
 			throw new IllegalArgumentException("Wrong index.");
@@ -500,8 +492,8 @@ public class Art2aCollection {
 	 * Saves all information of the ART2aCollection to a XmlWriter.
 	 * 
 	 * @param writer
-	 *            The XmlWriter to write the data in. All XML knods containing data are enclosed by the "CollectionData"
-	 *            knod. At the end of the method the end element of the "CollectionData" knod will be written.
+	 *            The XmlWriter to write the data in. All XML knods containing data are enclosed by the "CollectionData" knod. At
+	 *            the end of the method the end element of the "CollectionData" knod will be written.
 	 * @throws RuntimeException
 	 *             when the information of the collection cannot be saved to the xml-writer.
 	 */
@@ -522,6 +514,7 @@ public class Art2aCollection {
 
 	/**
 	 * Get the file names of the temporary files which stores the results of the classification.
+	 * 
 	 * @return
 	 */
 	public List<String> getTemporaryFileNamesOfResults() {
@@ -620,9 +613,10 @@ public class Art2aCollection {
 	 * @param vigilanceParameters
 	 *            The vigilance parameters.
 	 * @param maximumClassificationTime
-	 * 			  The maximum classification time for one epoch.
+	 *            The maximum classification time for one epoch.
 	 */
-	private List<String> createClassificatorsAndSaveResultsAsTempFiles(FingerprintItem[] objects, double[] vigilanceParameters, int maximumClassificationTime) {
+	private List<String> createClassificatorsAndSaveResultsAsTempFiles(FingerprintItem[] objects, double[] vigilanceParameters,
+			int maximumClassificationTime) {
 		Art2aClassificator myART;
 		try {
 			File tempFile;
@@ -639,12 +633,14 @@ public class Art2aCollection {
 				myART.setConvergenceFlag(true);
 				myART.classify();
 				// Store the results
-				tempFile = File.createTempFile("ART2a_Result" + String.valueOf(i) + "of" + String.valueOf(mNumberOfClassificators) + "Classifications", ".xml");
+				tempFile = File.createTempFile(
+						"ART2a_Result" + String.valueOf(i) + "of" + String.valueOf(mNumberOfClassificators) + "Classifications",
+						".xml");
 				fwriter = new FileWriter(tempFile);
 				bwriter = new BufferedWriter(fwriter);
 				ouputFactory = XMLOutputFactory.newInstance();
 				writer = ouputFactory.createXMLStreamWriter(bwriter);
-				writer.writeStartDocument();	
+				writer.writeStartDocument();
 				myART.saveResultToXmlWriter(writer);
 				writer.writeEndDocument();
 				writer.close();

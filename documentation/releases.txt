@@ -16,3 +16,5 @@
 - Updated JChemPaint to 3.1.2
 - Added PDF writer activity
 - Added art2a classification library
+- Added Iterative Input workers
+- String Converter (I/O) worker

@@ -2,9 +2,12 @@ package org.openscience.cdk.applications.taverna.qsar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import net.sf.taverna.t2.invocation.InvocationContext;
+import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
@@ -58,7 +61,9 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
+		InvocationContext context = callback.getContext();
+		ReferenceService referenceService = context.getReferenceService();
+		Map<String, T2Reference> outputs = null;
 		ArrayList<Class<? extends AbstractCDKActivity>> classes = (ArrayList<Class<? extends AbstractCDKActivity>>) this
 				.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_CHOSEN_QSARDESCRIPTORS);
 		if (classes == null || classes.isEmpty()) {
@@ -77,10 +82,34 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 				e.printStackTrace();
 			}
 			if (clazz != null) {
-				outputs = descriptor.work(inputs, callback);
+				if (outputs == null) {
+					List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(
+							inputs.get(this.getINPUT_PORTS()[0]), byte[].class, context);
+					T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
+					outputs = new HashMap<String, T2Reference>();
+					outputs.put(descriptor.getINPUT_PORTS()[0], containerRef);
+				} else {
+					List<byte[]> dataArray = new ArrayList<byte[]>();
+					try {
+						dataArray.addAll((List<byte[]>) referenceService.renderIdentifier(
+								outputs.get(descriptor.getRESULT_PORTS()[0]), byte[].class, context));
+						comment.add("Error: " + clazz.getSimpleName() + " not calculated!");
+					} catch (NullPointerException e) {
+					}
+					try {
+						dataArray.addAll((List<byte[]>) referenceService.renderIdentifier(
+								outputs.get(descriptor.getRESULT_PORTS()[1]), byte[].class, context));
+						comment.add("Error: " + "In " + clazz.getSimpleName() + " not all structures calculated!");
+					} catch (NullPointerException e) {
+					}
+					outputs = new HashMap<String, T2Reference>();
+					T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
+					outputs.put(descriptor.getINPUT_PORTS()[0], containerRef);
+				}
+				outputs = descriptor.work(outputs, callback);
 			}
 			long timeEnd = System.nanoTime();
-			comment.add(clazz.getName() + ", " + String.valueOf(TimeUnit.NANOSECONDS.toMillis(timeEnd - timeStart)));
+			comment.add(clazz.getSimpleName() + ", " + String.valueOf(TimeUnit.NANOSECONDS.toMillis(timeEnd - timeStart)));
 		}
 		return outputs;
 	}

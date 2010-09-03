@@ -85,16 +85,16 @@ public class MDLSDFileWriterActivity extends AbstractCDKActivity implements IFil
 			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
 		}
 		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
-		String filename = FileNameGenerator.getNewFile(directory.getPath(), extension);
+		File file = FileNameGenerator.getNewFile(directory.getPath(), extension);
 		try {
-			SDFWriter writer = new SDFWriter(new FileWriter(new File(filename)));
+			SDFWriter writer = new SDFWriter(new FileWriter(file));
 			for (CMLChemFile cmlChemFile : chemFileList) {
 				writer.write(cmlChemFile);
 			}
 			writer.close();
 		} catch (Exception e) {
 			e.printStackTrace();
-			comment.add("Error writing file: " + filename + "!");
+			comment.add("Error writing file: " + file.getPath() + "!");
 		}
 		comment.add("done");
 		return null;

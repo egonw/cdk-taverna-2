@@ -22,7 +22,6 @@
 package org.openscience.cdk.applications.taverna.reactionenumerator;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,15 +29,13 @@ import java.util.Map;
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 
 import org.junit.Assert;
-import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.interfaces.IReaction;
 
 /**
@@ -82,7 +79,7 @@ public class ReactionEnumeratorActivityTest extends CDKTavernaTestCases {
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
 		List<byte[]> objectData = (List<byte[]>) outputs.get(ReactionEnumeratorActivity.RESULT_PORT);
-		List<Reaction> resultList = CDKObjectHandler.getReactionList(objectData);
+		List<IReaction> resultList = CDKObjectHandler.getReactionList(objectData);
 		Assert.assertEquals(9, resultList.size());
 		List<String> comment = (List<String>) outputs.get(activity.getCOMMENT_PORT());
 		for (String c : comment) {

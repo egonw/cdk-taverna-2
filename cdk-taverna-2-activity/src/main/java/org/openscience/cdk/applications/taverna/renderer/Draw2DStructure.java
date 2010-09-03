@@ -11,6 +11,7 @@ import org.openscience.cdk.geometry.GeometryTools;
 import org.openscience.cdk.graph.ConnectivityChecker;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IMoleculeSet;
+import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.jchempaint.renderer.Renderer;
 import org.openscience.jchempaint.renderer.visitor.AWTDrawVisitor;
 
@@ -65,11 +66,44 @@ public class Draw2DStructure {
 			renderer.paintMolecule(molecule, new AWTDrawVisitor(g2), new Rectangle(0, 0, width, height), true);
 		} else {
 			int x = (int) ((width * (1.0 - scale)) / 2);
-			int y = (int) ((height * (1.0- scale)) / 2);
+			int y = (int) ((height * (1.0 - scale)) / 2);
 			int scaledWith = (int) (width * scale);
 			int scaledHeight = (int) (height * scale);
 			molecule = Draw2DStructure.fitMoleculeGeometry(molecule, new Dimension(scaledWith, scaledHeight));
 			renderer.paintMolecule(molecule, new AWTDrawVisitor(g2), new Rectangle(x, y, scaledWith, scaledHeight), true);
+		}
+		g2.dispose();
+		return image;
+	}
+
+	public static BufferedImage drawReaction(IReaction reaction, int width, int height) throws Exception {
+		return drawReaction(reaction, width, height, 1.0);
+	}
+
+	public static BufferedImage drawReaction(IReaction reaction, int width, int height, double scale) throws Exception {
+		// Init image
+		GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
+				.getDefaultConfiguration();
+		BufferedImage image = gc.createCompatibleImage(width, height);
+		// Init renderer
+		Renderer renderer = RendererFactory.getRendererInstance();
+
+		Graphics2D g2 = (Graphics2D) image.getGraphics().create();
+		g2.setColor(renderer.getRenderer2DModel().getBackColor());
+		g2.fillRect(0, 0, width, height);
+		Rectangle drawArea;
+		if (scale >= 1.0) {
+			drawArea = new Rectangle(0, 0, width, height);
+			renderer.setup(reaction, drawArea);
+			renderer.paintReaction(reaction, new AWTDrawVisitor(g2), drawArea, true);
+		} else {
+			int x = (int) ((width * (1.0 - scale)) / 2);
+			int y = (int) ((height * (1.0 - scale)) / 2);
+			int scaledWith = (int) (width * scale);
+			int scaledHeight = (int) (height * scale);
+			drawArea = new Rectangle(x, y, scaledWith, scaledHeight);
+			renderer.setup(reaction, drawArea);
+			renderer.paintReaction(reaction, new AWTDrawVisitor(g2), drawArea, false);
 		}
 		g2.dispose();
 		return image;

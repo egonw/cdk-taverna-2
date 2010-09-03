@@ -32,6 +32,7 @@ import java.util.List;
 import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
+import org.openscience.cdk.interfaces.IReaction;
 
 /**
  * Class which serializes/deserializes objects into/from byte arrays.
@@ -58,7 +59,7 @@ public class CDKObjectHandler {
 	/**
 	 * Serializes an objects into a list of byte arrays.
 	 */
-	public static List<byte[]> getBytesList(List<Object> objs) throws IOException {
+	public static List<byte[]> getBytesList(List<?> objs) throws IOException {
 		ArrayList<byte[]> list = new ArrayList<byte[]>();
 		for (Object obj : objs) {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -66,7 +67,6 @@ public class CDKObjectHandler {
 			oos.writeObject(obj);
 			oos.flush();
 			oos.close();
-			bos.close();
 			byte[] data = bos.toByteArray();
 			list.add(data);
 		}
@@ -104,6 +104,10 @@ public class CDKObjectHandler {
 		return object;
 	}
 
+
+	/**
+	 * Deserializes a list of byte arrays into a chemFile list.
+	 */
 	public static List<CMLChemFile> getChemFileList(List<byte[]> dataArray) throws Exception {
 		ArrayList<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
 		for (byte[] data : dataArray) {
@@ -123,8 +127,11 @@ public class CDKObjectHandler {
 		return chemFileList;
 	}
 
-	public static List<Reaction> getReactionList(List<byte[]> dataArray) throws Exception {
-		ArrayList<Reaction> reactionList = new ArrayList<Reaction>();
+	/**
+	 * Deserializes a list of byte arrays into a reaction list.
+	 */
+	public static List<IReaction> getReactionList(List<byte[]> dataArray) throws Exception {
+		ArrayList<IReaction> reactionList = new ArrayList<IReaction>();
 		for (byte[] data : dataArray) {
 			Object obj = null;
 			try {

@@ -28,13 +28,12 @@ package org.openscience.cdk.applications.art2aclassification;
 
 /**
  * Enumerates the reasons why the classification algorithm stopped.
- *
+ * 
  * * @author original C# code: Stefan Neumann, Gesellschaft fuer naturwissenschaftliche Informatik, stefan.neumann@gnwi.de<br>
- *         porting to Java: Christian Geiger, University of Applied Sciences Gelsenkirchen, 2007
- *  @author Thomas Kuhn
+ * porting to Java: Christian Geiger, University of Applied Sciences Gelsenkirchen, 2007
+ * 
+ * @author Thomas Kuhn
  */
 public enum Art2aClassificatorResult {
-	NumberOfEpochsLimitReached,
-	TimeLimitReached,
-	ConvergedSuccessfully 
+	NumberOfEpochsLimitReached, TimeLimitReached, ConvergedSuccessfully
 }

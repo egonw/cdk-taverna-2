@@ -35,7 +35,6 @@ import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 
 /**
@@ -82,8 +81,10 @@ public class IsomorphismTesterActivityTest extends CDKTavernaTestCases {
 		for (String c : comment) {
 			Assert.assertTrue(!c.toLowerCase().contains("error"));
 		}
-		List<CMLChemFile> calcStructures = CDKObjectHandler.getChemFileList((List<byte[]>) outputs.get(activity.getRESULT_PORTS()[0]));
-		List<CMLChemFile> notCalcStructures = CDKObjectHandler.getChemFileList((List<byte[]>) outputs.get(activity.getRESULT_PORTS()[1]));
+		List<CMLChemFile> calcStructures = CDKObjectHandler
+				.getChemFileList((List<byte[]>) outputs.get(activity.getRESULT_PORTS()[0]));
+		List<CMLChemFile> notCalcStructures = CDKObjectHandler.getChemFileList((List<byte[]>) outputs.get(activity
+				.getRESULT_PORTS()[1]));
 		Assert.assertEquals(1, calcStructures.size());
 		Assert.assertEquals(9, notCalcStructures.size());
 	}

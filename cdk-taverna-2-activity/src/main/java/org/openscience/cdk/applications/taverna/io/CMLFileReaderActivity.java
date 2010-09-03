@@ -76,18 +76,20 @@ public class CMLFileReaderActivity extends AbstractCDKActivity implements IFileR
 		List<CMLChemFile> cmlChemFileList = null;
 		List<byte[]> dataList = new ArrayList<byte[]>();
 		// Read SDfile
-		File file = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (file == null) {
+		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+		if (files == null || files.length == 0) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
 		}
 		try {
-			CMLReader reader = new CMLReader(new FileInputStream(file));
-			reader.read(cmlChemFile);
-			reader.close();
-			cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(cmlChemFile);
-			// Congfigure output
-			for (CMLChemFile c : cmlChemFileList) {
-				dataList.add(CDKObjectHandler.getBytes(c));
+			for (File file : files) {
+				CMLReader reader = new CMLReader(new FileInputStream(file));
+				cmlChemFile = (CMLChemFile) reader.read(cmlChemFile);
+				reader.close();
+				cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(cmlChemFile);
+				// Congfigure output
+				for (CMLChemFile c : cmlChemFileList) {
+					dataList.add(CDKObjectHandler.getBytes(c));
+				}
 			}
 			T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
@@ -109,6 +111,7 @@ public class CMLFileReaderActivity extends AbstractCDKActivity implements IFileR
 		HashMap<String, Object> properties = new HashMap<String, Object>();
 		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".cml");
 		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "CML File");
+		properties.put(CDKTavernaConstants.PROPERTY_SUPPORT_MULTI_FILE, true);
 		return properties;
 	}
 

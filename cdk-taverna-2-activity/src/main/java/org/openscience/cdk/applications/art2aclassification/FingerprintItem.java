@@ -48,10 +48,10 @@ public class FingerprintItem {
 	/**
 	 * Constructor
 	 */
-	public FingerprintItem(){
-		
+	public FingerprintItem() {
+
 	}
-	
+
 	/**
 	 * Constructor
 	 * 
@@ -60,8 +60,7 @@ public class FingerprintItem {
 	 * @param correspondingObject
 	 *            Corresponding object from which fingerprint vector was derived
 	 */
-	public FingerprintItem(double[] fingerprintVector,
-			Object correspondingObject) {
+	public FingerprintItem(double[] fingerprintVector, Object correspondingObject) {
 		this.fingerprintVector = fingerprintVector;
 		this.correspondingObject = correspondingObject;
 	}

@@ -76,23 +76,27 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 		List<CMLChemFile> cmlChemFileList = null;
 		List<byte[]> dataList = new ArrayList<byte[]>();
 		// Read SDfile
-		File file = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (file == null) {
+		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+		if (files == null || files.length == 0) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
 		}
 		try {
-			MDLV2000Reader tmpMDLReader = new MDLV2000Reader(new FileReader(file));
-			tmpMDLReader.read(cmlChemFile);
-			tmpMDLReader.close();
-			cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(cmlChemFile);
-			// Congfigure output
-			for (CMLChemFile c : cmlChemFileList) {
-				dataList.add(CDKObjectHandler.getBytes(c));
+			for (File file : files) {
+				MDLV2000Reader tmpMDLReader = new MDLV2000Reader(new FileReader(file));
+				tmpMDLReader.read(cmlChemFile);
+				tmpMDLReader.close();
+				cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(cmlChemFile);
+
+				for (CMLChemFile c : cmlChemFileList) {
+					dataList.add(CDKObjectHandler.getBytes(c));
+				}
 			}
+			// Congfigure output
 			T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			throw new CDKTavernaException(this.getActivityName(), "Error reading SD file!");
+			e.printStackTrace();
+			throw new CDKTavernaException(this.getActivityName(), "Error reading SD file!");	
 		}
 		comment.add("done");
 		// Return results
@@ -109,6 +113,7 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 		HashMap<String, Object> properties = new HashMap<String, Object>();
 		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".sdf");
 		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL SDFile");
+		properties.put(CDKTavernaConstants.PROPERTY_SUPPORT_MULTI_FILE, true);
 		return properties;
 	}
 

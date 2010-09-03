@@ -1,14 +1,11 @@
 package org.openscience.cdk.applications.taverna.renderer;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import javax.imageio.ImageIO;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ReferenceService;
@@ -88,8 +85,8 @@ public class WriteMoleculeAsPDFActivity extends AbstractCDKActivity implements I
 				containerList.addAll(ChemFileManipulator.getAllAtomContainers(cmlChemFile));
 			}
 			try {
-				String filename = FileNameGenerator.getNewFile(directory.getPath(), extension);
-				DrawPDF.drawPDF(containerList, filename);
+				File file = FileNameGenerator.getNewFile(directory.getPath(), extension);
+				DrawPDF.drawMoleculesAsPDF(containerList, file);
 			} catch (Exception e) {
 				e.printStackTrace();
 				// TODO Exception handling

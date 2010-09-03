@@ -32,8 +32,8 @@ import org.junit.Assert;
 import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
-import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
+import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 
 /**
@@ -55,7 +55,8 @@ public class MDLRXNFileReaderActivityTest extends CDKTavernaTestCases {
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
 		// TODO read resource
-		File rxnTestFile = new File("src\\test\\resources\\data\\mol\\reaction.rxn");
+		File[] rxnTestFile = new File[] { new File("src" + File.separator + "test" + File.separator + "resources"
+				+ File.separator + "data" + File.separator + "mol" + File.separator + "reaction.rxn") };
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, rxnTestFile);
 		configBean.setActivityName(MDLRXNFileReaderActivity.RXN_FILE_READER_ACTIVITY);
 	}
@@ -69,8 +70,8 @@ public class MDLRXNFileReaderActivityTest extends CDKTavernaTestCases {
 		expectedOutputTypes.put(activity.getCOMMENT_PORT(), String.class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
-		byte[] objectData = (byte[]) outputs.get(activity.getRESULT_PORTS()[0]);
-		Reaction reaction = (Reaction) CDKObjectHandler.getObject(objectData);
+		List<byte[]> objectData = (List<byte[]>) outputs.get(activity.getRESULT_PORTS()[0]);
+		Reaction reaction = (Reaction) CDKObjectHandler.getObject(objectData.get(0));
 		Assert.assertEquals(2, reaction.getReactantCount());
 		Assert.assertEquals(1, reaction.getProductCount());
 		List<String> comment = (List<String>) outputs.get(activity.getCOMMENT_PORT());

@@ -23,7 +23,6 @@ package org.openscience.cdk.applications.taverna.io;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,9 +33,6 @@ import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
-import org.openscience.cdk.ChemFile;
-import org.openscience.cdk.ChemModel;
-import org.openscience.cdk.ChemSequence;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
@@ -46,9 +42,6 @@ import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrappe
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
 import org.openscience.cdk.io.CMLWriter;
-import org.openscience.cdk.io.SDFWriter;
-import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
-import org.openscience.cdk.tools.manipulator.ChemSequenceManipulator;
 
 /**
  * Class which represents the CML File writer activity.
@@ -93,18 +86,18 @@ public class CMLFileWriterActivity extends AbstractCDKActivity implements IFileW
 			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
 		}
 		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
-		String filename = FileNameGenerator.getNewFile(directory.getPath(), extension);
+		File file = FileNameGenerator.getNewFile(directory.getPath(), extension);
 		try {
 			CMLChemFile tmpChemFile = new CMLChemFile();
 			for (CMLChemFile cmlChemFile : chemFileList) {
 				CMLChemFileWrapper.wrapChemModelAtomContainerInChemModel(cmlChemFile, tmpChemFile);
 			}
-			CMLWriter writer = new CMLWriter(new FileOutputStream(new File(filename)));
+			CMLWriter writer = new CMLWriter(new FileOutputStream(file));
 			writer.write(tmpChemFile);
 			writer.close();
 		} catch (Exception e) {
 			e.printStackTrace();
-			comment.add("Error writing file: " + filename + "!");
+			comment.add("Error writing file: " + file.getPath() + "!");
 		}
 		comment.add("done");
 		return null;

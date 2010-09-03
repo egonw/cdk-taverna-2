@@ -43,12 +43,27 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<CDKActivityConfigurationBean> implements
 		AsynchronousActivity<CDKActivityConfigurationBean> {
 
+	/**
+	 * Input port names.
+	 */
 	protected String[] INPUT_PORTS;
+	/**
+	 * Output port names.
+	 */
 	protected String[] RESULT_PORTS;
+	/**
+	 * Comment port name.
+	 */
 	protected final String COMMENT_PORT = "Comment";
 
+	/**
+	 * Comment list.
+	 */
 	protected List<String> comment = new ArrayList<String>();
 
+	/**
+	 * Configuration bean.
+	 */
 	private CDKActivityConfigurationBean configBean;
 
 	public AbstractCDKActivity() {

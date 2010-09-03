@@ -24,6 +24,8 @@ package org.openscience.cdk.applications.taverna.io;
 import java.io.File;
 import java.io.FileReader;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
@@ -37,7 +39,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
-import org.openscience.cdk.io.MDLRXNReader;
+import org.openscience.cdk.io.MDLRXNV2000Reader;
 
 /**
  * Class which represents the MDL RXN file reader activity.
@@ -50,7 +52,7 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFi
 	public static final String RXN_FILE_READER_ACTIVITY = "RXN File Reader";
 
 	public MDLRXNFileReaderActivity() {
-		this.RESULT_PORTS = new String[] { "Reactions" };
+		this.RESULT_PORTS = new String[] { "Reaction(s)" };		
 	}
 
 	@Override
@@ -69,17 +71,19 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFi
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
-		Reaction reaction = new Reaction();
+		List<Reaction> reactions = new LinkedList<Reaction>();
 		// Read RXN file
-		File file = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (file == null) {
+		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+		if (files == null || files.length == 0) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
 		}
 		try {
-			MDLRXNReader reader = new MDLRXNReader(new FileReader(file));
-			reaction = (Reaction) reader.read(reaction);
+			for (File file : files) {
+				MDLRXNV2000Reader reader = new MDLRXNV2000Reader(new FileReader(file));
+				reactions.add((Reaction) reader.read(new Reaction()));
+			}
 			// Congfigure output
-			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytes(reaction), 0, true, context);
+			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(reactions), 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			throw new CDKTavernaException(this.getActivityName(), "Error reading RXN file!");
@@ -99,6 +103,7 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFi
 		HashMap<String, Object> properties = new HashMap<String, Object>();
 		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".rxn");
 		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL RXN file");
+		properties.put(CDKTavernaConstants.PROPERTY_SUPPORT_MULTI_FILE, true);
 		return properties;
 	}
 

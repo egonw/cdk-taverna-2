@@ -83,10 +83,10 @@ public class WriteMoleculeAsPNGActivity extends AbstractCDKActivity implements I
 			String extension = (String) this.getConfiguration()
 					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 			for (CMLChemFile cmlChemFile : chemFileList) {
-				String filename = FileNameGenerator.getNewFile(directory.getPath(), extension);
+				File file = FileNameGenerator.getNewFile(directory.getPath(), extension);
 				IAtomContainer molecule = ChemFileManipulator.getAllAtomContainers(cmlChemFile).get(0);
 				BufferedImage image = Draw2DStructure.drawMolecule(molecule, 800, 600);
-				ImageIO.write(image, "png", new File(filename));
+				ImageIO.write(image, "png", file);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

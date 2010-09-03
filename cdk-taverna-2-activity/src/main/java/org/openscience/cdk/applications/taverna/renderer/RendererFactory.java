@@ -13,8 +13,6 @@ import org.openscience.jchempaint.renderer.generators.ReactionArrowGenerator;
 import org.openscience.jchempaint.renderer.generators.ReactionPlusGenerator;
 import org.openscience.jchempaint.renderer.generators.RingGenerator;
 
-import com.itextpdf.text.Phrase;
-
 public class RendererFactory {
 
 	public static Renderer getRendererInstance() {

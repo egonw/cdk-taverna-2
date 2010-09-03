@@ -22,6 +22,7 @@
 package org.openscience.cdk.applications.taverna.basicutilities;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -42,7 +43,7 @@ public class FileNameGenerator {
 	 *            The file extension
 	 * @return
 	 */
-	public static String getNewFile(String path, String extension) {
+	public synchronized static File getNewFile(String path, String extension) {
 		String filename = "";
 		File file = null;
 		int idx = 1;
@@ -58,7 +59,21 @@ public class FileNameGenerator {
 			file = new File(filename + temp + extension);
 			idx++;
 		} while (file.exists());
-		filename += temp + extension;
-		return filename;
+		try {
+			file.createNewFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return file;
+	}
+
+	public synchronized static String getTempDir() {
+		String tmpDir = System.getProperty("java.io.tmpdir") + File.separator + "CDKTaverna";
+		File file = new File(tmpDir);
+		if(!file.exists()) {
+			file.mkdir();
+		}
+		return tmpDir;
 	}
 }

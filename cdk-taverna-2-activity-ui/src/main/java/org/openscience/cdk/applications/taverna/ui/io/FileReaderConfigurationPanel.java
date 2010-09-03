@@ -42,37 +42,50 @@ import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityCon
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
+import org.openscience.cdk.applications.taverna.Preferences;
+import org.openscience.cdk.applications.taverna.basicutilities.CDKFileFilter;
 
 /**
- * Configuration panel for MDL file writing activities.
+ * Configuration panel for file reading activities.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class MDLFileWriterConfigurationPanel extends
+public class FileReaderConfigurationPanel extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
 
-	private static final long serialVersionUID = -1161055144757128604L;
+	private static final long serialVersionUID = 8171127307831390262L;
 
 	private AbstractCDKActivity activity;
 	private CDKActivityConfigurationBean configBean;
 
-	private File file = null;
+	private File[] files = null;
 	private JTextField filePathField = new JTextField();
 
 	private AbstractAction chooseFileAction = new AbstractAction() {
 
+		private static final long serialVersionUID = 5977560838089160808L;
+
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser openDialog = new JFileChooser(new File("."));
-			openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			if (openDialog.showOpenDialog(MDLFileWriterConfigurationPanel.this) == JFileChooser.APPROVE_OPTION) {
-				MDLFileWriterConfigurationPanel.this.file = openDialog.getSelectedFile();
-				MDLFileWriterConfigurationPanel.this.showValue();
+			JFileChooser openDialog = new JFileChooser(new File(Preferences.getInstance().getCurrentDirectory()));
+			if (FileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
+					CDKTavernaConstants.PROPERTY_SUPPORT_MULTI_FILE) != null) {
+				openDialog.setMultiSelectionEnabled(true);
+			}
+			String extension = (String) FileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
+					CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
+			String description = (String) FileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
+					CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION);
+			openDialog.addChoosableFileFilter(new CDKFileFilter(description, extension));
+			if (openDialog.showOpenDialog(FileReaderConfigurationPanel.this) == JFileChooser.APPROVE_OPTION) {
+				Preferences.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
+				FileReaderConfigurationPanel.this.files = openDialog.getSelectedFiles();
+				FileReaderConfigurationPanel.this.showValue();
 			}
 		}
 	};
 
-	public MDLFileWriterConfigurationPanel(AbstractCDKActivity activity) {
+	public FileReaderConfigurationPanel(AbstractCDKActivity activity) {
 		this.activity = activity;
 		this.configBean = this.activity.getConfiguration();
 		this.initGUI();
@@ -82,7 +95,9 @@ public class MDLFileWriterConfigurationPanel extends
 		try {
 			this.removeAll();
 			this.setLayout(new GridLayout(2, 0, 1, 1));
-			JLabel label = new JLabel("Output directory:");
+			String description = (String) FileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
+					CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION);
+			JLabel label = new JLabel(description + ":");
 			this.add(label);
 			JPanel filePanel = new JPanel();
 			filePanel.setLayout(new FlowLayout());
@@ -107,19 +122,30 @@ public class MDLFileWriterConfigurationPanel extends
 	}
 
 	private void showValue() {
-		this.filePathField.setText(this.file.getPath());
+		String paths = "";
+		for (File file : files) {
+			paths += file.getPath();
+			if (files.length > 1) {
+				paths += ";";
+			}
+		}
+		this.filePathField.setText(paths);
 		this.filePathField.repaint();
 		this.revalidate();
 	}
 
 	@Override
 	public boolean checkValues() {
-		if (this.file != null && this.file.exists()) {
-			return true;
+		String extension = (String) FileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
+		for (File file : files) {
+			if (file == null || !file.exists() || !file.getPath().endsWith(extension)) {
+				JOptionPane.showMessageDialog(this, "Chosen file is not valid!", "Invalid File", JOptionPane.ERROR_MESSAGE);
+				// Not valid, return false
+				return false;
+			}
 		}
-		JOptionPane.showMessageDialog(this, "Chosen directory is not valid!", "Invalid directory", JOptionPane.ERROR_MESSAGE);
-		// Not valid, return false
-		return false;
+		return true;
 	}
 
 	@Override
@@ -129,26 +155,40 @@ public class MDLFileWriterConfigurationPanel extends
 
 	@Override
 	public boolean isConfigurationChanged() {
-		if (this.file == null) {
+		if (this.files == null) {
 			return false;
 		}
-		File file = (File) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		return !this.file.equals(file);
+		File[] files = (File[]) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+		return !this.files.equals(files);
 	}
 
 	@Override
 	public void noteConfiguration() {
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
-		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.file);
-		this.filePathField.setText(this.file.getPath());
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.files);
+		String paths = "";
+		for (File file : files) {
+			paths += file.getPath();
+			if (files.length > 1) {
+				paths += ";";
+			}
+		}
+		this.filePathField.setText(paths);
 		this.filePathField.repaint();
 	}
 
 	@Override
 	public void refreshConfiguration() {
-		this.file = (File) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (this.file != null) {
-			this.filePathField.setText(this.file.getAbsolutePath());
+		this.files = (File[]) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+		if (this.files != null) {
+			String paths = "";
+			for (File file : files) {
+				paths += file.getPath();
+				if (files.length > 1) {
+					paths += ";";
+				}
+			}
+			this.filePathField.setText(paths);
 			this.filePathField.repaint();
 		}
 	}

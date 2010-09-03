@@ -40,6 +40,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.interfaces.IPortNumber;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IReaction;
 
@@ -51,7 +52,7 @@ import enumerator.main.ReactionEnumerator;
  * @author Andreas Truzskowski
  * 
  */
-public class ReactionEnumeratorActivity extends AbstractCDKActivity {
+public class ReactionEnumeratorActivity extends AbstractCDKActivity implements IPortNumber {
 
 	public static final String REACTION_ENUMERATOR_ACTIVITY = "Reaction Enumerator";
 	public static final String REACTANT_PORT = "Reactant";
@@ -83,11 +84,13 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 		List<byte[]> dataList;
 		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_REACTANT_PORTS);
 		ReactionEnumerator enumerator = new ReactionEnumerator();
+		// TODO remove
+		enumerator.setCreate2DCoordinates(true);
 		try {
 			// get reactants
 			for (int i = 0; i < numberOfPorts; i++) {
-				dataList = (List<byte[]>) referenceService.renderIdentifier(inputs.get(ReactionEnumeratorActivity.REACTANT_PORT
-						+ " " + (i + 1)), byte[].class, context);
+				dataList = (List<byte[]>) referenceService.renderIdentifier(
+						inputs.get(ReactionEnumeratorActivity.REACTANT_PORT + " " + (i + 1)), byte[].class, context);
 				List<CMLChemFile> list = null;
 				try {
 					list = CDKObjectHandler.getChemFileList(dataList);

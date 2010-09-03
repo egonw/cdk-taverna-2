@@ -84,10 +84,10 @@ public class WriteMoleculeAsJPGActivity extends AbstractCDKActivity implements I
 					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 			for (CMLChemFile cmlChemFile : chemFileList) {
 				try {
-					String filename = FileNameGenerator.getNewFile(directory.getPath(), extension);
+					File file = FileNameGenerator.getNewFile(directory.getPath(), extension);
 					IAtomContainer molecule = ChemFileManipulator.getAllAtomContainers(cmlChemFile).get(0);
 					BufferedImage image = Draw2DStructure.drawMolecule(molecule, 800, 600);
-					ImageIO.write(image, "jpg", new File(filename));
+					ImageIO.write(image, "jpg", file);
 				} catch (Exception e) {
 					e.printStackTrace();
 					// TODO Exception handling

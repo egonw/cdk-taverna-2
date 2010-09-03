@@ -31,9 +31,9 @@ import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 import org.junit.Assert;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
@@ -57,7 +57,8 @@ public class MDLMolFileReaderActivityTest extends CDKTavernaTestCases {
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
 		// TODO read resource
-		File molTestFile = new File("src\\test\\resources\\data\\mol\\molfile.mol");
+		File[] molTestFile = new File[] { new File("src" + File.separator + "test" + File.separator + "resources"
+				+ File.separator + "data" + File.separator + "mol" + File.separator + "molfile.mol") };
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, molTestFile);
 		configBean.setActivityName(MDLMolFileReaderActivity.MOL_FILE_READER_ACTIVITY);
 	}
@@ -71,8 +72,8 @@ public class MDLMolFileReaderActivityTest extends CDKTavernaTestCases {
 		expectedOutputTypes.put(activity.getCOMMENT_PORT(), String.class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
-		byte[] objectData = (byte[]) outputs.get(activity.getRESULT_PORTS()[0]);
-		CMLChemFile chemFile = (CMLChemFile) CDKObjectHandler.getObject(objectData);
+		List<byte[]> objectData = (List<byte[]>) outputs.get(activity.getRESULT_PORTS()[0]);
+		CMLChemFile chemFile = (CMLChemFile) CDKObjectHandler.getObject(objectData.get(0));
 		IAtomContainer container = ChemFileManipulator.getAllAtomContainers(chemFile).get(0);
 		Assert.assertEquals(16, container.getAtomCount());
 		Assert.assertEquals(17, container.getBondCount());

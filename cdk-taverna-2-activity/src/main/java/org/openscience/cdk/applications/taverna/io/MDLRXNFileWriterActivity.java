@@ -33,13 +33,13 @@ import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
-import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
+import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.io.MDLRXNWriter;
 
 /**
@@ -72,7 +72,7 @@ public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFi
 			throws CDKTavernaException {
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
-		List<Reaction> reactionList = new ArrayList<Reaction>();
+		List<IReaction> reactionList = new ArrayList<IReaction>();
 		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
 				context);
 		try {
@@ -85,15 +85,15 @@ public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFi
 			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
 		}
 		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
-		for (Reaction reaction : reactionList) {
-			String filename = FileNameGenerator.getNewFile(directory.getPath(), extension);
+		for (IReaction reaction : reactionList) {
+			File file = FileNameGenerator.getNewFile(directory.getPath(), extension);
 			try {
-				MDLRXNWriter writer = new MDLRXNWriter(new FileWriter(new File(filename)));
+				MDLRXNWriter writer = new MDLRXNWriter(new FileWriter(file));
 				writer.write(reaction);
 				writer.close();
 			} catch (Exception e) {
 				e.printStackTrace();
-				comment.add("Error writing file: " + filename + "!");
+				comment.add("Error writing file: " + file.getPath() + "!");
 			}
 		}
 		comment.add("done");

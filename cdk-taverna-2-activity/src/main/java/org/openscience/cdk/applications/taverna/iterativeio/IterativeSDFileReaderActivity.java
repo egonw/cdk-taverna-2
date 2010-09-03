@@ -1,9 +1,9 @@
 package org.openscience.cdk.applications.taverna.iterativeio;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.LineNumberReader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,10 +20,10 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
+import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 
-public class IterativeSDFileReaderActivity extends AbstractCDKActivity implements IFileReader {
+public class IterativeSDFileReaderActivity extends AbstractCDKActivity implements IIterativeFileReader {
 
 	public static final String ITERATIVE_SD_FILE_READER_ACTIVITY = "Iterative SDfile Reader";
 
@@ -73,20 +73,19 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity implement
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<CMLChemFile> cmlChemFileList = null;
-		List<byte[]> dataList = new ArrayList<byte[]>();
 		// Read SDfile
-		File file = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+		File file = ((File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE))[0];
 		if (file == null) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
 		}
 		List<T2Reference> outputList = new ArrayList<T2Reference>();
+		int index = 0;
 		try {
 			LineNumberReader lineReader = new LineNumberReader(new FileReader(file));
 			String line;
 			String SDFilePart = "";
 			int counter = 0;
-			int index = 0;
-			while (true) {
+			do {
 				line = lineReader.readLine();
 				if (line != null) {
 					SDFilePart += line + "\n";
@@ -95,8 +94,9 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity implement
 					}
 				}
 				if (line == null || counter >= readSize) {
+					List<byte[]> dataList = new ArrayList<byte[]>();
 					CMLChemFile cmlChemFile = new CMLChemFile();
-					MDLV2000Reader tmpMDLReader = new MDLV2000Reader(new StringReader(SDFilePart));
+					MDLV2000Reader tmpMDLReader = new MDLV2000Reader(new ByteArrayInputStream(SDFilePart.getBytes()));
 					tmpMDLReader.read(cmlChemFile);
 					cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(cmlChemFile);
 					// Congfigure output
@@ -111,15 +111,14 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity implement
 					counter = 0;
 					SDFilePart = "";
 				}
-				if (line == null) {
-					break;
-				}
-			}
+			} while (line != null);
 			T2Reference containerRef = referenceService.register(outputList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new CDKTavernaException(this.getActivityName(), "Error reading SDF file!");
 		}
+		comment.add("iterations:" + index);
 		comment.add("done");
 		// Return results
 		return outputs;

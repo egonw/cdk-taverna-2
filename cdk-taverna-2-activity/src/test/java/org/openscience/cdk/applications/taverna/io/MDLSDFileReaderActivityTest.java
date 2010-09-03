@@ -32,8 +32,8 @@ import org.junit.Assert;
 import org.openscience.cdk.ChemFile;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
-import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
+import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
@@ -57,7 +57,8 @@ public class MDLSDFileReaderActivityTest extends CDKTavernaTestCases {
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
 		// TODO read resource
-		File sdTestFile = new File("src\\test\\resources\\data\\mol\\sdfile.sdf");
+		File[] sdTestFile = new File[] { new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
+				+ "data" + File.separator + "mol" + File.separator + "sdfile.sdf") };
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, sdTestFile);
 		configBean.setActivityName(MDLSDFileReaderActivity.SD_FILE_READER_ACTIVITY);
 	}

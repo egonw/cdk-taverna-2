@@ -86,9 +86,9 @@ public class SMILESFileWriterActivity extends AbstractCDKActivity implements IFi
 			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
 		}
 		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
-		String filename = FileNameGenerator.getNewFile(directory.getPath(), extension);
+		File file = FileNameGenerator.getNewFile(directory.getPath(), extension);
 		try {
-			SMILESWriter writer = new SMILESWriter(new FileWriter(new File(filename)));
+			SMILESWriter writer = new SMILESWriter(new FileWriter(file));
 			for (CMLChemFile cmlChemFile : chemFileList) {
 				writer.write(CMLChemFileWrapper.wrapChemModelInAtomContainer(cmlChemFile));
 			}

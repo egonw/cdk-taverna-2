@@ -42,18 +42,18 @@ import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityCon
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKFileFilter;
+import org.openscience.cdk.applications.taverna.Preferences;
 
 /**
- * Configuration panel for MDL file reading activities.
+ * Configuration panel for file writing activities.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class MDLFileReaderConfigurationPanel extends
+public class FileWriterConfigurationPanel extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
 
-	private static final long serialVersionUID = 8171127307831390262L;
+	private static final long serialVersionUID = -1161055144757128604L;
 
 	private AbstractCDKActivity activity;
 	private CDKActivityConfigurationBean configBean;
@@ -64,20 +64,17 @@ public class MDLFileReaderConfigurationPanel extends
 	private AbstractAction chooseFileAction = new AbstractAction() {
 
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser openDialog = new JFileChooser(new File("."));
-			String extension = (String) MDLFileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
-					CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
-			String description = (String) MDLFileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
-					CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION);
-			openDialog.addChoosableFileFilter(new CDKFileFilter(description, extension));
-			if (openDialog.showOpenDialog(MDLFileReaderConfigurationPanel.this) == JFileChooser.APPROVE_OPTION) {
-				MDLFileReaderConfigurationPanel.this.file = openDialog.getSelectedFile();
-				MDLFileReaderConfigurationPanel.this.showValue();
+			JFileChooser openDialog = new JFileChooser(new File(Preferences.getInstance().getCurrentDirectory()));
+			openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			if (openDialog.showOpenDialog(FileWriterConfigurationPanel.this) == JFileChooser.APPROVE_OPTION) {
+				Preferences.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
+				FileWriterConfigurationPanel.this.file = openDialog.getSelectedFile();
+				FileWriterConfigurationPanel.this.showValue();
 			}
 		}
 	};
 
-	public MDLFileReaderConfigurationPanel(AbstractCDKActivity activity) {
+	public FileWriterConfigurationPanel(AbstractCDKActivity activity) {
 		this.activity = activity;
 		this.configBean = this.activity.getConfiguration();
 		this.initGUI();
@@ -87,9 +84,7 @@ public class MDLFileReaderConfigurationPanel extends
 		try {
 			this.removeAll();
 			this.setLayout(new GridLayout(2, 0, 1, 1));
-			String description = (String) MDLFileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
-					CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION);
-			JLabel label = new JLabel(description + ":");
+			JLabel label = new JLabel("Output directory:");
 			this.add(label);
 			JPanel filePanel = new JPanel();
 			filePanel.setLayout(new FlowLayout());
@@ -121,14 +116,10 @@ public class MDLFileReaderConfigurationPanel extends
 
 	@Override
 	public boolean checkValues() {
-		String extension = (String) MDLFileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
-				CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
-		if (this.file != null || this.file.exists()) {
-			if (this.file.getPath().endsWith(extension)) {
-				return true;
-			}
+		if (this.file != null && this.file.exists()) {
+			return true;
 		}
-		JOptionPane.showMessageDialog(this, "Chosen file is not valid!", "Invalid File", JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(this, "Chosen directory is not valid!", "Invalid directory", JOptionPane.ERROR_MESSAGE);
 		// Not valid, return false
 		return false;
 	}
