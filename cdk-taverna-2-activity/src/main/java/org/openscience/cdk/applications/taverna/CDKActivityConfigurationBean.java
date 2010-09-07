@@ -36,16 +36,13 @@ public class CDKActivityConfigurationBean implements Serializable {
 	private String folderName;
 	private HashMap<String, Object> additionalProperties = new HashMap<String, Object>();
 
-	@SuppressWarnings("unchecked")
-	private Class configurationPanelClass;
+	private Class<?> configurationPanelClass;
 
-	@SuppressWarnings("unchecked")
-	public Class getConfigurationPanelClass() {
+	public Class<?> getConfigurationPanelClass() {
 		return configurationPanelClass;
 	}
 
-	@SuppressWarnings("unchecked")
-	public void setConfigurationPanelClass(Class confiurationPanelClass) {
+	public void setConfigurationPanelClass(Class<?> confiurationPanelClass) {
 		this.configurationPanelClass = confiurationPanelClass;
 	}
 

@@ -85,7 +85,7 @@ public class ReactionReactantSplitterActivity extends AbstractCDKActivity implem
 		} catch (Exception e) {
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
-		for(int i = 0; i < numberOfPorts; i++) {
+		for (int i = 0; i < numberOfPorts; i++) {
 			IAtomContainer container = reactionList.get(0).getReactants().getAtomContainer(i);
 			CMLChemFile chemFile = CMLChemFileWrapper.wrapAtomContainerInChemModel(container);
 			resultList[i] = chemFile;

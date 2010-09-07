@@ -104,7 +104,6 @@ public class CDKObjectHandler {
 		return object;
 	}
 
-
 	/**
 	 * Deserializes a list of byte arrays into a chemFile list.
 	 */

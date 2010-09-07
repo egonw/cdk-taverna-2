@@ -35,7 +35,6 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
-import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 
 /**
@@ -86,7 +85,7 @@ public class ReactionToMDLRXNStringConverterActivityTest extends CDKTavernaTestC
 		try {
 			this.makeConfigBean();
 			this.executeAsynch();
-		//	this.cleanUp();
+			// this.cleanUp();
 		} catch (Exception e) {
 			e.printStackTrace();
 			// This test causes an error

@@ -22,8 +22,6 @@
 package org.openscience.cdk.applications.taverna.stringconverter;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +37,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.io.MDLWriter;
 import org.openscience.cdk.io.SDFWriter;
 
 /**

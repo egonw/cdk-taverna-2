@@ -25,8 +25,6 @@ import java.io.DataOutputStream;
 import java.util.HashMap;
 import java.util.UUID;
 
-import org.openscience.cdk.io.SDFWriter;
-
 /**
  * Singleton class holding configuration properties.
  * 
@@ -41,7 +39,7 @@ public class Preferences {
 	private HashMap<UUID, String> dataCollectorFilenameMap = new HashMap<UUID, String>();
 	private HashMap<UUID, DataOutputStream> dataCollectorIdxStreamMap = new HashMap<UUID, DataOutputStream>();
 	private HashMap<UUID, DataOutputStream> dataCollectorDataStreamMap = new HashMap<UUID, DataOutputStream>();
-	
+
 	private Preferences() {
 	}
 

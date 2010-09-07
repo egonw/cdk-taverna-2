@@ -22,8 +22,6 @@
 package org.openscience.cdk.applications.taverna.stringconverter;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -22,7 +22,6 @@
 package org.openscience.cdk.applications.taverna.stringconverter;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +83,7 @@ public class StructureToCMLStringConverterActivityTest extends CDKTavernaTestCas
 		try {
 			this.makeConfigBean();
 			this.executeAsynch();
-		//	this.cleanUp();
+			// this.cleanUp();
 		} catch (Exception e) {
 			e.printStackTrace();
 			// This test causes an error

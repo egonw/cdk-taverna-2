@@ -71,12 +71,11 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity implemen
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
-		// Read SDfile
+		// Read RXNfile
 		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (files == null || files.length == 0) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
+			throw new CDKTavernaException(this.getActivityName(), "Error, no file(s) chosen!");
 		}
-		int iterations = 0;
 		try {
 			List<Reaction> reactions = new LinkedList<Reaction>();
 			List<T2Reference> outputList = new ArrayList<T2Reference>();
@@ -94,15 +93,13 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity implemen
 					callback.receiveResult(outputs, new int[] { i });
 					reactions.clear();
 					counter = 0;
-					iterations++;
 				}
 			}
 			T2Reference containerRef = referenceService.register(outputList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			throw new CDKTavernaException(this.getActivityName(), "Error reading SDF file!");
+			throw new CDKTavernaException(this.getActivityName(), "Error reading RXN file!");
 		}
-		comment.add("iterations:" + iterations);
 		comment.add("done");
 		// Return results
 		return outputs;

@@ -22,8 +22,6 @@
 package org.openscience.cdk.applications.taverna.stringconverter;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,11 +36,9 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
-import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.io.MDLRXNWriter;
-import org.openscience.cdk.io.MDLWriter;
 
 /**
  * Test class for the MDL RXN String to reaction converter activity.

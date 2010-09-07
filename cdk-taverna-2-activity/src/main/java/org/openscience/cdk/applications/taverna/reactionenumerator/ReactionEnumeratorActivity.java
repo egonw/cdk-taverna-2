@@ -111,8 +111,10 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity implements I
 			Reaction[] results = enumerator.enumerateReactions(reaction, reactants);
 			// prepare output data
 			dataList = new ArrayList<byte[]>();
-			for (int i = 0; i < results.length; i++) {
-				dataList.add(CDKObjectHandler.getBytes(results[i]));
+			if (results != null && results.length != 0) {
+				for (int i = 0; i < results.length; i++) {
+					dataList.add(CDKObjectHandler.getBytes(results[i]));
+				}
 			}
 			T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 			outputs.put(RESULT_PORT, containerRef);

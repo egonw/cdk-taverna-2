@@ -36,7 +36,7 @@ import org.openscience.cdk.tools.IDCreator;
 
 /**
  * @author Egon Willighagen
- *
+ * 
  */
 public class CMLChemFile extends ChemFile {
 

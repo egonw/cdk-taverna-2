@@ -11,8 +11,9 @@
 - Add reaction and molecule 2d coord generator (remove state from reaction enumerator activtiy/ drawpdf)
 
 25.08.2010
-- Add String converter
+- Add String converter -> done
 - Iterative workflow execution
 
 02.09.2010
 - Interrupting SDF reading if an error in a molecule occurs
+- QSAR Descriptor bug (not calculated structures)

@@ -28,7 +28,6 @@ package org.openscience.cdk.applications.taverna.stringconverter;
  * 
  */
 import java.io.ByteArrayInputStream;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -47,7 +46,6 @@ import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
-import org.openscience.cdk.io.MDLReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 
 public class MDLSDFileStringToStructureConverterActivity extends AbstractCDKActivity implements IFileReader {

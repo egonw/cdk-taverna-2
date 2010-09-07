@@ -184,7 +184,6 @@ public class CMLChemFileWrapper {
 		IAtomContainer[] atomContainerArray = new AtomContainer[cmlChemFileList.size()];
 		List<IAtomContainer> listOfAtomContainerTemp = null;
 		for (int i = 0; i < atomContainerArray.length; i++) {
-
 			listOfAtomContainerTemp = ChemFileManipulator.getAllAtomContainers(cmlChemFileList.get(i));
 			if (listOfAtomContainerTemp.size() == 1) {
 				atomContainerArray[i] = listOfAtomContainerTemp.get(0);

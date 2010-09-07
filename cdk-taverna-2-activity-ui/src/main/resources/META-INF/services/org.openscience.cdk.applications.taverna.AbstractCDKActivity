@@ -14,10 +14,14 @@ org.openscience.cdk.applications.taverna.isomorphism.SubgraphIsomorphismFilterAc
 org.openscience.cdk.applications.taverna.iterativeio.IterativeMultiRXNFileReaderActivity
 org.openscience.cdk.applications.taverna.iterativeio.IterativeRXNFileReaderActivity
 org.openscience.cdk.applications.taverna.iterativeio.IterativeSDFileReaderActivity
+org.openscience.cdk.applications.taverna.iterativeio.LoopSDFileReaderActivity
+org.openscience.cdk.applications.taverna.iterativeio.LoopRXNFileReaderActivity
+org.openscience.cdk.applications.taverna.iterativeio.ConsumeStateActivity
 org.openscience.cdk.applications.taverna.jchempaint.JChemPaintActivity
 org.openscience.cdk.applications.taverna.miscellaneous.ReactionReactantSplitterActivity
 org.openscience.cdk.applications.taverna.miscellaneous.ReactionSplitterActivity
 org.openscience.cdk.applications.taverna.miscellaneous.UUIDGeneratorActivity
+org.openscience.cdk.applications.taverna.miscellaneous.AtomTypeTesterActivity
 org.openscience.cdk.applications.taverna.qsar.descriptors.atomic.AtomDegree
 org.openscience.cdk.applications.taverna.qsar.descriptors.atomic.AtomHybridization
 org.openscience.cdk.applications.taverna.qsar.descriptors.atomic.AtomHybridizationVSEPR

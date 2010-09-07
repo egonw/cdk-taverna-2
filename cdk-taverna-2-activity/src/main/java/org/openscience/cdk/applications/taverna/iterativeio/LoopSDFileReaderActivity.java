@@ -23,12 +23,16 @@ import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrappe
 import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 
-public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity implements IIterativeFileReader {
+public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIterativeFileReader {
 
-	public static final String ITERATIVE_MULTI_RXN_FILE_READER_ACTIVITY = "Iterative Multi RXN File Reader";
+	public static final String LOOP_SD_FILE_READER_ACTIVITY = "Loop SDfile Reader";
+	public static final String RUNNING = "RUNNING";
+	public static final String FINISHED = "FINISHED";
 
-	public IterativeMultiRXNFileReaderActivity() {
-		this.RESULT_PORTS = new String[] { "Reactions" };
+	private LineNumberReader lineReader = null;
+
+	public LoopSDFileReaderActivity() {
+		this.RESULT_PORTS = new String[] { "Structures", "State" };
 	}
 
 	@Override
@@ -38,26 +42,27 @@ public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity imp
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1, 0);
+		addOutput(this.RESULT_PORTS[0], 1);
+		addOutput(this.RESULT_PORTS[1], 0);
 	}
 
 	@Override
 	public String getActivityName() {
-		return IterativeMultiRXNFileReaderActivity.ITERATIVE_MULTI_RXN_FILE_READER_ACTIVITY;
+		return LoopSDFileReaderActivity.LOOP_SD_FILE_READER_ACTIVITY;
 	}
 
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".rxn");
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL Multi RXN File");
+		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".sdf");
+		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL SDFile");
 		properties.put(CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE, 50);
 		return properties;
 	}
 
 	@Override
 	public String getDescription() {
-		return "Description: " + IterativeMultiRXNFileReaderActivity.ITERATIVE_MULTI_RXN_FILE_READER_ACTIVITY;
+		return "Description: " + LoopSDFileReaderActivity.LOOP_SD_FILE_READER_ACTIVITY;
 	}
 
 	@Override
@@ -69,57 +74,62 @@ public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity imp
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
 		int readSize = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE);
+		String state = RUNNING;
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<CMLChemFile> cmlChemFileList = null;
 		// Read SDfile
-		File file = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+		File file = ((File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE))[0];
 		if (file == null) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
 		}
-		List<T2Reference> outputList = new ArrayList<T2Reference>();
+		// clear comments
+		comment.clear();
 		try {
-			LineNumberReader lineReader = new LineNumberReader(new FileReader(file));
+			if (this.lineReader == null) {
+				this.lineReader = new LineNumberReader(new FileReader(file));
+			}
 			String line;
-			String RXNFilePart = "";
+			String SDFilePart = "";
 			int counter = 0;
-			int index = 0;
+			List<byte[]> dataList = new ArrayList<byte[]>();
 			do {
 				line = lineReader.readLine();
 				if (line != null) {
-					RXNFilePart += line + "\n";
+					SDFilePart += line + "\n";
 					if (line.contains("$$$$")) {
 						counter++;
 					}
 				}
 				if (line == null || counter >= readSize) {
-					List<byte[]> dataList = new ArrayList<byte[]>();
+
 					CMLChemFile cmlChemFile = new CMLChemFile();
-					MDLV2000Reader tmpMDLReader = new MDLV2000Reader(new ByteArrayInputStream(RXNFilePart.getBytes()));
+					MDLV2000Reader tmpMDLReader = new MDLV2000Reader(new ByteArrayInputStream(SDFilePart.getBytes()));
 					tmpMDLReader.read(cmlChemFile);
 					cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(cmlChemFile);
 					// Congfigure output
 					for (CMLChemFile c : cmlChemFileList) {
 						dataList.add(CDKObjectHandler.getBytes(c));
 					}
-					T2Reference containerRef = referenceService.register(dataList, 1, true, context);
-					outputList.add(index, containerRef);
-					outputs.put(this.RESULT_PORTS[0], containerRef);
-					callback.receiveResult(outputs, new int[] { index });
-					index++;
-					counter = 0;
-					RXNFilePart = "";
+					if (line == null) {
+						state = FINISHED;
+						comment.add("All done!");
+					} else {
+						comment.add("Has next iteration!");
+					}
+					SDFilePart = "";
 				}
-			} while (line != null);
-			T2Reference containerRef = referenceService.register(outputList, 1, true, context);
+			} while (line != null && counter < readSize);
+			T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
+			containerRef = referenceService.register(state, 0, true, context);
+			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			throw new CDKTavernaException(this.getActivityName(), "Error reading RXN file!");
+			e.printStackTrace();
+			throw new CDKTavernaException(this.getActivityName(), "Error reading SDF file!");
 		}
-		comment.add("done");
 		// Return results
 		return outputs;
 	}
-
 }

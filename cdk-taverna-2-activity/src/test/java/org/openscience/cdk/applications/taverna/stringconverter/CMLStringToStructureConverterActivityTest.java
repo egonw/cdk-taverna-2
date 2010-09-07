@@ -88,7 +88,7 @@ public class CMLStringToStructureConverterActivityTest extends CDKTavernaTestCas
 		try {
 			this.makeConfigBean();
 			this.executeAsynch();
-			//this.cleanUp();
+			// this.cleanUp();
 		} catch (Exception e) {
 			e.printStackTrace();
 			// This test causes an error

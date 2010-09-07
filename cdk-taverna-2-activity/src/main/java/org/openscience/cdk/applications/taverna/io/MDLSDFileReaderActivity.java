@@ -96,7 +96,7 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new CDKTavernaException(this.getActivityName(), "Error reading SD file!");	
+			throw new CDKTavernaException(this.getActivityName(), "Error reading SD file!");
 		}
 		comment.add("done");
 		// Return results

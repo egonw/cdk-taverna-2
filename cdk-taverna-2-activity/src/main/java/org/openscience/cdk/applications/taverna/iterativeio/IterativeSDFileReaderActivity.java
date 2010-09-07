@@ -118,7 +118,6 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity implement
 			e.printStackTrace();
 			throw new CDKTavernaException(this.getActivityName(), "Error reading SDF file!");
 		}
-		comment.add("iterations:" + index);
 		comment.add("done");
 		// Return results
 		return outputs;
