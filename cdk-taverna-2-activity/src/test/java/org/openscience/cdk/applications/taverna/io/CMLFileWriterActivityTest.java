@@ -65,7 +65,8 @@ public class CMLFileWriterActivityTest extends CDKTavernaTestCases {
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".cml");
 		configBean.setActivityName(CMLFileWriterActivity.CML_FILE_WRITER_ACTIVITY);
 	}
-
+	
+	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
 		Map<String, Object> inputs = new HashMap<String, Object>();

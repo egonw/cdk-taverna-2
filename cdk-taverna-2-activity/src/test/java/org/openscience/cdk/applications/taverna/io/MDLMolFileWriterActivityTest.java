@@ -66,6 +66,7 @@ public class MDLMolFileWriterActivityTest extends CDKTavernaTestCases {
 		configBean.setActivityName(MDLMolFileReaderActivity.MOL_FILE_READER_ACTIVITY);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
 		Map<String, Object> inputs = new HashMap<String, Object>();

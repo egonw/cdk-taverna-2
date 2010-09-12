@@ -21,7 +21,6 @@
  */
 package org.openscience.cdk.applications.taverna.stringconverter;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +37,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 
 /**
- * Test class for the structure to MDL Mol String converter activity.
+ * Test class for the reaction to MDL RXN String converter activity.
  * 
  * @author Andreas Truszkowski
  * 
@@ -48,8 +47,6 @@ public class ReactionToMDLRXNStringConverterActivityTest extends CDKTavernaTestC
 	private CDKActivityConfigurationBean configBean;
 
 	private AbstractCDKActivity activity = new ReactionToMDLRXNStringConverterActivity();
-
-	private File dir = null;
 
 	public ReactionToMDLRXNStringConverterActivityTest() {
 		super(ReactionToMDLRXNStringConverterActivity.MDL_RXN_STRING_CONVERTER_ACTIVITY);

@@ -19,10 +19,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna.stringconverter;
+package org.openscience.cdk.applications.taverna.io;
 
-import java.io.StringWriter;
-import java.util.ArrayList;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,67 +29,62 @@ import java.util.Map;
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 
 import org.junit.Assert;
-import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
-import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.interfaces.IReaction;
-import org.openscience.cdk.io.MDLRXNWriter;
 
 /**
- * Test class for the MDL RXN String to reaction converter activity.
+ * Test class for the MDL Multi RXN file reader activity.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class MDLRXNStringToReactionConverterActivityTest extends CDKTavernaTestCases {
+public class MDLMultiRXNFileReaderActivityTest extends CDKTavernaTestCases {
 
 	private CDKActivityConfigurationBean configBean;
 
-	private AbstractCDKActivity activity = new MDLRXNStringToStructureConverterActivity();
+	private AbstractCDKActivity activity = new MDLMultiRXNFileReaderActivity();
 
-	public MDLRXNStringToReactionConverterActivityTest() {
-		super(MDLRXNStringToStructureConverterActivity.MDL_RXN_STRING_CONVERTER_ACTIVITY);
+	public MDLMultiRXNFileReaderActivityTest() {
+		super(MDLMultiRXNFileReaderActivity.MULTI_RXN_FILE_READER_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		configBean.setActivityName(MDLRXNStringToStructureConverterActivity.MDL_RXN_STRING_CONVERTER_ACTIVITY);
+		// TODO read resource
+		File rxnTestFile = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
+				+ File.separator + "rxn" + File.separator + "multirxn.rxn");
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, rxnTestFile);
+		configBean.setActivityName(MDLMultiRXNFileReaderActivity.MULTI_RXN_FILE_READER_ACTIVITY);
 	}
 
 	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
+		// leave empty. No ports used
 		Map<String, Object> inputs = new HashMap<String, Object>();
-		Reaction reaction = CDKTavernaTestData.getReactionEvaluationReaction();
-		List<String> strings = new ArrayList<String>();
-		StringWriter stringWriter = new StringWriter();
-		MDLRXNWriter writer = new MDLRXNWriter(stringWriter);
-		writer.write(reaction);
-		writer.close();
-		strings.add(stringWriter.toString());
-		inputs.put(activity.getINPUT_PORTS()[0], strings);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
 		expectedOutputTypes.put(activity.getCOMMENT_PORT(), String.class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
-		List<byte[]> structuresData = (List<byte[]>) outputs.get(activity.getRESULT_PORTS()[0]);
-		List<IReaction> reactions = CDKObjectHandler.getReactionList(structuresData);
-		Assert.assertEquals(1, reactions.size());
+		List<byte[]> objectData = (List<byte[]>) outputs.get(activity.getRESULT_PORTS()[0]);
+		List<IReaction> reactions = CDKObjectHandler.getReactionList(objectData);
+		Assert.assertEquals(3, reactions.size());
 		List<String> comment = (List<String>) outputs.get(activity.getCOMMENT_PORT());
 		for (String c : comment) {
 			Assert.assertTrue(!c.toLowerCase().contains("error"));
 		}
 	}
 
-	public void executeTest() {
+	@Override
+	protected void executeTest() {
 		try {
 			this.makeConfigBean();
 			this.executeAsynch();
-			// this.cleanUp();
 		} catch (Exception e) {
 			e.printStackTrace();
 			// This test causes an error

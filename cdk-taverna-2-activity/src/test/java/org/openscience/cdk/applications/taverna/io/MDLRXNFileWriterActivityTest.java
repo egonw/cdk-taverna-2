@@ -65,6 +65,7 @@ public class MDLRXNFileWriterActivityTest extends CDKTavernaTestCases {
 		configBean.setActivityName(MDLRXNFileWriterActivity.RXN_FILE_WRITER_ACTIVITY);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
 		Map<String, Object> inputs = new HashMap<String, Object>();

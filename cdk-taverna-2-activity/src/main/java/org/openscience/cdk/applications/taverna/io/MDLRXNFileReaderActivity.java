@@ -52,7 +52,7 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFi
 	public static final String RXN_FILE_READER_ACTIVITY = "RXN File Reader";
 
 	public MDLRXNFileReaderActivity() {
-		this.RESULT_PORTS = new String[] { "Reaction(s)" };
+		this.RESULT_PORTS = new String[] { "Reactions" };
 	}
 
 	@Override

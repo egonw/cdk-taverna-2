@@ -21,7 +21,6 @@
  */
 package org.openscience.cdk.applications.taverna.stringconverter;
 
-import java.io.File;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,8 +49,6 @@ public class MDLSDFileStringToStructureConverterActivityTest extends CDKTavernaT
 	private CDKActivityConfigurationBean configBean;
 
 	private AbstractCDKActivity activity = new MDLSDFileStringToStructureConverterActivity();
-
-	private File dir = null;
 
 	public MDLSDFileStringToStructureConverterActivityTest() {
 		super(MDLSDFileStringToStructureConverterActivity.MDL_SDFILE_STRING_CONVERTER_ACTIVITY);

@@ -109,7 +109,7 @@ public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new CDKTavernaException(this.getActivityName(), "Error reading temp SD file!");
+			throw new CDKTavernaException(this.getActivityName(), "Error reading temp file!");
 		}
 		comment.add("done");
 		// Return results

@@ -63,6 +63,7 @@ public class SMILESFileReaderActivityTest extends CDKTavernaTestCases {
 		configBean.setActivityName(SMILESFileReaderActivity.SMILES_FILE_READER_ACTIVITY);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
 		// leave empty. No ports used

@@ -22,7 +22,7 @@
 package org.openscience.cdk.applications.taverna.iterativeio;
 
 /**
- * Class which represents the data collector activity.
+ * Class which represents the data collector acceptor activity.
  * 
  * @author Andreas Truzskowski
  * 

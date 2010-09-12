@@ -63,6 +63,7 @@ public class MDLMolFileReaderActivityTest extends CDKTavernaTestCases {
 		configBean.setActivityName(MDLMolFileReaderActivity.MOL_FILE_READER_ACTIVITY);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
 		// leave empty. No ports used

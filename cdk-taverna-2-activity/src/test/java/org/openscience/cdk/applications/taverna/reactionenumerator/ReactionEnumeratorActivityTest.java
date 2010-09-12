@@ -21,7 +21,6 @@
  */
 package org.openscience.cdk.applications.taverna.reactionenumerator;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +38,7 @@ import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.interfaces.IReaction;
 
 /**
- * Test class for the CML file writer activity.
+ * Test class for the reaction enumerator activity.
  * 
  * @author Andreas Truszkowski
  * 
@@ -49,8 +48,6 @@ public class ReactionEnumeratorActivityTest extends CDKTavernaTestCases {
 	private CDKActivityConfigurationBean configBean;
 
 	private AbstractCDKActivity activity = new ReactionEnumeratorActivity();
-
-	private File dir = null;
 
 	public ReactionEnumeratorActivityTest() {
 		super(ReactionEnumeratorActivity.REACTION_ENUMERATOR_ACTIVITY);
@@ -62,6 +59,7 @@ public class ReactionEnumeratorActivityTest extends CDKTavernaTestCases {
 		configBean.setActivityName(ReactionEnumeratorActivity.REACTION_ENUMERATOR_ACTIVITY);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
 		Map<String, Object> inputs = new HashMap<String, Object>();

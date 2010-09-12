@@ -50,7 +50,7 @@ import org.openscience.cdk.io.MDLReader;
  */
 public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFileReader {
 
-	public static final String MOL_FILE_READER_ACTIVITY = "Molfile Reader";
+	public static final String MOL_FILE_READER_ACTIVITY = "Mol file Reader";
 
 	public MDLMolFileReaderActivity() {
 		this.RESULT_PORTS = new String[] { "Structure(s)" };

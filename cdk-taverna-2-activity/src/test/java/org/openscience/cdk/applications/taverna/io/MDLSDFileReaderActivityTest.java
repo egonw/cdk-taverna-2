@@ -63,6 +63,7 @@ public class MDLSDFileReaderActivityTest extends CDKTavernaTestCases {
 		configBean.setActivityName(MDLSDFileReaderActivity.SD_FILE_READER_ACTIVITY);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
 		// leave empty. No ports used

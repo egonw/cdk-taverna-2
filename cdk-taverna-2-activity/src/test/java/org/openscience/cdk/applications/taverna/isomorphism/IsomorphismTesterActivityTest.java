@@ -21,7 +21,6 @@
  */
 package org.openscience.cdk.applications.taverna.isomorphism;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,8 +47,6 @@ public class IsomorphismTesterActivityTest extends CDKTavernaTestCases {
 	private CDKActivityConfigurationBean configBean;
 
 	private AbstractCDKActivity activity = new IsomorphismTesterActivity();
-
-	private File dir = null;
 
 	public IsomorphismTesterActivityTest() {
 		super(IsomorphismTesterActivity.ISOMORPHISM_TESTER_ACTIVITY);

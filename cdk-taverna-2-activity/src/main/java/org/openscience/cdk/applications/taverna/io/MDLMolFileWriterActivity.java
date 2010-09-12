@@ -49,7 +49,7 @@ import org.openscience.cdk.io.MDLWriter;
  */
 public class MDLMolFileWriterActivity extends AbstractCDKActivity implements IFileWriter {
 
-	public static final String MOL_FILE_WRITER_ACTIVITY = "Molfile Writer";
+	public static final String MOL_FILE_WRITER_ACTIVITY = "Mol file Writer";
 
 	public MDLMolFileWriterActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };

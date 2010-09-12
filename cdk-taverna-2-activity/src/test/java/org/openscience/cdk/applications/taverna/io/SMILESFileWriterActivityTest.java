@@ -39,7 +39,7 @@ import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 
 /**
- * Test class for the MDL SD file writer activity.
+ * Test class for the SMILES file writer activity.
  * 
  * @author Andreas Truszkowski
  * 
@@ -66,6 +66,7 @@ public class SMILESFileWriterActivityTest extends CDKTavernaTestCases {
 		configBean.setActivityName(SMILESFileWriterActivity.SMILES_FILE_WRITER_ACTIVITY);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
 		Map<String, Object> inputs = new HashMap<String, Object>();

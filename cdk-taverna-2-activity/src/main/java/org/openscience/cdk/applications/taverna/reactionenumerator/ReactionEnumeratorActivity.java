@@ -43,8 +43,7 @@ import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrappe
 import org.openscience.cdk.applications.taverna.interfaces.IPortNumber;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IReaction;
-
-import enumerator.main.ReactionEnumerator;
+import org.openscience.cdk.reaction.enumerator.ReactionEnumerator;
 
 /**
  * Class which represents the reaction enumerator activity.

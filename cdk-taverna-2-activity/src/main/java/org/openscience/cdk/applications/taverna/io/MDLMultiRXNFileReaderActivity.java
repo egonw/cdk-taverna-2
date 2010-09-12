@@ -43,7 +43,8 @@ import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLRXNReader;
 
 /**
- * Class which represents the MDL Multi RXN file reader activity.
+ * Class which represents the MDL Multi RXN file reader activity. (Not official supported file format. Only RXN Strings separated
+ * by "$$$$".)
  * 
  * @author Andreas Truzskowski
  * 

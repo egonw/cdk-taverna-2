@@ -86,7 +86,6 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 				tmpMDLReader.read(cmlChemFile);
 				tmpMDLReader.close();
 				cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(cmlChemFile);
-
 				for (CMLChemFile c : cmlChemFileList) {
 					dataList.add(CDKObjectHandler.getBytes(c));
 				}

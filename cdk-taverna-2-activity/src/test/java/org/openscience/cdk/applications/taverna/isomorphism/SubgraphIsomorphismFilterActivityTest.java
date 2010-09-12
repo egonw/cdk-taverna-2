@@ -40,7 +40,7 @@ import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.io.MDLReader;
 
 /**
- * Test class for the isomorphism tester activity.
+ * Test class for the subgraph isomorphism tester activity.
  * 
  * @author Andreas Truszkowski
  * 
@@ -50,8 +50,6 @@ public class SubgraphIsomorphismFilterActivityTest extends CDKTavernaTestCases {
 	private CDKActivityConfigurationBean configBean;
 
 	private AbstractCDKActivity activity = new SubgraphIsomorphismFilterActivity();
-
-	private File dir = null;
 
 	public SubgraphIsomorphismFilterActivityTest() {
 		super(SubgraphIsomorphismFilterActivity.SUBGRAPHISOMORPHISM_FILTER_ACTIVITY);
@@ -73,7 +71,8 @@ public class SubgraphIsomorphismFilterActivityTest extends CDKTavernaTestCases {
 			structures.add(CDKObjectHandler.getBytes(chemFile));
 		}
 		inputs.put(activity.getINPUT_PORTS()[0], structures);
-		File testFile = new File("src\\test\\resources\\data\\mol\\substructure.mol");
+		File testFile = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
+				+ File.separator + "mol" + File.separator + "substructure.mol");
 		MDLReader reader = new MDLReader(new FileReader(testFile));
 		reader.read(substructure);
 		inputs.put(activity.getINPUT_PORTS()[1], CDKObjectHandler.getBytes(substructure));
