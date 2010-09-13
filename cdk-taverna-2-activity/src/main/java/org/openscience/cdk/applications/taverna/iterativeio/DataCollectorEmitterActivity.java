@@ -28,6 +28,7 @@ package org.openscience.cdk.applications.taverna.iterativeio;
  * 
  */
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,6 +47,7 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.Preferences;
+import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 
 public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 
@@ -82,12 +84,13 @@ public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 			// close old writer
 			Preferences.getInstance().getDataCollectorIdxStream(id).close();
 			Preferences.getInstance().getDataCollectorDataStream(id).close();
+			Preferences.getInstance().setDataCollectorDataStream(id, null);
+			Preferences.getInstance().setDataCollectorIdxStream(id, null);
 			// Read cached data
-			String filename = Preferences.getInstance().getDataCollectorFilename(id);
-			String idxFilename = filename + ".idx";
-			String datFilename = filename + ".dat";
-			DataInputStream idxStream = new DataInputStream(new FileInputStream(idxFilename));
-			DataInputStream datStream = new DataInputStream(new FileInputStream(datFilename));
+			String filename = FileNameGenerator.getTempDir();
+			filename += id.toString();
+			DataInputStream idxStream = new DataInputStream(new FileInputStream(filename + ".idx"));
+			DataInputStream datStream = new DataInputStream(new FileInputStream(filename + ".dat"));
 			do {
 				try {
 					int offset = idxStream.readInt();
@@ -101,9 +104,8 @@ public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 			datStream.close();
 			idxStream.close();
 			// Clean up
-			new File(filename).delete();
-			new File(idxFilename).delete();
-			new File(datFilename).delete();
+			new File(filename + ".idx").delete();
+			new File(filename + ".dat").delete();
 			// Congfigure output
 			T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);

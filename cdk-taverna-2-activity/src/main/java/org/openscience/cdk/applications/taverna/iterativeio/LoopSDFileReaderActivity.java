@@ -103,22 +103,26 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 					}
 				}
 				if (line == null || counter >= readSize) {
-
-					CMLChemFile cmlChemFile = new CMLChemFile();
-					MDLV2000Reader tmpMDLReader = new MDLV2000Reader(new ByteArrayInputStream(SDFilePart.getBytes()));
-					tmpMDLReader.read(cmlChemFile);
-					cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(cmlChemFile);
-					// Congfigure output
-					for (CMLChemFile c : cmlChemFileList) {
-						dataList.add(CDKObjectHandler.getBytes(c));
+					try {
+						CMLChemFile cmlChemFile = new CMLChemFile();
+						MDLV2000Reader tmpMDLReader = new MDLV2000Reader(new ByteArrayInputStream(SDFilePart.getBytes()));
+						tmpMDLReader.read(cmlChemFile);
+						cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(cmlChemFile);
+						// Congfigure output
+						for (CMLChemFile c : cmlChemFileList) {
+							dataList.add(CDKObjectHandler.getBytes(c));
+						}
+						if (line == null) {
+							state = FINISHED;
+							comment.add("All done!");
+						} else {
+							comment.add("Has next iteration!");
+						}
+						SDFilePart = "";
+					} catch (Exception e) {
+						System.out.println(SDFilePart);
+						e.printStackTrace();
 					}
-					if (line == null) {
-						state = FINISHED;
-						comment.add("All done!");
-					} else {
-						comment.add("Has next iteration!");
-					}
-					SDFilePart = "";
 				}
 			} while (line != null && counter < readSize);
 			T2Reference containerRef = referenceService.register(dataList, 1, true, context);

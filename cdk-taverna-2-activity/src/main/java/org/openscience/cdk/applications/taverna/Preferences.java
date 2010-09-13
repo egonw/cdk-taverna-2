@@ -22,8 +22,12 @@
 package org.openscience.cdk.applications.taverna;
 
 import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.UUID;
+
+import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 
 /**
  * Singleton class holding configuration properties.
@@ -36,7 +40,6 @@ public class Preferences {
 	private static Preferences instance = null;
 
 	private String currentDirectory = ".";
-	private HashMap<UUID, String> dataCollectorFilenameMap = new HashMap<UUID, String>();
 	private HashMap<UUID, DataOutputStream> dataCollectorIdxStreamMap = new HashMap<UUID, DataOutputStream>();
 	private HashMap<UUID, DataOutputStream> dataCollectorDataStreamMap = new HashMap<UUID, DataOutputStream>();
 
@@ -66,24 +69,30 @@ public class Preferences {
 		this.currentDirectory = currentDirectory;
 	}
 
-	public String getDataCollectorFilename(UUID id) {
-		return (String) dataCollectorFilenameMap.get(id);
-	}
-
-	public void setDataCollectorFilename(UUID id, String filename) {
-		this.dataCollectorFilenameMap.put(id, filename);
-	}
-
-	public DataOutputStream getDataCollectorDataStream(UUID id) {
-		return dataCollectorDataStreamMap.get(id);
+	public DataOutputStream getDataCollectorDataStream(UUID id) throws FileNotFoundException {
+		DataOutputStream stream = dataCollectorDataStreamMap.get(id);
+		if (stream == null) {
+			String filename = FileNameGenerator.getTempDir();
+			filename += id.toString();
+			filename += ".dat";
+			stream = new DataOutputStream(new FileOutputStream(filename));
+		}
+		return stream;
 	}
 
 	public void setDataCollectorDataStream(UUID id, DataOutputStream stream) {
 		this.dataCollectorDataStreamMap.put(id, stream);
 	}
 
-	public DataOutputStream getDataCollectorIdxStream(UUID id) {
-		return dataCollectorIdxStreamMap.get(id);
+	public DataOutputStream getDataCollectorIdxStream(UUID id) throws FileNotFoundException {
+		DataOutputStream stream = dataCollectorIdxStreamMap.get(id);
+		if (stream == null) {
+			String filename = FileNameGenerator.getTempDir();
+			filename += id.toString();
+			filename += ".idx";
+			stream = new DataOutputStream(new FileOutputStream(filename));
+		}
+		return stream;
 	}
 
 	public void setDataCollectorIdxStream(UUID id, DataOutputStream stream) {

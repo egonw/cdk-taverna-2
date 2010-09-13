@@ -48,18 +48,9 @@ import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator
 public class DataCollectorAcceptorActivity extends AbstractCDKActivity {
 
 	public static final String DATA_COLLECTOR_ACCEPTOR_ACTIVITY = "Data Collector Acceptor";
-	private DataOutputStream dataStream = null;
-	private DataOutputStream idxStream = null;
-	private String filename = "";
-	private String indexFilename = "";
-	private String dataFilename = "";
 
 	public DataCollectorAcceptorActivity() {
 		this.INPUT_PORTS = new String[] { "Data", "UUID" };
-		String tmpDir = FileNameGenerator.getTempDir();
-		this.filename = FileNameGenerator.getNewFile(tmpDir, "", this.iteration).getPath();
-		this.indexFilename = this.filename + ".idx";
-		this.dataFilename = this.filename + ".dat";
 	}
 
 	@Override
@@ -87,16 +78,11 @@ public class DataCollectorAcceptorActivity extends AbstractCDKActivity {
 		if (id == null) {
 			throw new CDKTavernaException(DATA_COLLECTOR_ACCEPTOR_ACTIVITY, "UUID not set!");
 		}
-		Preferences.getInstance().setDataCollectorFilename(id, this.filename);
-		Preferences.getInstance().setDataCollectorDataStream(id, this.dataStream);
-		Preferences.getInstance().setDataCollectorIdxStream(id, this.idxStream);
+		DataOutputStream dataStream;
+		DataOutputStream idxStream;
 		try {
-			if (this.dataStream == null) {
-				this.dataStream = new DataOutputStream(new FileOutputStream(this.dataFilename));
-			}
-			if (this.idxStream == null) {
-				this.idxStream = new DataOutputStream(new FileOutputStream(this.indexFilename));
-			}
+			 dataStream = Preferences.getInstance().getDataCollectorDataStream(id);
+			 idxStream = Preferences.getInstance().getDataCollectorIdxStream(id);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -104,8 +90,10 @@ public class DataCollectorAcceptorActivity extends AbstractCDKActivity {
 		}
 		try {
 			for (byte[] data : dataArray) {
-				this.idxStream.writeInt(data.length);
-				this.dataStream.write(data);
+				idxStream.writeInt(data.length);
+				idxStream.flush();
+				dataStream.write(data);
+				dataStream.flush();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
