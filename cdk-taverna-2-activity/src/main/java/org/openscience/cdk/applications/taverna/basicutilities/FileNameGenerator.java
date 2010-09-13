@@ -43,7 +43,7 @@ public class FileNameGenerator {
 	 *            The file extension
 	 * @return
 	 */
-	public synchronized static File getNewFile(String path, String extension) {
+	public synchronized static File getNewFile(String path, String extension, int iteration) {
 		String filename = "";
 		File file = null;
 		int idx = 1;
@@ -52,6 +52,7 @@ public class FileNameGenerator {
 		if (!path.endsWith(File.separator)) {
 			filename += File.separator;
 		}
+		filename += iteration + "_";
 		filename += dateformat.format(new Date());
 		String temp;
 		do {

@@ -78,7 +78,7 @@ public class WriteReactionAsPDFActivity extends AbstractCDKActivity implements I
 			String extension = (String) this.getConfiguration()
 					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 			try {
-				File file = FileNameGenerator.getNewFile(directory.getPath(), extension);
+				File file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
 				DrawPDF.drawReactionAsPDF(reactionList, file);
 			} catch (Exception e) {
 				e.printStackTrace();

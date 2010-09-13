@@ -86,7 +86,7 @@ public class CMLFileWriterActivity extends AbstractCDKActivity implements IFileW
 			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
 		}
 		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
-		File file = FileNameGenerator.getNewFile(directory.getPath(), extension);
+		File file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
 		try {
 			CMLChemFile tmpChemFile = new CMLChemFile();
 			for (CMLChemFile cmlChemFile : chemFileList) {

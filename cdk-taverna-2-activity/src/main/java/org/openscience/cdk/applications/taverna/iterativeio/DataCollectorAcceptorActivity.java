@@ -57,7 +57,7 @@ public class DataCollectorAcceptorActivity extends AbstractCDKActivity {
 	public DataCollectorAcceptorActivity() {
 		this.INPUT_PORTS = new String[] { "Data", "UUID" };
 		String tmpDir = FileNameGenerator.getTempDir();
-		this.filename = FileNameGenerator.getNewFile(tmpDir, "").getPath();
+		this.filename = FileNameGenerator.getNewFile(tmpDir, "", this.iteration).getPath();
 		this.indexFilename = this.filename + ".idx";
 		this.dataFilename = this.filename + ".dat";
 	}

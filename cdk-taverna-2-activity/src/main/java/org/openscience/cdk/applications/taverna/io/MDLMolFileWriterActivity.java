@@ -85,7 +85,7 @@ public class MDLMolFileWriterActivity extends AbstractCDKActivity implements IFi
 		}
 		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 		for (CMLChemFile cmlChemFile : chemFileList) {
-			File file = FileNameGenerator.getNewFile(directory.getPath(), extension);
+			File file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
 			try {
 				MDLWriter writer = new MDLWriter(new FileWriter(file));
 				writer.write(cmlChemFile);

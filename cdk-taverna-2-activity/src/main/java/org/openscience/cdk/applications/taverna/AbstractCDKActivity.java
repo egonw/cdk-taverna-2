@@ -44,6 +44,10 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 		AsynchronousActivity<CDKActivityConfigurationBean> {
 
 	/**
+	 * Number of current iteration.
+	 */
+	protected int iteration = 0;
+	/**
 	 * Input port names.
 	 */
 	protected String[] INPUT_PORTS;
@@ -117,6 +121,7 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 				InvocationContext context = callback.getContext();
 				ReferenceService referenceService = context.getReferenceService();
 				try {
+					AbstractCDKActivity.this.iteration++;
 					outputs = AbstractCDKActivity.this.work(inputs, callback);
 				} catch (CDKTavernaException e) {
 					e.printStackTrace();

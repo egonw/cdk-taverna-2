@@ -85,7 +85,7 @@ public class WriteMoleculeAsPDFActivity extends AbstractCDKActivity implements I
 				containerList.addAll(ChemFileManipulator.getAllAtomContainers(cmlChemFile));
 			}
 			try {
-				File file = FileNameGenerator.getNewFile(directory.getPath(), extension);
+				File file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
 				DrawPDF.drawMoleculesAsPDF(containerList, file);
 			} catch (Exception e) {
 				e.printStackTrace();

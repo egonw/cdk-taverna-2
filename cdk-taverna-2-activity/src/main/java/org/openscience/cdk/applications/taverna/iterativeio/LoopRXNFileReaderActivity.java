@@ -27,7 +27,7 @@ public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements II
 	public static final String RUNNING = "RUNNING";
 	public static final String FINISHED = "FINISHED";
 
-	private List<File> fileList = null;
+	private ArrayList<File> fileList = null;
 
 	public LoopRXNFileReaderActivity() {
 		this.RESULT_PORTS = new String[] { "Reactions", "State" };
@@ -55,6 +55,7 @@ public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements II
 		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".rxn");
 		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL RXN file");
 		properties.put(CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE, 50);
+		properties.put(CDKTavernaConstants.PROPERTY_SUPPORT_MULTI_FILE, true);
 		return properties;
 	}
 
@@ -82,7 +83,10 @@ public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements II
 			if (files == null || files.length == 0) {
 				throw new CDKTavernaException(this.getActivityName(), "Error, no file(s) chosen!");
 			}
-			this.fileList = Arrays.asList(files);
+			this.fileList = new ArrayList<File>();
+			for (File f : files) {
+				this.fileList.add(f);
+			}
 		}
 		List<byte[]> dataList = new ArrayList<byte[]>();
 		for (int i = 0; i < readSize; i++) {

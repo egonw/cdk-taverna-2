@@ -86,7 +86,7 @@ public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFi
 		}
 		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 		for (IReaction reaction : reactionList) {
-			File file = FileNameGenerator.getNewFile(directory.getPath(), extension);
+			File file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
 			try {
 				MDLRXNWriter writer = new MDLRXNWriter(new FileWriter(file));
 				writer.write(reaction);
