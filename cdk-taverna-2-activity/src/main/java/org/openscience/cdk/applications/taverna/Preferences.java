@@ -22,6 +22,7 @@
 package org.openscience.cdk.applications.taverna;
 
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.HashMap;
@@ -75,7 +76,12 @@ public class Preferences {
 			String filename = FileNameGenerator.getTempDir();
 			filename += id.toString();
 			filename += ".dat";
-			stream = new DataOutputStream(new FileOutputStream(filename));
+			File file = new File(filename);
+			if (file.exists()) {
+				file.delete();
+			}
+			stream = new DataOutputStream(new FileOutputStream(file));
+			this.setDataCollectorDataStream(id, stream);
 		}
 		return stream;
 	}
@@ -90,7 +96,12 @@ public class Preferences {
 			String filename = FileNameGenerator.getTempDir();
 			filename += id.toString();
 			filename += ".idx";
-			stream = new DataOutputStream(new FileOutputStream(filename));
+			File file = new File(filename);
+			if (file.exists()) {
+				file.delete();
+			}
+			stream = new DataOutputStream(new FileOutputStream(file));
+			this.setDataCollectorIdxStream(id, stream);
 		}
 		return stream;
 	}

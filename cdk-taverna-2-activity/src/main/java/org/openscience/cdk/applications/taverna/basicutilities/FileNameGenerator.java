@@ -70,7 +70,7 @@ public class FileNameGenerator {
 	}
 
 	public synchronized static String getTempDir() {
-		String tmpDir = System.getProperty("java.io.tmpdir") + File.separator + "CDKTaverna" + File.separator;
+		String tmpDir = System.getProperty("java.io.tmpdir") + "CDKTaverna" + File.separator;
 		File file = new File(tmpDir);
 		if (!file.exists()) {
 			file.mkdir();

@@ -91,10 +91,10 @@ public class DataCollectorAcceptorActivity extends AbstractCDKActivity {
 		try {
 			for (byte[] data : dataArray) {
 				idxStream.writeInt(data.length);
-				idxStream.flush();
 				dataStream.write(data);
-				dataStream.flush();
 			}
+			idxStream.flush();
+			dataStream.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
 			comment.add("Error writing data!");

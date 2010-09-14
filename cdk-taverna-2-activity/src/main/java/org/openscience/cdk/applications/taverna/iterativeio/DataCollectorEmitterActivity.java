@@ -74,6 +74,12 @@ public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		List<byte[]> dataList = new ArrayList<byte[]>();
 		UUID id = UUID.fromString((String) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
 				context));
@@ -89,8 +95,10 @@ public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 			// Read cached data
 			String filename = FileNameGenerator.getTempDir();
 			filename += id.toString();
-			DataInputStream idxStream = new DataInputStream(new FileInputStream(filename + ".idx"));
-			DataInputStream datStream = new DataInputStream(new FileInputStream(filename + ".dat"));
+			File idxFile = new File(filename + ".idx");
+			File datFile = new File(filename + ".dat");
+			DataInputStream idxStream = new DataInputStream(new FileInputStream(idxFile));
+			DataInputStream datStream = new DataInputStream(new FileInputStream(datFile));
 			do {
 				try {
 					int offset = idxStream.readInt();
@@ -104,8 +112,8 @@ public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 			datStream.close();
 			idxStream.close();
 			// Clean up
-			new File(filename + ".idx").delete();
-			new File(filename + ".dat").delete();
+		//	idxFile.delete();
+		//	datFile.delete();
 			// Congfigure output
 			T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);

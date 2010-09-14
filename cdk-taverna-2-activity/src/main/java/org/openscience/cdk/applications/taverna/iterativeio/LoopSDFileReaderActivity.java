@@ -113,6 +113,7 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 							dataList.add(CDKObjectHandler.getBytes(c));
 						}
 						if (line == null) {
+							this.lineReader = null;
 							state = FINISHED;
 							comment.add("All done!");
 						} else {

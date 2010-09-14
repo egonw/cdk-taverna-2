@@ -44,9 +44,11 @@ import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 public class UUIDGeneratorActivity extends AbstractCDKActivity implements IFileReader {
 
 	public static final String UUID_GENERATOR_ACTIVITY = "UUID Generator";
+	private UUID id = null;
 
 	public UUIDGeneratorActivity() {
 		this.RESULT_PORTS = new String[] { "UUID" };
+		this.id = UUID.randomUUID();
 	}
 
 	@Override
@@ -65,8 +67,7 @@ public class UUIDGeneratorActivity extends AbstractCDKActivity implements IFileR
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
-		UUID id = UUID.randomUUID();
-		T2Reference containerRef = referenceService.register(id.toString(), 0, true, context);
+		T2Reference containerRef = referenceService.register(this.id.toString(), 0, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);
 		comment.add("done");
 		// Return results
