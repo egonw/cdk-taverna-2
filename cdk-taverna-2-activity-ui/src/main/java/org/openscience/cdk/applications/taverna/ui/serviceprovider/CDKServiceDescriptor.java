@@ -1,10 +1,13 @@
 package org.openscience.cdk.applications.taverna.ui.serviceprovider;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 import net.sf.taverna.t2.servicedescriptions.ServiceDescription;
 import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityConfigurationPanel;
@@ -57,8 +60,15 @@ public class CDKServiceDescriptor extends ServiceDescription<CDKActivityConfigur
 	 */
 	@Override
 	public Icon getIcon() {
-		// TODO Auto-generated method stub
-		return null;
+		ClassLoader cld = getClass().getClassLoader();
+		URL url;
+		try {
+			url = cld.getResources("icons/icon.gif").nextElement();
+		} catch (Exception e) {
+			// Use standard icon
+			return null;
+		}
+		return  new ImageIcon(url);
 	}
 
 	/**

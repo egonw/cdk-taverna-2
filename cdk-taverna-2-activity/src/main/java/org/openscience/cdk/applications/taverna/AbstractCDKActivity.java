@@ -96,7 +96,7 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 		this.addInputPorts();
 		this.addOutputPorts();
 		// Add always comment port
-		this.addOutput(this.COMMENT_PORT, 1);
+	//	this.addOutput(this.COMMENT_PORT, 1);
 	}
 
 	/**
@@ -131,8 +131,8 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 				if (outputs == null) {
 					outputs = new HashMap<String, T2Reference>();
 				}
-				T2Reference containerRef = referenceService.register(AbstractCDKActivity.this.comment, 1, true, context);
-				outputs.put(AbstractCDKActivity.this.COMMENT_PORT, containerRef);
+	//			T2Reference containerRef = referenceService.register(AbstractCDKActivity.this.comment, 1, true, context);
+	//			outputs.put(AbstractCDKActivity.this.COMMENT_PORT, containerRef);
 				// return map of output data, with empty index array as this is
 				// the only and final result (this index parameter is used if
 				// pipelining output)

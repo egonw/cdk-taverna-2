@@ -19,6 +19,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileReader;
 import org.openscience.cdk.io.MDLRXNReader;
+import org.openscience.cdk.io.MDLRXNV2000Reader;
 
 public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements IIterativeFileReader {
 
@@ -90,7 +91,7 @@ public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements II
 		List<byte[]> dataList = new ArrayList<byte[]>();
 		for (int i = 0; i < readSize; i++) {
 			try {
-				MDLRXNReader reader = new MDLRXNReader(new FileReader(fileList.remove(0)));
+				MDLRXNV2000Reader reader = new MDLRXNV2000Reader(new FileReader(fileList.remove(0)));
 				Reaction reaction = (Reaction) reader.read(new Reaction());
 				dataList.add(CDKObjectHandler.getBytes(reaction));
 				if (fileList.isEmpty()) {
