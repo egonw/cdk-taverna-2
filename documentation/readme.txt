@@ -12,12 +12,12 @@ Deploying the plugin with maven
 			<url>file:///P:/CDKTaverna/release_repository</url>
 		</repository>
 	</distributionManagement>
-	An the repository under:
+7) An the repository under:
 	<scm>
 		<connection>scm:svn:https://cdktaverna2.svn.sourceforge.net/svnroot/cdktaverna2/tags/</connection>
 		<developerConnection>scm:svn:https://cdktaverna2.svn.sourceforge.net/svnroot/cdktaverna2/tags/</developerConnection>
  	</scm>
 
-Debugging maven wth eclipse:
+Debugging maven with eclipse:
 1)  mvn -Dmaven.surefire.debug -Dtest=??? test
 2)  eclipse: debug-> debug configurations -> remote java application
