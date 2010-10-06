@@ -27,12 +27,15 @@ package org.openscience.cdk.applications.taverna.io;
 
 import java.io.File;
 import java.io.FileReader;
+import java.util.List;
 
 import org.openscience.cdk.ChemModel;
 import org.openscience.cdk.ChemSequence;
 import org.openscience.cdk.MoleculeSet;
 import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
+import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemModel;
 import org.openscience.cdk.interfaces.IChemSequence;
 import org.openscience.cdk.interfaces.IMolecule;
@@ -44,6 +47,7 @@ import org.openscience.cdk.io.MDLReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.io.SMILESReader;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
+import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 public class CDKIOReader {
 
@@ -104,19 +108,10 @@ public class CDKIOReader {
 	 * @return Array of cmlChemFiles
 	 */
 	public static CMLChemFile[] wrapInChemModelArray(CMLChemFile cmlChemFile) {
-		// FileNameGenerator fileNameGenerator = new FileNameGenerator();
-		int numberOfChemModels = 0;
-		int chemModelNumber = 0;
-		for (int i = 0; i < cmlChemFile.getChemSequenceCount(); i++) {
-			numberOfChemModels += cmlChemFile.getChemSequence(i).getChemModelCount();
-		}
-		CMLChemFile[] result = new CMLChemFile[numberOfChemModels];
-		for (int i = 0; i < cmlChemFile.getChemSequenceCount(); i++) {
-			IChemSequence sequence = cmlChemFile.getChemSequence(i);
-			result[chemModelNumber] = new CMLChemFile();
-			result[chemModelNumber].addChemSequence(sequence);
-			// result[chemModelNumber].setProperty(FileNameGenerator.FILENAME, fileNameGenerator.getNewFileNameList());
-			chemModelNumber++;
+		List<IAtomContainer> container = ChemFileManipulator.getAllAtomContainers(cmlChemFile);
+		CMLChemFile[] result = new CMLChemFile[container.size()];
+		for (int i = 0; i < container.size(); i++) {
+			result[i] = CMLChemFileWrapper.wrapAtomContainerInChemModel(container.get(i));
 		}
 		return result;
 	}

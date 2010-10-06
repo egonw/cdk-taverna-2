@@ -17,7 +17,9 @@
 - Added PDF writer activity
 - Added art2a classification library
 - Added Iterative Input/Output workers
-- String Converter (I/O) worker
+- Added String Converter (I/O) workers
 - Added iterative loop activities
+- Added Reaction Enumerator Subgraph Tester
+- Several bug fixes
 
 

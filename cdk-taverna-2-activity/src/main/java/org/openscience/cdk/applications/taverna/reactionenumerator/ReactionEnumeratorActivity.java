@@ -64,7 +64,7 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity implements I
 		for (int i = 0; i < numberOfPorts; i++) {
 			addInput(ReactionEnumeratorActivity.REACTANT_PORT + " " + (i + 1), 1, true, null, byte[].class);
 		}
-		addInput(ReactionEnumeratorActivity.REACTION_PORT, 0, true, null, byte[].class);
+		addInput(ReactionEnumeratorActivity.REACTION_PORT, 1, true, null, byte[].class);
 	}
 
 	@Override
@@ -103,9 +103,9 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity implements I
 				reactants.add(containerArray);
 			}
 			// get reaction
-			byte[] data = (byte[]) referenceService.renderIdentifier(inputs.get(ReactionEnumeratorActivity.REACTION_PORT),
-					byte[].class, context);
-			reaction = (IReaction) CDKObjectHandler.getObject(data);
+			List<byte[]> data = (List<byte[]>) referenceService.renderIdentifier(
+					inputs.get(ReactionEnumeratorActivity.REACTION_PORT), byte[].class, context);
+			reaction = (IReaction) CDKObjectHandler.getObject(data.get(0));
 			// enumerate results
 			Reaction[] results = enumerator.enumerateReactions(reaction, reactants);
 			// prepare output data

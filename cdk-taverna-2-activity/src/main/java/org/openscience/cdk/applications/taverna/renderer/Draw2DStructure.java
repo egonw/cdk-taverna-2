@@ -70,7 +70,11 @@ public class Draw2DStructure {
 			int scaledWith = (int) (width * scale);
 			int scaledHeight = (int) (height * scale);
 			molecule = Draw2DStructure.fitMoleculeGeometry(molecule, new Dimension(scaledWith, scaledHeight));
-			renderer.paintMolecule(molecule, new AWTDrawVisitor(g2), new Rectangle(x, y, scaledWith, scaledHeight), true);
+			try {
+				renderer.paintMolecule(molecule, new AWTDrawVisitor(g2), new Rectangle(x, y, scaledWith, scaledHeight), true);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		g2.dispose();
 		return image;

@@ -103,6 +103,7 @@ org.openscience.cdk.applications.taverna.qsar.QSARDescriptorActivity
 org.openscience.cdk.applications.taverna.qsar.QSARVectorGeneratorActivity
 org.openscience.cdk.applications.taverna.qsar.CSVGeneratorActivity
 org.openscience.cdk.applications.taverna.reactionenumerator.ReactionEnumeratorActivity
+org.openscience.cdk.applications.taverna.reactionenumerator.ReactionEnumeratorSubgraphFilterActivity
 org.openscience.cdk.applications.taverna.renderer.WriteMoleculeAsJPGActivity
 org.openscience.cdk.applications.taverna.renderer.WriteMoleculeAsPDFActivity
 org.openscience.cdk.applications.taverna.renderer.WriteMoleculeAsPNGActivity
