@@ -12,6 +12,7 @@ import org.openscience.cdk.applications.taverna.iterativeio.DataCollectorAccepto
 import org.openscience.cdk.applications.taverna.iterativeio.DataCollectorEmitterActivity;
 import org.openscience.cdk.applications.taverna.jchempaint.JChemPaintActivity;
 import org.openscience.cdk.applications.taverna.qsar.QSARDescriptorActivity;
+import org.openscience.cdk.applications.taverna.reactionenumerator.ReactionEnumeratorActivity;
 import org.openscience.cdk.applications.taverna.ui.EmptyConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.io.FileReaderConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.io.FileWriterConfigurationPanel;
@@ -21,6 +22,8 @@ import org.openscience.cdk.applications.taverna.ui.miscellaneous.DataCollectorAc
 import org.openscience.cdk.applications.taverna.ui.miscellaneous.DataCollectorEmitterConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.miscellaneous.PortNumberConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.qsar.QSARDescriptorConfigurationPanel;
+import org.openscience.cdk.applications.taverna.ui.reactionenumerator.ReactionEnumeratorConfigurationPanel;
+import org.openscience.cdk.reaction.enumerator.ReactionEnumerator;
 
 public class CDKConfigurationPanelFactory {
 
@@ -38,6 +41,8 @@ public class CDKConfigurationPanelFactory {
 			return new JChemPaintConfigurationPanel(activity);
 		} else if (activity instanceof QSARDescriptorActivity) {
 			return new QSARDescriptorConfigurationPanel(activity);
+		} else if (activity instanceof ReactionEnumeratorActivity) {
+			return new ReactionEnumeratorConfigurationPanel(activity);
 		}
 //		else if (activity instanceof StructureDataCollectorAcceptorActivity) {
 //			return new DataCollectorAcceptorConfigurationPanel(activity);

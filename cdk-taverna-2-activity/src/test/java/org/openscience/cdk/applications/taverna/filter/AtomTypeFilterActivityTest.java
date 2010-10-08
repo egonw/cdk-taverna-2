@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna.miscellaneous;
+package org.openscience.cdk.applications.taverna.filter;
 
 import java.io.File;
 import java.util.HashMap;
@@ -35,26 +35,27 @@ import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.filter.DoubletsFilterActivity;
 
 /**
- * Test class for the atom type tester activity.
+ * Test class for the atom type filter activity.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class AtomTypeTesterActivityTest extends CDKTavernaTestCases {
+public class AtomTypeFilterActivityTest extends CDKTavernaTestCases {
 
 	private CDKActivityConfigurationBean configBean;
 
-	private AbstractCDKActivity activity = new AtomTypeTesterActivity();
+	private AbstractCDKActivity activity = new AtomTypeFilterActivity();
 
-	public AtomTypeTesterActivityTest() {
-		super(AtomTypeTesterActivity.ATOMTYPE_TESTER_ACTIVITY);
+	public AtomTypeFilterActivityTest() {
+		super(AtomTypeFilterActivity.ATOMTYPE_FILTER_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		configBean.setActivityName(AtomTypeTesterActivity.ATOMTYPE_TESTER_ACTIVITY);
+		configBean.setActivityName(AtomTypeFilterActivity.ATOMTYPE_FILTER_ACTIVITY);
 	}
 
 	@SuppressWarnings("unchecked")

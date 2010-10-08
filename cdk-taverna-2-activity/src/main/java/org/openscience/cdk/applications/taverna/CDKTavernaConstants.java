@@ -39,6 +39,7 @@ public class CDKTavernaConstants {
 	public static final String ISOMORPHISM_FOLDER_NAME = "Isomorphism";
 	public static final String MISCELLANEOUS_FOLDER_NAME = "Miscellaneous";
 	public static final String STRING_CONVERTER_FOLDER_NAME = "String Converter";
+	public static final String FILTER_FOLDER_NAME = "Filter";
 	// --------------------Properties-------------------------------------
 	public static final String PROPERTY_FILE = "FILE";
 	public static final String PROPERTY_FILE_EXTENSION = "FILE EXTENSION";

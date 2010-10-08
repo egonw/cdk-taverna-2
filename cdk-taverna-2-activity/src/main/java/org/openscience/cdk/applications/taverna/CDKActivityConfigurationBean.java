@@ -113,4 +113,13 @@ public class CDKActivityConfigurationBean implements Serializable {
 	public void addAdditionalProperty(String key, Object object) {
 		this.additionalProperties.put(key, object);
 	}
+	
+	/**
+	 * Removes an additionally property.
+	 * 
+	 * @param key
+	 */
+	public void removeAdditionalProperty(String key) {
+		this.additionalProperties.remove(key);
+	}
 }

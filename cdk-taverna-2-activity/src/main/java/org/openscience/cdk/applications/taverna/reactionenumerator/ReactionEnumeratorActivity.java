@@ -51,12 +51,15 @@ import org.openscience.cdk.reaction.enumerator.ReactionEnumerator;
  * @author Andreas Truzskowski
  * 
  */
-public class ReactionEnumeratorActivity extends AbstractCDKActivity implements IPortNumber {
+public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 
 	public static final String REACTION_ENUMERATOR_ACTIVITY = "Reaction Enumerator";
 	public static final String REACTANT_PORT = "Reactant";
 	public static final String REACTION_PORT = "Reaction";
 	public static final String RESULT_PORT = "Resulting Reactions";
+	
+	public static final String USE_MULTI_MATCH_CHECKER = "USE_MULTI_MATCH_CHECKER";
+	public static final String USE_VARIABLE_REGION_CHECKER = "USE_VARIABLE_REGION_CHECKER";
 
 	@Override
 	protected void addInputPorts() {
@@ -64,7 +67,7 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity implements I
 		for (int i = 0; i < numberOfPorts; i++) {
 			addInput(ReactionEnumeratorActivity.REACTANT_PORT + " " + (i + 1), 1, true, null, byte[].class);
 		}
-		addInput(ReactionEnumeratorActivity.REACTION_PORT, 1, true, null, byte[].class);
+		addInput(ReactionEnumeratorActivity.REACTION_PORT, 0, true, null, byte[].class);
 	}
 
 	@Override
@@ -103,9 +106,9 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity implements I
 				reactants.add(containerArray);
 			}
 			// get reaction
-			List<byte[]> data = (List<byte[]>) referenceService.renderIdentifier(
+			byte[] data = (byte[]) referenceService.renderIdentifier(
 					inputs.get(ReactionEnumeratorActivity.REACTION_PORT), byte[].class, context);
-			reaction = (IReaction) CDKObjectHandler.getObject(data.get(0));
+			reaction = (IReaction) CDKObjectHandler.getObject(data);
 			// enumerate results
 			Reaction[] results = enumerator.enumerateReactions(reaction, reactants);
 			// prepare output data
@@ -132,6 +135,8 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity implements I
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
+		properties.put(ReactionEnumeratorActivity.USE_MULTI_MATCH_CHECKER, true);
+		properties.put(ReactionEnumeratorActivity.USE_VARIABLE_REGION_CHECKER, true);
 		properties.put(CDKTavernaConstants.PROPERTY_REACTANT_PORTS, new Integer(2));
 		return properties;
 	}

@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2010 by Andreas Truszkowski <ATruszkowski@gmx.de>
  *
@@ -18,12 +19,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- */
-package org.openscience.cdk.applications.taverna.miscellaneous;
+ */package org.openscience.cdk.applications.taverna.filter;
 
-import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,16 +34,22 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
+import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.interfaces.IReaction;
+import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
+import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomType;
+import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 
-public class ReactionSplitterActivity extends AbstractCDKActivity {
+public class AtomTypeFilterActivity extends AbstractCDKActivity {
 
-	public static final String REACTION_SPLITTER_ACTIVITY = "Reaction Splitter";
+	public static final String ATOMTYPE_FILTER_ACTIVITY = "Atom Type Filter";
 
-	public ReactionSplitterActivity() {
-		this.INPUT_PORTS = new String[] { "Reactions" };
-		this.RESULT_PORTS = new String[] { "1 Reactant", "2 Reactants", "3 Reactants", "greater 3 Reactants" };
+	public AtomTypeFilterActivity() {
+		this.INPUT_PORTS = new String[] { "Structures", };
+		this.RESULT_PORTS = new String[] { "Typed Structures", "NOT Typed Structures" };
 	}
 
 	@Override
@@ -61,12 +66,12 @@ public class ReactionSplitterActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getActivityName() {
-		return ReactionSplitterActivity.REACTION_SPLITTER_ACTIVITY;
+		return AtomTypeFilterActivity.ATOMTYPE_FILTER_ACTIVITY;
 	}
 
 	@Override
 	public String getDescription() {
-		return "Descriptions: " + ReactionSplitterActivity.REACTION_SPLITTER_ACTIVITY;
+		return "Descriptions: " + AtomTypeFilterActivity.ATOMTYPE_FILTER_ACTIVITY;
 	}
 
 	@Override
@@ -76,43 +81,57 @@ public class ReactionSplitterActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getFolderName() {
-		return CDKTavernaConstants.MISCELLANEOUS_FOLDER_NAME;
+		return CDKTavernaConstants.FILTER_FOLDER_NAME;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
-		List<IReaction> reactionList;
-		LinkedList<IReaction>[] resultList = (LinkedList<IReaction>[]) Array.newInstance(LinkedList.class, 4);
-		for (int i = 0; i < resultList.length; i++) {
-			resultList[i] = new LinkedList<IReaction>();
-		}
+		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
+		List<CMLChemFile> typedList = new ArrayList<CMLChemFile>();
+		List<CMLChemFile> notTypedList = new ArrayList<CMLChemFile>();
+		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
 		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
 				context);
 		try {
-			reactionList = CDKObjectHandler.getReactionList(dataArray);
+			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
-		for (IReaction r : reactionList) {
-			if (r.getReactantCount() < 4 && r.getReactantCount() > 0) {
-				resultList[r.getReactantCount() - 1].add(r);
-			} else {
-				resultList[3].add(r);
+		IAtomContainer[] containers;
+		try {
+			containers = CMLChemFileWrapper.convertCMLChemFileListToAtomContainerArray(chemFileList);
+		} catch (Exception exception) {
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), exception.getMessage());
+		}
+		for (IAtomContainer cont : containers) {
+			IAtom tmpAtom = null;
+			try {
+				CDKAtomTypeMatcher tmpMatcher = CDKAtomTypeMatcher.getInstance(cont.getBuilder());
+				for (int i = 0; i < cont.getAtomCount(); i++) {
+					tmpAtom = cont.getAtom(i);
+					if (tmpAtom.getAtomTypeName() == null) {
+						IAtomType tmpType = tmpMatcher.findMatchingAtomType(cont, tmpAtom);
+						AtomTypeManipulator.configure(tmpAtom, tmpType);
+					}
+				}
+			} catch (Exception e) {
+				comment.add("Atom with element " + tmpAtom.getSymbol() + " could not be typed!");
+				notTypedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(cont));
+				e.printStackTrace();
 			}
+			typedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(cont));
 		}
 		comment.add("Calculation done;");
 		// Congfigure output
 		try {
-			for (int i = 0; i < resultList.length; i++) {
-				List<byte[]> dataObjects = CDKObjectHandler.getBytesList(resultList[i]);
-				T2Reference containerRef = referenceService.register(dataObjects, 1, true, context);
-				outputs.put(this.RESULT_PORTS[i], containerRef);
-			}
+			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(typedList), 1, true, context);
+			outputs.put(this.RESULT_PORTS[0], containerRef);
+			containerRef = referenceService.register(CDKObjectHandler.getBytesList(notTypedList), 1, true, context);
+			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
 			e.printStackTrace();
 			// TODO exception handling
