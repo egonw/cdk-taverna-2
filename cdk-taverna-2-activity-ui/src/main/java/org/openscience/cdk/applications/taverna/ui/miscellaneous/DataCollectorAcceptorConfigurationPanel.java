@@ -27,16 +27,13 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.net.URL;
 import java.util.UUID;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -45,8 +42,6 @@ import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityCon
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
-import org.openscience.cdk.applications.taverna.Preferences;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKFileFilter;
 
 /**
  * Configuration panel for data collector acceptor activities.

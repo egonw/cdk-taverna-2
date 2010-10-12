@@ -22,15 +22,12 @@
 package org.openscience.cdk.applications.taverna.reactionenumerator;
 
 import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 
 import org.junit.Assert;
@@ -38,15 +35,10 @@ import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
-import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.io.CDKIOReader;
-import org.openscience.cdk.applications.taverna.io.CDKIOWriter;
-import org.openscience.cdk.applications.taverna.reactionenumerator.ReactionEnumeratorSubgraphFilterActivity;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.io.MDLReader;
 
 /**
  * Test class for the reaction enumerator subgraph tester activity.

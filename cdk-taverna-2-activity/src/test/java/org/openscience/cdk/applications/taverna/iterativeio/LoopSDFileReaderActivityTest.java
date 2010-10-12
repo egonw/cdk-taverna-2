@@ -29,7 +29,6 @@ import java.util.Map;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 
 import org.junit.Assert;

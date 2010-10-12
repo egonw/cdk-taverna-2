@@ -27,7 +27,6 @@ import java.util.Map;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 
 import org.junit.Assert;
@@ -39,7 +38,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.applications.taverna.miscellaneous.ReactionReactantSplitterActivity;
 import org.openscience.cdk.interfaces.IReaction;
 
 /**

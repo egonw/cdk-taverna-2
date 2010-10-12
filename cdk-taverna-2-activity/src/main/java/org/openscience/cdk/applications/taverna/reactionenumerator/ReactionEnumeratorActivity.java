@@ -40,11 +40,9 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
-import org.openscience.cdk.applications.taverna.interfaces.IPortNumber;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.reaction.enumerator.ReactionEnumerator;
-import org.openscience.cdk.reaction.enumerator.tools.ErrorLogger;
 
 /**
  * Class which represents the reaction enumerator activity.

@@ -28,7 +28,6 @@ package org.openscience.cdk.applications.taverna.iterativeio;
  * 
  */
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,7 +46,6 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.Preferences;
-import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 
 public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 

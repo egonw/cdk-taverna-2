@@ -18,7 +18,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileReader;
-import org.openscience.cdk.io.MDLRXNReader;
 import org.openscience.cdk.io.MDLRXNV2000Reader;
 
 public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements IIterativeFileReader {

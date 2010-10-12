@@ -28,7 +28,6 @@ import java.util.Map;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 
 import org.junit.Assert;
@@ -38,7 +37,6 @@ import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.applications.taverna.filter.DoubletsFilterActivity;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 

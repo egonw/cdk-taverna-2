@@ -1,6 +1,5 @@
 package org.openscience.cdk.applications.taverna.ui.serviceprovider;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;

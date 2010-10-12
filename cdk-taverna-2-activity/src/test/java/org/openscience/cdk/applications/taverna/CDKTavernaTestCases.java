@@ -27,10 +27,8 @@ package org.openscience.cdk.applications.taverna;
 
 import junit.framework.TestCase;
 
-import org.junit.internal.runners.TestMethod;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.tools.LoggingTool;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Super class for <b>all</b> CDK-Taverna TestCase implementations that ensures that the LoggingTool is configured.
