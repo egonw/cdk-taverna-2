@@ -4,7 +4,7 @@
 
 	<groupId>org.openscience.cdk.applications.taverna</groupId>
 	<artifactId>cdk-taverna2</artifactId>
-	<version>0.3-SNAPSHOT</version>
+	<version>0.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>CDK-Taverna 2 activity</name>
 	
@@ -22,10 +22,10 @@
 	</distributionManagement>
 
 	<properties>
-		<t2.core.version>1.1</t2.core.version>
-		<t2.activities.version>1.1</t2.activities.version>
-		<t2.ui.api.version>1.1</t2.ui.api.version>
-		<t2.workbench.version>2.1.2</t2.workbench.version>
+		<t2.core.version>1.2</t2.core.version>
+		<t2.activities.version>1.2</t2.activities.version>
+		<t2.ui.api.version>1.2</t2.ui.api.version>
+		<t2.workbench.version>2.2.0</t2.workbench.version>
 	</properties>
 
 	<build>

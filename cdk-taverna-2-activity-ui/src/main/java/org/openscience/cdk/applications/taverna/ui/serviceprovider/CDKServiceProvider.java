@@ -2,6 +2,7 @@ package org.openscience.cdk.applications.taverna.ui.serviceprovider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.swing.Icon;
 
@@ -64,6 +65,10 @@ public class CDKServiceProvider implements ServiceDescriptionProvider {
 	@Override
 	public String toString() {
 		return getName();
+	}
+
+	public String getId() {
+		return UUID.randomUUID().toString();
 	}
 
 }
