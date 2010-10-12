@@ -62,7 +62,7 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFi
 
 	@Override
 	protected void addOutputPorts() {
-		this.addOutput(this.RESULT_PORTS[0], 0);
+		this.addOutput(this.RESULT_PORTS[0], 1);
 	}
 
 	@Override
