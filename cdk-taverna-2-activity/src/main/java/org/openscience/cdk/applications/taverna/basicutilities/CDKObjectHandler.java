@@ -131,17 +131,16 @@ public class CDKObjectHandler {
 	 */
 	public static List<IReaction> getReactionList(List<byte[]> dataArray) throws Exception {
 		ArrayList<IReaction> reactionList = new ArrayList<IReaction>();
+		if(dataArray == null) {
+			throw new Exception("DataArray == null");
+		}
 		for (byte[] data : dataArray) {
 			Object obj = null;
-			try {
 				obj = CDKObjectHandler.getObject(data);
-			} catch (Exception e) {
-				throw new Exception(CDKTavernaException.WRONG_INPUT_PORT_TYPE);
-			}
-			if (obj instanceof Reaction) {
-				reactionList.add((Reaction) obj);
+			if (obj instanceof IReaction) {
+				reactionList.add((IReaction) obj);
 			} else {
-				throw new Exception(CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+				throw new Exception(CDKTavernaException.WRONG_INPUT_PORT_TYPE + " Type: " + obj.toString());
 			}
 		}
 		return reactionList;
