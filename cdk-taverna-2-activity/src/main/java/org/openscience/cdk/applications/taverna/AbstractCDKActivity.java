@@ -123,7 +123,7 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 				try {
 					AbstractCDKActivity.this.iteration++;
 					outputs = AbstractCDKActivity.this.work(inputs, callback);
-				} catch (CDKTavernaException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 					comment.add(e.getMessage());
 					callback.fail(e.getMessage());
@@ -145,7 +145,7 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 	 * Abstract method with does the work.
 	 */
 	public abstract Map<String, T2Reference> work(final Map<String, T2Reference> inputs,
-			final AsynchronousActivityCallback callback) throws CDKTavernaException;
+			final AsynchronousActivityCallback callback) throws Exception;
 
 	@Override
 	public CDKActivityConfigurationBean getConfiguration() {

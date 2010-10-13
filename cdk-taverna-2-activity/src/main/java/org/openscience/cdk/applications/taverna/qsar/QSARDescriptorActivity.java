@@ -60,7 +60,7 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
+			throws Exception {
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		Map<String, T2Reference> outputs = null;

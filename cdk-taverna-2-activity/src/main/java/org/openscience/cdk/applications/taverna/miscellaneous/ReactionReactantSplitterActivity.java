@@ -89,7 +89,7 @@ public class ReactionReactantSplitterActivity extends AbstractCDKActivity implem
 	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
+			throws Exception {
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
@@ -101,11 +101,11 @@ public class ReactionReactantSplitterActivity extends AbstractCDKActivity implem
 		}
 		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
 				context);
-		try {
+//		try {
 			reactionList = CDKObjectHandler.getReactionList(dataArray);
-		} catch (Exception e) {
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
+//		} catch (Exception e) {
+//			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
+//		}
 		for (int i = 0; i < numberOfPorts; i++) {
 			IAtomContainer container = reactionList.get(0).getReactants().getAtomContainer(i);
 			CMLChemFile chemFile = CMLChemFileWrapper.wrapAtomContainerInChemModel(container);
