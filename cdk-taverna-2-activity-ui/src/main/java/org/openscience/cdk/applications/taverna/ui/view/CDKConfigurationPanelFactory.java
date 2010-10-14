@@ -8,14 +8,12 @@ import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
 import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileReader;
 import org.openscience.cdk.applications.taverna.interfaces.IPortNumber;
-import org.openscience.cdk.applications.taverna.jchempaint.JChemPaintActivity;
 import org.openscience.cdk.applications.taverna.qsar.QSARDescriptorActivity;
 import org.openscience.cdk.applications.taverna.reactionenumerator.ReactionEnumeratorActivity;
 import org.openscience.cdk.applications.taverna.ui.EmptyConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.io.FileReaderConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.io.FileWriterConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.io.IterativeFileReaderConfigurationPanel;
-import org.openscience.cdk.applications.taverna.ui.jchempaint.JChemPaintConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.miscellaneous.PortNumberConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.qsar.QSARDescriptorConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.reactionenumerator.ReactionEnumeratorConfigurationPanel;
@@ -32,9 +30,11 @@ public class CDKConfigurationPanelFactory {
 			return new IterativeFileReaderConfigurationPanel(activity);
 		} else if (activity instanceof IPortNumber) {
 			return new PortNumberConfigurationPanel(activity);
-		} else if (activity instanceof JChemPaintActivity) {
-			return new JChemPaintConfigurationPanel(activity);
-		} else if (activity instanceof QSARDescriptorActivity) {
+		}
+//		else if (activity instanceof JChemPaintActivity) {
+//			return new JChemPaintConfigurationPanel(activity);
+//		}
+		else if (activity instanceof QSARDescriptorActivity) {
 			return new QSARDescriptorConfigurationPanel(activity);
 		} else if (activity instanceof ReactionEnumeratorActivity) {
 			return new ReactionEnumeratorConfigurationPanel(activity);
