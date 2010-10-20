@@ -17,3 +17,7 @@
 02.09.2010
 - Interrupting SDF reading if an error occurs in a molecule 
 - QSAR Descriptor bug (not calculated structures)
+
+19.10.2010
+- Rework the iterative multi rxn file reader
+- Exception handling in QSARDescriptorActivity

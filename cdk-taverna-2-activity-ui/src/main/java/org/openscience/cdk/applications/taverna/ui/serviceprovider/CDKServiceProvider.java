@@ -19,7 +19,7 @@ public class CDKServiceProvider implements ServiceDescriptionProvider {
 	/**
 	 * Do the actual search for services. Return using the callBack parameter.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public void findServiceDescriptionsAsync(FindServiceDescriptionsCallBack callBack) {
 		CDKServiceDescriptor service;
 		// Use callback.status() for long-running searches

@@ -27,8 +27,10 @@ package org.openscience.cdk.applications.taverna.io;
  * @author Andreas Truzskowski
  * 
  */
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
+import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +46,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 
@@ -52,6 +54,9 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 
 	public static final String SD_FILE_READER_ACTIVITY = "SDfile Reader";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public MDLSDFileReaderActivity() {
 		this.RESULT_PORTS = new String[] { "Structures" };
 	}
@@ -72,30 +77,49 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
-		CMLChemFile cmlChemFile = new CMLChemFile();
-		List<CMLChemFile> cmlChemFileList = null;
 		List<byte[]> dataList = new ArrayList<byte[]>();
 		// Read SDfile
 		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (files == null || files.length == 0) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
 		}
-		try {
-			for (File file : files) {
-				MDLV2000Reader tmpMDLReader = new MDLV2000Reader(new FileReader(file));
-				tmpMDLReader.read(cmlChemFile);
-				tmpMDLReader.close();
-				cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(cmlChemFile);
-				for (CMLChemFile c : cmlChemFileList) {
-					dataList.add(CDKObjectHandler.getBytes(c));
+		for (File file : files) {
+			try {
+				LineNumberReader lineReader = new LineNumberReader(new FileReader(file));
+				String line;
+				String SDFilePart = "";
+				while ((line = lineReader.readLine()) != null) {
+					SDFilePart += line + "\n";
+					if (line.contains("$$$$")) {
+						try {
+							CMLChemFile cmlChemFile = new CMLChemFile();
+							MDLV2000Reader tmpMDLReader = new MDLV2000Reader(new ByteArrayInputStream(SDFilePart.getBytes()));
+							tmpMDLReader.read(cmlChemFile);
+							tmpMDLReader.close();
+							dataList.add(CDKObjectHandler.getBytes(cmlChemFile));
+						} catch (Exception e) {
+							ErrorLogger.getInstance().writeError("Error in SD file: " + file.getPath() + "!\n" + SDFilePart,
+									this.getActivityName(), e);
+							comment.add("Error in SD file: " + file.getPath() + "!\n" + SDFilePart);
+						} finally {
+							SDFilePart = "";
+						}
+					}
 				}
+				lineReader.close();
+			} catch (Exception e) {
+				ErrorLogger.getInstance().writeError("Error while reading SD file: " + file.getPath() + "!",
+						this.getActivityName(), e);
+				comment.add("Error while reading SD file: " + file.getPath() + "!");
 			}
-			// Congfigure output
+		}
+		// Congfigure output
+		try {
 			T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new CDKTavernaException(this.getActivityName(), "Error reading SD file!");
+			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
 		comment.add("done");
 		// Return results

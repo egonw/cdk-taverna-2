@@ -106,12 +106,6 @@ public class DataCollectorAcceptorConfigurationPanel extends
 		}
 	}
 
-	private void showValue() {
-		this.idField.setText(this.id.toString());
-		this.idField.repaint();
-		this.revalidate();
-	}
-
 	@Override
 	public boolean checkValues() {
 		return true;

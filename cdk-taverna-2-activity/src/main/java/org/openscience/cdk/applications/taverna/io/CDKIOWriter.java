@@ -30,6 +30,10 @@ import java.io.StringWriter;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.io.MDLWriter;
 
+/**
+ * @author Egon Willighagen
+ *
+ */
 public class CDKIOWriter {
 
 	/**
@@ -41,6 +45,7 @@ public class CDKIOWriter {
 		StringWriter writer = new StringWriter();
 		MDLWriter molWriter = new MDLWriter(writer);
 		molWriter.write(file);
+		molWriter.close();
 		return writer.toString();
 	}
 

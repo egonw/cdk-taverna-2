@@ -38,6 +38,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
@@ -53,6 +54,9 @@ public class CSVGeneratorActivity extends AbstractCDKActivity implements IFileWr
 
 	public static final String CSV_GENERATOR_ACTIVITY = "CSV Generator";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public CSVGeneratorActivity() {
 		this.INPUT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names", "Structures" };
 		this.RESULT_PORTS = new String[] { "CSV String" };
@@ -82,6 +86,7 @@ public class CSVGeneratorActivity extends AbstractCDKActivity implements IFileWr
 		try {
 			vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(vectorData);
 		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		SortedSet<String> descriptorNames;
@@ -89,6 +94,7 @@ public class CSVGeneratorActivity extends AbstractCDKActivity implements IFileWr
 		try {
 			descriptorNames = (SortedSet<String>) CDKObjectHandler.getObject(nameData);
 		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
@@ -97,23 +103,32 @@ public class CSVGeneratorActivity extends AbstractCDKActivity implements IFileWr
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
+		List<String> csv = null;
 		try {
 			List<UUID> uuids = this.getUUIDs(chemFileList);
-			List<String> csv = this.createCSV(vectorMap, descriptorNames, uuids);
-			T2Reference containerRef = referenceService.register(csv, 1, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
-			comment.add("done");
+			csv = this.createCSV(vectorMap, descriptorNames, uuids);
 		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
+			ErrorLogger.getInstance().writeError("Error while creating csv!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
+		T2Reference containerRef = referenceService.register(csv, 1, true, context);
+		outputs.put(this.RESULT_PORTS[0], containerRef);
+		comment.add("done");
+
 		// Return results
 		return outputs;
 
 	}
 
+	/**
+	 * Returns a list of the UUIDs from given the chem files.
+	 * 
+	 * @param chemFileList
+	 * @return List of the UUIDs from given the chem files.
+	 */
 	private List<UUID> getUUIDs(List<CMLChemFile> chemFileList) {
 		ArrayList<UUID> uuids = new ArrayList<UUID>();
 		for (CMLChemFile chemFile : chemFileList) {
@@ -177,7 +192,6 @@ public class CSVGeneratorActivity extends AbstractCDKActivity implements IFileWr
 				}
 				csv.add(buffer.toString());
 			}
-
 		}
 		return csv;
 	}

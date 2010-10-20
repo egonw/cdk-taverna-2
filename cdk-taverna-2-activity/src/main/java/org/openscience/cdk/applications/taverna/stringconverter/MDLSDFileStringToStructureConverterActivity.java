@@ -45,6 +45,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 
@@ -52,6 +53,9 @@ public class MDLSDFileStringToStructureConverterActivity extends AbstractCDKActi
 
 	public static final String MDL_SDFILE_STRING_CONVERTER_ACTIVITY = "MDL SDFile String to Structures Converter";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public MDLSDFileStringToStructureConverterActivity() {
 		this.INPUT_PORTS = new String[] { "MDL SDFile String" };
 		this.RESULT_PORTS = new String[] { "Structures", "Not Converted" };
@@ -92,7 +96,8 @@ public class MDLSDFileStringToStructureConverterActivity extends AbstractCDKActi
 				}
 			} catch (Exception e) {
 				notConverted.add(cml);
-				comment.add("Error converting MDL SDFile String!");
+				ErrorLogger.getInstance().writeError("Error converting MDL SD file String!", this.getActivityName(), e);
+				comment.add("Error converting MDL SD file String!");
 			}
 		}
 		if (dataList.isEmpty()) {

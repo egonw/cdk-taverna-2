@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
@@ -124,7 +126,7 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 					AbstractCDKActivity.this.iteration++;
 					outputs = AbstractCDKActivity.this.work(inputs, callback);
 				} catch (Exception e) {
-					e.printStackTrace();
+					ErrorLogger.getInstance().writeError("Not catched exception.", "AbstractCDKActivity", e);
 					comment.add(e.getMessage());
 					callback.fail(e.getMessage());
 				}

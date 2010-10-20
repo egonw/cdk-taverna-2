@@ -39,6 +39,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
 import org.openscience.cdk.io.CMLWriter;
@@ -79,6 +80,7 @@ public class CMLFileWriterActivity extends AbstractCDKActivity implements IFileW
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Errowhile deserializing object.", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
@@ -96,7 +98,7 @@ public class CMLFileWriterActivity extends AbstractCDKActivity implements IFileW
 			writer.write(tmpChemFile);
 			writer.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			ErrorLogger.getInstance().writeError("Error writing file: " + file.getPath() + "!", this.getActivityName(), e);
 			comment.add("Error writing file: " + file.getPath() + "!");
 		}
 		comment.add("done");

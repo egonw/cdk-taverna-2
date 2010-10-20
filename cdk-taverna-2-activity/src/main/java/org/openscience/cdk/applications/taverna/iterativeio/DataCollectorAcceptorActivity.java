@@ -22,7 +22,7 @@
 package org.openscience.cdk.applications.taverna.iterativeio;
 
 /**
- * Class which represents the data collector acceptor activity.
+ * Class which represents the data collector acceptor activity. Its used for gathering data from iterative sources.
  * 
  * @author Andreas Truzskowski
  * 
@@ -42,11 +42,15 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.Preferences;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 
 public class DataCollectorAcceptorActivity extends AbstractCDKActivity {
 
 	public static final String DATA_COLLECTOR_ACCEPTOR_ACTIVITY = "Data Collector Acceptor";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public DataCollectorAcceptorActivity() {
 		this.INPUT_PORTS = new String[] { "Data", "UUID" };
 	}
@@ -74,30 +78,27 @@ public class DataCollectorAcceptorActivity extends AbstractCDKActivity {
 		UUID id = UUID.fromString((String) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[1]), String.class,
 				context));
 		if (id == null) {
-			throw new CDKTavernaException(DATA_COLLECTOR_ACCEPTOR_ACTIVITY, "UUID not set!");
+			throw new CDKTavernaException(this.getActivityName(), "UUID not set!");
 		}
 		DataOutputStream dataStream;
 		DataOutputStream idxStream;
 		try {
-			 dataStream = Preferences.getInstance().getDataCollectorDataStream(id);
-			 idxStream = Preferences.getInstance().createDataCollectorIdxStream(id);
+			dataStream = Preferences.getInstance().getDataCollectorDataStream(id);
+			idxStream = Preferences.getInstance().createDataCollectorIdxStream(id);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new CDKTavernaException(DATA_COLLECTOR_ACCEPTOR_ACTIVITY, "Error while initializing data stream!");
+			ErrorLogger.getInstance().writeError("Error while initializing data stream!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error while initializing data stream!");
 		}
-		try {	
+		try {
 			for (byte[] data : dataArray) {
 				idxStream.writeInt(data.length);
 				dataStream.write(data);
 			}
-
 			idxStream.flush();
 			dataStream.flush();
 		} catch (Exception e) {
-			e.printStackTrace();
-			comment.add("Error writing data");
-			throw new CDKTavernaException(DATA_COLLECTOR_ACCEPTOR_ACTIVITY, "Error writing data!");
+			ErrorLogger.getInstance().writeError("Error while writing cache data!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error while writing cache data!");
 		}
 		comment.add("done");
 		// Return results

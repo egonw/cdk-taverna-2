@@ -45,6 +45,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.CMLReader;
 
@@ -52,6 +53,9 @@ public class CMLFileReaderActivity extends AbstractCDKActivity implements IFileR
 
 	public static final String CML_FILE_READER_ACTIVITY = "CML File Reader";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public CMLFileReaderActivity() {
 		this.RESULT_PORTS = new String[] { "Structures" };
 	}
@@ -80,8 +84,8 @@ public class CMLFileReaderActivity extends AbstractCDKActivity implements IFileR
 		if (files == null || files.length == 0) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
 		}
-		try {
-			for (File file : files) {
+		for (File file : files) {
+			try {
 				CMLReader reader = new CMLReader(new FileInputStream(file));
 				cmlChemFile = (CMLChemFile) reader.read(cmlChemFile);
 				reader.close();
@@ -90,12 +94,14 @@ public class CMLFileReaderActivity extends AbstractCDKActivity implements IFileR
 				for (CMLChemFile c : cmlChemFileList) {
 					dataList.add(CDKObjectHandler.getBytes(c));
 				}
+			} catch (Exception e) {
+				ErrorLogger.getInstance().writeError("Error reading CML file: " + file.getPath(), this.getActivityName(), e);
+				comment.add("Error reading CML file: " + file.getPath());
 			}
-			T2Reference containerRef = referenceService.register(dataList, 1, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
-		} catch (Exception e) {
-			throw new CDKTavernaException(this.getActivityName(), "Error reading CML file!");
 		}
+		T2Reference containerRef = referenceService.register(dataList, 1, true, context);
+		outputs.put(this.RESULT_PORTS[0], containerRef);
+
 		comment.add("done");
 		// Return results
 		return outputs;

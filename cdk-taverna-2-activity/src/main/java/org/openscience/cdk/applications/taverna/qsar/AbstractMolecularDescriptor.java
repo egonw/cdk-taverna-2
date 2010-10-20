@@ -1,3 +1,24 @@
+/*
+ * Copyright (C) 2010 by Andreas Truszkowski <ATruszkowski@gmx.de>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1
+ * of the License, or (at your option) any later version.
+ * All we ask is that proper credit is given for our work, which includes
+ * - but is not limited to - adding the above copyright notice to the beginning
+ * of your source code files, and to any copyright notice that you may distribute
+ * with programs based on this work.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ */
 package org.openscience.cdk.applications.taverna.qsar;
 
 import java.util.ArrayList;
@@ -17,15 +38,25 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.qsar.DescriptorValue;
 import org.openscience.cdk.qsar.IMolecularDescriptor;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
+/**
+ * Abstract class which represents a molecular descriptor activity.
+ * 
+ * @author Andreas Truszkowski
+ * 
+ */
 public abstract class AbstractMolecularDescriptor extends AbstractCDKActivity {
 
 	private IMolecularDescriptor descriptor;
 
+	/**
+	 * Creates a new instance.
+	 */
 	public AbstractMolecularDescriptor() {
 		super();
 		this.INPUT_PORTS = new String[] { "Structures" };
@@ -79,6 +110,7 @@ public abstract class AbstractMolecularDescriptor extends AbstractCDKActivity {
 		try {
 			inputList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		if (descriptor == null) {
@@ -88,30 +120,26 @@ public abstract class AbstractMolecularDescriptor extends AbstractCDKActivity {
 						"The descriptor could not be initialized!");
 			}
 		}
-		try {
-			for (Iterator<CMLChemFile> iter = inputList.iterator(); iter.hasNext();) {
-				CMLChemFile file = iter.next();
-				List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(file);
-				for (IAtomContainer molecule : moleculeList) {
-					try {
-						if (molecule.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
-							UUID uuid = UUID.randomUUID();
-							molecule.setProperty(CDKTavernaConstants.MOLECULEID, uuid);
-						}
-						DescriptorValue value = descriptor.calculate(molecule);
-						molecule.setProperty(value.getSpecification(), value);
-						calculatedList.add(file);
-
-					} catch (Exception e) {
-						notCalculatedList.add(file);
-						// TODO exception handling
+		for (Iterator<CMLChemFile> iter = inputList.iterator(); iter.hasNext();) {
+			CMLChemFile file = iter.next();
+			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(file);
+			for (IAtomContainer molecule : moleculeList) {
+				try {
+					if (molecule.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
+						UUID uuid = UUID.randomUUID();
+						molecule.setProperty(CDKTavernaConstants.MOLECULEID, uuid);
 					}
+					DescriptorValue value = descriptor.calculate(molecule);
+					molecule.setProperty(value.getSpecification(), value);
+					calculatedList.add(file);
+
+				} catch (Exception e) {
+					ErrorLogger.getInstance().writeError("Error while calculating QSAR descriptor!", this.getActivityName(), e);
+					notCalculatedList.add(file);
 				}
 			}
-			comment.add("Calculation done;");
-		} catch (Exception exception) {
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), exception.getMessage());
 		}
+		comment.add("Calculation done;");
 		// Congfigure output
 		try {
 			dataArray = new ArrayList<byte[]>();
@@ -131,8 +159,8 @@ public abstract class AbstractMolecularDescriptor extends AbstractCDKActivity {
 			containerRef = referenceService.register(dataArray, 1, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			e.printStackTrace();
-			// TODO exception handling
+			ErrorLogger.getInstance().writeError("Error while configurating output ports!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output ports!");
 		}
 		return outputs;
 	}

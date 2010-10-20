@@ -44,6 +44,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLWriter;
 
@@ -51,6 +52,9 @@ public class StructureToMDLMolStringConverterActivity extends AbstractCDKActivit
 
 	public static final String MDL_MOL_STRING_CONVERTER_ACTIVITY = "Structure to MDL Mol String Converter";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public StructureToMDLMolStringConverterActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
 		this.RESULT_PORTS = new String[] { "MDL Mol String", "Not Converted" };
@@ -82,6 +86,7 @@ public class StructureToMDLMolStringConverterActivity extends AbstractCDKActivit
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		List<String> molStringList = new ArrayList<String>();
@@ -94,6 +99,7 @@ public class StructureToMDLMolStringConverterActivity extends AbstractCDKActivit
 				molStringList.add(stringWriter.toString());
 			} catch (Exception e) {
 				notConverted.add(cml);
+				ErrorLogger.getInstance().writeError("Error converting MDL mol String!", this.getActivityName(), e);
 				comment.add("Error converting MDL Mol String!");
 			}
 		}

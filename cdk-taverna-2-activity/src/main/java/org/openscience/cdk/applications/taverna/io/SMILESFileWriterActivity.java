@@ -39,6 +39,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
 import org.openscience.cdk.io.SMILESWriter;
@@ -53,6 +54,9 @@ public class SMILESFileWriterActivity extends AbstractCDKActivity implements IFi
 
 	public static final String SMILES_FILE_WRITER_ACTIVITY = "SMILES File Writer";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public SMILESFileWriterActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
 	}
@@ -79,6 +83,7 @@ public class SMILESFileWriterActivity extends AbstractCDKActivity implements IFi
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
@@ -94,8 +99,8 @@ public class SMILESFileWriterActivity extends AbstractCDKActivity implements IFi
 			}
 			writer.close();
 		} catch (Exception e) {
-			e.printStackTrace();
-			comment.add("Error writing file!");
+			ErrorLogger.getInstance().writeError("Error writing SMILES file: " + file.getPath() + "!", this.getActivityName(), e);
+			comment.add("Error writing SMILES file: " + file.getPath() + "!");
 		}
 		comment.add("done");
 		return null;

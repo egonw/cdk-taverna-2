@@ -45,9 +45,15 @@ public class Preferences {
 	private HashMap<UUID, DataOutputStream> dataCollectorIdxStreamMap = new HashMap<UUID, DataOutputStream>();
 	private HashMap<UUID, DataOutputStream> dataCollectorDataStreamMap = new HashMap<UUID, DataOutputStream>();
 
+	/**
+	 * Creates a new instance.
+	 */
 	private Preferences() {
 	}
 
+	/**
+	 * @return instance of the preferences class.
+	 */
 	public synchronized static Preferences getInstance() {
 		if (instance == null) {
 			instance = new Preferences();
@@ -71,13 +77,29 @@ public class Preferences {
 		this.currentDirectory = currentDirectory;
 	}
 
+	/**
+	 * Creates a filename from given id and extension for the data collector activity.
+	 * 
+	 * @param id
+	 *            of the stream
+	 * @param extension
+	 * @return
+	 */
 	public String createDataCollectorFilename(UUID id, String extension) {
-		String filename = FileNameGenerator.getTempDir();
+		String filename = FileNameGenerator.getCacheDir();
 		filename += id.toString();
 		filename += "." + extension;
 		return filename;
 	}
 
+	/**
+	 * Creates a new data output stream for the data collector activity from the given id.
+	 * 
+	 * @param id
+	 *            of the stream
+	 * @return new stream
+	 * @throws FileNotFoundException
+	 */
 	public DataOutputStream getDataCollectorDataStream(UUID id) throws FileNotFoundException {
 		DataOutputStream stream = this.dataCollectorDataStreamMap.get(id);
 		if (stream == null) {
@@ -92,16 +114,37 @@ public class Preferences {
 		return stream;
 	}
 
+	/**
+	 * Closes the data output stream with the given data.
+	 * 
+	 * @param id
+	 *            of the stream
+	 * @throws IOException
+	 */
 	public void closeDataCollectorDataStream(UUID id) throws IOException {
 		DataOutputStream stream = dataCollectorIdxStreamMap.get(id);
 		stream.close();
 		this.dataCollectorDataStreamMap.remove(id);
 	}
 
+	/**
+	 * Stores the data output stream.
+	 * 
+	 * @param id
+	 *            of the stream
+	 * @param stream
+	 */
 	private void setDataCollectorDataStream(UUID id, DataOutputStream stream) {
 		this.dataCollectorDataStreamMap.put(id, stream);
 	}
 
+	/**
+	 * Creates a new index output stream for the data collector activity from given id.
+	 * 
+	 * @param id
+	 * @return
+	 * @throws FileNotFoundException
+	 */
 	public DataOutputStream createDataCollectorIdxStream(UUID id) throws FileNotFoundException {
 		DataOutputStream stream = this.dataCollectorIdxStreamMap.get(id);
 		if (stream == null) {
@@ -116,12 +159,26 @@ public class Preferences {
 		return stream;
 	}
 
+	/**
+	 * Closes an index output stream.
+	 * 
+	 * @param id
+	 *            of the stream
+	 * @throws IOException
+	 */
 	public void closeDataCollectorIdxStream(UUID id) throws IOException {
 		DataOutputStream stream = dataCollectorIdxStreamMap.get(id);
 		stream.close();
 		this.dataCollectorDataStreamMap.remove(id);
 	}
 
+	/**
+	 * Stores the index output stream.
+	 * 
+	 * @param id
+	 *            of the stream
+	 * @param stream
+	 */
 	private void setDataCollectorIdxStream(UUID id, DataOutputStream stream) {
 		this.dataCollectorIdxStreamMap.put(id, stream);
 	}

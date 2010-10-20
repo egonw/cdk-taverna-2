@@ -39,6 +39,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -91,6 +92,7 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity implements 
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		Map<UUID, Map<String, Object>> vectorMap = new HashMap<UUID, Map<String, Object>>();
@@ -116,8 +118,8 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity implements 
 						for (Object key : keys) {
 							if (bond.getProperty(key) instanceof DescriptorValue) {
 								dValue = (DescriptorValue) bond.getProperty(key);
-								descriptorName = dValue.getSpecification().getSpecificationReference()
-										.split(descriptorSpecificationSplitter)[1];
+								descriptorName = dValue.getSpecification().getSpecificationReference().split(
+										descriptorSpecificationSplitter)[1];
 								descriptorName += "." + i;
 								result = dValue.getValue();
 								if (result instanceof DoubleResult) {
@@ -147,8 +149,8 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity implements 
 						for (Object key : keys) {
 							if (atom.getProperty(key) instanceof DescriptorValue) {
 								dValue = (DescriptorValue) atom.getProperty(key);
-								descriptorName = dValue.getSpecification().getSpecificationReference()
-										.split(descriptorSpecificationSplitter)[1];
+								descriptorName = dValue.getSpecification().getSpecificationReference().split(
+										descriptorSpecificationSplitter)[1];
 								result = dValue.getValue();
 								descriptorName += "." + i;
 								if (result instanceof DoubleResult) {
@@ -176,8 +178,8 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity implements 
 					for (Object key : keys) {
 						if (atomContainer.getProperty(key) instanceof DescriptorValue) {
 							dValue = (DescriptorValue) atomContainer.getProperty(key);
-							descriptorName = dValue.getSpecification().getSpecificationReference()
-									.split(descriptorSpecificationSplitter)[1];
+							descriptorName = dValue.getSpecification().getSpecificationReference().split(
+									descriptorSpecificationSplitter)[1];
 							result = dValue.getValue();
 							if (result instanceof DoubleResult) {
 								descriptorNames.add(descriptorName);

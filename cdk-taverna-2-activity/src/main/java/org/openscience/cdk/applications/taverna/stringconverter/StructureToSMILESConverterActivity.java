@@ -45,6 +45,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.SMILESWriter;
 
@@ -52,6 +53,9 @@ public class StructureToSMILESConverterActivity extends AbstractCDKActivity impl
 
 	public static final String SMILES_CONVERTER_ACTIVITY = "Structure to SMILES Converter";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public StructureToSMILESConverterActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
 		this.RESULT_PORTS = new String[] { "SMILES", "Not Converted" };
@@ -83,6 +87,7 @@ public class StructureToSMILESConverterActivity extends AbstractCDKActivity impl
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		List<String> molStringList = new ArrayList<String>();
@@ -95,6 +100,7 @@ public class StructureToSMILESConverterActivity extends AbstractCDKActivity impl
 				molStringList.add(stringWriter.toString());
 			} catch (Exception e) {
 				notConverted.add(cml);
+				ErrorLogger.getInstance().writeError("Error converting SMILES!", this.getActivityName(), e);
 				comment.add("Error converting SMILES!");
 			}
 		}

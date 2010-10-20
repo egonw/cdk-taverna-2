@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Hashtable;
 
 /**
  * Class which provides methods for a centralized file name handling within the cdk-taverna project
@@ -33,6 +34,8 @@ import java.util.Date;
  * 
  */
 public class FileNameGenerator {
+
+	private static Hashtable<String, Integer> usedFilesTable = new Hashtable<String, Integer>();
 
 	/**
 	 * Generates a unique filename from the given parameters.
@@ -46,7 +49,7 @@ public class FileNameGenerator {
 	public synchronized static File getNewFile(String path, String extension, int iteration) {
 		String filename = "";
 		File file = null;
-		int idx = 1;
+		Integer idx = 1;
 		SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
 		filename += path;
 		if (!path.endsWith(File.separator)) {
@@ -55,11 +58,16 @@ public class FileNameGenerator {
 		filename += iteration + "_";
 		filename += dateformat.format(new Date());
 		String temp;
+		String key = path + "_" + iteration;
+		if (usedFilesTable.get(key) != null) {
+			idx = usedFilesTable.get(key);
+		}
 		do {
 			temp = "_" + idx;
 			file = new File(filename + temp + extension);
 			idx++;
 		} while (file.exists());
+		usedFilesTable.put(key, idx);
 		try {
 			file.createNewFile();
 		} catch (IOException e) {
@@ -69,12 +77,63 @@ public class FileNameGenerator {
 		return file;
 	}
 
+	/**
+	 * @return path of the OS temporary directory.
+	 */
 	public synchronized static String getTempDir() {
-		String tmpDir = System.getProperty("java.io.tmpdir") + "CDKTaverna" + File.separator;
+		String tmpDir = System.getProperty("java.io.tmpdir") + "cdk-taverna_2" + File.separator;
 		File file = new File(tmpDir);
 		if (!file.exists()) {
 			file.mkdir();
 		}
 		return tmpDir;
+	}
+
+	/**
+	 * @return path to the cache directory. It's located in the OS temporary directory.
+	 */
+	public synchronized static String getCacheDir() {
+		String cacheDir = getTempDir();
+		cacheDir += "cache" + File.separator;
+		File file = new File(cacheDir);
+		if (!file.exists()) {
+			file.mkdir();
+		}
+		return cacheDir;
+	}
+	
+	/**
+	 * @return path to the log directory. It's located in the OS temporary directory.
+	 */
+	public synchronized static String getLogDir() {
+		String logDir = getTempDir();
+		logDir += "log" + File.separator;
+		File file = new File(logDir);
+		if (!file.exists()) {
+			file.mkdir();
+		}
+		return logDir;
+	}
+
+	/**
+	 * Deletes all files and subdirectories under dir. Returns true if all deletions were successful. If a deletion fails, the
+	 * method stops attempting to delete and returns false.
+	 * 
+	 * @param dir
+	 *            Directory to delete
+	 * @return
+	 */
+	public synchronized static boolean deleteDir(File dir) {
+		if (dir.isDirectory()) {
+			String[] children = dir.list();
+			for (int i = 0; i < children.length; i++) {
+				boolean success = deleteDir(new File(dir, children[i]));
+				if (!success) {
+					return false;
+				}
+			}
+		}
+		// The directory is now empty so delete it
+		return dir.delete();
 	}
 }

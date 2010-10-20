@@ -39,11 +39,12 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLRXNReader;
 
 /**
- * Class which represents the MDL Multi RXN file reader activity. (Not official supported file format. Only RXN Strings separated
+ * Class which represents the MDL Multi RXN file reader activity. (Not official supported file format. Only MDL RXN Strings separated
  * by "$$$$".)
  * 
  * @author Andreas Truzskowski
@@ -53,6 +54,9 @@ public class MDLMultiRXNFileReaderActivity extends AbstractCDKActivity implement
 
 	public static final String MULTI_RXN_FILE_READER_ACTIVITY = "Mutli RXN File Reader";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public MDLMultiRXNFileReaderActivity() {
 		this.RESULT_PORTS = new String[] { "Reactions" };
 	}
@@ -85,20 +89,33 @@ public class MDLMultiRXNFileReaderActivity extends AbstractCDKActivity implement
 			String reactionString = "";
 			while ((line = lineReader.readLine()) != null) {
 				if (line.contains("$$$$")) {
-					MDLRXNReader reader = new MDLRXNReader(new ByteArrayInputStream(reactionString.getBytes()));
-					Reaction reaction = (Reaction) reader.read(new Reaction());
-					reactionList.add(reaction);
-					reactionString = "";
+					try {
+						MDLRXNReader reader = new MDLRXNReader(new ByteArrayInputStream(reactionString.getBytes()));
+						Reaction reaction = (Reaction) reader.read(new Reaction());
+						reactionList.add(reaction);
+						reader.close();
+					} catch (Exception e) {
+						ErrorLogger.getInstance().writeError("Error reading RXN part: \n" + reactionString,
+								this.getActivityName(), e);
+						comment.add("Error reading RXN part: \n" + reactionString);
+					} finally {
+						reactionString = "";
+					}
 				} else {
 					reactionString += line + "\n";
 				}
 			}
-			// Congfigure output
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error reading multi RXN file: " + file.getPath(), this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error reading multi RXN file: " + file.getPath());
+		}
+		// Congfigure output
+		try {
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(reactionList), 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new CDKTavernaException(this.getActivityName(), "Error reading RXN file");
+			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
 		comment.add("done");
 		// Return results

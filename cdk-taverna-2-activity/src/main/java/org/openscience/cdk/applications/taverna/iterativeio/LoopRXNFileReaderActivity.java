@@ -1,3 +1,24 @@
+/*
+ * Copyright (C) 2010 by Andreas Truszkowski <ATruszkowski@gmx.de>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1
+ * of the License, or (at your option) any later version.
+ * All we ask is that proper credit is given for our work, which includes
+ * - but is not limited to - adding the above copyright notice to the beginning
+ * of your source code files, and to any copyright notice that you may distribute
+ * with programs based on this work.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ */
 package org.openscience.cdk.applications.taverna.iterativeio;
 
 import java.io.File;
@@ -17,9 +38,17 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileReader;
 import org.openscience.cdk.io.MDLRXNV2000Reader;
 
+
+/**
+ * Class which represents the iterative loop rxn file reader.
+ * 
+ * @author Andreas Truszkowski
+ * 
+ */
 public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements IIterativeFileReader {
 
 	public static final String LOOP_RXN_FILE_READER_ACTIVITY = "Loop RXN file Reader";
@@ -28,6 +57,9 @@ public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements II
 
 	private ArrayList<File> fileList = null;
 
+	/**
+	 * Creates a new instance.
+	 */
 	public LoopRXNFileReaderActivity() {
 		this.RESULT_PORTS = new String[] { "Reactions", "State" };
 	}
@@ -89,20 +121,24 @@ public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements II
 		}
 		List<byte[]> dataList = new ArrayList<byte[]>();
 		for (int i = 0; i < readSize; i++) {
+			File file = fileList.remove(0);
 			try {
-				MDLRXNV2000Reader reader = new MDLRXNV2000Reader(new FileReader(fileList.remove(0)));
+				MDLRXNV2000Reader reader = new MDLRXNV2000Reader(new FileReader(file));
 				Reaction reaction = (Reaction) reader.read(new Reaction());
+				reader.close();
 				dataList.add(CDKObjectHandler.getBytes(reaction));
-				if (fileList.isEmpty()) {
-					state = FINISHED;
-					comment.add("All done!");
-				} else {
-					comment.add("Has next iteration!");
-				}
 			} catch (Exception e) {
-				e.printStackTrace();
-				throw new CDKTavernaException(this.getActivityName(), "Error reading RXN file!");
+				ErrorLogger.getInstance().writeError("Error while reading RXN file: " + file.getPath() + "!",
+						this.getActivityName(), e);
+				throw new CDKTavernaException(this.getActivityName(), "Error while reading RXN file: " + file.getPath() + "!");
 			}
+			if (fileList.isEmpty()) {
+				state = FINISHED;
+				comment.add("All done!");
+			} else {
+				comment.add("Has next iteration!");
+			}
+
 		}
 		T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);

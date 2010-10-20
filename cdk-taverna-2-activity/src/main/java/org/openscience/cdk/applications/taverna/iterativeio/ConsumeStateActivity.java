@@ -34,7 +34,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 
 /**
- * Class which represents the consume state activity.
+ * Class which represents the consume state activity. Used with iterative loop reader.
  * 
  * @author Andreas Truzskowski
  * 
@@ -43,13 +43,16 @@ public class ConsumeStateActivity extends AbstractCDKActivity {
 
 	public static final String CONSUME_STATE_ACTIVITY = "Consume State";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public ConsumeStateActivity() {
 		this.INPUT_PORTS = new String[] { "State" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		addInput(this.INPUT_PORTS[0], 0, true, null, String.class);
+		addInput(this.INPUT_PORTS[0], 1, true, null, String.class);
 	}
 
 	@Override

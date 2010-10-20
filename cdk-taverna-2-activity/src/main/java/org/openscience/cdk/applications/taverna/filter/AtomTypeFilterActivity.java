@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2010 by Andreas Truszkowski <ATruszkowski@gmx.de>
  *
@@ -37,16 +36,27 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomType;
 import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 
+/**
+ * Class which represents the atom type filter activity. It tries to type each atom of the given structures and separates the
+ * structures in typeable and not typeable ones.
+ * 
+ * @author Andreas Truszkowski
+ * 
+ */
 public class AtomTypeFilterActivity extends AbstractCDKActivity {
 
 	public static final String ATOMTYPE_FILTER_ACTIVITY = "Atom Type Filter";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public AtomTypeFilterActivity() {
 		this.INPUT_PORTS = new String[] { "Structures", };
 		this.RESULT_PORTS = new String[] { "Typed Structures", "NOT Typed Structures" };
@@ -99,13 +109,17 @@ public class AtomTypeFilterActivity extends AbstractCDKActivity {
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while deserializing object.", this.getConfiguration().getActivityName(),
+					e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		IAtomContainer[] containers;
 		try {
 			containers = CMLChemFileWrapper.convertCMLChemFileListToAtomContainerArray(chemFileList);
-		} catch (Exception exception) {
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), exception.getMessage());
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while converting CML chem file list.",
+					this.getConfiguration().getActivityName(), e);
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		for (IAtomContainer cont : containers) {
 			IAtom tmpAtom = null;
@@ -121,7 +135,6 @@ public class AtomTypeFilterActivity extends AbstractCDKActivity {
 			} catch (Exception e) {
 				comment.add("Atom with element " + tmpAtom.getSymbol() + " could not be typed!");
 				notTypedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(cont));
-				e.printStackTrace();
 			}
 			typedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(cont));
 		}
@@ -133,8 +146,9 @@ public class AtomTypeFilterActivity extends AbstractCDKActivity {
 			containerRef = referenceService.register(CDKObjectHandler.getBytesList(notTypedList), 1, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			e.printStackTrace();
-			// TODO exception handling
+			ErrorLogger.getInstance().writeError("Error while configuring output ports.",
+					this.getConfiguration().getActivityName(), e);
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		return outputs;
 	}

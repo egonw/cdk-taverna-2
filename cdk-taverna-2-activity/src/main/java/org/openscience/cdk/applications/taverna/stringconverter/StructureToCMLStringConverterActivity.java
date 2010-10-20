@@ -43,12 +43,16 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 
 public class StructureToCMLStringConverterActivity extends AbstractCDKActivity implements IFileReader {
 
 	public static final String CML_STRING_CONVERTER_ACTIVITY = "Structure to CML String Converter";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public StructureToCMLStringConverterActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
 		this.RESULT_PORTS = new String[] { "CML String", "Not Converted" };
@@ -80,6 +84,7 @@ public class StructureToCMLStringConverterActivity extends AbstractCDKActivity i
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		List<String> cmlStringList = new ArrayList<String>();
@@ -88,6 +93,7 @@ public class StructureToCMLStringConverterActivity extends AbstractCDKActivity i
 				cmlStringList.add(cml.toCML());
 			} catch (Exception e) {
 				notConverted.add(cml);
+				ErrorLogger.getInstance().writeError("Error converting CML String!", this.getActivityName(), e);
 				comment.add("Error converting CML string!");
 			}
 		}

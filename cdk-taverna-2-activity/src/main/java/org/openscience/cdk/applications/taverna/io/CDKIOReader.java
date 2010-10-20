@@ -49,6 +49,10 @@ import org.openscience.cdk.io.SMILESReader;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
+/**
+ * @author Egon Willighagen, Andreas Truszkowski
+ *
+ */
 public class CDKIOReader {
 
 	/**
@@ -76,7 +80,7 @@ public class CDKIOReader {
 		for (int i = 0; i < results.length; i++) {
 			results[i] = wrapInChemModel(som2D.getMolecule(i));
 		}
-
+		reader.close();
 		return results;
 	}
 
@@ -95,7 +99,6 @@ public class CDKIOReader {
 		model.setMoleculeSet(moleculeSet);
 		sequence.addChemModel(model);
 		file.addChemSequence(sequence);
-
 		return file;
 	}
 
@@ -131,7 +134,7 @@ public class CDKIOReader {
 		CMLChemFile model = new CMLChemFile();
 		ISimpleChemObjectReader reader = new MDLReader(new FileReader(new File(filename)));
 		reader.read(model);
-
+		reader.close();
 		return wrapInChemModelArray(model);
 	}
 
@@ -199,7 +202,7 @@ public class CDKIOReader {
 		CMLChemFile model = new CMLChemFile();
 		ISimpleChemObjectReader reader = new MDLV2000Reader(new FileReader(new File(filename)));
 		reader.read(model);
-
+		reader.close();
 		return wrapInChemModelArray(model);
 	}
 

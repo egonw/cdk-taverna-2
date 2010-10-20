@@ -29,6 +29,7 @@ import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.ChemModel;
 import org.openscience.cdk.ChemSequence;
 import org.openscience.cdk.MoleculeSet;
+import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemModel;
@@ -58,8 +59,8 @@ public class CMLChemFileWrapper {
 		if (listOfAtomContainerTemp.size() == 1) {
 			atomContainer = listOfAtomContainerTemp.get(0);
 		} else {
-			// FIXME Exception handling
-			throw new Exception("ConvertCMLChemFileListToAtomContainerArray: More than one molecules within one CMLChemfile");
+			throw new CDKTavernaException("CMLChemFileWrapper",
+					"ConvertCMLChemFileListToAtomContainerArray: More than one molecules within one CMLChemfile");
 		}
 		return atomContainer;
 	}
@@ -99,7 +100,6 @@ public class CMLChemFileWrapper {
 		model.setMoleculeSet(moleculeSet);
 		sequence.addChemModel(model);
 		file.addChemSequence(sequence);
-
 		return file;
 	}
 
@@ -189,7 +189,8 @@ public class CMLChemFileWrapper {
 				atomContainerArray[i] = listOfAtomContainerTemp.get(0);
 			} else {
 				// FIXME Exception handling
-				throw new Exception("ConvertCMLChemFileListToAtomContainerArray: More than one molecules within one CMLChemfile");
+				throw new CDKTavernaException("CMLChemFileWrapper",
+						"ConvertCMLChemFileListToAtomContainerArray: More than one molecules within one CMLChemfile");
 			}
 		}
 		return atomContainerArray;

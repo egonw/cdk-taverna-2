@@ -45,13 +45,17 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLReader;
 
 public class MDLMolStringToStructureConverterActivity extends AbstractCDKActivity implements IFileReader {
 
 	public static final String MDL_MOL_STRING_CONVERTER_ACTIVITY = "MDL Mol String to Structures Converter";
-
+	
+	/**
+	 * Creates a new instance.
+	 */
 	public MDLMolStringToStructureConverterActivity() {
 		this.INPUT_PORTS = new String[] { "MDL Mol String" };
 		this.RESULT_PORTS = new String[] { "Structures", "Not Converted" };
@@ -92,7 +96,8 @@ public class MDLMolStringToStructureConverterActivity extends AbstractCDKActivit
 				}
 			} catch (Exception e) {
 				notConverted.add(mol);
-				comment.add("Error converting MDL Mol String!");
+				ErrorLogger.getInstance().writeError("Error converting MDL mol String!", this.getActivityName(), e);
+				comment.add("Error converting MDL mol String!");
 			}
 		}
 		if (dataList.isEmpty()) {

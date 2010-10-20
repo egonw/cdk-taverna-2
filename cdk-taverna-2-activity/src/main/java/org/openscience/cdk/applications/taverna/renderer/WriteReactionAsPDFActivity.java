@@ -19,10 +19,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna.io;
+package org.openscience.cdk.applications.taverna.renderer;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,33 +40,54 @@ import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
 import org.openscience.cdk.interfaces.IReaction;
-import org.openscience.cdk.io.MDLRXNWriter;
 
 /**
- * Class which represents the MDL RXN file writer activity.
+ * Class which represents the write reaction as pdf activitiy. Saves reaction images in a pdf files.
  * 
- * @author Andreas Truzskowski
+ * @author Andreas Truszkowski
  * 
  */
-public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFileWriter {
+public class WriteReactionAsPDFActivity extends AbstractCDKActivity implements IFileWriter {
 
-	public static final String RXN_FILE_WRITER_ACTIVITY = "RXN File Writer";
+	private static final String WRITE_REACTION_AS_PDF_ACTIVITY = "Write Reaction As PDF";
 
 	/**
 	 * Creates a new instance.
 	 */
-	public MDLRXNFileWriterActivity() {
+	public WriteReactionAsPDFActivity() {
 		this.INPUT_PORTS = new String[] { "Reactions" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
+		this.addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
 	}
 
 	@Override
 	protected void addOutputPorts() {
-		// empty
+		// Nothing to add
+	}
+
+	@Override
+	public String getActivityName() {
+		return WriteReactionAsPDFActivity.WRITE_REACTION_AS_PDF_ACTIVITY;
+	}
+
+	@Override
+	public HashMap<String, Object> getAdditionalProperties() {
+		HashMap<String, Object> properties = new HashMap<String, Object>();
+		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".pdf");
+		return properties;
+	}
+
+	@Override
+	public String getDescription() {
+		return "Description: " + WriteReactionAsPDFActivity.WRITE_REACTION_AS_PDF_ACTIVITY;
+	}
+
+	@Override
+	public String getFolderName() {
+		return CDKTavernaConstants.RENDERER_FOLDER_NAME;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -77,54 +97,26 @@ public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFi
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<IReaction> reactionList = new ArrayList<IReaction>();
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
-				context);
-		try {
-			reactionList = CDKObjectHandler.getReactionList(dataArray);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
-		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (directory == null) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
-		}
-		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
-		for (IReaction reaction : reactionList) {
-			File file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
+			List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]),
+					byte[].class, context);
 			try {
-				MDLRXNWriter writer = new MDLRXNWriter(new FileWriter(file));
-				writer.write(reaction);
-				writer.close();
+				reactionList = CDKObjectHandler.getReactionList(dataArray);
 			} catch (Exception e) {
-				ErrorLogger.getInstance()
-						.writeError("Error writing RXN file: " + file.getPath() + "!", this.getActivityName(), e);
-				comment.add("Error writing RXN file: " + file.getPath() + "!");
+				ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+				throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 			}
-		}
-		comment.add("done");
+			File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+			String extension = (String) this.getConfiguration()
+					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
+			try {
+				File file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
+				DrawPDF.drawReactionAsPDF(reactionList, file);
+			} catch (Exception e) {
+				ErrorLogger.getInstance().writeError("Error while drawing reaction image into pdf!", this.getActivityName(), e);
+				throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
+			}
 		return null;
+
 	}
 
-	@Override
-	public String getActivityName() {
-		return MDLRXNFileWriterActivity.RXN_FILE_WRITER_ACTIVITY;
-	}
-
-	@Override
-	public HashMap<String, Object> getAdditionalProperties() {
-		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".rxn");
-		return properties;
-	}
-
-	@Override
-	public String getDescription() {
-		return "Description: " + MDLRXNFileWriterActivity.RXN_FILE_WRITER_ACTIVITY;
-	}
-
-	@Override
-	public String getFolderName() {
-		return CDKTavernaConstants.IO_FOLDER_NAME;
-	}
 }

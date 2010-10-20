@@ -45,6 +45,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.SDFWriter;
 
@@ -52,6 +53,9 @@ public class StructureToMDLSDFileStringConverterActivity extends AbstractCDKActi
 
 	public static final String MDL_SDFILE_STRING_CONVERTER_ACTIVITY = "Structure to MDL SDFilr String Converter";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public StructureToMDLSDFileStringConverterActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
 		this.RESULT_PORTS = new String[] { "MDL SDFile String", "Not Converted" };
@@ -83,6 +87,7 @@ public class StructureToMDLSDFileStringConverterActivity extends AbstractCDKActi
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		List<String> sdfStringList = new ArrayList<String>();
@@ -93,14 +98,15 @@ public class StructureToMDLSDFileStringConverterActivity extends AbstractCDKActi
 				writer.write(cml);
 			} catch (Exception e) {
 				notConverted.add(cml);
-				comment.add("Error converting MDL SDFile String!");
+				ErrorLogger.getInstance().writeError("Error converting MDL SD file String!", this.getActivityName(), e);
+				comment.add("Error converting MDL SD file String!");
 			}
 		}
 		try {
 			writer.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ErrorLogger.getInstance().writeError("I/O error!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		sdfStringList.add(stringWriter.toString());
 		if (sdfStringList.isEmpty()) {

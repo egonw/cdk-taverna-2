@@ -38,6 +38,7 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLRXNV2000Reader;
 
@@ -51,6 +52,9 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFi
 
 	public static final String RXN_FILE_READER_ACTIVITY = "RXN File Reader";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public MDLRXNFileReaderActivity() {
 		this.RESULT_PORTS = new String[] { "Reactions" };
 	}
@@ -77,16 +81,23 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFi
 		if (files == null || files.length == 0) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
 		}
-		try {
-			for (File file : files) {
+		for (File file : files) {
+			try {
 				MDLRXNV2000Reader reader = new MDLRXNV2000Reader(new FileReader(file));
 				reactions.add((Reaction) reader.read(new Reaction()));
+				reader.close();
+			} catch (Exception e) {
+				ErrorLogger.getInstance().writeError("Error reading RXN file: \n" + file.getPath(), this.getActivityName(), e);
+				comment.add("Error reading RXN file: \n" + file.getPath());
 			}
-			// Congfigure output
+		}
+		// Congfigure output
+		try {
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(reactions), 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			throw new CDKTavernaException(this.getActivityName(), "Error reading RXN file!");
+			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
 		comment.add("done");
 		// Return results

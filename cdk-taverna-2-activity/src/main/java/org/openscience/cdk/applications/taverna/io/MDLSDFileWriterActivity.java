@@ -38,6 +38,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
 import org.openscience.cdk.io.SDFWriter;
@@ -52,6 +53,9 @@ public class MDLSDFileWriterActivity extends AbstractCDKActivity implements IFil
 
 	public static final String SD_FILE_WRITER_ACTIVITY = "SDfile Writer";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public MDLSDFileWriterActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
 	}
@@ -78,6 +82,7 @@ public class MDLSDFileWriterActivity extends AbstractCDKActivity implements IFil
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
@@ -93,8 +98,8 @@ public class MDLSDFileWriterActivity extends AbstractCDKActivity implements IFil
 			}
 			writer.close();
 		} catch (Exception e) {
-			e.printStackTrace();
-			comment.add("Error writing file: " + file.getPath() + "!");
+			ErrorLogger.getInstance().writeError("Error writing SD file: " + file.getPath() + "!", this.getActivityName(), e);
+			comment.add("Error writing SD file: " + file.getPath() + "!");
 		}
 		comment.add("done");
 		return null;

@@ -63,6 +63,8 @@ public class FileWriterConfigurationPanel extends
 
 	private AbstractAction chooseFileAction = new AbstractAction() {
 
+		private static final long serialVersionUID = 2594222854083984583L;
+
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser openDialog = new JFileChooser(new File(Preferences.getInstance().getCurrentDirectory()));
 			openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);

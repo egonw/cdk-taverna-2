@@ -19,13 +19,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna.io;
+package org.openscience.cdk.applications.taverna.renderer;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ReferenceService;
@@ -40,28 +43,29 @@ import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
-import org.openscience.cdk.io.MDLWriter;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 /**
- * Class which represents the MDL Mol file writer activity.
+ * Class which represents the write molecule as png activitiy. Saves molecule images as png files.
  * 
- * @author Andreas Truzskowski
+ * @author Andreas Truszkowski
  * 
  */
-public class MDLMolFileWriterActivity extends AbstractCDKActivity implements IFileWriter {
+public class WriteMoleculeAsPNGActivity extends AbstractCDKActivity implements IFileWriter {
 
-	public static final String MOL_FILE_WRITER_ACTIVITY = "Mol file Writer";
+	private static final String WRITE_MOLECULE_AS_PNG_ACTIVITY = "Write Molecule As PNG";
 
 	/**
 	 * Creates a new instance.
 	 */
-	public MDLMolFileWriterActivity() {
+	public WriteMoleculeAsPNGActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
+		this.addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
 	}
 
 	@Override
@@ -69,60 +73,59 @@ public class MDLMolFileWriterActivity extends AbstractCDKActivity implements IFi
 		// Nothing to add
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Map<String, T2Reference> work(final Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		List<CMLChemFile> chemFileList;
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
-				context);
-		try {
-			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing objects!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
-		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (directory == null) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
-		}
-		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
-		for (CMLChemFile cmlChemFile : chemFileList) {
-			File file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
-			try {
-				MDLWriter writer = new MDLWriter(new FileWriter(file));
-				writer.write(cmlChemFile);
-				writer.close();
-			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error writing file: " + file.getPath() + "!", this.getActivityName(), e);
-				comment.add("Error writing file: " + file.getPath() + "!");
-			}
-		}
-		comment.add("done");
-		return null;
-	}
-
 	@Override
 	public String getActivityName() {
-		return MDLMolFileWriterActivity.MOL_FILE_WRITER_ACTIVITY;
+		return WriteMoleculeAsPNGActivity.WRITE_MOLECULE_AS_PNG_ACTIVITY;
 	}
 
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".mol");
+		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".png");
 		return properties;
 	}
 
 	@Override
 	public String getDescription() {
-		return "Description: " + MDLMolFileWriterActivity.MOL_FILE_WRITER_ACTIVITY;
+		return "Description: " + WriteMoleculeAsPNGActivity.WRITE_MOLECULE_AS_PNG_ACTIVITY;
 	}
 
 	@Override
 	public String getFolderName() {
-		return CDKTavernaConstants.IO_FOLDER_NAME;
+		return CDKTavernaConstants.RENDERER_FOLDER_NAME;
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
+			throws CDKTavernaException {
+		InvocationContext context = callback.getContext();
+		ReferenceService referenceService = context.getReferenceService();
+		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
+
+		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
+				context);
+		try {
+			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
+		}
+		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
+		for (CMLChemFile cmlChemFile : chemFileList) {
+			try {
+				File file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
+				IAtomContainer molecule = ChemFileManipulator.getAllAtomContainers(cmlChemFile).get(0);
+				BufferedImage image = Draw2DStructure.drawMolecule(molecule, 800, 600);
+				ImageIO.write(image, "png", file);
+			} catch (Exception e) {
+				ErrorLogger.getInstance().writeError("Error while rendering image!", this.getActivityName(), e);
+				throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
+			}
+		}
+		return null;
+
+	}
+
 }

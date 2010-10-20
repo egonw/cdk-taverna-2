@@ -36,12 +36,22 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.interfaces.IReaction;
 
+/**
+ * Class which represents the reaction splitter class. It splits the given reactions depending on their number of reactants.
+ * 
+ * @author Andreas Truszkowski
+ *
+ */
 public class ReactionSplitterActivity extends AbstractCDKActivity {
 
 	public static final String REACTION_SPLITTER_ACTIVITY = "Reaction Splitter";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public ReactionSplitterActivity() {
 		this.INPUT_PORTS = new String[] { "Reactions" };
 		this.RESULT_PORTS = new String[] { "1 Reactant", "2 Reactants", "3 Reactants", "greater 3 Reactants" };
@@ -96,6 +106,7 @@ public class ReactionSplitterActivity extends AbstractCDKActivity {
 		try {
 			reactionList = CDKObjectHandler.getReactionList(dataArray);
 		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		for (IReaction r : reactionList) {
@@ -114,8 +125,8 @@ public class ReactionSplitterActivity extends AbstractCDKActivity {
 				outputs.put(this.RESULT_PORTS[i], containerRef);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			// TODO exception handling
+			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
 		return outputs;
 	}

@@ -25,7 +25,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 /**
- * Example activity configuration bean.
+ * CDK Taverna 2 activity configuration bean.
  * 
  */
 public class CDKActivityConfigurationBean implements Serializable {
@@ -113,7 +113,7 @@ public class CDKActivityConfigurationBean implements Serializable {
 	public void addAdditionalProperty(String key, Object object) {
 		this.additionalProperties.put(key, object);
 	}
-	
+
 	/**
 	 * Removes an additionally property.
 	 * 

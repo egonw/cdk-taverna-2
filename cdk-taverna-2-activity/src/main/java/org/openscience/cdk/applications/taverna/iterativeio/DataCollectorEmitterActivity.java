@@ -22,7 +22,7 @@
 package org.openscience.cdk.applications.taverna.iterativeio;
 
 /**
- * Class which represents the data collector emitter activity.
+ * Class which represents the data collector emitter activity. Used in combination with the data collector acceptor activity.
  * 
  * @author Andreas Truzskowski
  * 
@@ -46,11 +46,15 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.Preferences;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 
 public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 
 	public static final String DATA_COLLECTOR_EMITTER_ACTIVITY = "Data Collector Emitter";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public DataCollectorEmitterActivity() {
 		this.INPUT_PORTS = new String[] { "UUID" };
 		this.RESULT_PORTS = new String[] { "Data" };
@@ -83,8 +87,8 @@ public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 			Preferences.getInstance().closeDataCollectorDataStream(id);
 			Preferences.getInstance().closeDataCollectorDataStream(id);
 			// Read cached data
-			File idxFile = new File(Preferences.getInstance().createDataCollectorFilename(id,"idx"));
-			File datFile = new File(Preferences.getInstance().createDataCollectorFilename(id,"dat"));
+			File idxFile = new File(Preferences.getInstance().createDataCollectorFilename(id, "idx"));
+			File datFile = new File(Preferences.getInstance().createDataCollectorFilename(id, "dat"));
 			DataInputStream idxStream = new DataInputStream(new FileInputStream(idxFile));
 			DataInputStream datStream = new DataInputStream(new FileInputStream(datFile));
 			do {
@@ -102,13 +106,13 @@ public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 			// Clean up
 			idxFile.delete();
 			datFile.delete();
-			// Congfigure output
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while reading cache data!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error while reading cache data!");
+		}
+		// Congfigure output
 			T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new CDKTavernaException(this.getActivityName(), "Error reading temp file!");
-		}
 		comment.add("done");
 		// Return results
 		return outputs;

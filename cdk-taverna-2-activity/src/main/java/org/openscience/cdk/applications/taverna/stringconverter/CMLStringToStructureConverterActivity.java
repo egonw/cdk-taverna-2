@@ -45,6 +45,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.CMLReader;
 
@@ -52,6 +53,9 @@ public class CMLStringToStructureConverterActivity extends AbstractCDKActivity i
 
 	public static final String CML_STRING_CONVERTER_ACTIVITY = "CML String to Structures Converter";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public CMLStringToStructureConverterActivity() {
 		this.INPUT_PORTS = new String[] { "CML String" };
 		this.RESULT_PORTS = new String[] { "Structures", "Not Converted" };
@@ -92,6 +96,7 @@ public class CMLStringToStructureConverterActivity extends AbstractCDKActivity i
 				}
 			} catch (Exception e) {
 				notConverted.add(cml);
+				ErrorLogger.getInstance().writeError("Error converting CML String!", this.getActivityName(), e);
 				comment.add("Error converting CML String!");
 			}
 		}

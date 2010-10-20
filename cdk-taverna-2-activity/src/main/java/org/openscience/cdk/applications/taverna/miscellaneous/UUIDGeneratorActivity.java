@@ -22,7 +22,7 @@
 package org.openscience.cdk.applications.taverna.miscellaneous;
 
 /**
- * Class which represents the structure to CML String converter activity.
+ * Class which represents the structure to UUID generator activity.
  * 
  * @author Andreas Truzskowski
  * 
@@ -46,6 +46,9 @@ public class UUIDGeneratorActivity extends AbstractCDKActivity implements IFileR
 	public static final String UUID_GENERATOR_ACTIVITY = "UUID Generator";
 	private UUID id = null;
 
+	/**
+	 * Creates a new instance.
+	 */
 	public UUIDGeneratorActivity() {
 		this.RESULT_PORTS = new String[] { "UUID" };
 	}

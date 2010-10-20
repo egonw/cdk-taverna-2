@@ -633,9 +633,8 @@ public class Art2aCollection {
 				myART.setConvergenceFlag(true);
 				myART.classify();
 				// Store the results
-				tempFile = File.createTempFile(
-						"ART2a_Result" + String.valueOf(i) + "of" + String.valueOf(mNumberOfClassificators) + "Classifications",
-						".xml");
+				tempFile = File.createTempFile("ART2a_Result" + String.valueOf(i) + "of"
+						+ String.valueOf(mNumberOfClassificators) + "Classifications", ".xml");
 				fwriter = new FileWriter(tempFile);
 				bwriter = new BufferedWriter(fwriter);
 				ouputFactory = XMLOutputFactory.newInstance();

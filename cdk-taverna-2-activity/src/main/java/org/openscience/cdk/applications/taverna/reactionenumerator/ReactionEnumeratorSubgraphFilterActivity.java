@@ -40,6 +40,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.interfaces.IReaction;
@@ -59,6 +60,9 @@ public class ReactionEnumeratorSubgraphFilterActivity extends AbstractCDKActivit
 
 	public static final String REACTION_ENUMERATOR_SUBGRAPH_FILTER_ACTIVITY = "Reaction Enumerator Subgraph Filter";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public ReactionEnumeratorSubgraphFilterActivity() {
 		this.INPUT_PORTS = new String[] { "Structures", "Query Structure" };
 		this.RESULT_PORTS = new String[] { "Calculated Structures", "NOT Calculated Structures" };
@@ -115,13 +119,15 @@ public class ReactionEnumeratorSubgraphFilterActivity extends AbstractCDKActivit
 		try {
 			inputList = CDKObjectHandler.getChemFileList(dataInputOne);
 		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		Object obj;
 		try {
 			obj = CDKObjectHandler.getObject(dataInputTwo);
-		} catch (Exception e1) {
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		if (obj instanceof CMLChemFile) {
 			queryChemFile = (CMLChemFile) obj;
@@ -133,7 +139,6 @@ public class ReactionEnumeratorSubgraphFilterActivity extends AbstractCDKActivit
 		} catch (Exception e) {
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
-		try {
 			for (Iterator<CMLChemFile> iter = inputList.iterator(); iter.hasNext();) {
 				CMLChemFile file = iter.next();
 				List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(file);
@@ -165,14 +170,11 @@ public class ReactionEnumeratorSubgraphFilterActivity extends AbstractCDKActivit
 						}
 					} catch (Exception e) {
 						notCalculatedList.add(file);
-						e.printStackTrace();
+						ErrorLogger.getInstance().writeError("Error while testing for subgraph isomorphism!", this.getActivityName(), e);
 					}
 				}
 			}
 			comment.add("Calculation done;");
-		} catch (Exception exception) {
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), exception.getMessage());
-		}
 		// Congfigure output
 		try {
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(calculatedList), 1, true, context);
@@ -180,8 +182,8 @@ public class ReactionEnumeratorSubgraphFilterActivity extends AbstractCDKActivit
 			containerRef = referenceService.register(CDKObjectHandler.getBytesList(notCalculatedList), 1, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			e.printStackTrace();
-			// TODO exception handling
+			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
 		return outputs;
 	}

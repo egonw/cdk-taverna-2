@@ -29,7 +29,6 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.interfaces.IReaction;
@@ -114,6 +113,7 @@ public class CDKObjectHandler {
 			try {
 				obj = CDKObjectHandler.getObject(data);
 			} catch (Exception e) {
+				ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, "CDKObjectHandler", e);
 				throw new Exception(CDKTavernaException.WRONG_INPUT_PORT_TYPE);
 			}
 			if (obj instanceof CMLChemFile) {
@@ -131,12 +131,17 @@ public class CDKObjectHandler {
 	 */
 	public static List<IReaction> getReactionList(List<byte[]> dataArray) throws Exception {
 		ArrayList<IReaction> reactionList = new ArrayList<IReaction>();
-		if(dataArray == null) {
+		if (dataArray == null) {
 			throw new Exception("DataArray == null");
 		}
 		for (byte[] data : dataArray) {
 			Object obj = null;
-				obj = CDKObjectHandler.getObject(data);
+			try {
+			obj = CDKObjectHandler.getObject(data);
+			} catch (Exception e) {
+				ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, "CDKObjectHandler", e);
+				throw new Exception(CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+			}
 			if (obj instanceof IReaction) {
 				reactionList.add((IReaction) obj);
 			} else {

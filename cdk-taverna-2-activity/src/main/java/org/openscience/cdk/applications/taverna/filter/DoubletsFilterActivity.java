@@ -36,13 +36,23 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.isomorphism.UniversalIsomorphismTester;
 
+/**
+ * Class which represents the doublets filter activity. It filter doublets in given structures list.
+ * 
+ * @author Andreas Truszkowski
+ * 
+ */
 public class DoubletsFilterActivity extends AbstractCDKActivity {
 
 	public static final String DOUBLETS_FILTER_ACTIVITY = "Doublets Filter";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public DoubletsFilterActivity() {
 		this.INPUT_PORTS = new String[] { "Structures", };
 		this.RESULT_PORTS = new String[] { "Filtered Structures" };
@@ -92,13 +102,17 @@ public class DoubletsFilterActivity extends AbstractCDKActivity {
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while deserializing object.", this.getConfiguration().getActivityName(),
+					e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		IAtomContainer[] containers;
 		try {
 			containers = CMLChemFileWrapper.convertCMLChemFileListToAtomContainerArray(chemFileList);
-		} catch (Exception exception) {
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), exception.getMessage());
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while converting CML chem file list.",
+					this.getConfiguration().getActivityName(), e);
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		ArrayList<IAtomContainer> tempList = new ArrayList<IAtomContainer>();
 		for (int i = 0; i < containers.length; i++) {
@@ -110,18 +124,19 @@ public class DoubletsFilterActivity extends AbstractCDKActivity {
 					if (UniversalIsomorphismTester.isIsomorph(targetContainer, queryContainer)) {
 						doublet = true;
 						break;
-						}
+					}
 				}
 			} catch (Exception e) {
 				comment.add("Error!");
-				e.printStackTrace();
+				ErrorLogger.getInstance().writeError("Error while searching for isomorphs.",
+						this.getConfiguration().getActivityName(), e);
 			}
 			if (!doublet) {
 				tempList.add(queryContainer);
 			}
 		}
-		
-		for(IAtomContainer c : tempList) {
+
+		for (IAtomContainer c : tempList) {
 			filteredList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(c));
 		}
 		comment.add("Calculation done;");
@@ -130,8 +145,9 @@ public class DoubletsFilterActivity extends AbstractCDKActivity {
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(filteredList), 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			e.printStackTrace();
-			// TODO exception handling
+			ErrorLogger.getInstance().writeError("Error while configuring output ports.",
+					this.getConfiguration().getActivityName(), e);
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		return outputs;
 	}

@@ -39,6 +39,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLReader;
 
@@ -52,6 +53,9 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFi
 
 	public static final String MOL_FILE_READER_ACTIVITY = "Mol file Reader";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public MDLMolFileReaderActivity() {
 		this.RESULT_PORTS = new String[] { "Structure(s)" };
 	}
@@ -78,16 +82,23 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFi
 		if (files == null || files.length == 0) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
 		}
-		try {
-			for (File file : files) {
+		for (File file : files) {
+			try {
 				MDLReader reader = new MDLReader(new FileReader(file));
 				cmlChemFiles.addAll(CMLChemFileWrapper.wrapInChemModelList((CMLChemFile) reader.read(new CMLChemFile())));
+			} catch (Exception e) {
+				ErrorLogger.getInstance().writeError("Error reading mol file: " + file.getPath(), this.getActivityName(), e);
+				comment.add("Error reading mol file: " + file.getPath());
 			}
-			// Congfigure output
-			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(cmlChemFiles), 1, true, context);
+		}
+		// Congfigure output
+		T2Reference containerRef;
+		try {
+			containerRef = referenceService.register(CDKObjectHandler.getBytesList(cmlChemFiles), 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			throw new CDKTavernaException(this.getActivityName(), "Error reading Mol file!");
+			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
 		comment.add("done");
 		// Return results

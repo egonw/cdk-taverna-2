@@ -33,9 +33,15 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.List;
 
+import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.math.RandomNumbersTool;
 
+/**
+ * @author Egon Willighagen, Andreas Truszkowski
+ * 
+ */
 public class CDKIOFileWriter {
 	/**
 	 * Method to write a CMLChemfile-Array to a file after it is converted to a cml-string Mainly for debugging purpose
@@ -114,10 +120,10 @@ public class CDKIOFileWriter {
 				pw.print(content[i]);
 			}
 		} catch (Exception e) {
-			throw new Exception("Could not write File", e);
+			ErrorLogger.getInstance().writeError("Could not write file.", "CDKIOFileWriter", e);
+			throw new CDKTavernaException("CDKIOFileWriter", "Could not write File");
 		} finally {
 			if (pw != null) {
-
 				pw.close();
 			}
 		}
@@ -136,10 +142,10 @@ public class CDKIOFileWriter {
 				pw.print(content[i]);
 			}
 		} catch (Exception e) {
-			throw new Exception("Could not write File", e);
+			ErrorLogger.getInstance().writeError("Could not write file.", "CDKIOFileWriter", e);
+			throw new CDKTavernaException("CDKIOFileWriter", "Could not write File");
 		} finally {
 			if (pw != null) {
-
 				pw.close();
 			}
 		}
@@ -157,7 +163,7 @@ public class CDKIOFileWriter {
 		File file = new File(path);
 		if (!file.exists()) {
 			if (!file.mkdirs()) {
-				throw new Exception("Could not create the directory: " + file.getPath());
+				throw new CDKTavernaException("CDKIOFileWriter", "Could not create the directory: " + file.getPath());
 			}
 		}
 	}

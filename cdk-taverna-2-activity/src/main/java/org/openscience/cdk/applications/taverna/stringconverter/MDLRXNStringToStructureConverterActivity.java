@@ -44,6 +44,7 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLRXNV2000Reader;
 
@@ -51,6 +52,9 @@ public class MDLRXNStringToStructureConverterActivity extends AbstractCDKActivit
 
 	public static final String MDL_RXN_STRING_CONVERTER_ACTIVITY = "MDL RXN String to Structures Converter";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public MDLRXNStringToStructureConverterActivity() {
 		this.INPUT_PORTS = new String[] { "MDL RXN String" };
 		this.RESULT_PORTS = new String[] { "Reactions", "Not Converted" };
@@ -87,6 +91,7 @@ public class MDLRXNStringToStructureConverterActivity extends AbstractCDKActivit
 				dataList.add(CDKObjectHandler.getBytes(reaction));
 			} catch (Exception e) {
 				notConverted.add(string);
+				ErrorLogger.getInstance().writeError("Error converting MDL RXN String!", this.getActivityName(), e);
 				comment.add("Error converting MDL RXN String!");
 			}
 		}

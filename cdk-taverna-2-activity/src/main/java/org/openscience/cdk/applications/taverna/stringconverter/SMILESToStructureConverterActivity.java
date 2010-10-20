@@ -46,6 +46,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.io.SMILESReader;
@@ -55,6 +56,9 @@ public class SMILESToStructureConverterActivity extends AbstractCDKActivity impl
 
 	public static final String SMILES_CONVERTER_ACTIVITY = "SMILES to Structures Converter";
 
+	/**
+	 * Creates a new instance.
+	 */
 	public SMILESToStructureConverterActivity() {
 		this.INPUT_PORTS = new String[] { "SMILES" };
 		this.RESULT_PORTS = new String[] { "Structures", "Not Converted" };
@@ -89,8 +93,10 @@ public class SMILESToStructureConverterActivity extends AbstractCDKActivity impl
 				try {
 					SMILESReader reader = new SMILESReader(new ByteArrayInputStream(cml.getBytes()));
 					som = (IMoleculeSet) reader.read(new MoleculeSet());
+					reader.close();
 				} catch (Exception e) {
-					throw new CDKTavernaException(this.getActivityName(), "Error reading SMILES file!");
+					ErrorLogger.getInstance().writeError("Error while reading SMILES file!", this.getActivityName(), e);
+					throw new CDKTavernaException(this.getActivityName(), "Error while reading SMILES file!");
 				}
 				IMoleculeSet som2D = new MoleculeSet();
 				StructureDiagramGenerator str = new StructureDiagramGenerator();
@@ -100,6 +106,7 @@ public class SMILESToStructureConverterActivity extends AbstractCDKActivity impl
 						str.generateCoordinates();
 						som2D.addMolecule(str.getMolecule());
 					} catch (Exception e) {
+						ErrorLogger.getInstance().writeError("Error generating 2D Coordinate!", this.getActivityName(), e);
 						comment.add("Error generating 2D Coordinate!");
 					}
 				}
@@ -108,11 +115,13 @@ public class SMILESToStructureConverterActivity extends AbstractCDKActivity impl
 						CMLChemFile cmlChemFile = CMLChemFileWrapper.wrapInChemModel(som2D.getMolecule(i));
 						dataList.add(CDKObjectHandler.getBytes(cmlChemFile));
 					} catch (Exception e) {
+						ErrorLogger.getInstance().writeError("Error creating output data!", this.getActivityName(), e);
 						throw new CDKTavernaException(this.getActivityName(), "Error creating output data!");
 					}
 				}
 			} catch (Exception e) {
 				notConverted.add(cml);
+				ErrorLogger.getInstance().writeError("Error converting SMILES!", this.getActivityName(), e);
 				comment.add("Error converting SMILES!");
 			}
 		}

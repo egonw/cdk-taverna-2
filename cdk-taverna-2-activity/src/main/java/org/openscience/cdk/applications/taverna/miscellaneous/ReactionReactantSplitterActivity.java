@@ -36,10 +36,17 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IPortNumber;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IReaction;
 
+/**
+ * Class which represents the reaction reactant splitter activity. It splits a given reaction into its reactants.
+ * 
+ * @author Andreas Truszkowski
+ * 
+ */
 public class ReactionReactantSplitterActivity extends AbstractCDKActivity implements IPortNumber {
 
 	public static final String REACTION_REACTANT_SPLITTER_ACTIVITY = "Reaction Reactant Splitter";
@@ -88,8 +95,7 @@ public class ReactionReactantSplitterActivity extends AbstractCDKActivity implem
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws Exception {
+	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback) throws Exception {
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
@@ -101,11 +107,11 @@ public class ReactionReactantSplitterActivity extends AbstractCDKActivity implem
 		}
 		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
 				context);
-//		try {
-			reactionList = CDKObjectHandler.getReactionList(dataArray);
-//		} catch (Exception e) {
-//			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-//		}
+		// try {
+		reactionList = CDKObjectHandler.getReactionList(dataArray);
+		// } catch (Exception e) {
+		// throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
+		// }
 		for (int i = 0; i < numberOfPorts; i++) {
 			IAtomContainer container = reactionList.get(0).getReactants().getAtomContainer(i);
 			CMLChemFile chemFile = CMLChemFileWrapper.wrapAtomContainerInChemModel(container);
@@ -120,8 +126,8 @@ public class ReactionReactantSplitterActivity extends AbstractCDKActivity implem
 				outputs.put(this.RESULT_PORTS[i], containerRef);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			// TODO exception handling
+			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
 		return outputs;
 	}
