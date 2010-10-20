@@ -8,18 +8,20 @@
 0.1.1
 - Fixed class loader bug  
 
-0.1.2
+0.2
 - Added IsomorphismTesterActivity/SubgraphIsomorphismFilterActivity 
 - Added QSAR vector generator
-- Updated CDK to 1.3.5
-- Updated Reaction Enumerator to CDK 1.3.5
-- Updated JChemPaint to 3.1.2
-- Added PDF writer activity
+- Updated to CDK to 1.3.5
+- Updated to Reaction Enumerator to CDK 1.3.5
+- Updated to JChemPaint to 3.1.2
+- Added PDF, JPG, PNG writer activity
 - Added art2a classification library
 - Added Iterative Input/Output workers
 - Added String Converter (I/O) workers
 - Added iterative loop activities
 - Added Reaction Enumerator Subgraph Tester
+- Added several worker
 - Several bug fixes
+- Logging and exception handling
 
 
