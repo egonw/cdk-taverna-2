@@ -41,6 +41,8 @@ import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
+import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileReader;
+import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileWriter;
 import org.openscience.cdk.io.SDFWriter;
 
 /**
@@ -49,9 +51,10 @@ import org.openscience.cdk.io.SDFWriter;
  * @author Andreas Truzskowski
  * 
  */
-public class MDLSDFileWriterActivity extends AbstractCDKActivity implements IFileWriter {
+public class MDLSDFileWriterActivity extends AbstractCDKActivity implements IIterativeFileWriter {
 
 	public static final String SD_FILE_WRITER_ACTIVITY = "SDfile Writer";
+	private File file = null;
 
 	/**
 	 * Creates a new instance.
@@ -77,28 +80,41 @@ public class MDLSDFileWriterActivity extends AbstractCDKActivity implements IFil
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
-				context);
+		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]),
+				byte[].class, context);
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
+		if (chemFileList.isEmpty()) {
+			return null;
+		}
 		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (directory == null) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
 		}
-		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
-		File file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
+		String extension = (String) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
+		Boolean oneFilePerIteration = (Boolean) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_ONE_FILE_PER_ITERATION);
+		if (oneFilePerIteration) {
+			this.file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
+		} else {
+			if (this.file == null) {
+				this.file = FileNameGenerator.getNewFile(directory.getPath(), extension);
+			}
+		}
 		try {
-			SDFWriter writer = new SDFWriter(new FileWriter(file));
+			SDFWriter writer = new SDFWriter(new FileWriter(file, !oneFilePerIteration));
 			for (CMLChemFile cmlChemFile : chemFileList) {
 				writer.write(cmlChemFile);
 			}
 			writer.close();
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error writing SD file: " + file.getPath() + "!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error writing SD file: " + file.getPath() + "!",
+					this.getActivityName(), e);
 			comment.add("Error writing SD file: " + file.getPath() + "!");
 		}
 		comment.add("done");
@@ -113,6 +129,7 @@ public class MDLSDFileWriterActivity extends AbstractCDKActivity implements IFil
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
+		properties.put(CDKTavernaConstants.PROPERTY_ONE_FILE_PER_ITERATION, true);
 		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".sdf");
 		return properties;
 	}

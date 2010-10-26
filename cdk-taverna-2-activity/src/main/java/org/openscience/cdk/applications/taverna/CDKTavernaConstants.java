@@ -52,6 +52,7 @@ public class CDKTavernaConstants {
 	public static final String PROPERTY_ITERATIVE_READ_SIZE = "PROPERTY ITERATIVE READ SIZE";
 	public static final String PROPERTY_UUID = "UUID";
 	public static final String PROPERTY_ATOM_COUNT_CUTOFF = "ATOM COUNT CUTOFF";
+	public static final String PROPERTY_ONE_FILE_PER_ITERATION = "ONE FILE PER ITERATION";
 	// --------------------Miscellaneous-------------------------------------
 	public static final String MOLECULEID = "MOLECULEID";
 }

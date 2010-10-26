@@ -52,7 +52,7 @@ import org.openscience.cdk.applications.taverna.io.MDLMolFileWriterActivity;
  * @author Andreas Truszkowski
  * 
  */
-public class FileWriterConfigurationPanel extends
+public class IterativeFileWriterConfigurationPanel extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
 
 	private static final long serialVersionUID = -1161055144757128604L;
@@ -62,6 +62,7 @@ public class FileWriterConfigurationPanel extends
 
 	private File file = null;
 	private JTextField filePathField = new JTextField();
+	private JCheckBox checkBox;
 
 	private AbstractAction chooseFileAction = new AbstractAction() {
 
@@ -70,15 +71,15 @@ public class FileWriterConfigurationPanel extends
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser openDialog = new JFileChooser(new File(Preferences.getInstance().getCurrentDirectory()));
 			openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			if (openDialog.showOpenDialog(FileWriterConfigurationPanel.this) == JFileChooser.APPROVE_OPTION) {
+			if (openDialog.showOpenDialog(IterativeFileWriterConfigurationPanel.this) == JFileChooser.APPROVE_OPTION) {
 				Preferences.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
-				FileWriterConfigurationPanel.this.file = openDialog.getSelectedFile();
-				FileWriterConfigurationPanel.this.showValue();
+				IterativeFileWriterConfigurationPanel.this.file = openDialog.getSelectedFile();
+				IterativeFileWriterConfigurationPanel.this.showValue();
 			}
 		}
 	};
 
-	public FileWriterConfigurationPanel(AbstractCDKActivity activity) {
+	public IterativeFileWriterConfigurationPanel(AbstractCDKActivity activity) {
 		this.activity = activity;
 		this.configBean = this.activity.getConfiguration();
 		this.initGUI();
@@ -87,7 +88,7 @@ public class FileWriterConfigurationPanel extends
 	protected void initGUI() {
 		try {
 			this.removeAll();
-			this.setLayout(new GridLayout(2, 0, 1, 1));
+			this.setLayout(new GridLayout(3, 0, 1, 1));
 			JLabel label = new JLabel("Output directory:");
 			this.add(label);
 			JPanel filePanel = new JPanel();
@@ -104,7 +105,9 @@ public class FileWriterConfigurationPanel extends
 			fileChooserButton.setPreferredSize(new Dimension(25, 25));
 			fileChooserButton.setIcon(icon);
 			filePanel.add(fileChooserButton);
-			this.add(filePanel); 
+			this.add(filePanel);
+			this.checkBox = new JCheckBox("One file per iteration");
+				this.add(this.checkBox); 
 			this.refreshConfiguration();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -135,11 +138,13 @@ public class FileWriterConfigurationPanel extends
 
 	@Override
 	public boolean isConfigurationChanged() {
+		Boolean oneFilePerIteration = (Boolean) configBean
+				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_ONE_FILE_PER_ITERATION);
 		if (this.file == null) {
 			return false;
 		}
 		File file = (File) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		return !this.file.equals(file);
+		return !this.file.equals(file) && this.checkBox.isSelected() != oneFilePerIteration;
 	}
 
 	@Override
@@ -148,6 +153,8 @@ public class FileWriterConfigurationPanel extends
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.file);
 		this.filePathField.setText(this.file.getPath());
 		this.filePathField.repaint();
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_ONE_FILE_PER_ITERATION,
+				this.checkBox.isSelected());
 	}
 
 	@Override
@@ -157,6 +164,9 @@ public class FileWriterConfigurationPanel extends
 			this.filePathField.setText(this.file.getAbsolutePath());
 			this.filePathField.repaint();
 		}
+		Boolean oneFilePerIteration = (Boolean) configBean
+				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_ONE_FILE_PER_ITERATION);
+		this.checkBox.setSelected(oneFilePerIteration);
 	}
 
 }

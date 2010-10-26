@@ -28,7 +28,8 @@ import java.util.Date;
 import java.util.Hashtable;
 
 /**
- * Class which provides methods for a centralized file name handling within the cdk-taverna project
+ * Class which provides methods for a centralized file name handling within the
+ * cdk-taverna project
  * 
  * @author Andreas Truszkowski
  * 
@@ -46,7 +47,20 @@ public class FileNameGenerator {
 	 *            The file extension
 	 * @return
 	 */
-	public synchronized static File getNewFile(String path, String extension, int iteration) {
+	public synchronized static File getNewFile(String path, String extension) {
+		return getNewFile(path, extension, null);
+	}
+
+	/**
+	 * Generates a unique filename from the given parameters.
+	 * 
+	 * @param path
+	 *            Path to the file
+	 * @param extension
+	 *            The file extension
+	 * @return
+	 */
+	public synchronized static File getNewFile(String path, String extension, Integer iteration) {
 		String filename = "";
 		File file = null;
 		Integer idx = 1;
@@ -55,7 +69,9 @@ public class FileNameGenerator {
 		if (!path.endsWith(File.separator)) {
 			filename += File.separator;
 		}
-		filename += iteration + "_";
+		if (iteration != null) {
+			filename += iteration + "_";
+		}
 		filename += dateformat.format(new Date());
 		String temp;
 		String key = path + "_" + iteration;
@@ -90,7 +106,8 @@ public class FileNameGenerator {
 	}
 
 	/**
-	 * @return path to the cache directory. It's located in the OS temporary directory.
+	 * @return path to the cache directory. It's located in the OS temporary
+	 *         directory.
 	 */
 	public synchronized static String getCacheDir() {
 		String cacheDir = getTempDir();
@@ -101,9 +118,10 @@ public class FileNameGenerator {
 		}
 		return cacheDir;
 	}
-	
+
 	/**
-	 * @return path to the log directory. It's located in the OS temporary directory.
+	 * @return path to the log directory. It's located in the OS temporary
+	 *         directory.
 	 */
 	public synchronized static String getLogDir() {
 		String logDir = getTempDir();
@@ -116,8 +134,9 @@ public class FileNameGenerator {
 	}
 
 	/**
-	 * Deletes all files and subdirectories under dir. Returns true if all deletions were successful. If a deletion fails, the
-	 * method stops attempting to delete and returns false.
+	 * Deletes all files and subdirectories under dir. Returns true if all
+	 * deletions were successful. If a deletion fails, the method stops
+	 * attempting to delete and returns false.
 	 * 
 	 * @param dir
 	 *            Directory to delete
