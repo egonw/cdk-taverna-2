@@ -121,3 +121,4 @@ org.openscience.cdk.applications.taverna.stringconverter.StructureToMDLSDFileStr
 org.openscience.cdk.applications.taverna.stringconverter.StructureToSMILESConverterActivity
 org.openscience.cdk.applications.taverna.iterativeio.DataCollectorAcceptorActivity
 org.openscience.cdk.applications.taverna.iterativeio.DataCollectorEmitterActivity
+org.openscience.cdk.applications.taverna.curation.MoleculeConnectivityCheckerActivity

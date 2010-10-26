@@ -40,6 +40,7 @@ public class CDKTavernaConstants {
 	public static final String MISCELLANEOUS_FOLDER_NAME = "Miscellaneous";
 	public static final String STRING_CONVERTER_FOLDER_NAME = "String Converter";
 	public static final String FILTER_FOLDER_NAME = "Filter";
+	public static final String CURATION_FOLDER_NAME = "Molecule Curation";
 	// --------------------Properties-------------------------------------
 	public static final String PROPERTY_FILE = "FILE";
 	public static final String PROPERTY_FILE_EXTENSION = "FILE EXTENSION";
@@ -50,6 +51,7 @@ public class CDKTavernaConstants {
 	public static final String PROPERTY_CHOSEN_QSARDESCRIPTORS = "PROPERTY CHOSEN QSARDESCRIPTORS";
 	public static final String PROPERTY_ITERATIVE_READ_SIZE = "PROPERTY ITERATIVE READ SIZE";
 	public static final String PROPERTY_UUID = "UUID";
+	public static final String PROPERTY_ATOM_COUNT_CUTOFF = "ATOM COUNT CUTOFF";
 	// --------------------Miscellaneous-------------------------------------
 	public static final String MOLECULEID = "MOLECULEID";
 }

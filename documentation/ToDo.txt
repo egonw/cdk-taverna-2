@@ -21,3 +21,6 @@
 19.10.2010
 - Rework the iterative multi rxn file reader
 - Exception handling in QSARDescriptorActivity
+
+25.10.2010
+- Handle empty lists!! (String converter)
