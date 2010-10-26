@@ -122,3 +122,4 @@ org.openscience.cdk.applications.taverna.stringconverter.StructureToSMILESConver
 org.openscience.cdk.applications.taverna.iterativeio.DataCollectorAcceptorActivity
 org.openscience.cdk.applications.taverna.iterativeio.DataCollectorEmitterActivity
 org.openscience.cdk.applications.taverna.curation.MoleculeConnectivityCheckerActivity
+org.openscience.cdk.applications.taverna.curation.CurateStrangeElementsActivity
