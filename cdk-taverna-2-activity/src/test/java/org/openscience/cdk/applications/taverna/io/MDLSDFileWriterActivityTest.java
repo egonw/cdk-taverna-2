@@ -63,6 +63,7 @@ public class MDLSDFileWriterActivityTest extends CDKTavernaTestCases {
 		// TODO read resource
 		this.dir = new File("." + File.separator + "Test" + File.separator);
 		this.dir.mkdir();
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_ONE_FILE_PER_ITERATION, true);
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.dir);
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".sdf");
 		configBean.setActivityName(MDLSDFileWriterActivity.SD_FILE_WRITER_ACTIVITY);

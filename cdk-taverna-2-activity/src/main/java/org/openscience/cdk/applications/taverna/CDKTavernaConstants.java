@@ -53,6 +53,7 @@ public class CDKTavernaConstants {
 	public static final String PROPERTY_UUID = "UUID";
 	public static final String PROPERTY_ATOM_COUNT_CUTOFF = "ATOM COUNT CUTOFF";
 	public static final String PROPERTY_ONE_FILE_PER_ITERATION = "ONE FILE PER ITERATION";
+	public static final String PROPERTY_ATOM_SIGNATURE_HEIGHT = "ATOM SIGNATURE HEIGHT";
 	// --------------------Miscellaneous-------------------------------------
 	public static final String MOLECULEID = "MOLECULEID";
 }

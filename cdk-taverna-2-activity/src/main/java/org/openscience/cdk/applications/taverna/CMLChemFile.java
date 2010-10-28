@@ -59,6 +59,7 @@ public class CMLChemFile extends ChemFile {
 	public CMLChemFile(String CMLString) throws Exception {
 		CMLReader reader = new CMLReader(new ByteArrayInputStream(CMLString.getBytes()));
 		reader.read(this);
+		reader.close();
 	}
 
 	/**
@@ -74,7 +75,8 @@ public class CMLChemFile extends ChemFile {
 		CMLWriter writer = new CMLWriter(stringWriter);
 		writer.registerCustomizer(new QSARCustomizer());
 		writer.write(this);
-
+		stringWriter.close();
+		writer.close();
 		return stringWriter.toString();
 	}
 

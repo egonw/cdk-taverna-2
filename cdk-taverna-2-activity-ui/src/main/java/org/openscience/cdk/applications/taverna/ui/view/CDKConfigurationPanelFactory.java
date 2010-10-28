@@ -4,6 +4,7 @@ import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityCon
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
+import org.openscience.cdk.applications.taverna.curation.AtomSignatureActivity;
 import org.openscience.cdk.applications.taverna.curation.MoleculeConnectivityCheckerActivity;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
@@ -14,6 +15,7 @@ import org.openscience.cdk.applications.taverna.jchempaint.JChemPaintActivity;
 import org.openscience.cdk.applications.taverna.qsar.QSARDescriptorActivity;
 import org.openscience.cdk.applications.taverna.reactionenumerator.ReactionEnumeratorActivity;
 import org.openscience.cdk.applications.taverna.ui.EmptyConfigurationPanel;
+import org.openscience.cdk.applications.taverna.ui.curation.AtomSignatureConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.curation.CuratorConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.io.FileReaderConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.io.FileWriterConfigurationPanel;
@@ -40,6 +42,8 @@ public class CDKConfigurationPanelFactory {
 			return new PortNumberConfigurationPanel(activity);
 		} else if (activity instanceof JChemPaintActivity) {
 			return new JChemPaintConfigurationPanel(activity);
+		} else if (activity instanceof AtomSignatureActivity) {
+			return new AtomSignatureConfigurationPanel(activity);
 		} else if (activity instanceof QSARDescriptorActivity) {
 			return new QSARDescriptorConfigurationPanel(activity);
 		} else if (activity instanceof MoleculeConnectivityCheckerActivity) {

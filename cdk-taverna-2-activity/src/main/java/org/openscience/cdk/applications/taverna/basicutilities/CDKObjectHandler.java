@@ -48,10 +48,8 @@ public class CDKObjectHandler {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(bos);
 		oos.writeObject(obj);
-		oos.flush();
-		oos.close();
-		bos.close();
 		byte[] data = bos.toByteArray();
+		oos.close();
 		return data;
 	}
 
@@ -64,9 +62,8 @@ public class CDKObjectHandler {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			ObjectOutputStream oos = new ObjectOutputStream(bos);
 			oos.writeObject(obj);
-			oos.flush();
-			oos.close();
 			byte[] data = bos.toByteArray();
+			oos.close();
 			list.add(data);
 		}
 		return list;
@@ -81,10 +78,8 @@ public class CDKObjectHandler {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			ObjectOutputStream oos = new ObjectOutputStream(bos);
 			oos.writeObject(obj);
-			oos.flush();
-			oos.close();
-			bos.close();
 			byte[] data = bos.toByteArray();
+			oos.close();
 			list.add(data);
 		}
 		return list;
@@ -99,7 +94,6 @@ public class CDKObjectHandler {
 		ObjectInputStream ois = new ObjectInputStream(bis);
 		object = ois.readObject();
 		ois.close();
-		bis.close();
 		return object;
 	}
 
@@ -137,7 +131,7 @@ public class CDKObjectHandler {
 		for (byte[] data : dataArray) {
 			Object obj = null;
 			try {
-			obj = CDKObjectHandler.getObject(data);
+				obj = CDKObjectHandler.getObject(data);
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, "CDKObjectHandler", e);
 				throw new Exception(CDKTavernaException.WRONG_INPUT_PORT_TYPE);

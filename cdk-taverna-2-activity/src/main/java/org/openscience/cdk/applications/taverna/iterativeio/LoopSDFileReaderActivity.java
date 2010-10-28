@@ -23,11 +23,18 @@ package org.openscience.cdk.applications.taverna.iterativeio;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.LineNumberReader;
+import java.io.PrintWriter;
+import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
@@ -102,12 +109,13 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		int readSize = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE);
-		String state = RUNNING;
+			throws CDKTavernaException, FileNotFoundException {
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
+		int readSize = (Integer) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE);
+		String state = RUNNING;
 		// Read SDfile
 		File file = ((File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE))[0];
 		if (file == null) {
@@ -115,7 +123,7 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 		}
 		// clear comments
 		comment.clear();
-		List<byte[]> dataList = new ArrayList<byte[]>();
+		ArrayList<byte[]> dataList = new ArrayList<byte[]>();
 		try {
 			if (this.lineReader == null) {
 				this.lineReader = new LineNumberReader(new FileReader(file));
@@ -130,7 +138,7 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 					if (line.contains("$$$$")) {
 						try {
 							CMLChemFile cmlChemFile = new CMLChemFile();
-							MDLV2000Reader tmpMDLReader = new MDLV2000Reader(new ByteArrayInputStream(SDFilePart.getBytes()));
+							MDLV2000Reader tmpMDLReader = new MDLV2000Reader(new StringReader(SDFilePart));
 							tmpMDLReader.read(cmlChemFile);
 							tmpMDLReader.close();
 							dataList.add(CDKObjectHandler.getBytes(cmlChemFile));
@@ -147,7 +155,7 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 				if (line == null || counter >= readSize) {
 					if (line == null) {
 						state = FINISHED;
-						comment.add("All done!");	
+						comment.add("All done!");
 						this.lineReader.close();
 						this.lineReader = null;
 					} else {
@@ -159,9 +167,9 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 			ErrorLogger.getInstance().writeError("Error while reading SDF files!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while reading SDF files!");
 		}
-		T2Reference containerRef = referenceService.register(dataList, 1, true, context);
-		outputs.put(this.RESULT_PORTS[0], containerRef);
-		containerRef = referenceService.register(state, 0, true, context);
+		T2Reference reference = referenceService.register(dataList, 1, true, context);
+		outputs.put(this.RESULT_PORTS[0], reference);
+		T2Reference containerRef = referenceService.register(state, 0, true, context);
 		outputs.put(this.RESULT_PORTS[1], containerRef);
 		// Return results
 		return outputs;
