@@ -46,7 +46,8 @@ import com.itextpdf.text.pdf.PdfWriter;
  * @author Andreas Truszkowski
  * 
  */
-@SuppressWarnings("unused") // TODO
+@SuppressWarnings("unused")
+// TODO
 public class DrawPDF {
 	private static int width = 300;
 	private static int height = 300;

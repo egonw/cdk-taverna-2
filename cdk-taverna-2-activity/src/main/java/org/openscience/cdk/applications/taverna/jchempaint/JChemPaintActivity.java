@@ -42,7 +42,7 @@ import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrappe
  * Class which represents the JChemPaint activity.
  * 
  * @author Andreas Truszkowski
- *
+ * 
  */
 public class JChemPaintActivity extends AbstractCDKActivity {
 

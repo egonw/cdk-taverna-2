@@ -23,10 +23,10 @@ package org.openscience.cdk.applications.taverna.io;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ReferenceService;
@@ -36,14 +36,9 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
-import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.io.MDLWriter;
-import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
+import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileWriter;
 
 /**
  * Class which represents the MDL Mol file writer activity.
@@ -51,20 +46,21 @@ import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
  * @author Andreas Truzskowski
  * 
  */
-public class MDLMolFileWriterActivity extends AbstractCDKActivity implements IFileWriter {
+public class TextFileWriterActivity extends AbstractCDKActivity implements IIterativeFileWriter {
 
-	public static final String MOL_FILE_WRITER_ACTIVITY = "Mol file Writer";
+	public static final String TEXT_FILE_WRITER_ACTIVITY = "Text file Writer";
+	private File file = null;
 
 	/**
 	 * Creates a new instance.
 	 */
-	public MDLMolFileWriterActivity() {
-		this.INPUT_PORTS = new String[] { "Structures" };
+	public TextFileWriterActivity() {
+		this.INPUT_PORTS = new String[] { "Strings" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
+		addInput(this.INPUT_PORTS[0], 1, true, null, String.class);
 	}
 
 	@Override
@@ -78,38 +74,30 @@ public class MDLMolFileWriterActivity extends AbstractCDKActivity implements IFi
 			throws CDKTavernaException {
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
-		List<CMLChemFile> chemFileList;
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
+		List<String> strings = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
 				context);
-		try {
-			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing objects!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
 		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (directory == null) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
 		}
 		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
-		for (CMLChemFile cml : chemFileList) {
-			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(cml);
-			for (IAtomContainer atomContainer : moleculeList) {
-				File file;
-				if (atomContainer.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
-					file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
-				} else {
-					UUID uuid = (UUID) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID);
-					file = FileNameGenerator.getNewFileFromUUID(directory.getPath(), extension, uuid);
-				}
-				try {
-					MDLWriter writer = new MDLWriter(new FileWriter(file));
-					writer.write(atomContainer);
-					writer.close();
-				} catch (Exception e) {
-					ErrorLogger.getInstance()
-							.writeError("Error writing file: " + file.getPath() + "!", this.getActivityName(), e);
-				}
+		Boolean oneFilePerIteration = (Boolean) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_ONE_FILE_PER_ITERATION);
+		if (oneFilePerIteration) {
+			this.file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
+		} else {
+			if (this.file == null) {
+				this.file = FileNameGenerator.getNewFile(directory.getPath(), extension);
+			}
+		}
+		for (String s : strings) {
+			try {
+				PrintWriter writer = new PrintWriter(new FileWriter(file, !oneFilePerIteration));
+				writer.write(s + "\n");
+				writer.close();
+			} catch (Exception e) {
+				ErrorLogger.getInstance().writeError("Error writing text file: " + file.getPath() + "!", this.getActivityName(),
+						e);
 			}
 		}
 		return null;
@@ -117,19 +105,20 @@ public class MDLMolFileWriterActivity extends AbstractCDKActivity implements IFi
 
 	@Override
 	public String getActivityName() {
-		return MDLMolFileWriterActivity.MOL_FILE_WRITER_ACTIVITY;
+		return TextFileWriterActivity.TEXT_FILE_WRITER_ACTIVITY;
 	}
 
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".mol");
+		properties.put(CDKTavernaConstants.PROPERTY_ONE_FILE_PER_ITERATION, true);
+		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".txt");
 		return properties;
 	}
 
 	@Override
 	public String getDescription() {
-		return "Description: " + MDLMolFileWriterActivity.MOL_FILE_WRITER_ACTIVITY;
+		return "Description: " + TextFileWriterActivity.TEXT_FILE_WRITER_ACTIVITY;
 	}
 
 	@Override

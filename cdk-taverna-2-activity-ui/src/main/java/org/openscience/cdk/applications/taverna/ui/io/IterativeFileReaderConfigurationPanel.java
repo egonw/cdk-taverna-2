@@ -189,8 +189,8 @@ public class IterativeFileReaderConfigurationPanel extends
 	public void noteConfiguration() {
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.files);
-		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE,
-				Integer.parseInt(this.numberOfElementsField.getText()));
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE, Integer
+				.parseInt(this.numberOfElementsField.getText()));
 		String paths = "";
 		for (File file : files) {
 			paths += file.getPath();

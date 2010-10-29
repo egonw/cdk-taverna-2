@@ -99,9 +99,7 @@ public class CMLFileWriterActivity extends AbstractCDKActivity implements IFileW
 			writer.close();
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError("Error writing file: " + file.getPath() + "!", this.getActivityName(), e);
-			comment.add("Error writing file: " + file.getPath() + "!");
 		}
-		comment.add("done");
 		return null;
 	}
 

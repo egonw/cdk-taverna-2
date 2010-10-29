@@ -116,8 +116,6 @@ public class CSVGeneratorActivity extends AbstractCDKActivity implements IFileWr
 		}
 		T2Reference containerRef = referenceService.register(csv, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);
-		comment.add("done");
-
 		// Return results
 		return outputs;
 
@@ -135,7 +133,7 @@ public class CSVGeneratorActivity extends AbstractCDKActivity implements IFileWr
 			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(chemFile);
 			for (IAtomContainer atomContainer : moleculeList) {
 				if (atomContainer.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
-					comment.add("Molecule contains no ID!");
+					ErrorLogger.getInstance().writeMessage("Molecule contains no UUID in " + this.getActivityName());
 				} else {
 					uuids.add((UUID) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID));
 				}

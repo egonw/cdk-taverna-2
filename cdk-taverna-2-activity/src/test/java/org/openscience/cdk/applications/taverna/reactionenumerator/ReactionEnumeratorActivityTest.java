@@ -76,17 +76,12 @@ public class ReactionEnumeratorActivityTest extends CDKTavernaTestCases {
 				.getReactionEvaluationReaction() });
 		inputs.put(ReactionEnumeratorActivity.REACTION_PORT, reactionData);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(activity.getCOMMENT_PORT(), String.class);
 		expectedOutputTypes.put(ReactionEnumeratorActivity.RESULT_PORT, byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
+		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
 		List<byte[]> objectData = (List<byte[]>) outputs.get(ReactionEnumeratorActivity.RESULT_PORT);
 		List<IReaction> resultList = CDKObjectHandler.getReactionList(objectData);
 		Assert.assertEquals(9, resultList.size());
-		List<String> comment = (List<String>) outputs.get(activity.getCOMMENT_PORT());
-		for (String c : comment) {
-			Assert.assertTrue(!c.toLowerCase().contains("error"));
-		}
 	}
 
 	public void cleanUp() {

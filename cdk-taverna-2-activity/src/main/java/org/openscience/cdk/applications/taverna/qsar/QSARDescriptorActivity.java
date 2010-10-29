@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ReferenceService;
@@ -69,15 +68,14 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 			throw new CDKTavernaException(this.getActivityName(), "No QSAR descriptors chosen!");
 		}
 		for (Class<? extends AbstractCDKActivity> clazz : classes) {
-			long timeStart = System.nanoTime();
 			AbstractCDKActivity descriptor = null;
 			try {
 				descriptor = clazz.newInstance();
 			} catch (InstantiationException e) {
-				comment.add(e.getMessage() + " Descriptor: " + clazz.getSimpleName());
+				// TODO
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
-				comment.add(e.getMessage() + " Descriptor: " + clazz.getSimpleName());
+				// TODO
 				e.printStackTrace();
 			}
 			if (clazz != null) {
@@ -92,14 +90,15 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 					try {
 						dataArray.addAll((List<byte[]>) referenceService.renderIdentifier(outputs.get(descriptor
 								.getRESULT_PORTS()[0]), byte[].class, context));
-						comment.add("Error: " + clazz.getSimpleName() + " not calculated!");
 					} catch (NullPointerException e) {
+						// TODO
 					}
 					try {
 						dataArray.addAll((List<byte[]>) referenceService.renderIdentifier(outputs.get(descriptor
 								.getRESULT_PORTS()[1]), byte[].class, context));
-						comment.add("Error: " + "In " + clazz.getSimpleName() + " not all structures calculated!");
+
 					} catch (NullPointerException e) {
+						// TODO
 					}
 					outputs = new HashMap<String, T2Reference>();
 					T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
@@ -107,8 +106,6 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 				}
 				outputs = descriptor.work(outputs, callback);
 			}
-			long timeEnd = System.nanoTime();
-			comment.add(clazz.getSimpleName() + ", " + String.valueOf(TimeUnit.NANOSECONDS.toMillis(timeEnd - timeStart)));
 		}
 		return outputs;
 	}

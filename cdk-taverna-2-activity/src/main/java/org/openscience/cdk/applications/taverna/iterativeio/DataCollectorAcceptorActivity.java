@@ -100,7 +100,6 @@ public class DataCollectorAcceptorActivity extends AbstractCDKActivity {
 			ErrorLogger.getInstance().writeError("Error while writing cache data!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while writing cache data!");
 		}
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

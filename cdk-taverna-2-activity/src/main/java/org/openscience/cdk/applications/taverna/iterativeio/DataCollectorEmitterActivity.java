@@ -111,9 +111,8 @@ public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 			throw new CDKTavernaException(this.getActivityName(), "Error while reading cache data!");
 		}
 		// Congfigure output
-			T2Reference containerRef = referenceService.register(dataList, 1, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
-		comment.add("done");
+		T2Reference containerRef = referenceService.register(dataList, 1, true, context);
+		outputs.put(this.RESULT_PORTS[0], containerRef);
 		// Return results
 		return outputs;
 	}

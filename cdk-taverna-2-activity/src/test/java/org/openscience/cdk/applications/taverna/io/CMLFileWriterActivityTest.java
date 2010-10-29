@@ -79,13 +79,8 @@ public class CMLFileWriterActivityTest extends CDKTavernaTestCases {
 		}
 		inputs.put(activity.getINPUT_PORTS()[0], data);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(activity.getCOMMENT_PORT(), String.class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
-		List<String> comment = (List<String>) outputs.get(activity.getCOMMENT_PORT());
-		for (String c : comment) {
-			Assert.assertTrue(!c.toLowerCase().contains("error"));
-		}
+		Assert.assertEquals("Unexpected outputs", 0, outputs.size());
 	}
 
 	public void cleanUp() {

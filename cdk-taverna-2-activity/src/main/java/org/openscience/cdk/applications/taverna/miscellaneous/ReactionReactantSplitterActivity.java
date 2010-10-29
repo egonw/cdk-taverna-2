@@ -117,7 +117,6 @@ public class ReactionReactantSplitterActivity extends AbstractCDKActivity implem
 			CMLChemFile chemFile = CMLChemFileWrapper.wrapAtomContainerInChemModel(container);
 			resultList[i] = chemFile;
 		}
-		comment.add("Calculation done;");
 		// Congfigure output
 		try {
 			for (int i = 0; i < resultList.length; i++) {

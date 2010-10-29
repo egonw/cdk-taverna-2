@@ -21,20 +21,16 @@
  */
 package org.openscience.cdk.applications.taverna;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 
 /**
  * Abstract class to describe an Taverna 2 activity.
@@ -61,11 +57,6 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 	 * Comment port name.
 	 */
 	protected final String COMMENT_PORT = "Comment";
-
-	/**
-	 * Comment list.
-	 */
-	protected List<String> comment = new ArrayList<String>();
 
 	/**
 	 * Configuration bean.
@@ -97,8 +88,6 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 		removeOutputs();
 		this.addInputPorts();
 		this.addOutputPorts();
-		// Add always comment port
-		this.addOutput(this.COMMENT_PORT, 1);
 	}
 
 	/**
@@ -120,21 +109,16 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 			public void run() {
 				// Do work
 				Map<String, T2Reference> outputs = null;
-				InvocationContext context = callback.getContext();
-				ReferenceService referenceService = context.getReferenceService();
 				try {
 					AbstractCDKActivity.this.iteration++;
 					outputs = AbstractCDKActivity.this.work(inputs, callback);
 				} catch (Exception e) {
 					ErrorLogger.getInstance().writeError("Not catched exception.", "AbstractCDKActivity", e);
-					comment.add(e.getMessage());
 					callback.fail(e.getMessage());
 				}
 				if (outputs == null) {
 					outputs = new HashMap<String, T2Reference>();
 				}
-				T2Reference containerRef = referenceService.register(AbstractCDKActivity.this.comment, 1, true, context);
-				outputs.put(AbstractCDKActivity.this.COMMENT_PORT, containerRef);
 				// return map of output data, with empty index array as this is
 				// the only and final result (this index parameter is used if
 				// pipelining output)

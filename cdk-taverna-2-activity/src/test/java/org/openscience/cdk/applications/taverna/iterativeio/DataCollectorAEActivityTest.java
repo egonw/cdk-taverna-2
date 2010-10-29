@@ -82,28 +82,18 @@ public class DataCollectorAEActivityTest extends CDKTavernaTestCases {
 			inputs.put(this.acceptor.getINPUT_PORTS()[0], dataList);
 			inputs.put(this.acceptor.getINPUT_PORTS()[1], uuid.toString());
 			Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-			expectedOutputTypes.put(this.acceptor.getCOMMENT_PORT(), String.class);
 			Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(this.acceptor, inputs, expectedOutputTypes);
-			Assert.assertEquals("Unexpected outputs", 1, outputs.size());
-			List<String> comment = (List<String>) outputs.get(this.acceptor.getCOMMENT_PORT());
-			for (String c : comment) {
-				Assert.assertTrue(!c.toLowerCase().contains("error"));
-			}
+			Assert.assertEquals("Unexpected outputs", 0, outputs.size());
 		}
 		// Execute emitter
 		Map<String, Object> inputs = new HashMap<String, Object>();
 		inputs.put(this.emitter.getINPUT_PORTS()[0], uuid.toString());
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(this.emitter.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(this.emitter.getCOMMENT_PORT(), String.class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(this.emitter, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
+		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
 		List<byte[]> objectData = (List<byte[]>) outputs.get(this.emitter.getRESULT_PORTS()[0]);
 		Assert.assertEquals(10, objectData.size());
-		List<String> comment = (List<String>) outputs.get(this.emitter.getCOMMENT_PORT());
-		for (String c : comment) {
-			Assert.assertTrue(!c.toLowerCase().contains("error"));
-		}
 	}
 
 	public void cleanUp() {

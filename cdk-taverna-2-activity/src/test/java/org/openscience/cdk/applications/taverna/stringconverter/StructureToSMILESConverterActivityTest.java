@@ -67,15 +67,10 @@ public class StructureToSMILESConverterActivityTest extends CDKTavernaTestCases 
 		inputs.put(activity.getINPUT_PORTS()[0], dataList);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], String.class);
-		expectedOutputTypes.put(activity.getCOMMENT_PORT(), String.class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
+		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
 		List<String> structuresData = (List<String>) outputs.get(activity.getRESULT_PORTS()[0]);
 		Assert.assertEquals(10, structuresData.size());
-		List<String> comment = (List<String>) outputs.get(activity.getCOMMENT_PORT());
-		for (String c : comment) {
-			Assert.assertTrue(!c.toLowerCase().contains("error"));
-		}
 	}
 
 	public void executeTest() {

@@ -153,7 +153,6 @@ public class SubgraphIsomorphismFilterActivity extends AbstractCDKActivity {
 				}
 			}
 		}
-		comment.add("Calculation done;");
 		// Congfigure output
 		try {
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(calculatedList), 1, true, context);

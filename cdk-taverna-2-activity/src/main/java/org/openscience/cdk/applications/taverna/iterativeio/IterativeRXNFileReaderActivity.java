@@ -120,7 +120,6 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity implemen
 				} catch (Exception e) {
 					ErrorLogger.getInstance().writeError("Error in RXN file: " + files[i].getPath() + "!",
 							this.getActivityName(), e);
-					comment.add("Error in RXN file: " + files[i].getPath() + "!");
 				}
 				counter++;
 				if (i == files.length - 1 || counter >= readSize) {
@@ -140,7 +139,6 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity implemen
 		}
 		T2Reference containerRef = referenceService.register(outputList, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

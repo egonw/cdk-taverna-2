@@ -40,8 +40,6 @@ import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
-import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
-import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileReader;
 import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileWriter;
 import org.openscience.cdk.io.SDFWriter;
 
@@ -80,8 +78,8 @@ public class MDLSDFileWriterActivity extends AbstractCDKActivity implements IIte
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]),
-				byte[].class, context);
+		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
+				context);
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
@@ -95,8 +93,7 @@ public class MDLSDFileWriterActivity extends AbstractCDKActivity implements IIte
 		if (directory == null) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
 		}
-		String extension = (String) this.getConfiguration().getAdditionalProperty(
-				CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
+		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 		Boolean oneFilePerIteration = (Boolean) this.getConfiguration().getAdditionalProperty(
 				CDKTavernaConstants.PROPERTY_ONE_FILE_PER_ITERATION);
 		if (oneFilePerIteration) {
@@ -113,11 +110,8 @@ public class MDLSDFileWriterActivity extends AbstractCDKActivity implements IIte
 			}
 			writer.close();
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error writing SD file: " + file.getPath() + "!",
-					this.getActivityName(), e);
-			comment.add("Error writing SD file: " + file.getPath() + "!");
+			ErrorLogger.getInstance().writeError("Error writing SD file: " + file.getPath() + "!", this.getActivityName(), e);
 		}
-		comment.add("done");
 		return null;
 	}
 

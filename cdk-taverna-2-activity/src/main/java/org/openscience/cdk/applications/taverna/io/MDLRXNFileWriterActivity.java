@@ -99,10 +99,8 @@ public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFi
 			} catch (Exception e) {
 				ErrorLogger.getInstance()
 						.writeError("Error writing RXN file: " + file.getPath() + "!", this.getActivityName(), e);
-				comment.add("Error writing RXN file: " + file.getPath() + "!");
 			}
 		}
-		comment.add("done");
 		return null;
 	}
 

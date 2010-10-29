@@ -149,7 +149,6 @@ public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity imp
 		}
 		T2Reference containerRef = referenceService.register(outputList, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

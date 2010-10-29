@@ -9,6 +9,7 @@ org.openscience.cdk.applications.taverna.io.MDLSDFileReaderActivity
 org.openscience.cdk.applications.taverna.io.MDLSDFileWriterActivity
 org.openscience.cdk.applications.taverna.io.SMILESFileReaderActivity
 org.openscience.cdk.applications.taverna.io.SMILESFileWriterActivity
+org.openscience.cdk.applications.taverna.io.TextFileWriterActivity
 org.openscience.cdk.applications.taverna.isomorphism.IsomorphismTesterActivity
 org.openscience.cdk.applications.taverna.isomorphism.SubgraphIsomorphismFilterActivity
 org.openscience.cdk.applications.taverna.iterativeio.IterativeMultiRXNFileReaderActivity
@@ -123,4 +124,5 @@ org.openscience.cdk.applications.taverna.iterativeio.DataCollectorAcceptorActivi
 org.openscience.cdk.applications.taverna.iterativeio.DataCollectorEmitterActivity
 org.openscience.cdk.applications.taverna.curation.MoleculeConnectivityCheckerActivity
 org.openscience.cdk.applications.taverna.curation.CurateStrangeElementsActivity
-org.openscience.cdk.applications.taverna.curation.AtomSignatureConfigurationPanel
+org.openscience.cdk.applications.taverna.curation.AtomSignatureActivity
+org.openscience.cdk.applications.taverna.miscellaneous.TagMoleculesWithUUIDActivity

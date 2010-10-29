@@ -43,7 +43,7 @@ import org.openscience.cdk.interfaces.IReaction;
  * Class which represents the reaction splitter class. It splits the given reactions depending on their number of reactants.
  * 
  * @author Andreas Truszkowski
- *
+ * 
  */
 public class ReactionSplitterActivity extends AbstractCDKActivity {
 
@@ -116,7 +116,6 @@ public class ReactionSplitterActivity extends AbstractCDKActivity {
 				resultList[3].add(r);
 			}
 		}
-		comment.add("Calculation done;");
 		// Congfigure output
 		try {
 			for (int i = 0; i < resultList.length; i++) {

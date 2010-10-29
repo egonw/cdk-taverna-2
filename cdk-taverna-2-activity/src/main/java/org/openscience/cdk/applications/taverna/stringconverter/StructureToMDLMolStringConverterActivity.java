@@ -100,7 +100,6 @@ public class StructureToMDLMolStringConverterActivity extends AbstractCDKActivit
 			} catch (Exception e) {
 				notConverted.add(cml);
 				ErrorLogger.getInstance().writeError("Error converting MDL mol String!", this.getActivityName(), e);
-				comment.add("Error converting MDL Mol String!");
 			}
 		}
 		if (molStringList.isEmpty()) {
@@ -110,7 +109,6 @@ public class StructureToMDLMolStringConverterActivity extends AbstractCDKActivit
 		outputs.put(this.RESULT_PORTS[0], containerRef);
 		containerRef = referenceService.register(notConverted, 1, true, context);
 		outputs.put(this.RESULT_PORTS[1], containerRef);
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

@@ -95,7 +95,6 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError("Error while reading SMILES file: " + file.getPath() + "!",
 						this.getActivityName(), e);
-				comment.add("Error while reading SMILES file: " + file.getPath() + "!");
 			}
 			IMoleculeSet som2D = new MoleculeSet();
 			StructureDiagramGenerator str = new StructureDiagramGenerator();
@@ -106,7 +105,6 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 					som2D.addMolecule(str.getMolecule());
 				} catch (Exception e) {
 					ErrorLogger.getInstance().writeError("Error generating 2D Coordinate!", this.getActivityName(), e);
-					comment.add("Error generating 2D Coordinate!");
 				}
 			}
 			for (int i = 0; i < som2D.getMoleculeCount(); i++) {
@@ -122,7 +120,6 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 		}
 		T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

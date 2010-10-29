@@ -68,18 +68,13 @@ public class AtomTypeFilterActivityTest extends CDKTavernaTestCases {
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[1], byte[].class);
-		expectedOutputTypes.put(activity.getCOMMENT_PORT(), String.class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs", 3, outputs.size());
+		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
 		List<byte[]> objectData = (List<byte[]>) outputs.get(activity.getRESULT_PORTS()[0]);
 		List<CMLChemFile> typedStructures = (List<CMLChemFile>) CDKObjectHandler.getChemFileList(objectData);
 		Assert.assertEquals(10, typedStructures.size());
 		objectData = (List<byte[]>) outputs.get(activity.getRESULT_PORTS()[1]);
 		Assert.assertEquals(true, objectData.isEmpty());
-		List<String> comment = (List<String>) outputs.get(activity.getCOMMENT_PORT());
-		for (String c : comment) {
-			Assert.assertTrue(!c.toLowerCase().contains("error"));
-		}
 	}
 
 	public void cleanUp() {

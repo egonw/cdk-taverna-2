@@ -88,7 +88,6 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFi
 				cmlChemFiles.addAll(CMLChemFileWrapper.wrapInChemModelList((CMLChemFile) reader.read(new CMLChemFile())));
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError("Error reading mol file: " + file.getPath(), this.getActivityName(), e);
-				comment.add("Error reading mol file: " + file.getPath());
 			}
 		}
 		// Congfigure output
@@ -100,7 +99,6 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFi
 			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

@@ -72,7 +72,6 @@ public class UUIDGeneratorActivity extends AbstractCDKActivity implements IFileR
 		this.id = UUID.randomUUID();
 		T2Reference containerRef = referenceService.register(this.id.toString(), 0, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

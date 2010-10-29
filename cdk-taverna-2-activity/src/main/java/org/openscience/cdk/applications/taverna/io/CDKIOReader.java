@@ -51,7 +51,7 @@ import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 /**
  * @author Egon Willighagen, Andreas Truszkowski
- *
+ * 
  */
 public class CDKIOReader {
 

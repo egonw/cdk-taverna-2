@@ -99,7 +99,6 @@ public class StructureToMDLSDFileStringConverterActivity extends AbstractCDKActi
 			} catch (Exception e) {
 				notConverted.add(cml);
 				ErrorLogger.getInstance().writeError("Error converting MDL SD file String!", this.getActivityName(), e);
-				comment.add("Error converting MDL SD file String!");
 			}
 		}
 		try {
@@ -116,7 +115,6 @@ public class StructureToMDLSDFileStringConverterActivity extends AbstractCDKActi
 		outputs.put(this.RESULT_PORTS[0], containerRef);
 		containerRef = referenceService.register(notConverted, 1, true, context);
 		outputs.put(this.RESULT_PORTS[1], containerRef);
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

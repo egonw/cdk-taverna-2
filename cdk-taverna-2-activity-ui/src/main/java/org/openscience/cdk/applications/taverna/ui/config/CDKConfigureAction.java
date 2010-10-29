@@ -15,7 +15,8 @@ public class CDKConfigureAction extends ActivityConfigurationAction<AbstractCDKA
 
 	private ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> configurationPanel = null;
 
-	public CDKConfigureAction(AbstractCDKActivity activity, Frame owner, ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> configurationPanel) {
+	public CDKConfigureAction(AbstractCDKActivity activity, Frame owner,
+			ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> configurationPanel) {
 		super(activity);
 		this.configurationPanel = configurationPanel;
 	}

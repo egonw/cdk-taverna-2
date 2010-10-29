@@ -72,9 +72,8 @@ public class CMLFileReaderActivityTest extends CDKTavernaTestCases {
 		Map<String, Object> inputs = new HashMap<String, Object>();
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(activity.getCOMMENT_PORT(), String.class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
+		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
 		List<byte[]> objectData = (List<byte[]>) outputs.get(activity.getRESULT_PORTS()[0]);
 		Assert.assertEquals(3, objectData.size());
 		for (byte[] data : objectData) {
@@ -82,10 +81,6 @@ public class CMLFileReaderActivityTest extends CDKTavernaTestCases {
 			IAtomContainer container = ChemFileManipulator.getAllAtomContainers(chemFile).get(0);
 			Assert.assertTrue(container.getAtomCount() > 0);
 			Assert.assertTrue(container.getBondCount() > 0);
-		}
-		List<String> comment = (List<String>) outputs.get(activity.getCOMMENT_PORT());
-		for (String c : comment) {
-			Assert.assertTrue(!c.toLowerCase().contains("error"));
 		}
 	}
 

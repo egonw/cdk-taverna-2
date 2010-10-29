@@ -77,7 +77,8 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback) throws CDKTavernaException {
+	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
+			throws CDKTavernaException {
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
@@ -109,7 +110,8 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 				try {
 					containerArray[j] = CMLChemFileWrapper.wrapChemModelInAtomContainer(list.get(j));
 				} catch (Exception e) {
-					ErrorLogger.getInstance().writeError("Error while wrapping IAtomContainer in ChemModel!", this.getActivityName(), e);
+					ErrorLogger.getInstance().writeError("Error while wrapping IAtomContainer in ChemModel!",
+							this.getActivityName(), e);
 					throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 				}
 			}

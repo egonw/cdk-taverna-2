@@ -127,7 +127,6 @@ public class DoubletsFilterActivity extends AbstractCDKActivity {
 					}
 				}
 			} catch (Exception e) {
-				comment.add("Error!");
 				ErrorLogger.getInstance().writeError("Error while searching for isomorphs.",
 						this.getConfiguration().getActivityName(), e);
 			}
@@ -139,7 +138,6 @@ public class DoubletsFilterActivity extends AbstractCDKActivity {
 		for (IAtomContainer c : tempList) {
 			filteredList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(c));
 		}
-		comment.add("Calculation done;");
 		// Congfigure output
 		try {
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(filteredList), 1, true, context);

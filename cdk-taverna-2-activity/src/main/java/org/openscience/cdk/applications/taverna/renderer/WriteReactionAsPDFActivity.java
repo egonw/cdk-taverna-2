@@ -97,24 +97,23 @@ public class WriteReactionAsPDFActivity extends AbstractCDKActivity implements I
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<IReaction> reactionList = new ArrayList<IReaction>();
-			List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]),
-					byte[].class, context);
-			try {
-				reactionList = CDKObjectHandler.getReactionList(dataArray);
-			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
-				throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-			}
-			File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-			String extension = (String) this.getConfiguration()
-					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
-			try {
-				File file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
-				DrawPDF.drawReactionAsPDF(reactionList, file);
-			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error while drawing reaction image into pdf!", this.getActivityName(), e);
-				throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-			}
+		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
+				context);
+		try {
+			reactionList = CDKObjectHandler.getReactionList(dataArray);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
+		}
+		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
+		try {
+			File file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
+			DrawPDF.drawReactionAsPDF(reactionList, file);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while drawing reaction image into pdf!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
+		}
 		return null;
 
 	}

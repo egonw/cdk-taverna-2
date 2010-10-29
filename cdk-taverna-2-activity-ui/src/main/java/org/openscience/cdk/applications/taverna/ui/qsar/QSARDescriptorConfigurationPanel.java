@@ -92,14 +92,14 @@ public class QSARDescriptorConfigurationPanel extends
 			buttonPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
 			this.selectAllButton = new JButton("Select all");
 			this.selectAllButton.addActionListener(new ActionListener() {
-				
+
 				public void actionPerformed(ActionEvent e) {
 					QSARDescriptorConfigurationPanel.this.selectAll();
 				}
 			});
 			this.clearButton = new JButton("Clear");
 			this.clearButton.addActionListener(new ActionListener() {
-				
+
 				public void actionPerformed(ActionEvent e) {
 					QSARDescriptorConfigurationPanel.this.unselectAll();
 				}
@@ -127,7 +127,7 @@ public class QSARDescriptorConfigurationPanel extends
 		}
 
 	}
-	
+
 	private void selectAll() {
 		for (Entry<Class<? extends AbstractCDKActivity>, JCheckBox> entry : this.selectionMap.entrySet()) {
 			JCheckBox checkBox = entry.getValue();
@@ -141,7 +141,7 @@ public class QSARDescriptorConfigurationPanel extends
 			checkBox.setSelected(false);
 		}
 	}
-	
+
 	private ArrayList<Class<? extends AbstractCDKActivity>> getSelectedClasses() {
 		ArrayList<Class<? extends AbstractCDKActivity>> classes = new ArrayList<Class<? extends AbstractCDKActivity>>();
 		for (Entry<Class<? extends AbstractCDKActivity>, JCheckBox> entry : this.selectionMap.entrySet()) {

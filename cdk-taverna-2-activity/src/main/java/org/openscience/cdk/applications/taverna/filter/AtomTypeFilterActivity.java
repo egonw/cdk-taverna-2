@@ -133,12 +133,11 @@ public class AtomTypeFilterActivity extends AbstractCDKActivity {
 					}
 				}
 			} catch (Exception e) {
-				comment.add("Atom with element " + tmpAtom.getSymbol() + " could not be typed!");
+				ErrorLogger.getInstance().writeMessage("Atom with element " + tmpAtom.getSymbol() + " could not be typed!");
 				notTypedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(cont));
 			}
 			typedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(cont));
 		}
-		comment.add("Calculation done;");
 		// Congfigure output
 		try {
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(typedList), 1, true, context);

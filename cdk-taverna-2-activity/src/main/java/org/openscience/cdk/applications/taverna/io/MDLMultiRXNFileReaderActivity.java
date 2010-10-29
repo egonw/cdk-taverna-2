@@ -44,8 +44,8 @@ import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLRXNReader;
 
 /**
- * Class which represents the MDL Multi RXN file reader activity. (Not official supported file format. Only MDL RXN Strings separated
- * by "$$$$".)
+ * Class which represents the MDL Multi RXN file reader activity. (Not official supported file format. Only MDL RXN Strings
+ * separated by "$$$$".)
  * 
  * @author Andreas Truzskowski
  * 
@@ -97,7 +97,6 @@ public class MDLMultiRXNFileReaderActivity extends AbstractCDKActivity implement
 					} catch (Exception e) {
 						ErrorLogger.getInstance().writeError("Error reading RXN part: \n" + reactionString,
 								this.getActivityName(), e);
-						comment.add("Error reading RXN part: \n" + reactionString);
 					} finally {
 						reactionString = "";
 					}
@@ -117,7 +116,6 @@ public class MDLMultiRXNFileReaderActivity extends AbstractCDKActivity implement
 			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

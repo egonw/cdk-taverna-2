@@ -18,15 +18,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- */
-package org.openscience.cdk.applications.taverna.io;
+ */package org.openscience.cdk.applications.taverna.miscellaneous;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ReferenceService;
@@ -40,25 +38,24 @@ import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
-import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
-import org.openscience.cdk.io.SMILESWriter;
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 /**
- * Class which represents the SMILES file writer activity.
+ * Class which represents the doublets filter activity. It filter doublets in given structures list.
  * 
- * @author Andreas Truzskowski
+ * @author Andreas Truszkowski
  * 
  */
-public class SMILESFileWriterActivity extends AbstractCDKActivity implements IFileWriter {
+public class TagMoleculesWithUUIDActivity extends AbstractCDKActivity {
 
-	public static final String SMILES_FILE_WRITER_ACTIVITY = "SMILES File Writer";
+	public static final String TAG_MOLECULES_WITH_UUID_ACTIVITY = "Tag Molecules With UUID";
 
 	/**
 	 * Creates a new instance.
 	 */
-	public SMILESFileWriterActivity() {
-		this.INPUT_PORTS = new String[] { "Structures" };
+	public TagMoleculesWithUUIDActivity() {
+		this.INPUT_PORTS = new String[] { "Structures", };
+		this.RESULT_PORTS = new String[] { "Tagged Structures" };
 	}
 
 	@Override
@@ -68,7 +65,27 @@ public class SMILESFileWriterActivity extends AbstractCDKActivity implements IFi
 
 	@Override
 	protected void addOutputPorts() {
-		// empty
+		addOutput(this.RESULT_PORTS[0], 1);
+	}
+
+	@Override
+	public String getActivityName() {
+		return TagMoleculesWithUUIDActivity.TAG_MOLECULES_WITH_UUID_ACTIVITY;
+	}
+
+	@Override
+	public String getDescription() {
+		return "Descriptions: " + TagMoleculesWithUUIDActivity.TAG_MOLECULES_WITH_UUID_ACTIVITY;
+	}
+
+	@Override
+	public HashMap<String, Object> getAdditionalProperties() {
+		return new HashMap<String, Object>();
+	}
+
+	@Override
+	public String getFolderName() {
+		return CDKTavernaConstants.MISCELLANEOUS_FOLDER_NAME;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -77,52 +94,43 @@ public class SMILESFileWriterActivity extends AbstractCDKActivity implements IFi
 			throws CDKTavernaException {
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
+		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
+		List<CMLChemFile> taggedMoleculesList = new ArrayList<CMLChemFile>();
 		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
 		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
 				context);
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error while deserializing object.", this.getConfiguration().getActivityName(),
+					e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
-		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (directory == null) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
-		}
-		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
-		File file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
+		IAtomContainer[] containers;
 		try {
-			SMILESWriter writer = new SMILESWriter(new FileWriter(file));
-			for (CMLChemFile cmlChemFile : chemFileList) {
-				writer.write(CMLChemFileWrapper.wrapChemModelInAtomContainer(cmlChemFile));
-			}
-			writer.close();
+			containers = CMLChemFileWrapper.convertCMLChemFileListToAtomContainerArray(chemFileList);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error writing SMILES file: " + file.getPath() + "!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error while converting CML chem file list.",
+					this.getConfiguration().getActivityName(), e);
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
-		return null;
-	}
-
-	@Override
-	public String getActivityName() {
-		return SMILESFileWriterActivity.SMILES_FILE_WRITER_ACTIVITY;
-	}
-
-	@Override
-	public HashMap<String, Object> getAdditionalProperties() {
-		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".smiles");
-		return properties;
-	}
-
-	@Override
-	public String getDescription() {
-		return "Description: " + SMILESFileWriterActivity.SMILES_FILE_WRITER_ACTIVITY;
-	}
-
-	@Override
-	public String getFolderName() {
-		return CDKTavernaConstants.IO_FOLDER_NAME;
+		for (int i = 0; i < containers.length; i++) {
+			if (containers[i].getProperty(CDKTavernaConstants.MOLECULEID) == null) {
+				UUID uuid = UUID.randomUUID();
+				containers[i].setProperty(CDKTavernaConstants.MOLECULEID, uuid);
+				taggedMoleculesList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(containers[i]));
+			}
+		}
+		// Congfigure output
+		try {
+			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(taggedMoleculesList), 1, true,
+					context);
+			outputs.put(this.RESULT_PORTS[0], containerRef);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while configuring output ports.",
+					this.getConfiguration().getActivityName(), e);
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
+		}
+		return outputs;
 	}
 }

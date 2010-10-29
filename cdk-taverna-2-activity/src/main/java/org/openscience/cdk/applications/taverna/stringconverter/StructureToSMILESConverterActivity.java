@@ -101,7 +101,6 @@ public class StructureToSMILESConverterActivity extends AbstractCDKActivity impl
 			} catch (Exception e) {
 				notConverted.add(cml);
 				ErrorLogger.getInstance().writeError("Error converting SMILES!", this.getActivityName(), e);
-				comment.add("Error converting SMILES!");
 			}
 		}
 		if (molStringList.isEmpty()) {
@@ -111,7 +110,6 @@ public class StructureToSMILESConverterActivity extends AbstractCDKActivity impl
 		outputs.put(this.RESULT_PORTS[0], containerRef);
 		containerRef = referenceService.register(notConverted, 1, true, context);
 		outputs.put(this.RESULT_PORTS[1], containerRef);
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

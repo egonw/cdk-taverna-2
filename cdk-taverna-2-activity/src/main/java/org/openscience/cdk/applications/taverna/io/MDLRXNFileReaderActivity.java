@@ -88,7 +88,6 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFi
 				reader.close();
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError("Error reading RXN file: \n" + file.getPath(), this.getActivityName(), e);
-				comment.add("Error reading RXN file: \n" + file.getPath());
 			}
 		}
 		// Congfigure output
@@ -99,7 +98,6 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFi
 			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

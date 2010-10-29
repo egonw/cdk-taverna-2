@@ -139,42 +139,41 @@ public class ReactionEnumeratorSubgraphFilterActivity extends AbstractCDKActivit
 		} catch (Exception e) {
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
-			for (Iterator<CMLChemFile> iter = inputList.iterator(); iter.hasNext();) {
-				CMLChemFile file = iter.next();
-				List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(file);
-				for (IAtomContainer molecule : moleculeList) {
-					try {
-						IMolecule queryClone = (IMolecule) queryMolecule.clone();
-						IReaction reaction = new Reaction();
-						reaction.addReactant(queryClone);
-						reaction = VariableRegionChecker.convertAnyAtomData(reaction);
-						VariableRegionChecker tmpVariableRegionChecker = new VariableRegionChecker();
-						LinkedList<IAtomContainer[]> reactants = new LinkedList<IAtomContainer[]>();
-						reactants.add(new IAtomContainer[] { molecule });
-						reactants = tmpVariableRegionChecker.checkForVariableRegions(reaction, reactants);
-						if (reactants.get(0).length == 0) {
-							notCalculatedList.add(file);
-						} else {
-							String variableRegionData = (String) reactants.get(0)[0]
-									.getProperty(VariableRegionChecker.VARIABLEREGIONDATA);
-							if (variableRegionData != null) {
-								VariableRegionChecker.expandMoleculeFromVariableRegionData(variableRegionData, queryClone);
-							}
-							QueryAtomContainer query = QueryAtomContainerCreator
-									.createAnyAtomForPseudoAtomQueryContainer(queryClone);
-							if (UniversalIsomorphismTester.isSubgraph(molecule, query)) {
-								calculatedList.add(file);
-							} else {
-								notCalculatedList.add(file);
-							}
-						}
-					} catch (Exception e) {
+		for (Iterator<CMLChemFile> iter = inputList.iterator(); iter.hasNext();) {
+			CMLChemFile file = iter.next();
+			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(file);
+			for (IAtomContainer molecule : moleculeList) {
+				try {
+					IMolecule queryClone = (IMolecule) queryMolecule.clone();
+					IReaction reaction = new Reaction();
+					reaction.addReactant(queryClone);
+					reaction = VariableRegionChecker.convertAnyAtomData(reaction);
+					VariableRegionChecker tmpVariableRegionChecker = new VariableRegionChecker();
+					LinkedList<IAtomContainer[]> reactants = new LinkedList<IAtomContainer[]>();
+					reactants.add(new IAtomContainer[] { molecule });
+					reactants = tmpVariableRegionChecker.checkForVariableRegions(reaction, reactants);
+					if (reactants.get(0).length == 0) {
 						notCalculatedList.add(file);
-						ErrorLogger.getInstance().writeError("Error while testing for subgraph isomorphism!", this.getActivityName(), e);
+					} else {
+						String variableRegionData = (String) reactants.get(0)[0]
+								.getProperty(VariableRegionChecker.VARIABLEREGIONDATA);
+						if (variableRegionData != null) {
+							VariableRegionChecker.expandMoleculeFromVariableRegionData(variableRegionData, queryClone);
+						}
+						QueryAtomContainer query = QueryAtomContainerCreator.createAnyAtomForPseudoAtomQueryContainer(queryClone);
+						if (UniversalIsomorphismTester.isSubgraph(molecule, query)) {
+							calculatedList.add(file);
+						} else {
+							notCalculatedList.add(file);
+						}
 					}
+				} catch (Exception e) {
+					notCalculatedList.add(file);
+					ErrorLogger.getInstance().writeError("Error while testing for subgraph isomorphism!", this.getActivityName(),
+							e);
 				}
 			}
-			comment.add("Calculation done;");
+		}
 		// Congfigure output
 		try {
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(calculatedList), 1, true, context);

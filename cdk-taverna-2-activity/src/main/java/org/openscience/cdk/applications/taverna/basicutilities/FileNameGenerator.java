@@ -26,10 +26,10 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.UUID;
 
 /**
- * Class which provides methods for a centralized file name handling within the
- * cdk-taverna project
+ * Class which provides methods for a centralized file name handling within the cdk-taverna project
  * 
  * @author Andreas Truszkowski
  * 
@@ -39,7 +39,7 @@ public class FileNameGenerator {
 	private static Hashtable<String, Integer> usedFilesTable = new Hashtable<String, Integer>();
 
 	/**
-	 * Generates a unique filename from the given parameters.
+	 * Generates a unique filen from the given parameters.
 	 * 
 	 * @param path
 	 *            Path to the file
@@ -52,7 +52,7 @@ public class FileNameGenerator {
 	}
 
 	/**
-	 * Generates a unique filename from the given parameters.
+	 * Generates a unique filen from the given parameters.
 	 * 
 	 * @param path
 	 *            Path to the file
@@ -94,6 +94,34 @@ public class FileNameGenerator {
 	}
 
 	/**
+	 * Generates a filen from the given parameters.
+	 * 
+	 * @param path
+	 *            Path to the file
+	 * @param extension
+	 *            The file extension
+	 * @return
+	 */
+	public synchronized static File getNewFileFromUUID(String path, String extension, UUID uuid) {
+		String filename = "";
+		File file = null;
+		filename += path;
+		if (!path.endsWith(File.separator)) {
+			filename += File.separator;
+		}
+		filename += uuid.toString();
+		filename += extension;
+		file = new File(filename);
+		try {
+			file.createNewFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return file;
+	}
+
+	/**
 	 * @return path of the OS temporary directory.
 	 */
 	public synchronized static String getTempDir() {
@@ -106,8 +134,7 @@ public class FileNameGenerator {
 	}
 
 	/**
-	 * @return path to the cache directory. It's located in the OS temporary
-	 *         directory.
+	 * @return path to the cache directory. It's located in the OS temporary directory.
 	 */
 	public synchronized static String getCacheDir() {
 		String cacheDir = getTempDir();
@@ -120,8 +147,7 @@ public class FileNameGenerator {
 	}
 
 	/**
-	 * @return path to the log directory. It's located in the OS temporary
-	 *         directory.
+	 * @return path to the log directory. It's located in the OS temporary directory.
 	 */
 	public synchronized static String getLogDir() {
 		String logDir = getTempDir();
@@ -134,9 +160,8 @@ public class FileNameGenerator {
 	}
 
 	/**
-	 * Deletes all files and subdirectories under dir. Returns true if all
-	 * deletions were successful. If a deletion fails, the method stops
-	 * attempting to delete and returns false.
+	 * Deletes all files and subdirectories under dir. Returns true if all deletions were successful. If a deletion fails, the
+	 * method stops attempting to delete and returns false.
 	 * 
 	 * @param dir
 	 *            Directory to delete

@@ -19,6 +19,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 
@@ -97,8 +98,8 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity implement
 							dataList.add(CDKObjectHandler.getBytes(cmlChemFile));
 							counter++;
 						} catch (Exception e) {
-							comment.add("Error reading molecule in SD file:");
-							comment.add(SDFilePart);
+							ErrorLogger.getInstance().writeError("Error reading molecule in SD file:", this.getActivityName(), e);
+							ErrorLogger.getInstance().writeMessage(SDFilePart);
 						} finally {
 							SDFilePart = "";
 						}
@@ -117,10 +118,9 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity implement
 			T2Reference containerRef = referenceService.register(outputList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			e.printStackTrace();
+			ErrorLogger.getInstance().writeError("Error reading SDF file!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error reading SDF file!");
 		}
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

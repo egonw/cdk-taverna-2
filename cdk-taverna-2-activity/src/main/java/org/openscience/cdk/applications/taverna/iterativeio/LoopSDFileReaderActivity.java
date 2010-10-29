@@ -21,20 +21,13 @@
  */
 package org.openscience.cdk.applications.taverna.iterativeio;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.LineNumberReader;
-import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
@@ -113,16 +106,13 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
-		int readSize = (Integer) this.getConfiguration().getAdditionalProperty(
-				CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE);
+		int readSize = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE);
 		String state = RUNNING;
 		// Read SDfile
 		File file = ((File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE))[0];
 		if (file == null) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
 		}
-		// clear comments
-		comment.clear();
 		ArrayList<byte[]> dataList = new ArrayList<byte[]>();
 		try {
 			if (this.lineReader == null) {
@@ -146,7 +136,6 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 						} catch (Exception e) {
 							ErrorLogger.getInstance().writeError("Error while reading molecule: \n" + SDFilePart,
 									this.getActivityName(), e);
-							comment.add("Error while reading molecule: \n" + SDFilePart);
 						} finally {
 							SDFilePart = "";
 						}
@@ -155,11 +144,8 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 				if (line == null || counter >= readSize) {
 					if (line == null) {
 						state = FINISHED;
-						comment.add("All done!");
 						this.lineReader.close();
 						this.lineReader = null;
-					} else {
-						comment.add("Has next iteration!");
 					}
 				}
 			} while (line != null && counter < readSize);

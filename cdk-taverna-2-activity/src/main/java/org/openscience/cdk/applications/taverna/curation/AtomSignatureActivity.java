@@ -8,11 +8,11 @@ package org.openscience.cdk.applications.taverna.curation;
  *
  * @author kalai
  */
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ReferenceService;
@@ -24,7 +24,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.signature.AtomSignature;
@@ -32,7 +31,7 @@ import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 public class AtomSignatureActivity extends AbstractCDKActivity {
 
-	public static final String ATOM_SIGNATURE_ACTIVITY = "Atom Signature Of Molecule";
+	public static final String ATOM_SIGNATURE_ACTIVITY = "Generate Atom Signatures";
 
 	public AtomSignatureActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
@@ -59,8 +58,8 @@ public class AtomSignatureActivity extends AbstractCDKActivity {
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]),
-				byte[].class, context);
+		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
+				context);
 		List<CMLChemFile> chemFileList = null;
 		Integer height = (Integer) this.getConfiguration().getAdditionalProperty(
 				CDKTavernaConstants.PROPERTY_ATOM_SIGNATURE_HEIGHT);
@@ -73,15 +72,17 @@ public class AtomSignatureActivity extends AbstractCDKActivity {
 		for (CMLChemFile cml : chemFileList) {
 			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(cml);
 			for (IAtomContainer atomContainer : moleculeList) {
+				if (atomContainer.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
+					throw new CDKTavernaException(this.getActivityName(), "Molecule is not tagged with an UUID!");
+				}
+				UUID uuid = (UUID) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID);
 				for (IAtom atom : atomContainer.atoms()) {
 					AtomSignature atomSignature = new AtomSignature(atom, height, atomContainer);
-					String signature = atomSignature.toCanonicalString();
+					String signature = uuid.toString() + " - " + atomSignature.toCanonicalString();
 					allAtomSignatures.add(signature);
 				}
 			}
 		}
-		comment.add("done");
-
 		T2Reference containerRef = referenceService.register(allAtomSignatures, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);
 

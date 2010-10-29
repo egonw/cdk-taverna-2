@@ -44,7 +44,6 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.Preferences;
-import org.openscience.cdk.applications.taverna.io.MDLMolFileWriterActivity;
 
 /**
  * Configuration panel for file writing activities.
@@ -107,7 +106,7 @@ public class IterativeFileWriterConfigurationPanel extends
 			filePanel.add(fileChooserButton);
 			this.add(filePanel);
 			this.checkBox = new JCheckBox("One file per iteration");
-				this.add(this.checkBox); 
+			this.add(this.checkBox);
 			this.refreshConfiguration();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -125,8 +124,7 @@ public class IterativeFileWriterConfigurationPanel extends
 		if (this.file != null && this.file.exists()) {
 			return true;
 		}
-		JOptionPane.showMessageDialog(this, "Chosen directory is not valid!", "Invalid directory",
-				JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(this, "Chosen directory is not valid!", "Invalid directory", JOptionPane.ERROR_MESSAGE);
 		// Not valid, return false
 		return false;
 	}
@@ -153,8 +151,7 @@ public class IterativeFileWriterConfigurationPanel extends
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.file);
 		this.filePathField.setText(this.file.getPath());
 		this.filePathField.repaint();
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_ONE_FILE_PER_ITERATION,
-				this.checkBox.isSelected());
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_ONE_FILE_PER_ITERATION, this.checkBox.isSelected());
 	}
 
 	@Override

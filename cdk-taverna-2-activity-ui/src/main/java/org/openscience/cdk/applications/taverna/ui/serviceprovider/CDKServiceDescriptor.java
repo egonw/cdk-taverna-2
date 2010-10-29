@@ -23,14 +23,13 @@ public class CDKServiceDescriptor extends ServiceDescription<CDKActivityConfigur
 	private String activityName;
 	private String folderName;
 	private HashMap<String, Object> additionalProperties = new HashMap<String, Object>();
-	
+
 	public CDKServiceDescriptor(Class<? extends AbstractCDKActivity> activityClass) {
 		this.activityClass = activityClass;
 	}
 
 	/**
-	 * The subclass of Activity which should be instantiated when adding a
-	 * service for this description
+	 * The subclass of Activity which should be instantiated when adding a service for this description
 	 */
 	@Override
 	public Class<? extends Activity<CDKActivityConfigurationBean>> getActivityClass() {
@@ -38,10 +37,8 @@ public class CDKServiceDescriptor extends ServiceDescription<CDKActivityConfigur
 	}
 
 	/**
-	 * The configuration bean which is to be used for configuring the
-	 * instantiated activity. Making this bean will typically require some of
-	 * the fields set on this service description, like an endpoint URL or
-	 * method name.
+	 * The configuration bean which is to be used for configuring the instantiated activity. Making this bean will typically
+	 * require some of the fields set on this service description, like an endpoint URL or method name.
 	 * 
 	 */
 	@Override
@@ -67,12 +64,12 @@ public class CDKServiceDescriptor extends ServiceDescription<CDKActivityConfigur
 			// Use standard icon
 			return null;
 		}
-		return  new ImageIcon(url);
+		return new ImageIcon(url);
 	}
 
 	/**
-	 * The display name that will be shown in service palette and will be used
-	 * as a template for processor name when added to workflow.
+	 * The display name that will be shown in service palette and will be used as a template for processor name when added to
+	 * workflow.
 	 */
 	@Override
 	public String getName() {
@@ -80,8 +77,7 @@ public class CDKServiceDescriptor extends ServiceDescription<CDKActivityConfigur
 	}
 
 	/**
-	 * The path to this service description in the service palette. Folders will
-	 * be created for each element of the returned path.
+	 * The path to this service description in the service palette. Folders will be created for each element of the returned path.
 	 */
 	@Override
 	public List<String> getPath() {
@@ -90,9 +86,8 @@ public class CDKServiceDescriptor extends ServiceDescription<CDKActivityConfigur
 	}
 
 	/**
-	 * Return a list of data values uniquely identifying this service
-	 * description (to avoid duplicates). Include only primary key like fields,
-	 * ie. ignore descriptions, icons, etc.
+	 * Return a list of data values uniquely identifying this service description (to avoid duplicates). Include only primary key
+	 * like fields, ie. ignore descriptions, icons, etc.
 	 */
 	@Override
 	protected List<? extends Object> getIdentifyingData() {
@@ -123,7 +118,7 @@ public class CDKServiceDescriptor extends ServiceDescription<CDKActivityConfigur
 			Class<? extends ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean>> configurationPanelClass) {
 		this.configurationPanelClass = configurationPanelClass;
 	}
-	
+
 	public void setAdditionalProperties(HashMap<String, Object> additionalProperties) {
 		this.additionalProperties = additionalProperties;
 	}

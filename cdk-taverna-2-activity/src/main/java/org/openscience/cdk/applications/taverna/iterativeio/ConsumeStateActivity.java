@@ -66,7 +66,6 @@ public class ConsumeStateActivity extends AbstractCDKActivity {
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class, context);
-		comment.add("done");
 		return null;
 	}
 

@@ -92,7 +92,6 @@ public class MDLRXNStringToStructureConverterActivity extends AbstractCDKActivit
 			} catch (Exception e) {
 				notConverted.add(string);
 				ErrorLogger.getInstance().writeError("Error converting MDL RXN String!", this.getActivityName(), e);
-				comment.add("Error converting MDL RXN String!");
 			}
 		}
 		if (dataList.isEmpty()) {
@@ -102,7 +101,6 @@ public class MDLRXNStringToStructureConverterActivity extends AbstractCDKActivit
 		outputs.put(this.RESULT_PORTS[0], containerRef);
 		containerRef = referenceService.register(notConverted, 1, true, context);
 		outputs.put(this.RESULT_PORTS[1], containerRef);
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

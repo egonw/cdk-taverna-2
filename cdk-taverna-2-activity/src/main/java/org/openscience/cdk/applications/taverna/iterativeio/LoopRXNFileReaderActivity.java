@@ -42,7 +42,6 @@ import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileReader;
 import org.openscience.cdk.io.MDLRXNV2000Reader;
 
-
 /**
  * Class which represents the iterative loop rxn file reader.
  * 
@@ -134,11 +133,7 @@ public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements II
 			}
 			if (fileList.isEmpty()) {
 				state = FINISHED;
-				comment.add("All done!");
-			} else {
-				comment.add("Has next iteration!");
 			}
-
 		}
 		T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);

@@ -20,7 +20,7 @@ public class CDKContextualView extends ContextualView {
 	private final AbstractCDKActivity activity;
 	private JLabel description = new JLabel("ads");
 	private JLabel info = new JLabel();
-	
+
 	public CDKContextualView(AbstractCDKActivity activity) {
 		this.activity = activity;
 		initView();
@@ -47,7 +47,8 @@ public class CDKContextualView extends ContextualView {
 	@Override
 	public void refreshView() {
 		CDKActivityConfigurationBean configuration = this.activity.getConfiguration();
-		description.setText(CDKTavernaConstants.CDK_TAVERNA_FOLDER_NAME + " - " + configuration.getFolderName() + " - " + configuration.getActivityName());
+		description.setText(CDKTavernaConstants.CDK_TAVERNA_FOLDER_NAME + " - " + configuration.getFolderName() + " - "
+				+ configuration.getActivityName());
 	}
 
 	/**
@@ -61,7 +62,8 @@ public class CDKContextualView extends ContextualView {
 
 	@Override
 	public Action getConfigureAction(final Frame owner) {
-		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> configurationPanel = CDKConfigurationPanelFactory.getConfigurationPanel(this.activity);
+		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> configurationPanel = CDKConfigurationPanelFactory
+				.getConfigurationPanel(this.activity);
 		return new CDKConfigureAction(activity, owner, configurationPanel);
 	}
 

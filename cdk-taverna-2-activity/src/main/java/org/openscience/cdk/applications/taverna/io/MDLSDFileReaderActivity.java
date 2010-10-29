@@ -100,7 +100,6 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 						} catch (Exception e) {
 							ErrorLogger.getInstance().writeError("Error in SD file: " + file.getPath() + "!\n" + SDFilePart,
 									this.getActivityName(), e);
-							comment.add("Error in SD file: " + file.getPath() + "!\n" + SDFilePart);
 						} finally {
 							SDFilePart = "";
 						}
@@ -110,7 +109,6 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError("Error while reading SD file: " + file.getPath() + "!",
 						this.getActivityName(), e);
-				comment.add("Error while reading SD file: " + file.getPath() + "!");
 			}
 		}
 		// Congfigure output
@@ -121,7 +119,6 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

@@ -52,7 +52,7 @@ import org.openscience.cdk.io.MDLReader;
 public class MDLMolStringToStructureConverterActivity extends AbstractCDKActivity implements IFileReader {
 
 	public static final String MDL_MOL_STRING_CONVERTER_ACTIVITY = "MDL Mol String to Structures Converter";
-	
+
 	/**
 	 * Creates a new instance.
 	 */
@@ -97,7 +97,6 @@ public class MDLMolStringToStructureConverterActivity extends AbstractCDKActivit
 			} catch (Exception e) {
 				notConverted.add(mol);
 				ErrorLogger.getInstance().writeError("Error converting MDL mol String!", this.getActivityName(), e);
-				comment.add("Error converting MDL mol String!");
 			}
 		}
 		if (dataList.isEmpty()) {
@@ -107,7 +106,6 @@ public class MDLMolStringToStructureConverterActivity extends AbstractCDKActivit
 		outputs.put(this.RESULT_PORTS[0], containerRef);
 		containerRef = referenceService.register(notConverted, 1, true, context);
 		outputs.put(this.RESULT_PORTS[1], containerRef);
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

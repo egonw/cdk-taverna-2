@@ -210,7 +210,6 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity implements 
 			byte[] nameData = CDKObjectHandler.getBytes(descriptorNames);
 			containerRef = referenceService.register(nameData, 0, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
-			comment.add("done");
 		} catch (Exception e) {
 			// TODO: handle exception
 		}

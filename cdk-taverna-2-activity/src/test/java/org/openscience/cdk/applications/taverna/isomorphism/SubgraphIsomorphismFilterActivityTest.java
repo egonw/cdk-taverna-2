@@ -81,13 +81,8 @@ public class SubgraphIsomorphismFilterActivityTest extends CDKTavernaTestCases {
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[1], byte[].class);
-		expectedOutputTypes.put(activity.getCOMMENT_PORT(), String.class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs", 3, outputs.size());
-		List<String> comment = (List<String>) outputs.get(activity.getCOMMENT_PORT());
-		for (String c : comment) {
-			Assert.assertTrue(!c.toLowerCase().contains("error"));
-		}
+		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
 		List<CMLChemFile> calcStructures = CDKObjectHandler
 				.getChemFileList((List<byte[]>) outputs.get(activity.getRESULT_PORTS()[0]));
 		List<CMLChemFile> notCalcStructures = CDKObjectHandler.getChemFileList((List<byte[]>) outputs.get(activity

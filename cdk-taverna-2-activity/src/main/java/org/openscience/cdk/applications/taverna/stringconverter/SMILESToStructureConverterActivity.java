@@ -107,7 +107,6 @@ public class SMILESToStructureConverterActivity extends AbstractCDKActivity impl
 						som2D.addMolecule(str.getMolecule());
 					} catch (Exception e) {
 						ErrorLogger.getInstance().writeError("Error generating 2D Coordinate!", this.getActivityName(), e);
-						comment.add("Error generating 2D Coordinate!");
 					}
 				}
 				for (int i = 0; i < som2D.getMoleculeCount(); i++) {
@@ -122,7 +121,6 @@ public class SMILESToStructureConverterActivity extends AbstractCDKActivity impl
 			} catch (Exception e) {
 				notConverted.add(cml);
 				ErrorLogger.getInstance().writeError("Error converting SMILES!", this.getActivityName(), e);
-				comment.add("Error converting SMILES!");
 			}
 		}
 		if (dataList.isEmpty()) {
@@ -132,7 +130,6 @@ public class SMILESToStructureConverterActivity extends AbstractCDKActivity impl
 		outputs.put(this.RESULT_PORTS[0], containerRef);
 		containerRef = referenceService.register(notConverted, 1, true, context);
 		outputs.put(this.RESULT_PORTS[1], containerRef);
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

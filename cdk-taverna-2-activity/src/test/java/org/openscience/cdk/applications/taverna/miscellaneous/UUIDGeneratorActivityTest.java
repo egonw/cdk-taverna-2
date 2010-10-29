@@ -63,15 +63,10 @@ public class UUIDGeneratorActivityTest extends CDKTavernaTestCases {
 		Map<String, Object> inputs = new HashMap<String, Object>();
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], String.class);
-		expectedOutputTypes.put(activity.getCOMMENT_PORT(), String.class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
+		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
 		String uuidString = (String) outputs.get(activity.getRESULT_PORTS()[0]);
 		UUID.fromString(uuidString);
-		List<String> comment = (List<String>) outputs.get(activity.getCOMMENT_PORT());
-		for (String c : comment) {
-			Assert.assertTrue(!c.toLowerCase().contains("error"));
-		}
 	}
 
 	public void executeTest() {

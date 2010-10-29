@@ -96,13 +96,10 @@ public class CMLFileReaderActivity extends AbstractCDKActivity implements IFileR
 				}
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError("Error reading CML file: " + file.getPath(), this.getActivityName(), e);
-				comment.add("Error reading CML file: " + file.getPath());
 			}
 		}
 		T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);
-
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

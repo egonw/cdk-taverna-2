@@ -71,16 +71,11 @@ public class CMLStringToStructureConverterActivityTest extends CDKTavernaTestCas
 		inputs.put(activity.getINPUT_PORTS()[0], strings);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(activity.getCOMMENT_PORT(), String.class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
+		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
 		List<byte[]> structuresData = (List<byte[]>) outputs.get(activity.getRESULT_PORTS()[0]);
 		List<CMLChemFile> structures = CDKObjectHandler.getChemFileList(structuresData);
 		Assert.assertEquals(10, structures.size());
-		List<String> comment = (List<String>) outputs.get(activity.getCOMMENT_PORT());
-		for (String c : comment) {
-			Assert.assertTrue(!c.toLowerCase().contains("error"));
-		}
 	}
 
 	public void executeTest() {

@@ -19,8 +19,8 @@ import org.openscience.cdk.applications.taverna.ui.curation.AtomSignatureConfigu
 import org.openscience.cdk.applications.taverna.ui.curation.CuratorConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.io.FileReaderConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.io.FileWriterConfigurationPanel;
-import org.openscience.cdk.applications.taverna.ui.io.IterativeFileWriterConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.io.IterativeFileReaderConfigurationPanel;
+import org.openscience.cdk.applications.taverna.ui.io.IterativeFileWriterConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.jchempaint.JChemPaintConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.miscellaneous.PortNumberConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.qsar.QSARDescriptorConfigurationPanel;
@@ -34,7 +34,7 @@ public class CDKConfigurationPanelFactory {
 			return new FileReaderConfigurationPanel(activity);
 		} else if (activity instanceof IFileWriter) {
 			return new FileWriterConfigurationPanel(activity);
-		}  else if (activity instanceof IIterativeFileWriter) {
+		} else if (activity instanceof IIterativeFileWriter) {
 			return new IterativeFileWriterConfigurationPanel(activity);
 		} else if (activity instanceof IIterativeFileReader) {
 			return new IterativeFileReaderConfigurationPanel(activity);

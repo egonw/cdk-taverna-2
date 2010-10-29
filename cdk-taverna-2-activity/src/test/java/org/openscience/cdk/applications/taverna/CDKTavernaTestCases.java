@@ -25,8 +25,10 @@
  */
 package org.openscience.cdk.applications.taverna;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.tools.LoggingTool;
 
@@ -56,7 +58,9 @@ public abstract class CDKTavernaTestCases extends TestCase {
 	 * @throws Exception
 	 */
 	public void test_TestCase() throws CDKException, Exception {
+		ErrorLogger.getInstance().setErrorOccured(false);
 		executeTest();
+		Assert.assertFalse(ErrorLogger.getInstance().isErrorOccured());
 	}
 
 	protected abstract void executeTest();

@@ -32,7 +32,7 @@ import org.openscience.cdk.io.MDLWriter;
 
 /**
  * @author Egon Willighagen
- *
+ * 
  */
 public class CDKIOWriter {
 

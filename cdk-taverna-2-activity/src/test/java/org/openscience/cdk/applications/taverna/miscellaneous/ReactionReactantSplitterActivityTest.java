@@ -72,19 +72,14 @@ public class ReactionReactantSplitterActivityTest extends CDKTavernaTestCases {
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[1], byte[].class);
-		expectedOutputTypes.put(activity.getCOMMENT_PORT(), String.class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs", 3, outputs.size());
+		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
 		byte[] objectData = (byte[]) outputs.get(activity.getRESULT_PORTS()[0]);
 		CMLChemFile chemFile = (CMLChemFile) CDKObjectHandler.getObject(objectData);
 		assertEquals(1, ChemFileManipulator.getAllAtomContainers(chemFile).size());
 		objectData = (byte[]) outputs.get(activity.getRESULT_PORTS()[1]);
 		chemFile = (CMLChemFile) CDKObjectHandler.getObject(objectData);
 		assertEquals(1, ChemFileManipulator.getAllAtomContainers(chemFile).size());
-		List<String> comment = (List<String>) outputs.get(activity.getCOMMENT_PORT());
-		for (String c : comment) {
-			Assert.assertTrue(!c.toLowerCase().contains("error"));
-		}
 	}
 
 	public void cleanUp() {

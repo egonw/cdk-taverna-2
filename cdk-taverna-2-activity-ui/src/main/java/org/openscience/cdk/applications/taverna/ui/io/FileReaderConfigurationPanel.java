@@ -51,8 +51,7 @@ import org.openscience.cdk.applications.taverna.basicutilities.CDKFileFilter;
  * @author Andreas Truszkowski
  * 
  */
-public class FileReaderConfigurationPanel extends
-		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
+public class FileReaderConfigurationPanel extends ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
 
 	private static final long serialVersionUID = 8171127307831390262L;
 

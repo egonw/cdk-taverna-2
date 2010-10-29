@@ -65,8 +65,8 @@ public class CurateStrangeElementsActivity extends AbstractCDKActivity {
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]),
-				byte[].class, context);
+		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
+				context);
 		List<CMLChemFile> chemFileList = null;
 		ArrayList<CMLChemFile> curated = new ArrayList<CMLChemFile>();
 		ArrayList<CMLChemFile> discarded = new ArrayList<CMLChemFile>();
@@ -89,8 +89,6 @@ public class CurateStrangeElementsActivity extends AbstractCDKActivity {
 				}
 			}
 		}
-		comment.add("done");
-
 		try {
 			List<byte[]> curatedList = CDKObjectHandler.getBytesList(curated);
 			T2Reference containerRef = referenceService.register(curatedList, 1, true, context);

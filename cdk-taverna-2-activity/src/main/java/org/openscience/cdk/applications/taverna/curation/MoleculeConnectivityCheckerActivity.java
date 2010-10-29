@@ -67,8 +67,8 @@ public class MoleculeConnectivityCheckerActivity extends AbstractCDKActivity {
 		IMolecule nonPartitionedMolecule = null;
 		IMoleculeSet molSet = null;
 
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]),
-				byte[].class, context);
+		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
+				context);
 		List<CMLChemFile> chemFileList = null;
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
@@ -83,9 +83,11 @@ public class MoleculeConnectivityCheckerActivity extends AbstractCDKActivity {
 			for (IAtomContainer atomContainer : moleculeList) {
 
 				nonPartitionedMolecule = (IMolecule) atomContainer;
+				// TODO Copy all properties?
+				Map<Object, Object> properties = nonPartitionedMolecule.getProperties();
 				molSet = ConnectivityChecker.partitionIntoMolecules(nonPartitionedMolecule);
 				for (IAtomContainer molecule : molSet.molecules()) {
-
+					molecule.setProperties(properties);
 					if (molecule.getAtomCount() > cutoffvalue) {
 						accepted.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(molecule));
 
@@ -118,7 +120,6 @@ public class MoleculeConnectivityCheckerActivity extends AbstractCDKActivity {
 			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), ex);
 			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

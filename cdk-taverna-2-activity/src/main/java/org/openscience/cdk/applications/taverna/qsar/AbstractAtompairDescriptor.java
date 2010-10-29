@@ -145,7 +145,6 @@ public abstract class AbstractAtompairDescriptor extends AbstractCDKActivity {
 				}
 			}
 		}
-		comment.add("Calculation done;");
 		// Congfigure output
 		try {
 			dataArray = new ArrayList<byte[]>();

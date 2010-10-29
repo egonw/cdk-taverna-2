@@ -76,13 +76,12 @@ public class LoopSDFileReaderActivityTest extends CDKTavernaTestCases {
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[1], String.class);
-		expectedOutputTypes.put(activity.getCOMMENT_PORT(), String.class);
 		ArrayList<IAtomContainer> container = new ArrayList<IAtomContainer>();
 		String state = "";
 		int loops = 0;
 		do {
 			Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
-			Assert.assertEquals("Unexpected outputs", 3, outputs.size());
+			Assert.assertEquals("Unexpected outputs", 2, outputs.size());
 			List<byte[]> objectData = (List<byte[]>) outputs.get(activity.getRESULT_PORTS()[0]);
 			for (byte[] data : objectData) {
 				ChemFile chemFile = (ChemFile) CDKObjectHandler.getObject(data);
@@ -90,10 +89,6 @@ public class LoopSDFileReaderActivityTest extends CDKTavernaTestCases {
 				container.add(cont);
 			}
 			state = (String) outputs.get(activity.getRESULT_PORTS()[1]);
-			List<String> comment = (List<String>) outputs.get(activity.getCOMMENT_PORT());
-			for (String c : comment) {
-				Assert.assertTrue(!c.toLowerCase().contains("error"));
-			}
 			loops++;
 		} while (!state.equals(LoopSDFileReaderActivity.FINISHED));
 		Assert.assertEquals(3, container.size());

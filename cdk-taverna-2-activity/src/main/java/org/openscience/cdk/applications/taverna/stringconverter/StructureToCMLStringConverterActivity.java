@@ -94,7 +94,6 @@ public class StructureToCMLStringConverterActivity extends AbstractCDKActivity i
 			} catch (Exception e) {
 				notConverted.add(cml);
 				ErrorLogger.getInstance().writeError("Error converting CML String!", this.getActivityName(), e);
-				comment.add("Error converting CML string!");
 			}
 		}
 		if (cmlStringList.isEmpty()) {
@@ -104,7 +103,6 @@ public class StructureToCMLStringConverterActivity extends AbstractCDKActivity i
 		outputs.put(this.RESULT_PORTS[0], containerRef);
 		containerRef = referenceService.register(notConverted, 1, true, context);
 		outputs.put(this.RESULT_PORTS[1], containerRef);
-		comment.add("done");
 		// Return results
 		return outputs;
 	}

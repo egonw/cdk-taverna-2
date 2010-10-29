@@ -39,8 +39,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
  * @author Andreas Truszkowski
  * 
  */
-public class PortNumberConfigurationPanel extends
-		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
+public class PortNumberConfigurationPanel extends ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
 
 	private static final long serialVersionUID = -3256167899077394762L;
 

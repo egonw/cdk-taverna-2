@@ -55,8 +55,7 @@ public class CDKServiceProvider implements ServiceDescriptionProvider {
 	}
 
 	/**
-	 * Name of service provider, appears in right click for 'Remove service
-	 * provider'
+	 * Name of service provider, appears in right click for 'Remove service provider'
 	 */
 	public String getName() {
 		return "CDK Taverna 2";

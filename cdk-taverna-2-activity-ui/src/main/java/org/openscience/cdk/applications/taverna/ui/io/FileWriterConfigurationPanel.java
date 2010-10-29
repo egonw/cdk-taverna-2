@@ -31,7 +31,6 @@ import java.net.URL;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -44,7 +43,6 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.Preferences;
-import org.openscience.cdk.applications.taverna.io.MDLMolFileWriterActivity;
 
 /**
  * Configuration panel for file writing activities.
@@ -52,8 +50,7 @@ import org.openscience.cdk.applications.taverna.io.MDLMolFileWriterActivity;
  * @author Andreas Truszkowski
  * 
  */
-public class FileWriterConfigurationPanel extends
-		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
+public class FileWriterConfigurationPanel extends ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
 
 	private static final long serialVersionUID = -1161055144757128604L;
 
@@ -104,7 +101,7 @@ public class FileWriterConfigurationPanel extends
 			fileChooserButton.setPreferredSize(new Dimension(25, 25));
 			fileChooserButton.setIcon(icon);
 			filePanel.add(fileChooserButton);
-			this.add(filePanel); 
+			this.add(filePanel);
 			this.refreshConfiguration();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -122,8 +119,7 @@ public class FileWriterConfigurationPanel extends
 		if (this.file != null && this.file.exists()) {
 			return true;
 		}
-		JOptionPane.showMessageDialog(this, "Chosen directory is not valid!", "Invalid directory",
-				JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(this, "Chosen directory is not valid!", "Invalid directory", JOptionPane.ERROR_MESSAGE);
 		// Not valid, return false
 		return false;
 	}
