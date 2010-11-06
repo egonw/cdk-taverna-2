@@ -39,7 +39,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
@@ -50,7 +49,7 @@ import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
  * @author Thomas Kuhn, Andreas Truszkowski
  * 
  */
-public class CSVGeneratorActivity extends AbstractCDKActivity implements IFileWriter {
+public class CSVGeneratorActivity extends AbstractCDKActivity {
 
 	public static final String CSV_GENERATOR_ACTIVITY = "CSV Generator";
 
@@ -156,7 +155,7 @@ public class CSVGeneratorActivity extends AbstractCDKActivity implements IFileWr
 		String quotationMark = "\"";
 		Map<String, Object> descriptorValueMap;
 		buffer = new StringBuffer();
-		buffer.append("ID;");
+		buffer.append("\"ID\";");
 		for (String descriptorToken : descriptorNames) {
 			buffer.append(quotationMark);
 			buffer.append(descriptorToken);

@@ -13,6 +13,7 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 
 public class QSARDescriptorActivity extends AbstractCDKActivity {
 
@@ -61,51 +62,49 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback) throws Exception {
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
-		Map<String, T2Reference> outputs = null;
 		ArrayList<Class<? extends AbstractCDKActivity>> classes = (ArrayList<Class<? extends AbstractCDKActivity>>) this
 				.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_CHOSEN_QSARDESCRIPTORS);
 		if (classes == null || classes.isEmpty()) {
 			throw new CDKTavernaException(this.getActivityName(), "No QSAR descriptors chosen!");
 		}
+		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.getINPUT_PORTS()[0]),
+				byte[].class, context);
 		for (Class<? extends AbstractCDKActivity> clazz : classes) {
 			AbstractCDKActivity descriptor = null;
 			try {
 				descriptor = clazz.newInstance();
-			} catch (InstantiationException e) {
-				// TODO
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			if (clazz != null) {
-				if (outputs == null) {
-					List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs
-							.get(this.getINPUT_PORTS()[0]), byte[].class, context);
-					T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
-					outputs = new HashMap<String, T2Reference>();
-					outputs.put(descriptor.getINPUT_PORTS()[0], containerRef);
-				} else {
-					List<byte[]> dataArray = new ArrayList<byte[]>();
-					try {
-						dataArray.addAll((List<byte[]>) referenceService.renderIdentifier(outputs.get(descriptor
-								.getRESULT_PORTS()[0]), byte[].class, context));
-					} catch (NullPointerException e) {
-						// TODO
-					}
-					try {
-						dataArray.addAll((List<byte[]>) referenceService.renderIdentifier(outputs.get(descriptor
-								.getRESULT_PORTS()[1]), byte[].class, context));
-
-					} catch (NullPointerException e) {
-						// TODO
-					}
-					outputs = new HashMap<String, T2Reference>();
-					T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
-					outputs.put(descriptor.getINPUT_PORTS()[0], containerRef);
+				T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
+				inputs = new HashMap<String, T2Reference>();
+				inputs.put(descriptor.getINPUT_PORTS()[0], containerRef);
+				Map<String, T2Reference> outputs = descriptor.work(inputs, callback);
+				dataArray.clear();
+				try {
+					dataArray.addAll((List<byte[]>) referenceService.renderIdentifier(outputs
+							.get(descriptor.getRESULT_PORTS()[0]), byte[].class, context));
+				} catch (NullPointerException e) {
+					// TODO
 				}
-				outputs = descriptor.work(outputs, callback);
+				try {
+					dataArray.addAll((List<byte[]>) referenceService.renderIdentifier(outputs
+							.get(descriptor.getRESULT_PORTS()[1]), byte[].class, context));
+
+				} catch (NullPointerException e) {
+					// TODO
+				}
 			}
+		}
+		// Congfigure output
+		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
+		try {
+			T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
+			outputs.put(this.RESULT_PORTS[0], containerRef);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
 		return outputs;
 	}

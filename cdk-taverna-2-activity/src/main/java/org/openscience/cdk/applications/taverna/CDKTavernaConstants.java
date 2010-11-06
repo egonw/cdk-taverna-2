@@ -41,6 +41,7 @@ public class CDKTavernaConstants {
 	public static final String STRING_CONVERTER_FOLDER_NAME = "String Converter";
 	public static final String FILTER_FOLDER_NAME = "Filter";
 	public static final String CURATION_FOLDER_NAME = "Molecule Curation";
+	public static final String DATABASE_FOLDER_NAME = "Database";
 	// --------------------Properties-------------------------------------
 	public static final String PROPERTY_FILE = "FILE";
 	public static final String PROPERTY_FILE_EXTENSION = "FILE EXTENSION";

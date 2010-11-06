@@ -112,7 +112,7 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity implement
 					callback.receiveResult(outputs, new int[] { index });
 					index++;
 					counter = 0;
-					dataList = new ArrayList<byte[]>();
+					dataList.clear();
 				}
 			} while (line != null);
 			T2Reference containerRef = referenceService.register(outputList, 1, true, context);

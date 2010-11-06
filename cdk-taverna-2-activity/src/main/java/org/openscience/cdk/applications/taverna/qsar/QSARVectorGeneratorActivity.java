@@ -59,7 +59,7 @@ import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
  * @author Thomas Kuhn, Andreas Truszkowski
  * 
  */
-public class QSARVectorGeneratorActivity extends AbstractCDKActivity implements IFileWriter {
+public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 
 	public static final String QSAR_VECTOR_GENERATOR_ACTIVITY = "QSAR Vector Generator";
 
