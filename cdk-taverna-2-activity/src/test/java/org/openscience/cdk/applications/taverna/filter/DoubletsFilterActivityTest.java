@@ -65,9 +65,9 @@ public class DoubletsFilterActivityTest extends CDKTavernaTestCases {
 		Map<String, Object> inputs = new HashMap<String, Object>();
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
-		CMLChemFile[] doublets = new CMLChemFile[3]; 
-		for(int i = 0; i < doublets.length; i++) {
-			doublets[i] = (CMLChemFile)CDKTavernaTestData.getCMLChemFile()[0].clone();
+		CMLChemFile[] doublets = new CMLChemFile[3];
+		for (int i = 0; i < doublets.length; i++) {
+			doublets[i] = (CMLChemFile) CDKTavernaTestData.getCMLChemFile()[0].clone();
 		}
 		inputs.put(activity.getINPUT_PORTS()[0], CDKObjectHandler.getBytesList(doublets));
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);

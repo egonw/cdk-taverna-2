@@ -23,7 +23,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna.qsar.descriptors.molecular;
+package org.openscience.cdk.applications.taverna.filter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,15 +40,19 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.qsar.DescriptorValue;
 import org.openscience.cdk.qsar.descriptors.molecular.RuleOfFiveDescriptor;
-import org.openscience.cdk.qsar.result.IDescriptorResult;
 import org.openscience.cdk.qsar.result.IntegerResult;
+import org.openscience.cdk.reaction.enumerator.tools.ErrorLogger;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 public class RuleOfFiveFilter extends AbstractCDKActivity {
 
 	private static RuleOfFiveDescriptor descriptor;
+
+	public static final String RULE_OF_FIVE_FILTER_ACTIVITY = "Rule Of Five Filter";
 
 	public RuleOfFiveFilter() {
 		this.INPUT_PORTS = new String[] { "Structures" };
@@ -69,12 +73,12 @@ public class RuleOfFiveFilter extends AbstractCDKActivity {
 
 	@Override
 	public String getActivityName() {
-		return this.getClass().getSimpleName();
+		return RuleOfFiveFilter.RULE_OF_FIVE_FILTER_ACTIVITY;
 	}
 
 	@Override
 	public String getDescription() {
-		return "Descriptions: " + this.getClass().getSimpleName();
+		return "Descriptions: " + RuleOfFiveFilter.RULE_OF_FIVE_FILTER_ACTIVITY;
 	}
 
 	@Override
@@ -84,7 +88,7 @@ public class RuleOfFiveFilter extends AbstractCDKActivity {
 
 	@Override
 	public String getFolderName() {
-		return CDKTavernaConstants.QSAR_ATOMIC_DESCRIPTOR_FOLDER_NAME;
+		return CDKTavernaConstants.FILTER_FOLDER_NAME;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -118,44 +122,21 @@ public class RuleOfFiveFilter extends AbstractCDKActivity {
 		try {
 			for (CMLChemFile file : inputList) {
 				List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(file);
-				for (IAtomContainer molecules : moleculeList) {
+				for (IAtomContainer molecule : moleculeList) {
 					try {
-						IDescriptorResult result = descriptor.calculate(molecules).getValue();
-						if (result instanceof IntegerResult && ((IntegerResult) result).intValue() == 0) {
-							// file.setProperty(FileNameGenerator.FILENAME,
-							// fileNameGenerator.addFileNameToFileNameList(fileNameCalculated,
-							// (List<String>)file.getProperty(FileNameGenerator.FILENAME)));
-							matchedList.add(file);
-							// comment.add("Matched Rule of Five;");
-							break;
+						DescriptorValue value = descriptor.calculate(molecule);
+						molecule.setProperty(value.getSpecification(), value);
+						if (value.getValue() instanceof IntegerResult && ((IntegerResult) value.getValue()).intValue() == 0) {
+							matchedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(molecule));
 						} else {
-							// file.setProperty(FileNameGenerator.FILENAME,
-							// fileNameGenerator.addFileNameToFileNameList(fileNameNotCalculated,
-							// (List<String>)file.getProperty(FileNameGenerator.FILENAME)));
-							unmatchedList.add(file);
-							// if(result instanceof IntegerResult) {
-							// comment.add("NOT Matched Rule of Five within: " + String.valueOf(((IntegerResult)
-							// result).intValue()) + " rules");
-							// } else {
-							// comment.add("NOT Matched Rule of Five!");
-							// }
-							break;
+							unmatchedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(molecule));
 						}
 					} catch (Exception e) {
-						// file.setProperty(FileNameGenerator.FILENAME,
-						// fileNameGenerator.addFileNameToFileNameList(fileNameNotCalculated,
-						// (List<String>)file.getProperty(FileNameGenerator.FILENAME)));
-						unmatchedList.add(file);
-						// String molID = "";
-						// if (file.getProperty(CDKTavernaConfig.DATABASEID) != null) {
-						// molID += file.getProperty(CDKTavernaConfig.DATABASEID).toString() + " ;";
-						// }
-						// if (file.getProperty(CDKTavernaConfig.MOLECULEID) != null) {
-						// molID += file.getProperty(CDKTavernaConfig.MOLECULEID) + " ;";
-						// }
-						// comment.add(molID + "Error, calculation of the Descriptor for this molecule caused an error!" + e);
+						unmatchedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(molecule));
+						ErrorLogger.getInstance().writeError(
+								"Error, calculation of the Descriptor for this molecule caused an error!",
+								this.getActivityName(), e);
 					}
-
 				}
 			}
 		} catch (Exception exception) {
@@ -163,25 +144,15 @@ public class RuleOfFiveFilter extends AbstractCDKActivity {
 		}
 		// Congfigure output
 		try {
-			dataArray = new ArrayList<byte[]>();
-			if (!matchedList.isEmpty()) {
-				for (CMLChemFile c : matchedList) {
-					dataArray.add(CDKObjectHandler.getBytes(c));
-				}
-			}
+			dataArray = CDKObjectHandler.getBytesList(matchedList);
 			T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
-			dataArray = new ArrayList<byte[]>();
-			if (!unmatchedList.isEmpty()) {
-				for (CMLChemFile c : unmatchedList) {
-					dataArray.add(CDKObjectHandler.getBytes(c));
-				}
-			}
+			dataArray = CDKObjectHandler.getBytesList(unmatchedList);
 			containerRef = referenceService.register(dataArray, 1, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			e.printStackTrace();
-			// TODO exception handling
+			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
 		return outputs;
 	}

@@ -24,6 +24,7 @@ org.openscience.cdk.applications.taverna.miscellaneous.ReactionSplitterActivity
 org.openscience.cdk.applications.taverna.miscellaneous.UUIDGeneratorActivity
 org.openscience.cdk.applications.taverna.filter.AtomTypeFilterActivity
 org.openscience.cdk.applications.taverna.filter.DoubletsFilterActivity
+org.openscience.cdk.applications.taverna.filter.RuleOfFiveFilter
 org.openscience.cdk.applications.taverna.qsar.descriptors.atomic.AtomDegree
 org.openscience.cdk.applications.taverna.qsar.descriptors.atomic.AtomHybridization
 org.openscience.cdk.applications.taverna.qsar.descriptors.atomic.AtomHybridizationVSEPR
@@ -91,7 +92,7 @@ org.openscience.cdk.applications.taverna.qsar.descriptors.molecular.MomentOfIner
 org.openscience.cdk.applications.taverna.qsar.descriptors.molecular.PetitjeanNumber
 org.openscience.cdk.applications.taverna.qsar.descriptors.molecular.PetitjeanShapeIndex
 org.openscience.cdk.applications.taverna.qsar.descriptors.molecular.RotatableBondsCount
-org.openscience.cdk.applications.taverna.qsar.descriptors.molecular.RuleOfFiveFilter
+org.openscience.cdk.applications.taverna.qsar.descriptors.molecular.RuleOfFive
 org.openscience.cdk.applications.taverna.qsar.descriptors.molecular.TPSA
 org.openscience.cdk.applications.taverna.qsar.descriptors.molecular.VAdjMa
 org.openscience.cdk.applications.taverna.qsar.descriptors.molecular.Weight

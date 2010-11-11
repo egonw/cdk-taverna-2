@@ -84,7 +84,7 @@ public class StructureToMDLSDFileStringConverterActivityTest extends CDKTavernaT
 			assertEquals(false, true);
 		}
 	}
-	
+
 	/**
 	 * Method which returns a test suit with the name of this class
 	 * 

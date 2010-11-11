@@ -70,8 +70,8 @@ public class ReactionEnumeratorSubgraphFilterActivityTest extends CDKTavernaTest
 				+ File.separator + "reSubgraph" + File.separator + "educts001.sdf";
 		CMLChemFile[] structures = CDKIOReader.readFromSDV2000File(testFile);
 		inputs.put(activity.getINPUT_PORTS()[0], CDKObjectHandler.getBytesList(structures));
-		testFile = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
-		+ File.separator + "reSubgraph" + File.separator + "reaction.rxn";
+		testFile = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data" + File.separator
+				+ "reSubgraph" + File.separator + "reaction.rxn";
 		Reaction reaction = CDKIOReader.readRXNV2000File(testFile);
 		CMLChemFile substructure = CMLChemFileWrapper.wrapAtomContainerInChemModel(reaction.getReactants().getAtomContainer(0));
 		inputs.put(activity.getINPUT_PORTS()[1], CDKObjectHandler.getBytes(substructure));
@@ -79,9 +79,9 @@ public class ReactionEnumeratorSubgraphFilterActivityTest extends CDKTavernaTest
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[1], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs",2, outputs.size());
-		List<CMLChemFile> calcStructures = CDKObjectHandler
-				.getChemFileList((List<byte[]>) outputs.get(activity.getRESULT_PORTS()[0]));
+		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
+		List<CMLChemFile> calcStructures = CDKObjectHandler.getChemFileList((List<byte[]>) outputs
+				.get(activity.getRESULT_PORTS()[0]));
 		List<CMLChemFile> notCalcStructures = CDKObjectHandler.getChemFileList((List<byte[]>) outputs.get(activity
 				.getRESULT_PORTS()[1]));
 		Assert.assertEquals(3, calcStructures.size());
@@ -102,7 +102,7 @@ public class ReactionEnumeratorSubgraphFilterActivityTest extends CDKTavernaTest
 			assertEquals(false, true);
 		}
 	}
-	
+
 	/**
 	 * Method which returns a test suit with the name of this class
 	 * 

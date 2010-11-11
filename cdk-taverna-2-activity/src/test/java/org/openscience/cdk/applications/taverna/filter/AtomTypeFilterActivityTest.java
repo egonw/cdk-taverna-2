@@ -91,7 +91,7 @@ public class AtomTypeFilterActivityTest extends CDKTavernaTestCases {
 			assertEquals(false, true);
 		}
 	}
-	
+
 	/**
 	 * Method which returns a test suit with the name of this class
 	 * 
@@ -100,6 +100,5 @@ public class AtomTypeFilterActivityTest extends CDKTavernaTestCases {
 	public static Test suite() {
 		return new TestSuite(AtomTypeFilterActivityTest.class);
 	}
-
 
 }

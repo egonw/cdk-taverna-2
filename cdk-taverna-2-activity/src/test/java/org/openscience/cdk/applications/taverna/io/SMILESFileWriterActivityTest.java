@@ -68,7 +68,6 @@ public class SMILESFileWriterActivityTest extends CDKTavernaTestCases {
 		configBean.setActivityName(SMILESFileWriterActivity.SMILES_FILE_WRITER_ACTIVITY);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
 		Map<String, Object> inputs = new HashMap<String, Object>();
@@ -101,7 +100,7 @@ public class SMILESFileWriterActivityTest extends CDKTavernaTestCases {
 			assertEquals(false, true);
 		}
 	}
-	
+
 	/**
 	 * Method which returns a test suit with the name of this class
 	 * 

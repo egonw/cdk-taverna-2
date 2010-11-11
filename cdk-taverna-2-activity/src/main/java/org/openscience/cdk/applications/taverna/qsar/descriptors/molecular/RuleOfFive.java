@@ -5,7 +5,7 @@ package org.openscience.cdk.applications.taverna.qsar.descriptors.molecular;
  * $Date: 2008-05-05 12:58:11 +0200 (Mo, 05 Mai 2008) $
  * $Revision: 10819 $
  * 
- * Copyright (C) 2010 by Andreas Truszkowski <ATruszkowski@gmx.de>
+ * Copyright (C) 2006 by Mario Baseda <mariobaseda@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -26,33 +26,25 @@ package org.openscience.cdk.applications.taverna.qsar.descriptors.molecular;
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-import org.openscience.cdk.applications.taverna.qsar.AbstractDescriptorTestCase;
+import org.openscience.cdk.applications.taverna.qsar.AbstractMolecularDescriptor;
+import org.openscience.cdk.qsar.IMolecularDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.RuleOfFiveDescriptor;
 
 /**
- * Class with contains JUnit-Tests for the CDK-Taverna Project
+ * Class which provides the implementation for a cdk-taverna molecular qsar descriptor.
  * 
- * @author Andreas Truszkowski
+ * @author Thomas Kuhn
  * 
  */
-public class RuleOfFiveTest extends AbstractDescriptorTestCase {
+public class RuleOfFive extends AbstractMolecularDescriptor {
 
-	/**
-	 * Constructor which instantiate the testing processor
-	 */
-	public RuleOfFiveTest() {
-		super(RuleOfFive.class);
-	}
-
-	/**
-	 * Method which returns a test suit with the name of this class
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @return TestSuite
+	 * @see org.openscience.cdk.applications.taverna.qsar.descriptors.bond.AbstractBondDescriptor#getDescriptor()
 	 */
-	public static Test suite() {
-		return new TestSuite(RuleOfFiveTest.class);
+	protected IMolecularDescriptor getDescriptor() {
+		return new RuleOfFiveDescriptor();
 	}
 
 }

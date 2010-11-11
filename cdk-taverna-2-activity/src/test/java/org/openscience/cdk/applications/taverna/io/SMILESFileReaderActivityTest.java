@@ -94,7 +94,7 @@ public class SMILESFileReaderActivityTest extends CDKTavernaTestCases {
 			assertEquals(false, true);
 		}
 	}
-	
+
 	/**
 	 * Method which returns a test suit with the name of this class
 	 * 

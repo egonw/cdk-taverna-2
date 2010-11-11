@@ -95,7 +95,7 @@ public class MDLRXNStringToReactionConverterActivityTest extends CDKTavernaTestC
 			assertEquals(false, true);
 		}
 	}
-	
+
 	/**
 	 * Method which returns a test suit with the name of this class
 	 * 

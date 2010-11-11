@@ -22,7 +22,6 @@
 package org.openscience.cdk.applications.taverna.miscellaneous;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -56,7 +55,6 @@ public class UUIDGeneratorActivityTest extends CDKTavernaTestCases {
 		configBean.setActivityName(UUIDGeneratorActivity.UUID_GENERATOR_ACTIVITY);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
 		// leave empty. No ports used
@@ -79,7 +77,7 @@ public class UUIDGeneratorActivityTest extends CDKTavernaTestCases {
 			assertEquals(false, true);
 		}
 	}
-	
+
 	/**
 	 * Method which returns a test suit with the name of this class
 	 * 

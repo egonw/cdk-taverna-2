@@ -68,7 +68,6 @@ public class MDLMolFileWriterActivityTest extends CDKTavernaTestCases {
 		configBean.setActivityName(MDLMolFileReaderActivity.MOL_FILE_READER_ACTIVITY);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
 		Map<String, Object> inputs = new HashMap<String, Object>();
@@ -79,7 +78,7 @@ public class MDLMolFileWriterActivityTest extends CDKTavernaTestCases {
 		}
 		inputs.put(activity.getINPUT_PORTS()[0], data);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-			Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
+		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 0, outputs.size());
 	}
 
@@ -110,5 +109,5 @@ public class MDLMolFileWriterActivityTest extends CDKTavernaTestCases {
 	public static Test suite() {
 		return new TestSuite(MDLMolFileReaderActivityTest.class);
 	}
-	
+
 }

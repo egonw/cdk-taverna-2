@@ -62,7 +62,6 @@ public class ReactionReactantSplitterActivityTest extends CDKTavernaTestCases {
 		configBean.setActivityName(ReactionReactantSplitterActivity.REACTION_REACTANT_SPLITTER_ACTIVITY);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
 		Map<String, Object> inputs = new HashMap<String, Object>();
@@ -96,7 +95,7 @@ public class ReactionReactantSplitterActivityTest extends CDKTavernaTestCases {
 			assertEquals(false, true);
 		}
 	}
-	
+
 	/**
 	 * Method which returns a test suit with the name of this class
 	 * 

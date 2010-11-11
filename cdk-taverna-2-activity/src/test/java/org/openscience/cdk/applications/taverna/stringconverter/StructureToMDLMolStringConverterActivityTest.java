@@ -84,7 +84,7 @@ public class StructureToMDLMolStringConverterActivityTest extends CDKTavernaTest
 			assertEquals(false, true);
 		}
 	}
-	
+
 	/**
 	 * Method which returns a test suit with the name of this class
 	 * 

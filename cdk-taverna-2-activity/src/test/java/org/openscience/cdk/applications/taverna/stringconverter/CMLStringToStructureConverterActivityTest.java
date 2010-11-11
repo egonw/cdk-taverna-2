@@ -89,7 +89,7 @@ public class CMLStringToStructureConverterActivityTest extends CDKTavernaTestCas
 			assertEquals(false, true);
 		}
 	}
-	
+
 	/**
 	 * Method which returns a test suit with the name of this class
 	 * 

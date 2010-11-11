@@ -88,7 +88,7 @@ public class MDLMultiRXNFileReaderActivityTest extends CDKTavernaTestCases {
 			assertEquals(false, true);
 		}
 	}
-	
+
 	/**
 	 * Method which returns a test suit with the name of this class
 	 * 
