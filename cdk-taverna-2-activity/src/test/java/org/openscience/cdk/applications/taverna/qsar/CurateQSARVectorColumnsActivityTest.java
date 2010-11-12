@@ -60,8 +60,8 @@ public class CurateQSARVectorColumnsActivityTest extends CDKTavernaTestCases {
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
 		// TODO read resource
-		File csvFile = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-				+ "data" + File.separator + "qsar" + File.separator + "qsar.csv");
+		File[] csvFile = new File[] { new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
+				+ "data" + File.separator + "qsar" + File.separator + "qsar.csv") };
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, csvFile); 
 		configBean.setActivityName(CSVToQSARVectorActivity.CSV_TO_QSAR_VECTOR_ACTIVITY);
 	}
