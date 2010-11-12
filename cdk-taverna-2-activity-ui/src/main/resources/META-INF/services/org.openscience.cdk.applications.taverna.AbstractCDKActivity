@@ -10,6 +10,7 @@ org.openscience.cdk.applications.taverna.io.MDLSDFileWriterActivity
 org.openscience.cdk.applications.taverna.io.SMILESFileReaderActivity
 org.openscience.cdk.applications.taverna.io.SMILESFileWriterActivity
 org.openscience.cdk.applications.taverna.io.TextFileWriterActivity
+org.openscience.cdk.applications.taverna.io.CSVFileWriterActivity
 org.openscience.cdk.applications.taverna.isomorphism.IsomorphismTesterActivity
 org.openscience.cdk.applications.taverna.isomorphism.SubgraphIsomorphismFilterActivity
 org.openscience.cdk.applications.taverna.iterativeio.IterativeMultiRXNFileReaderActivity
@@ -105,6 +106,10 @@ org.openscience.cdk.applications.taverna.qsar.descriptors.protein.TaeAminoAcid
 org.openscience.cdk.applications.taverna.qsar.QSARDescriptorActivity
 org.openscience.cdk.applications.taverna.qsar.QSARVectorGeneratorActivity
 org.openscience.cdk.applications.taverna.qsar.CSVGeneratorActivity
+org.openscience.cdk.applications.taverna.qsar.CSVToQSARVectorActivity
+org.openscience.cdk.applications.taverna.qsar.CurateQSARVectorColumnsActivity
+org.openscience.cdk.applications.taverna.qsar.CreateFingerprintItemListFromQSARVectorActivity
+org.openscience.cdk.applications.taverna.classification.art2a.ART2aClassificator
 org.openscience.cdk.applications.taverna.reactionenumerator.ReactionEnumeratorActivity
 org.openscience.cdk.applications.taverna.reactionenumerator.ReactionEnumeratorSubgraphFilterActivity
 org.openscience.cdk.applications.taverna.renderer.WriteMoleculeAsJPGActivity

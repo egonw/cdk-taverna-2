@@ -25,6 +25,8 @@
  */
 package org.openscience.cdk.applications.art2aclassification;
 
+import java.io.Serializable;
+
 /**
  * Fingerprint Item<br>
  * This class is a ported C# struct.
@@ -33,7 +35,9 @@ package org.openscience.cdk.applications.art2aclassification;
  *         porting to Java: Christian Geiger, University of Applied Sciences Gelsenkirchen, 2007
  * @author Thomas Kuhn
  */
-public class FingerprintItem {
+public class FingerprintItem implements Serializable {
+
+	private static final long serialVersionUID = 8313117841278591628L;
 
 	/**
 	 * Fingerprint vector

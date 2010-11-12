@@ -78,7 +78,13 @@ public class FileReaderConfigurationPanel extends ActivityConfigurationPanel<Abs
 			openDialog.addChoosableFileFilter(new CDKFileFilter(description, extension));
 			if (openDialog.showOpenDialog(FileReaderConfigurationPanel.this) == JFileChooser.APPROVE_OPTION) {
 				Preferences.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
-				FileReaderConfigurationPanel.this.files = openDialog.getSelectedFiles();
+				if (FileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
+						CDKTavernaConstants.PROPERTY_SUPPORT_MULTI_FILE) != null) {
+					FileReaderConfigurationPanel.this.files = openDialog.getSelectedFiles();
+				} else {
+					File file = openDialog.getSelectedFile();
+					FileReaderConfigurationPanel.this.files = new File[] { file };
+				}
 				FileReaderConfigurationPanel.this.showValue();
 			}
 		}

@@ -41,20 +41,20 @@ import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator
 import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileWriter;
 
 /**
- * Class which represents the text file writer activity.
+ * Class which represents the CSV file writer activity.
  * 
  * @author Andreas Truzskowski
  * 
  */
-public class TextFileWriterActivity extends AbstractCDKActivity implements IIterativeFileWriter {
+public class CSVFileWriterActivity extends AbstractCDKActivity implements IIterativeFileWriter {
 
-	public static final String TEXT_FILE_WRITER_ACTIVITY = "Text File Writer";
+	public static final String CSV_FILE_WRITER_ACTIVITY = "CSV File Writer";
 	private File file = null;
 
 	/**
 	 * Creates a new instance.
 	 */
-	public TextFileWriterActivity() {
+	public CSVFileWriterActivity() {
 		this.INPUT_PORTS = new String[] { "Strings" };
 	}
 
@@ -105,20 +105,20 @@ public class TextFileWriterActivity extends AbstractCDKActivity implements IIter
 
 	@Override
 	public String getActivityName() {
-		return TextFileWriterActivity.TEXT_FILE_WRITER_ACTIVITY;
+		return CSVFileWriterActivity.CSV_FILE_WRITER_ACTIVITY;
 	}
 
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
 		properties.put(CDKTavernaConstants.PROPERTY_ONE_FILE_PER_ITERATION, true);
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".txt");
+		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".csv");
 		return properties;
 	}
 
 	@Override
 	public String getDescription() {
-		return "Description: " + TextFileWriterActivity.TEXT_FILE_WRITER_ACTIVITY;
+		return "Description: " + CSVFileWriterActivity.CSV_FILE_WRITER_ACTIVITY;
 	}
 
 	@Override

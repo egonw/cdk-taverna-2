@@ -32,29 +32,30 @@ import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
+import org.openscience.cdk.applications.art2aclassification.FingerprintItem;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 
 /**
- * Class which implements a local worker for the cdk-taverna-2 project which provides the possibility to generate a CSV from
- * descriptor values which are calculated and stored within each molecule
+ * Class which represents the SMILES file reader activity.
  * 
- * @author Thomas Kuhn, Andreas Truszkowski
+ * @author Andreas Truzskowski
  * 
  */
-public class CSVGeneratorActivity extends AbstractCDKActivity {
+public class CreateFingerprintItemListFromQSARVectorActivity extends AbstractCDKActivity implements IFileReader {
 
-	public static final String CSV_GENERATOR_ACTIVITY = "CSV Generator";
+	public static final String CREATE_FINGERPRINT_ITEMLIST_FROM_QSAR_VECTOR_ACTIVITY = "Create Fingerprint Item List From QSAR Vector";
 
 	/**
 	 * Creates a new instance.
 	 */
-	public CSVGeneratorActivity() {
+	public CreateFingerprintItemListFromQSARVectorActivity() {
 		this.INPUT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
-		this.RESULT_PORTS = new String[] { "CSV String" };
+		this.RESULT_PORTS = new String[] { "Fingerprint Items" };
 	}
 
 	@Override
@@ -68,8 +69,8 @@ public class CSVGeneratorActivity extends AbstractCDKActivity {
 		addOutput(this.RESULT_PORTS[0], 1);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
+	@SuppressWarnings("unchecked")
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
@@ -91,80 +92,28 @@ public class CSVGeneratorActivity extends AbstractCDKActivity {
 			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
-		List<String> csv = null;
+		List<FingerprintItem> fingerprintList = null;
 		try {
 			QSARVectorUtility vectorUtility = new QSARVectorUtility();
-			List<UUID> uuids = vectorUtility.getUUIDs(vectorMap);
-			csv = this.createCSV(vectorMap, descriptorNames, uuids);
+			fingerprintList = vectorUtility.createFingerprintItemListFRomQSARVector(vectorMap, descriptorNames);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while creating csv!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error while creating fingerprint items!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
-		T2Reference containerRef = referenceService.register(csv, 1, true, context);
-		outputs.put(this.RESULT_PORTS[0], containerRef);
-		// Return results
+		try {
+			List<byte[]> fingerprintData = CDKObjectHandler.getBytesList(fingerprintList);
+			T2Reference containerRef = referenceService.register(fingerprintData, 1, true, context);
+			outputs.put(this.RESULT_PORTS[0], containerRef);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
+		}
 		return outputs;
-
-	}
-
-	/**
-	 * Creates a csv list of strings for a given vector of qsar descriptors
-	 * 
-	 * @param results
-	 *            Vector of qsar descriptor results
-	 * @return List of strings which contains the descriptor values as CSV
-	 */
-	private List<String> createCSV(Map<UUID, Map<String, Object>> results, ArrayList<String> descriptorNames, List<UUID> uuids) {
-		List<String> csv = new ArrayList<String>();
-		StringBuffer buffer;
-		String separator = ";";
-		String quotationMark = "\"";
-		Map<String, Object> descriptorValueMap;
-		buffer = new StringBuffer();
-		buffer.append("\"ID\";");
-		for (String descriptorToken : descriptorNames) {
-			buffer.append(quotationMark);
-			buffer.append(descriptorToken);
-			buffer.append(quotationMark);
-			buffer.append(separator);
-		}
-		csv.add(buffer.toString());
-		for (UUID id : uuids) {
-			buffer = new StringBuffer();
-			descriptorValueMap = results.get(id);
-			if (descriptorValueMap != null) {
-				buffer.append(quotationMark);
-				buffer.append(id.toString());
-				buffer.append(quotationMark);
-				buffer.append(separator);
-				for (String descriptorToken : descriptorNames) {
-					Object obj = descriptorValueMap.get(descriptorToken);
-					if (obj != null) {
-						buffer.append(quotationMark);
-						if (obj instanceof Integer) {
-							buffer.append((Integer) obj);
-						}
-						if (obj instanceof Double) {
-							buffer.append((Double) obj);
-						}
-						buffer.append(quotationMark);
-						buffer.append(separator);
-					} else {
-						buffer.append(quotationMark);
-						buffer.append(Double.NaN);
-						buffer.append(quotationMark);
-						buffer.append(separator);
-					}
-				}
-				csv.add(buffer.toString());
-			}
-		}
-		return csv;
 	}
 
 	@Override
 	public String getActivityName() {
-		return CSVGeneratorActivity.CSV_GENERATOR_ACTIVITY;
+		return CreateFingerprintItemListFromQSARVectorActivity.CREATE_FINGERPRINT_ITEMLIST_FROM_QSAR_VECTOR_ACTIVITY;
 	}
 
 	@Override
@@ -175,11 +124,13 @@ public class CSVGeneratorActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getDescription() {
-		return "Description: " + CSV_GENERATOR_ACTIVITY;
+		return "Description: "
+				+ CreateFingerprintItemListFromQSARVectorActivity.CREATE_FINGERPRINT_ITEMLIST_FROM_QSAR_VECTOR_ACTIVITY;
 	}
 
 	@Override
 	public String getFolderName() {
 		return CDKTavernaConstants.QSAR_FOLDER_NAME;
 	}
+
 }

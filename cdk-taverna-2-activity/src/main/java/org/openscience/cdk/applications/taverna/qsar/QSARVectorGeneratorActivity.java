@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.UUID;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
@@ -96,7 +94,7 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 		}
 		Map<UUID, Map<String, Object>> vectorMap = new HashMap<UUID, Map<String, Object>>();
 		Map<String, Object> descritorResultMap;
-		SortedSet<String> descriptorNames = new TreeSet<String>();
+		ArrayList<String> descriptorNames = new ArrayList<String>();
 		String descriptorSpecificationSplitter = "#";
 		String descriptorName;
 		IDescriptorResult result;
@@ -211,6 +209,7 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
 			// TODO: handle exception
+			e.printStackTrace();
 		}
 		// Return results
 		return outputs;

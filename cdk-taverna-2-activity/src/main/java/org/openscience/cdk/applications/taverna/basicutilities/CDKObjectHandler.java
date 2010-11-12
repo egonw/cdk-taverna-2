@@ -29,6 +29,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openscience.cdk.applications.art2aclassification.FingerprintItem;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.interfaces.IReaction;
@@ -143,6 +144,31 @@ public class CDKObjectHandler {
 			}
 		}
 		return reactionList;
+	}
+
+	/**
+	 * Deserializes a list of byte arrays into a fingerprint item list.
+	 */
+	public static List<FingerprintItem> getFingerprintList(List<byte[]> dataArray) throws Exception {
+		ArrayList<FingerprintItem> itemList = new ArrayList<FingerprintItem>();
+		if (dataArray == null) {
+			throw new Exception("DataArray == null");
+		}
+		for (byte[] data : dataArray) {
+			Object obj = null;
+			try {
+				obj = CDKObjectHandler.getObject(data);
+			} catch (Exception e) {
+				ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, "CDKObjectHandler", e);
+				throw new Exception(CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+			}
+			if (obj instanceof FingerprintItem) {
+				itemList.add((FingerprintItem) obj);
+			} else {
+				throw new Exception(CDKTavernaException.WRONG_INPUT_PORT_TYPE + " Type: " + obj.toString());
+			}
+		}
+		return itemList;
 	}
 
 }

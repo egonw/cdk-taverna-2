@@ -19,10 +19,15 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 
 	public static final String QSAR_DESCRIPTOR_ACTIVITY = "QSAR Descriptor";
 
+	private QSARDescriptorWorker[] workers = null;
+	private AsynchronousActivityCallback callback = null;
+	private int numberOfCompletedWorkers = 0;
+	private ArrayList<byte[]> resultData = null;
+	
 	public QSARDescriptorActivity() {
 		super();
 		this.INPUT_PORTS = new String[] { "Structures" };
-		this.RESULT_PORTS = new String[] { "Calculated Structures", "NOT Calculated Structures" };
+		this.RESULT_PORTS = new String[] { "Calculated Structures" };
 	}
 
 	@Override
@@ -60,8 +65,11 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback) throws Exception {
-		InvocationContext context = callback.getContext();
+		this.callback = callback;
+		InvocationContext context = this.callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
+		this.numberOfCompletedWorkers = 0;
+		this.resultData = new ArrayList<byte[]>();
 		ArrayList<Class<? extends AbstractCDKActivity>> classes = (ArrayList<Class<? extends AbstractCDKActivity>>) this
 				.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_CHOSEN_QSARDESCRIPTORS);
 		if (classes == null || classes.isEmpty()) {
@@ -69,44 +77,52 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 		}
 		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.getINPUT_PORTS()[0]),
 				byte[].class, context);
-		for (Class<? extends AbstractCDKActivity> clazz : classes) {
-			AbstractCDKActivity descriptor = null;
-			try {
-				descriptor = clazz.newInstance();
-			} catch (Exception e) {
-				e.printStackTrace();
+		// Prepare worker
+		int numberOfCores = Runtime.getRuntime().availableProcessors();
+		if(dataArray.size() < numberOfCores) {
+			numberOfCores = dataArray.size();
+		}
+		this.workers = new QSARDescriptorWorker[numberOfCores];
+		int dataSizePerThread = dataArray.size() / numberOfCores;
+		for(int i = 0; i < numberOfCores; i++) {
+			List<byte[]> tempData = null;
+			if(i < numberOfCores - 1) {
+				tempData = dataArray.subList(i * dataSizePerThread, (i + 1) * dataSizePerThread);
+			} else {
+				tempData = dataArray.subList(i * dataSizePerThread, dataArray.size());
 			}
-			if (clazz != null) {
-				T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
-				inputs = new HashMap<String, T2Reference>();
-				inputs.put(descriptor.getINPUT_PORTS()[0], containerRef);
-				Map<String, T2Reference> outputs = descriptor.work(inputs, callback);
-				dataArray.clear();
-				try {
-					dataArray.addAll((List<byte[]>) referenceService.renderIdentifier(outputs
-							.get(descriptor.getRESULT_PORTS()[0]), byte[].class, context));
-				} catch (NullPointerException e) {
-					// TODO
-				}
-				try {
-					dataArray.addAll((List<byte[]>) referenceService.renderIdentifier(outputs
-							.get(descriptor.getRESULT_PORTS()[1]), byte[].class, context));
+			this.workers[i] = new QSARDescriptorWorker(this, classes, tempData);
+			this.workers[i].start();
+		}
 
-				} catch (NullPointerException e) {
-					// TODO
-				}
-			}
+		// Wait for workers
+		synchronized (this) {
+			this.wait();
 		}
 		// Congfigure output
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		try {
-			T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
+			T2Reference containerRef = referenceService.register(this.resultData, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
 		return outputs;
+	}
+	
+	public void workerDone(List<byte[]> dataArray) {
+		this.numberOfCompletedWorkers++;
+		this.resultData.addAll(dataArray);
+		if(this.numberOfCompletedWorkers == this.workers.length) {
+			synchronized (this) {
+				this.notify();
+			}
+		}
+	}
+
+	public AsynchronousActivityCallback getCallback() {
+		return callback;
 	}
 
 }

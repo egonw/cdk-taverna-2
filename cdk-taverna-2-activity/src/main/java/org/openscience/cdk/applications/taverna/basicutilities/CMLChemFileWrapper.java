@@ -132,6 +132,22 @@ public class CMLChemFileWrapper {
 		}
 		return cmlChemfile;
 	}
+	
+	/**
+	 * Method which converts a atomContainer list to a CMLChemFile array
+	 * 
+	 * @param atomContainer
+	 *            List which will be converted
+	 * @return CMLChemFileArray which contains the atomContainers
+	 */
+	public static List<CMLChemFile> wrapAtomContainerListInChemModelList(List<IAtomContainer> atomContainers) {
+		List<CMLChemFile> cmlChemfileList = new ArrayList<CMLChemFile>();
+		for (int i = 0; i < atomContainers.size(); i++) {
+			cmlChemfileList.add(wrapAtomContainerInChemModel(atomContainers.get(i)));
+		}
+		return cmlChemfileList;
+	}
+
 
 	/**
 	 * Method which adds an atomContainer to a CMLChemFile

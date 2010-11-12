@@ -53,10 +53,6 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 	 * Output port names.
 	 */
 	protected String[] RESULT_PORTS;
-	/**
-	 * Comment port name.
-	 */
-	protected final String COMMENT_PORT = "Comment";
 
 	/**
 	 * Configuration bean.
@@ -170,13 +166,6 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 	 */
 	public String[] getRESULT_PORTS() {
 		return RESULT_PORTS;
-	}
-
-	/**
-	 * @return Comment port name/identifier.
-	 */
-	public String getCOMMENT_PORT() {
-		return COMMENT_PORT;
 	}
 
 }
