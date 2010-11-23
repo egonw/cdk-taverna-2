@@ -22,26 +22,19 @@
 package org.openscience.cdk.applications.taverna.qsar;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 
 import org.junit.Assert;
-import org.openscience.cdk.ChemFile;
-import org.openscience.cdk.applications.art2aclassification.FingerprintItem;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 /**
  * Test class for the MDL SD file reader activity.
@@ -65,10 +58,11 @@ public class QSARVectorToCSVActivityTest extends CDKTavernaTestCases {
 		// TODO read resource
 		File[] csvFile = new File[] { new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
 				+ "data" + File.separator + "qsar" + File.separator + "qsar.csv") };
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, csvFile); 
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, csvFile);
 		configBean.setActivityName(CSVToQSARVectorActivity.CSV_TO_QSAR_VECTOR_ACTIVITY);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
 		csvActivity.configure(configBean);
 		loadActivity.configure(configBean);
