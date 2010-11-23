@@ -480,6 +480,9 @@ public class QSARVectorUtility {
 				}
 			}
 		}
+		if(columnsToDelete == null) {
+			columnsToDelete = new HashSet<Integer>();
+		}
 		double ratioMolecules = rowsToDelete.size() / (double) (uuids.size()) * 100;
 		double ratioDescriptors = columnsToDelete.size() / (double) (descriptorNames.size() - 1) * 100;
 		stat = "Dynamic Curation: Corrupted Molecules: " + rowsToDelete.size() + " --> " + String.format("%.2f", ratioMolecules)
