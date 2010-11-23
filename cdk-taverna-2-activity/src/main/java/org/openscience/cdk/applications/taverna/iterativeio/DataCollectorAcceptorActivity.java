@@ -86,7 +86,7 @@ public class DataCollectorAcceptorActivity extends AbstractCDKActivity {
 			dataStream = Preferences.getInstance().getDataCollectorDataStream(id);
 			idxStream = Preferences.getInstance().createDataCollectorIdxStream(id);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while initializing data stream!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during initializing data stream!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while initializing data stream!");
 		}
 		try {
@@ -97,7 +97,7 @@ public class DataCollectorAcceptorActivity extends AbstractCDKActivity {
 			idxStream.flush();
 			dataStream.flush();
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while writing cache data!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during writing cache data!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while writing cache data!");
 		}
 		// Return results

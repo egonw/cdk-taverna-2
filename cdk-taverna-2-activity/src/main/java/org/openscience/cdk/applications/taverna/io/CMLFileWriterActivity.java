@@ -80,7 +80,7 @@ public class CMLFileWriterActivity extends AbstractCDKActivity implements IFileW
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Errowhile deserializing object.", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Erro during deserializing object.", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);

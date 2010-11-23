@@ -22,9 +22,11 @@
 package org.openscience.cdk.applications.taverna.qsar;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -75,7 +77,11 @@ public class CSVToQSARVectorActivityTest extends CDKTavernaTestCases {
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
 		byte[] objectData = (byte[]) outputs.get(activity.getRESULT_PORTS()[0]);
-		System.out.println();
+		Map<UUID, Map<String, Object>> vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(objectData);
+		Assert.assertEquals(9, vectorMap.size());
+		objectData = (byte[]) outputs.get(activity.getRESULT_PORTS()[1]);
+		ArrayList<String> descriptorNames = (ArrayList<String>) CDKObjectHandler.getObject(objectData);
+		Assert.assertEquals(277, descriptorNames.size());
 	}
 
 	@Override

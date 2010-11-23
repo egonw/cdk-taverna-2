@@ -101,7 +101,7 @@ public class Draw2DStructure {
 			try {
 				renderer.paintMolecule(molecule, new AWTDrawVisitor(g2), new Rectangle(x, y, scaledWith, scaledHeight), true);
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error while rendering molecucle!", "Draw2DStructure", e);
+				ErrorLogger.getInstance().writeError("Error during rendering molecucle!", "Draw2DStructure", e);
 			}
 		}
 		g2.dispose();

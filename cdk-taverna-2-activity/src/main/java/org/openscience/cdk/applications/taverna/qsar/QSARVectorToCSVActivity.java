@@ -45,14 +45,14 @@ import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
  * @author Thomas Kuhn, Andreas Truszkowski
  * 
  */
-public class CSVGeneratorActivity extends AbstractCDKActivity {
+public class QSARVectorToCSVActivity extends AbstractCDKActivity {
 
-	public static final String CSV_GENERATOR_ACTIVITY = "CSV Generator";
+	public static final String CSV_GENERATOR_ACTIVITY = "QSAR Vector To CSV";
 
 	/**
 	 * Creates a new instance.
 	 */
-	public CSVGeneratorActivity() {
+	public QSARVectorToCSVActivity() {
 		this.INPUT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
 		this.RESULT_PORTS = new String[] { "CSV String" };
 	}
@@ -80,7 +80,7 @@ public class CSVGeneratorActivity extends AbstractCDKActivity {
 		try {
 			vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(vectorData);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		ArrayList<String> descriptorNames;
@@ -88,7 +88,7 @@ public class CSVGeneratorActivity extends AbstractCDKActivity {
 		try {
 			descriptorNames = (ArrayList<String>) CDKObjectHandler.getObject(nameData);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		List<String> csv = null;
@@ -97,7 +97,7 @@ public class CSVGeneratorActivity extends AbstractCDKActivity {
 			List<UUID> uuids = vectorUtility.getUUIDs(vectorMap);
 			csv = this.createCSV(vectorMap, descriptorNames, uuids);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while creating csv!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during creating csv!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		T2Reference containerRef = referenceService.register(csv, 1, true, context);
@@ -164,7 +164,7 @@ public class CSVGeneratorActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getActivityName() {
-		return CSVGeneratorActivity.CSV_GENERATOR_ACTIVITY;
+		return QSARVectorToCSVActivity.CSV_GENERATOR_ACTIVITY;
 	}
 
 	@Override

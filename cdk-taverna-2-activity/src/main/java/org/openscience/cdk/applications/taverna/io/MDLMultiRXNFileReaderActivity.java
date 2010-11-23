@@ -113,7 +113,7 @@ public class MDLMultiRXNFileReaderActivity extends AbstractCDKActivity implement
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(reactionList), 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
 		// Return results

@@ -1,12 +1,29 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2010 by Andreas Truszkowski <ATruszkowski@gmx.de>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1
+ * of the License, or (at your option) any later version.
+ * All we ask is that proper credit is given for our work, which includes
+ * - but is not limited to - adding the above copyright notice to the beginning
+ * of your source code files, and to any copyright notice that you may distribute
+ * with programs based on this work.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-
 package org.openscience.cdk.applications.taverna.curation;
 
 /**
- *
+ * Class which represents the curate strange elemnts activity.
+ * 
  * @author kalai
  */
 import java.io.IOException;
@@ -96,8 +113,8 @@ public class CurateStrangeElementsActivity extends AbstractCDKActivity {
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (IOException ex) {
 
-			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), ex);
-			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
+			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), ex);
+			throw new CDKTavernaException(this.getActivityName(), "Error during configurating output port!");
 		}
 
 		try {
@@ -106,12 +123,18 @@ public class CurateStrangeElementsActivity extends AbstractCDKActivity {
 			T2Reference containerRef2 = referenceService.register(discardedList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef2);
 		} catch (IOException ex) {
-			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), ex);
-			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
+			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), ex);
+			throw new CDKTavernaException(this.getActivityName(), "Error during configurating output port!");
 		}
 		return outputs;
 	}
 
+	/**
+	 * Checks whether the molecule contains a strange element and should be removed.
+	 * 
+	 * @param molecule
+	 * @return
+	 */
 	private boolean shouldRemoveMolecule(IAtomContainer molecule) {
 		boolean removeMolecule = false;
 		String element;

@@ -1539,7 +1539,7 @@ public class Art2aClassificator {
 			for (int i = 0; i < mNumberOfVectors; i++) {
 				if (!reader.isEndElement()) {
 					reader.next();
-					mCorrespondingObjectArray[i] = Integer.valueOf(reader.getText());
+					mCorrespondingObjectArray[i] = reader.getText();
 					reader.next();
 					reader.nextTag();
 				} else {

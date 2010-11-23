@@ -85,8 +85,8 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity implement
 			String SDFilePart = "";
 			int counter = 0;
 			List<byte[]> dataList = new ArrayList<byte[]>();
+			line = lineReader.readLine();
 			do {
-				line = lineReader.readLine();
 				if (line != null) {
 					SDFilePart += line + "\n";
 					if (line.contains("$$$$")) {
@@ -114,6 +114,7 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity implement
 					counter = 0;
 					dataList.clear();
 				}
+				line = lineReader.readLine();
 			} while (line != null);
 			T2Reference containerRef = referenceService.register(outputList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);

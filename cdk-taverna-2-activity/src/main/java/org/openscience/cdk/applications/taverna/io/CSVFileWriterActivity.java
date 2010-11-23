@@ -90,15 +90,19 @@ public class CSVFileWriterActivity extends AbstractCDKActivity implements IItera
 				this.file = FileNameGenerator.getNewFile(directory.getPath(), extension);
 			}
 		}
-		for (String s : strings) {
-			try {
-				PrintWriter writer = new PrintWriter(new FileWriter(file, !oneFilePerIteration));
+		try {
+			PrintWriter writer = new PrintWriter(new FileWriter(file, !oneFilePerIteration));
+			for (int i = 0; i < strings.size(); i++) {
+				String s = strings.get(i);
+				if (this.iteration > 1 && !oneFilePerIteration && i == 0) {
+					continue;
+				}
 				writer.write(s + "\n");
-				writer.close();
-			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error writing text file: " + file.getPath() + "!", this.getActivityName(),
-						e);
 			}
+			writer.close();
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error writing csv file: " + file.getPath() + "!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error writing csv file: " + file.getPath() + "!");
 		}
 		return null;
 	}

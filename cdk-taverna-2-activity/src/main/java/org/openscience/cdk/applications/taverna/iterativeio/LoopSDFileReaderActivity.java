@@ -134,7 +134,7 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 							dataList.add(CDKObjectHandler.getBytes(cmlChemFile));
 							counter++;
 						} catch (Exception e) {
-							ErrorLogger.getInstance().writeError("Error while reading molecule: \n" + SDFilePart,
+							ErrorLogger.getInstance().writeError("Error during reading molecule: \n" + SDFilePart,
 									this.getActivityName(), e);
 						} finally {
 							SDFilePart = "";
@@ -150,7 +150,7 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 				}
 			} while (line != null && counter < readSize);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while reading SDF files!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during reading SDF files!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while reading SDF files!");
 		}
 		T2Reference reference = referenceService.register(dataList, 1, true, context);

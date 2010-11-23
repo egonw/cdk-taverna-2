@@ -132,7 +132,7 @@ public class CMLChemFileWrapper {
 		}
 		return cmlChemfile;
 	}
-	
+
 	/**
 	 * Method which converts a atomContainer list to a CMLChemFile array
 	 * 
@@ -147,7 +147,6 @@ public class CMLChemFileWrapper {
 		}
 		return cmlChemfileList;
 	}
-
 
 	/**
 	 * Method which adds an atomContainer to a CMLChemFile

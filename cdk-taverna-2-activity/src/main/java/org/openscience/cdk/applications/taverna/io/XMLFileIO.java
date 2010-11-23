@@ -44,22 +44,23 @@ import javax.xml.stream.XMLStreamWriter;
 
 /**
  * Class which stores xml files to disk. The original content compressed to reduce the data size.
+ * 
  * @author Thomas Kuhn
- *
+ * 
  */
 public class XMLFileIO {
-	
+
 	private XMLOutputFactory ouputFactory = null;
 	private BufferedReader breader = null;
 	private XMLInputFactory inputFactory = null;
 	private BufferedOutputStream bufferedOutputStream = null;
-	
+
 	/**
 	 * Get the xml stream writer which uses a gzip stream to compress the output file
+	 * 
 	 * @param file
-	 * 			File which gets created with the compressed gzip stream
-	 * @return
-	 * 			XMLStreamWriter to write the file
+	 *            File which gets created with the compressed gzip stream
+	 * @return XMLStreamWriter to write the file
 	 * @throws XMLStreamException
 	 * @throws IOException
 	 */
@@ -68,33 +69,38 @@ public class XMLFileIO {
 		this.ouputFactory = XMLOutputFactory.newInstance();
 		return this.ouputFactory.createXMLStreamWriter(this.bufferedOutputStream);
 	}
+
 	/**
 	 * Get the xml stream reader which reads a gzip file.
+	 * 
 	 * @param fileName
-	 * 				File name of file to be read
-	 * @return
-	 * 			XMLStreamReader to read the file
+	 *            File name of file to be read
+	 * @return XMLStreamReader to read the file
 	 * @throws XMLStreamException
 	 * @throws IOException
 	 */
-	public  XMLStreamReader getXMLStreamReaderWithCompression(String fileName) throws XMLStreamException, IOException {
+	public XMLStreamReader getXMLStreamReaderWithCompression(String fileName) throws XMLStreamException, IOException {
 		this.inputFactory = XMLInputFactory.newInstance();
 		this.breader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(fileName))));
 		return this.inputFactory.createXMLStreamReader(this.breader);
 	}
+
 	/**
 	 * Close the XMLStreamWriter
+	 * 
 	 * @throws IOException
 	 */
-	public void closeXMLStreamWriter() throws IOException  {
+	public void closeXMLStreamWriter() throws IOException {
 		this.bufferedOutputStream.flush();
 		this.bufferedOutputStream.close();
 	}
+
 	/**
 	 * Close the XMLStreamReader
+	 * 
 	 * @throws IOException
 	 */
 	public void closeXMLStreamReader() throws IOException {
 		this.breader.close();
-	}	
+	}
 }

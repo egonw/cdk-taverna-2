@@ -42,7 +42,7 @@ public class CDKTavernaConstants {
 	public static final String FILTER_FOLDER_NAME = "Filter";
 	public static final String CURATION_FOLDER_NAME = "Molecule Curation";
 	public static final String DATABASE_FOLDER_NAME = "Database";
-	public static final String ART2A_FOLDER_NAME = "ART-2a";
+	public static final String ART2A_FOLDER_NAME = "ART-2a Classification";
 	// --------------------Properties-------------------------------------
 	public static final String PROPERTY_FILE = "FILE";
 	public static final String PROPERTY_FILE_EXTENSION = "FILE EXTENSION";
@@ -56,6 +56,15 @@ public class CDKTavernaConstants {
 	public static final String PROPERTY_ATOM_COUNT_CUTOFF = "ATOM COUNT CUTOFF";
 	public static final String PROPERTY_ONE_FILE_PER_ITERATION = "ONE FILE PER ITERATION";
 	public static final String PROPERTY_ATOM_SIGNATURE_HEIGHT = "ATOM SIGNATURE HEIGHT";
+	public static final String PROPERTY_NUMBER_OF_USED_THREADS = "NUMBER OF USED THREADS";
+	public static final String PROPERTY_NUMBER_OF_CLASSIFICATIONS = "NUMBER OF CLASSIFICATIONS";
+	public static final String PROPERTY_UPPER_VIGILANCE_LIMIT = "UPPER VIGILANCE LIMIT";
+	public static final String PROPERTY_LOWER_VIGILANCE_LIMIT = "LOWER VIGILANCE LIMIT";
+	public static final String PROPERTY_MAXIMUM_CLASSIFICATION_TIME = "MAXIMUM CLASSIFICATION TIME";
+	public static final String PROPERTY_SCALE_FINGERPRINT_ITEMS = "SCALE FINGERPRINT ITEMS";
+	public static final String PROPERTY_NUMBER_OF_FINGERPRINT_ITEMS = "NUMBER OF FINGERPRINT ITEMS";
+	public static final String PROPERTY_QSAR_VECTOR_CURATION_TYPE = "QSAR VECTOR CURATION TYPE";
+	public static final String PROPERTY_QSAR_VECTOR_MIN_MAX_CURATION = "QSAR VECTOR MIN MAX CURATION";
 	// --------------------Miscellaneous-------------------------------------
 	public static final String MOLECULEID = "MOLECULEID";
 }

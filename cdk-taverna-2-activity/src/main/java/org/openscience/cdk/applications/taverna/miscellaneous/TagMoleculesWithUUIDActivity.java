@@ -41,7 +41,7 @@ import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 /**
- * Class which represents the doublets filter activity. It filter doublets in given structures list.
+ * Class which represents the tag molecules with UUID activity. 
  * 
  * @author Andreas Truszkowski
  * 
@@ -102,7 +102,7 @@ public class TagMoleculesWithUUIDActivity extends AbstractCDKActivity {
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing object.", this.getConfiguration().getActivityName(),
+			ErrorLogger.getInstance().writeError("Error during deserializing object.", this.getConfiguration().getActivityName(),
 					e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
@@ -110,7 +110,7 @@ public class TagMoleculesWithUUIDActivity extends AbstractCDKActivity {
 		try {
 			containers = CMLChemFileWrapper.convertCMLChemFileListToAtomContainerArray(chemFileList);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while converting CML chem file list.",
+			ErrorLogger.getInstance().writeError("Error during converting CML chem file list.",
 					this.getConfiguration().getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
@@ -127,7 +127,7 @@ public class TagMoleculesWithUUIDActivity extends AbstractCDKActivity {
 					context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while configuring output ports.",
+			ErrorLogger.getInstance().writeError("Error during configuring output ports.",
 					this.getConfiguration().getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}

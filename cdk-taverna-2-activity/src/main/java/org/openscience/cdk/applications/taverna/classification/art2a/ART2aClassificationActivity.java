@@ -22,7 +22,6 @@
 package org.openscience.cdk.applications.taverna.classification.art2a;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,14 +39,10 @@ import org.openscience.cdk.applications.art2aclassification.FingerprintItem;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
-import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
 import org.openscience.cdk.applications.taverna.io.XMLFileIO;
-import org.openscience.cdk.io.SMILESWriter;
 
 /**
  * Class which implements a local worker for the cdk-taverna project. This worker uses an implementation of the ART2A
@@ -57,7 +52,7 @@ import org.openscience.cdk.io.SMILESWriter;
  * @author Andreas Truzskowski
  * 
  */
-public class ART2aClassificator extends AbstractCDKActivity implements IFileWriter {
+public class ART2aClassificationActivity extends AbstractCDKActivity {
 
 	public static final String ART2A_CLASSIFICATOR_ACTIVITY = "ART-2a Classificator";
 
@@ -68,7 +63,7 @@ public class ART2aClassificator extends AbstractCDKActivity implements IFileWrit
 	/**
 	 * The number of classificator to calculate
 	 */
-	private int numberOfClassifications = 1;
+	private int numberOfClassifications = 10;
 	/**
 	 * The upper limit for the vigilance parameter
 	 */
@@ -103,8 +98,9 @@ public class ART2aClassificator extends AbstractCDKActivity implements IFileWrit
 	/**
 	 * Creates a new instance.
 	 */
-	public ART2aClassificator() {
+	public ART2aClassificationActivity() {
 		this.INPUT_PORTS = new String[] { "Fingerprint Items" };
+		this.RESULT_PORTS = new String[] { "ART-2a Files" };
 	}
 
 	@Override
@@ -114,13 +110,14 @@ public class ART2aClassificator extends AbstractCDKActivity implements IFileWrit
 
 	@Override
 	protected void addOutputPorts() {
-		// empty
+		addOutput(this.RESULT_PORTS[0], 1);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
+		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<FingerprintItem> fingerprintItemList = new ArrayList<FingerprintItem>();
@@ -137,10 +134,19 @@ public class ART2aClassificator extends AbstractCDKActivity implements IFileWrit
 			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
 		}
 		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
-		File file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
-
 		FingerprintItem[] fingerprintItemArray = new FingerprintItem[fingerprintItemList.size()];
 		fingerprintItemList.toArray(fingerprintItemArray);
+
+		this.scaleFingerprintItemToInternalZeroOne = (Boolean) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_SCALE_FINGERPRINT_ITEMS);
+		this.numberOfClassifications = (Integer) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_NUMBER_OF_CLASSIFICATIONS);
+		this.upperVigilanceLimit = (Double) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_UPPER_VIGILANCE_LIMIT);
+		this.lowerVigilanceLimit = (Double) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_LOWER_VIGILANCE_LIMIT);
+		this.maximumClassificationTime = (Integer) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_MAXIMUM_CLASSIFICATION_TIME);
 
 		if (this.numberOfClassifications < 1)
 			throw new IllegalArgumentException("The number of clusters must be greater 0.");
@@ -162,11 +168,10 @@ public class ART2aClassificator extends AbstractCDKActivity implements IFileWrit
 		if (this.scaleFingerprintItemToInternalZeroOne) {
 			Art2aClassificator.scaleFingerprintVectorComponentsToIntervalZeroOne(fingerprintItemArray);
 		}
-		File tempFile;
 		XMLStreamWriter writer;
 		Art2aClassificator myART;
 		XMLFileIO xmlFileIO = new XMLFileIO();
-		List<String> fileNames = new ArrayList<String>(this.numberOfClassifications);
+		List<String> resultFiles = new ArrayList<String>(this.numberOfClassifications);
 		for (int i = 0; i < this.numberOfClassifications; i++) {
 			try {
 				// Classifiy first
@@ -177,42 +182,46 @@ public class ART2aClassificator extends AbstractCDKActivity implements IFileWrit
 				myART.setDeterministicRandom(this.deterministicRandom);
 				myART.classify();
 				// Store the results
-				String path = file.getPath();
-				path.replace(extension, "");
-				path += "_ART2a_Result" + String.valueOf(i) + "of" + String.valueOf(this.numberOfClassifications);
-				path += extension;
-				tempFile = new File(path);
-				writer = xmlFileIO.getXMLStreamWriterWithCompression(tempFile);
+				String name = "ART2a_Result" + String.valueOf(i + 1) + "of" + String.valueOf(this.numberOfClassifications) + "_";
+				File file = FileNameGenerator.getNewFile(directory.getPath(), extension, name);
+				writer = xmlFileIO.getXMLStreamWriterWithCompression(file);
 				writer.writeStartDocument();
 				myART.saveResultToXmlWriter(writer);
 				writer.writeEndDocument();
 				writer.close();
-				fileNames.add(tempFile.getAbsolutePath());
+				resultFiles.add(file.getPath());
 				xmlFileIO.closeXMLStreamWriter();
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(
-						"Error while classification step " + String.valueOf(i) + " of "
+						"Error during classification step " + String.valueOf(i + 1) + " of "
 								+ String.valueOf(this.numberOfClassifications) + "!", this.getActivityName(), e);
 			}
 		}
-		return null;
+		T2Reference containerRef = referenceService.register(resultFiles, 1, true, context);
+		outputs.put(this.RESULT_PORTS[0], containerRef);
+		return outputs;
 	}
 
 	@Override
 	public String getActivityName() {
-		return ART2aClassificator.ART2A_CLASSIFICATOR_ACTIVITY;
+		return ART2aClassificationActivity.ART2A_CLASSIFICATOR_ACTIVITY;
 	}
 
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
 		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".art2a");
+		properties.put(CDKTavernaConstants.PROPERTY_NUMBER_OF_CLASSIFICATIONS, this.numberOfClassifications);
+		properties.put(CDKTavernaConstants.PROPERTY_UPPER_VIGILANCE_LIMIT, this.upperVigilanceLimit);
+		properties.put(CDKTavernaConstants.PROPERTY_LOWER_VIGILANCE_LIMIT, this.lowerVigilanceLimit);
+		properties.put(CDKTavernaConstants.PROPERTY_MAXIMUM_CLASSIFICATION_TIME, this.maximumClassificationTime);
+		properties.put(CDKTavernaConstants.PROPERTY_SCALE_FINGERPRINT_ITEMS, this.scaleFingerprintItemToInternalZeroOne);
 		return properties;
 	}
 
 	@Override
 	public String getDescription() {
-		return "Description: " + ART2aClassificator.ART2A_CLASSIFICATOR_ACTIVITY;
+		return "Description: " + ART2aClassificationActivity.ART2A_CLASSIFICATOR_ACTIVITY;
 	}
 
 	@Override

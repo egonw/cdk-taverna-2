@@ -42,7 +42,7 @@ import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.io.MDLWriter;
+import org.openscience.cdk.io.MDLV2000Writer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 /**
@@ -84,7 +84,7 @@ public class MDLMolFileWriterActivity extends AbstractCDKActivity implements IFi
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing objects!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during deserializing objects!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
@@ -103,7 +103,7 @@ public class MDLMolFileWriterActivity extends AbstractCDKActivity implements IFi
 					file = FileNameGenerator.getNewFileFromUUID(directory.getPath(), extension, uuid);
 				}
 				try {
-					MDLWriter writer = new MDLWriter(new FileWriter(file));
+					MDLV2000Writer writer = new MDLV2000Writer(new FileWriter(file));
 					writer.write(atomContainer);
 					writer.close();
 				} catch (Exception e) {

@@ -22,9 +22,11 @@
 package org.openscience.cdk.applications.taverna.qsar;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -46,15 +48,15 @@ import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
  * @author Andreas Truszkowski
  * 
  */
-public class CurateQSARVectorColumnsActivityTest extends CDKTavernaTestCases {
+public class CurateQSARVectorActivityTest extends CDKTavernaTestCases {
 
 	private CDKActivityConfigurationBean configBean;
 
 	private AbstractCDKActivity loadActivity = new CSVToQSARVectorActivity();
-	private AbstractCDKActivity curateActivity = new CurateQSARVectorColumnsActivity();
+	private AbstractCDKActivity curateActivity = new CurateQSARVectorActivity();
 
-	public CurateQSARVectorColumnsActivityTest() {
-		super(CurateQSARVectorColumnsActivity.CURATE_QSAR_VECTOR_COLUMNS_ACTIVITY);
+	public CurateQSARVectorActivityTest() {
+		super(CurateQSARVectorActivity.CURATE_QSAR_VECTOR_COLUMNS_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
@@ -83,7 +85,11 @@ public class CurateQSARVectorColumnsActivityTest extends CDKTavernaTestCases {
 		outputs = ActivityInvoker.invokeAsyncActivity(curateActivity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
 		byte[] objectData = (byte[]) outputs.get(curateActivity.getRESULT_PORTS()[0]);
-		System.out.println();
+		Map<UUID, Map<String, Object>> vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(objectData);
+		Assert.assertEquals(6, vectorMap.size());
+		objectData = (byte[]) outputs.get(curateActivity.getRESULT_PORTS()[1]);
+		ArrayList<String> descriptorNames = (ArrayList<String>) CDKObjectHandler.getObject(objectData);
+		Assert.assertEquals(103, descriptorNames.size());
 	}
 
 	@Override
@@ -104,7 +110,7 @@ public class CurateQSARVectorColumnsActivityTest extends CDKTavernaTestCases {
 	 * @return TestSuite
 	 */
 	public static Test suite() {
-		return new TestSuite(CurateQSARVectorColumnsActivityTest.class);
+		return new TestSuite(CurateQSARVectorActivityTest.class);
 	}
 
 }

@@ -36,22 +36,21 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 
 /**
- * Class which represents the SMILES file reader activity.
+ * Class which represents the Curate QSAR Vector activity.
  * 
  * @author Andreas Truzskowski
  * 
  */
-public class CurateQSARVectorColumnsActivity extends AbstractCDKActivity implements IFileReader {
+public class CurateQSARVectorActivity extends AbstractCDKActivity {
 
-	public static final String CURATE_QSAR_VECTOR_COLUMNS_ACTIVITY = "Curate QSAR Vector Colums";
+	public static final String CURATE_QSAR_VECTOR_COLUMNS_ACTIVITY = "Curate QSAR Vector";
 
 	/**
 	 * Creates a new instance.
 	 */
-	public CurateQSARVectorColumnsActivity() {
+	public CurateQSARVectorActivity() {
 		this.INPUT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
 		this.RESULT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
 	}
@@ -80,7 +79,7 @@ public class CurateQSARVectorColumnsActivity extends AbstractCDKActivity impleme
 		try {
 			vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(vectorData);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		ArrayList<String> descriptorNames;
@@ -88,18 +87,22 @@ public class CurateQSARVectorColumnsActivity extends AbstractCDKActivity impleme
 		try {
 			descriptorNames = (ArrayList<String>) CDKObjectHandler.getObject(nameData);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		Map<UUID, Map<String, Object>> curatedVectorMap = null;
 		ArrayList<String> curatedDescriptorNames = null;
+		int curationType = (Integer) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_QSAR_VECTOR_CURATION_TYPE);
+		boolean curateMinMax = (Boolean) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_QSAR_VECTOR_MIN_MAX_CURATION);
 		try {
 			QSARVectorUtility vectorUtility = new QSARVectorUtility();
-			vectorUtility.curateQSARVector(vectorMap, descriptorNames);
+			vectorUtility.curateQSARVector(vectorMap, descriptorNames, curationType, curateMinMax);
 			curatedVectorMap = vectorUtility.getCuratedVectorMap();
 			curatedDescriptorNames = vectorUtility.getCuratedDescriptorNames();
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while curating QSAR vector!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during curating QSAR vector!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		try {
@@ -110,7 +113,7 @@ public class CurateQSARVectorColumnsActivity extends AbstractCDKActivity impleme
 			containerRef = referenceService.register(nameData, 0, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
 		return outputs;
@@ -118,18 +121,20 @@ public class CurateQSARVectorColumnsActivity extends AbstractCDKActivity impleme
 
 	@Override
 	public String getActivityName() {
-		return CurateQSARVectorColumnsActivity.CURATE_QSAR_VECTOR_COLUMNS_ACTIVITY;
+		return CurateQSARVectorActivity.CURATE_QSAR_VECTOR_COLUMNS_ACTIVITY;
 	}
 
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
+		properties.put(CDKTavernaConstants.PROPERTY_QSAR_VECTOR_CURATION_TYPE, QSARVectorUtility.DYNAMIC_CURATION);
+		properties.put(CDKTavernaConstants.PROPERTY_QSAR_VECTOR_MIN_MAX_CURATION, true);
 		return properties;
 	}
 
 	@Override
 	public String getDescription() {
-		return "Description: " + CurateQSARVectorColumnsActivity.CURATE_QSAR_VECTOR_COLUMNS_ACTIVITY;
+		return "Description: " + CurateQSARVectorActivity.CURATE_QSAR_VECTOR_COLUMNS_ACTIVITY;
 	}
 
 	@Override

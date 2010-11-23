@@ -102,7 +102,7 @@ public class DoubletsFilterActivity extends AbstractCDKActivity {
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing object.", this.getConfiguration().getActivityName(),
+			ErrorLogger.getInstance().writeError("Error during deserializing object.", this.getConfiguration().getActivityName(),
 					e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
@@ -110,7 +110,7 @@ public class DoubletsFilterActivity extends AbstractCDKActivity {
 		try {
 			containers = CMLChemFileWrapper.convertCMLChemFileListToAtomContainerArray(chemFileList);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while converting CML chem file list.",
+			ErrorLogger.getInstance().writeError("Error during converting CML chem file list.",
 					this.getConfiguration().getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}

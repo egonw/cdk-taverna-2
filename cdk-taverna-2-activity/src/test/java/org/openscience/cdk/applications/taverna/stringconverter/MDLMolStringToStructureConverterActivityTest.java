@@ -38,7 +38,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.io.MDLWriter;
+import org.openscience.cdk.io.MDLV2000Writer;
 
 /**
  * Test class for the MDL Mol String to structure converter activity.
@@ -69,7 +69,7 @@ public class MDLMolStringToStructureConverterActivityTest extends CDKTavernaTest
 		List<String> strings = new ArrayList<String>();
 		for (int i = 0; i < cmlFiles.length; i++) {
 			StringWriter stringWriter = new StringWriter();
-			MDLWriter writer = new MDLWriter(stringWriter);
+			MDLV2000Writer writer = new MDLV2000Writer(stringWriter);
 			writer.write(cmlFiles[i]);
 			writer.close();
 			strings.add(stringWriter.toString());

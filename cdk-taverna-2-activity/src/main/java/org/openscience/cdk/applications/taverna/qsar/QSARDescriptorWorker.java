@@ -1,19 +1,31 @@
+/*
+ * Copyright (C) 2010 by Andreas Truszkowski <ATruszkowski@gmx.de>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1
+ * of the License, or (at your option) any later version.
+ * All we ask is that proper credit is given for our work, which includes
+ * - but is not limited to - adding the above copyright notice to the beginning
+ * of your source code files, and to any copyright notice that you may distribute
+ * with programs based on this work.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ */
 package org.openscience.cdk.applications.taverna.qsar;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
-import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
@@ -27,13 +39,19 @@ import org.openscience.cdk.qsar.IBondDescriptor;
 import org.openscience.cdk.qsar.IMolecularDescriptor;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
+/**
+ * Class which represents the QSAR descriptor worker.
+ * 
+ * @author Andreas Truszkowski
+ *
+ */
 public class QSARDescriptorWorker extends Thread {
 
-	private QSARDescriptorActivity owner = null;
+	private QSARDescriptorThreadedActivity owner = null;
 	private ArrayList<Class<? extends AbstractCDKActivity>> classes = null;
 	private List<byte[]> moleculeDataArray = null;
 
-	public QSARDescriptorWorker(QSARDescriptorActivity owner, ArrayList<Class<? extends AbstractCDKActivity>> classes,
+	public QSARDescriptorWorker(QSARDescriptorThreadedActivity owner, ArrayList<Class<? extends AbstractCDKActivity>> classes,
 			List<byte[]> moleculeDataArray) {
 		this.owner = owner;
 		this.classes = classes;
@@ -47,7 +65,7 @@ public class QSARDescriptorWorker extends Thread {
 			try {
 				chemFiles = CDKObjectHandler.getChemFileList(this.moleculeDataArray);
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error while deserializing object!", this.toString(), e);
+				ErrorLogger.getInstance().writeError("Error during deserializing object!", this.toString(), e);
 				this.owner.workerDone(new ArrayList<byte[]>());
 				return;
 			}
@@ -61,7 +79,9 @@ public class QSARDescriptorWorker extends Thread {
 				try {
 					descriptorActivity = clazz.newInstance();
 				} catch (Exception e) {
-					e.printStackTrace();
+					ErrorLogger.getInstance().writeError("Error during instantiation of descriptor: " + clazz.getSimpleName(),
+							this.getClass().getSimpleName(), e);
+					continue;
 				}
 				if (descriptorActivity instanceof AbstractAtomicDescriptor) {
 					IAtomicDescriptor descriptor = ((AbstractAtomicDescriptor) descriptorActivity).getDescriptor();
@@ -72,7 +92,8 @@ public class QSARDescriptorWorker extends Thread {
 								molecule.getAtom(j).setProperty(value.getSpecification(), value);
 							}
 						} catch (Exception e) {
-							ErrorLogger.getInstance().writeError("Error while calculating QSAR descriptor!",
+							ErrorLogger.getInstance().writeError(
+									"Error during calculating QSAR descriptor: " + descriptor.getClass() + "!",
 									descriptor.toString(), e);
 						}
 					}
@@ -88,7 +109,8 @@ public class QSARDescriptorWorker extends Thread {
 								}
 							}
 						} catch (Exception e) {
-							ErrorLogger.getInstance().writeError("Error while calculating QSAR descriptor!",
+							ErrorLogger.getInstance().writeError(
+									"Error during calculating QSAR descriptor: " + descriptor.getClass() + "!",
 									descriptor.toString(), e);
 						}
 					}
@@ -104,7 +126,8 @@ public class QSARDescriptorWorker extends Thread {
 								}
 							}
 						} catch (Exception e) {
-							ErrorLogger.getInstance().writeError("Error while calculating QSAR descriptor!",
+							ErrorLogger.getInstance().writeError(
+									"Error during calculating QSAR descriptor: " + descriptor.getClass() + "!",
 									descriptor.toString(), e);
 						}
 					}
@@ -117,7 +140,8 @@ public class QSARDescriptorWorker extends Thread {
 								molecule.getBond(j).setProperty(value.getSpecification(), value);
 							}
 						} catch (Exception e) {
-							ErrorLogger.getInstance().writeError("Error while calculating QSAR descriptor!",
+							ErrorLogger.getInstance().writeError(
+									"Error during calculating QSAR descriptor: " + descriptor.getClass() + "!",
 									descriptor.toString(), e);
 						}
 					}
@@ -128,23 +152,20 @@ public class QSARDescriptorWorker extends Thread {
 							DescriptorValue value = descriptor.calculate(molecule);
 							molecule.setProperty(value.getSpecification(), value);
 						} catch (Exception e) {
-							ErrorLogger.getInstance().writeError("Error while calculating QSAR descriptor!",
+							ErrorLogger.getInstance().writeError(
+									"Error during calculating QSAR descriptor: " + descriptor.getClass() + "!",
 									descriptor.toString(), e);
 						}
 					}
 				} else {
-					System.out.println(descriptorActivity.toString());
+					throw new CDKTavernaException("QSARDescreiptorWorker", "Unknown descriptor type: "
+							+ descriptorActivity.getActivityName());
 				}
 			}
 			chemFiles = CMLChemFileWrapper.wrapAtomContainerListInChemModelList(moleculeList);
-			try {
 				this.moleculeDataArray = CDKObjectHandler.getBytesList(chemFiles);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			ErrorLogger.getInstance().writeError("Error during calculation of QSAR descriptors!", this.getClass().getSimpleName(), e);
 		}
 		this.owner.workerDone(this.moleculeDataArray);
 	}

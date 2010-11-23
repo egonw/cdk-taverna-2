@@ -23,6 +23,7 @@ package org.openscience.cdk.applications.taverna.qsar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -60,6 +61,8 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 
 	public static final String QSAR_VECTOR_GENERATOR_ACTIVITY = "QSAR Vector Generator";
 
+	private HashSet<String> descriptorNames = new HashSet<String>();
+
 	public QSARVectorGeneratorActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
 		this.RESULT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
@@ -89,12 +92,11 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		Map<UUID, Map<String, Object>> vectorMap = new HashMap<UUID, Map<String, Object>>();
 		Map<String, Object> descritorResultMap;
-		ArrayList<String> descriptorNames = new ArrayList<String>();
 		String descriptorSpecificationSplitter = "#";
 		String descriptorName;
 		IDescriptorResult result;
@@ -204,7 +206,11 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 			byte[] vectorData = CDKObjectHandler.getBytes(vectorMap);
 			T2Reference containerRef = referenceService.register(vectorData, 0, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
-			byte[] nameData = CDKObjectHandler.getBytes(descriptorNames);
+			ArrayList<String> descriptorNamesList = new ArrayList<String>();
+			for (String name : this.descriptorNames) {
+				descriptorNamesList.add(name);
+			}
+			byte[] nameData = CDKObjectHandler.getBytes(descriptorNamesList);
 			containerRef = referenceService.register(nameData, 0, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {

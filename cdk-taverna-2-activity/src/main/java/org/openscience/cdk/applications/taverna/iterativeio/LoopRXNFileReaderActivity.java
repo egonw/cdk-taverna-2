@@ -127,7 +127,7 @@ public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements II
 				reader.close();
 				dataList.add(CDKObjectHandler.getBytes(reaction));
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error while reading RXN file: " + file.getPath() + "!",
+				ErrorLogger.getInstance().writeError("Error during reading RXN file: " + file.getPath() + "!",
 						this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), "Error while reading RXN file: " + file.getPath() + "!");
 			}

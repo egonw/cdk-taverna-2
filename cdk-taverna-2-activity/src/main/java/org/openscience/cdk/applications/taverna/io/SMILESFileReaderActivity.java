@@ -93,7 +93,7 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 				som = (IMoleculeSet) reader.read(new MoleculeSet());
 				reader.close();
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error while reading SMILES file: " + file.getPath() + "!",
+				ErrorLogger.getInstance().writeError("Error during reading SMILES file: " + file.getPath() + "!",
 						this.getActivityName(), e);
 			}
 			IMoleculeSet som2D = new MoleculeSet();
@@ -112,8 +112,8 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 					cmlChemFile = CMLChemFileWrapper.wrapInChemModel(som2D.getMolecule(i));
 					dataArray.addAll(CDKObjectHandler.getBytesList(CMLChemFileWrapper.wrapInChemModelList(cmlChemFile)));
 				} catch (Exception e) {
-					ErrorLogger.getInstance().writeError("Error while creating/serializing output data!", this.getActivityName(),
-							e);
+					ErrorLogger.getInstance().writeError("Error during creating/serializing output data!",
+							this.getActivityName(), e);
 					throw new CDKTavernaException(this.getActivityName(), "Error while creating/serializing output data!");
 				}
 			}

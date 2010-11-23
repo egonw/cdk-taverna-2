@@ -134,7 +134,7 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity implemen
 				}
 			}
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while reading RXN files!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during reading RXN files!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while reading RXN files!");
 		}
 		T2Reference containerRef = referenceService.register(outputList, 1, true, context);

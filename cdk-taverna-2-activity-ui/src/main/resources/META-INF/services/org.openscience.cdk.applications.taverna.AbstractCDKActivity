@@ -23,6 +23,9 @@ org.openscience.cdk.applications.taverna.jchempaint.JChemPaintActivity
 org.openscience.cdk.applications.taverna.miscellaneous.ReactionReactantSplitterActivity
 org.openscience.cdk.applications.taverna.miscellaneous.ReactionSplitterActivity
 org.openscience.cdk.applications.taverna.miscellaneous.UUIDGeneratorActivity
+org.openscience.cdk.applications.taverna.miscellaneous.AromaticityDetectorActivity
+org.openscience.cdk.applications.taverna.miscellaneous.AddExplicitHydrogensActivity
+org.openscience.cdk.applications.taverna.miscellaneous.TagMoleculesWithUUIDActivity
 org.openscience.cdk.applications.taverna.filter.AtomTypeFilterActivity
 org.openscience.cdk.applications.taverna.filter.DoubletsFilterActivity
 org.openscience.cdk.applications.taverna.filter.RuleOfFiveFilter
@@ -104,12 +107,18 @@ org.openscience.cdk.applications.taverna.qsar.descriptors.molecular.XLogP
 org.openscience.cdk.applications.taverna.qsar.descriptors.molecular.ZagrebIndex
 org.openscience.cdk.applications.taverna.qsar.descriptors.protein.TaeAminoAcid
 org.openscience.cdk.applications.taverna.qsar.QSARDescriptorActivity
+org.openscience.cdk.applications.taverna.qsar.QSARDescriptorThreadedActivity
 org.openscience.cdk.applications.taverna.qsar.QSARVectorGeneratorActivity
-org.openscience.cdk.applications.taverna.qsar.CSVGeneratorActivity
+org.openscience.cdk.applications.taverna.qsar.QSARVectorToCSVActivity
 org.openscience.cdk.applications.taverna.qsar.CSVToQSARVectorActivity
-org.openscience.cdk.applications.taverna.qsar.CurateQSARVectorColumnsActivity
+org.openscience.cdk.applications.taverna.qsar.CurateQSARVectorActivity
 org.openscience.cdk.applications.taverna.qsar.CreateFingerprintItemListFromQSARVectorActivity
-org.openscience.cdk.applications.taverna.classification.art2a.ART2aClassificator
+org.openscience.cdk.applications.taverna.qsar.MergeQSARVectorsActivity
+org.openscience.cdk.applications.taverna.qsar.CalculateQSARVectorStatisticsActivity
+org.openscience.cdk.applications.taverna.classification.art2a.ART2aClassificationActivity
+org.openscience.cdk.applications.taverna.classification.art2a.tools.ART2aResultAsPDFFileReader
+org.openscience.cdk.applications.taverna.classification.art2a.tools.ART2aResultAsPDF
+org.openscience.cdk.applications.taverna.classification.art2a.tools.ART2aResultConsideringDifferentOriginsAsPDF
 org.openscience.cdk.applications.taverna.reactionenumerator.ReactionEnumeratorActivity
 org.openscience.cdk.applications.taverna.reactionenumerator.ReactionEnumeratorSubgraphFilterActivity
 org.openscience.cdk.applications.taverna.renderer.WriteMoleculeAsJPGActivity
@@ -131,4 +140,4 @@ org.openscience.cdk.applications.taverna.iterativeio.DataCollectorEmitterActivit
 org.openscience.cdk.applications.taverna.curation.MoleculeConnectivityCheckerActivity
 org.openscience.cdk.applications.taverna.curation.CurateStrangeElementsActivity
 org.openscience.cdk.applications.taverna.curation.AtomSignatureActivity
-org.openscience.cdk.applications.taverna.miscellaneous.TagMoleculesWithUUIDActivity
+

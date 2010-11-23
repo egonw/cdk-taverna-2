@@ -13,8 +13,11 @@ import java.util.Map.Entry;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
@@ -25,6 +28,8 @@ import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityCon
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.applications.taverna.qsar.QSARDescriptorThreadedActivity;
 
 public class QSARDescriptorConfigurationPanel extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
@@ -37,7 +42,7 @@ public class QSARDescriptorConfigurationPanel extends
 	private CDKActivityConfigurationBean configBean;
 	private JButton selectAllButton = null;
 	private JButton clearButton = null;
-
+	private JTextField threadsTextField = null;
 	private HashMap<Class<? extends AbstractCDKActivity>, JCheckBox> selectionMap = null;
 	private ArrayList<Class<? extends AbstractCDKActivity>> selectedClasses = new ArrayList<Class<? extends AbstractCDKActivity>>();
 
@@ -77,7 +82,6 @@ public class QSARDescriptorConfigurationPanel extends
 				selectionPanel.add(scrollPanes[i]);
 			}
 			this.selectionMap = new HashMap<Class<? extends AbstractCDKActivity>, JCheckBox>();
-			;
 			for (int i = 0; i < packages.length; i++) {
 				panels[i].setLayout(new GridLayout(length[i], 1));
 				for (AbstractCDKActivity cdkActivity : cdkActivityRegistry.getInstances()) {
@@ -106,6 +110,21 @@ public class QSARDescriptorConfigurationPanel extends
 			});
 			buttonPanel.add(this.selectAllButton);
 			buttonPanel.add(this.clearButton);
+			JLabel threadsLabel = new JLabel("Number of used Threads:");
+			threadsLabel.setHorizontalAlignment(JLabel.RIGHT);
+			threadsLabel.setPreferredSize(new Dimension(150, 25));
+
+			int numberOfThreads = (Integer) this.configBean
+					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS);
+			this.threadsTextField = new JTextField();
+			this.threadsTextField.setText(String.valueOf(numberOfThreads));
+			this.threadsTextField.setPreferredSize(new Dimension(40, 25));
+			if (!(this.activity instanceof QSARDescriptorThreadedActivity)) {
+				threadsLabel.setEnabled(false);
+				threadsTextField.setEnabled(false);
+			}
+			buttonPanel.add(threadsLabel);
+			buttonPanel.add(this.threadsTextField);
 			this.add(selectionPanel, BorderLayout.CENTER);
 			this.add(buttonPanel, BorderLayout.SOUTH);
 			for (Entry<Class<? extends AbstractCDKActivity>, JCheckBox> entry : this.selectionMap.entrySet()) {
@@ -117,13 +136,14 @@ public class QSARDescriptorConfigurationPanel extends
 			if (classes != null) {
 				for (Class<? extends AbstractCDKActivity> clazz : classes) {
 					JCheckBox checkBox = this.selectionMap.get(clazz);
+					this.selectedClasses.add(clazz);
 					checkBox.setSelected(true);
 				}
 			}
 			this.repaint();
 		} catch (Exception e) {
-			e.printStackTrace();
-			// TODO Exception handling
+			ErrorLogger.getInstance().writeError("Error during setting up configuration panel!", this.getClass().getSimpleName(),
+					e);
 		}
 
 	}
@@ -156,6 +176,16 @@ public class QSARDescriptorConfigurationPanel extends
 
 	@Override
 	public boolean checkValues() {
+		try {
+			int v = Integer.parseInt(this.threadsTextField.getText());
+			if (v < 1) {
+				JOptionPane.showMessageDialog(this, "Please enter a valid number!", "Error", JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this, "Please enter a valid number!", "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
 		return !this.getSelectedClasses().isEmpty();
 	}
 
@@ -179,6 +209,12 @@ public class QSARDescriptorConfigurationPanel extends
 				}
 			}
 		}
+		int numberOfThreads = (Integer) this.configBean
+				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS);
+		int newValue = Integer.parseInt(this.threadsTextField.getText());
+		if (numberOfThreads != newValue) {
+			return true;
+		}
 		return false;
 	}
 
@@ -186,6 +222,8 @@ public class QSARDescriptorConfigurationPanel extends
 	public void noteConfiguration() {
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CHOSEN_QSARDESCRIPTORS, this.getSelectedClasses());
+		int newValue = Integer.parseInt(this.threadsTextField.getText());
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, newValue);
 	}
 
 	@Override

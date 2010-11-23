@@ -112,14 +112,14 @@ public class IsomorphismTesterActivity extends AbstractCDKActivity {
 		try {
 			inputList = CDKObjectHandler.getChemFileList(dataInputOne);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		Object obj;
 		try {
 			obj = CDKObjectHandler.getObject(dataInputTwo);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		if (obj instanceof CMLChemFile) {
@@ -130,7 +130,7 @@ public class IsomorphismTesterActivity extends AbstractCDKActivity {
 		try {
 			queryMolecule = CMLChemFileWrapper.wrapChemModelInAtomContainer(queryChemFile);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while wrapping IAtomContainer in ChemModel!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during wrapping IAtomContainer in ChemModel!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		for (Iterator<CMLChemFile> iter = inputList.iterator(); iter.hasNext();) {
@@ -155,7 +155,7 @@ public class IsomorphismTesterActivity extends AbstractCDKActivity {
 			containerRef = referenceService.register(CDKObjectHandler.getBytesList(notCalculatedList), 1, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
 		return outputs;

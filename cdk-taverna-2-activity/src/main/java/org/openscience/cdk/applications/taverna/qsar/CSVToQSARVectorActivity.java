@@ -43,7 +43,7 @@ import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 
 /**
- * Class which represents the SMILES file reader activity.
+ * Class which represents the CSV to QSAR vector activity.
  * 
  * @author Andreas Truzskowski
  * 
@@ -117,8 +117,8 @@ public class CSVToQSARVectorActivity extends AbstractCDKActivity implements IFil
 				}
 			}
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while reading CSV file: " + file.getPath() + "!", this.getActivityName(),
-					e);
+			ErrorLogger.getInstance().writeError("Error during reading CSV file: " + file.getPath() + "!",
+					this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while reading CSV file: " + file.getPath() + "!");
 		}
 		try {
@@ -129,7 +129,7 @@ public class CSVToQSARVectorActivity extends AbstractCDKActivity implements IFil
 			containerRef = referenceService.register(nameData, 0, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
 		return outputs;

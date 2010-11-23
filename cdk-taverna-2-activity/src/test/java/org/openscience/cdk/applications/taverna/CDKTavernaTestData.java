@@ -47,6 +47,7 @@ public class CDKTavernaTestData {
 	private static CMLChemFile[] cmlChemFile;
 	private static CMLChemFile[] cmlChemFileWith3DCoordinates;
 	private static StringBuffer logTests = new StringBuffer();
+	private static CMLChemFile[] connectivityCheckSample;
 	private static String pathToWriteInUnitTestFiles = "";
 	private static StringBuffer descriptorValues = new StringBuffer();
 	private static String[] smiles;
@@ -57,6 +58,8 @@ public class CDKTavernaTestData {
 	private static CMLChemFile[] reactionEvaluationResult;
 	private static Reaction reactionEvaluationReaction;
 	public static final String JUNITTESTINGFILENAME = "JunitTesting";
+	private static CMLChemFile[] atomSignatureSample;
+	private static CMLChemFile[] cmlStrangeChemFile;
 
 	public CDKTavernaTestData() throws Exception {
 	}
@@ -103,11 +106,6 @@ public class CDKTavernaTestData {
 	public static CMLChemFile[] getCMLChemFile() throws Exception {
 		if (!defaultDataLoaded) {
 			loadDefaultDataForTests();
-		} else {
-			for (int i = 0; i < cmlChemFile.length; i++) {
-				// cmlChemFile[i].setProperty(FileNameGenerator.FILENAME,
-				// fileNameGenerator.addFileNameToFileNameList(JUNITTESTINGFILENAME, fileNameGenerator.getNewFileNameList()));
-			}
 		}
 		return cmlChemFile;
 	}
@@ -150,18 +148,12 @@ public class CDKTavernaTestData {
 			for (int i = 0; i < smiles.length; i++) {
 				atomContainer[i] = sp.parseSmiles(smiles[i]);
 				cmlChemFile[i] = CMLChemFileWrapper.wrapAtomContainerInChemModel(atomContainer[i]);
-				// cmlChemFile[i].setProperty(FileNameGenerator.FILENAME,
-				// fileNameGenerator.addFileNameToFileNameList(JUNITTESTINGFILENAME, fileNameGenerator.getNewFileNameList()));
 			}
 			String path = "." + File.separator + "target" + File.separator + "test-classes" + File.separator + "data"
 					+ File.separator + "mol" + File.separator + "heptane.mol";
 			File file = new File(path);
 			if (file.exists()) {
 				cmlChemFileWith3DCoordinates = CDKIOReader.readFromMDLFile(path);
-				for (int i = 0; i < cmlChemFileWith3DCoordinates.length; i++) {
-					// cmlChemFileWith3DCoordinates[i].setProperty(FileNameGenerator.FILENAME,
-					// fileNameGenerator.addFileNameToFileNameList(JUNITTESTINGFILENAME, fileNameGenerator.getNewFileNameList()));
-				}
 			}
 			path = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data" + File.separator
 					+ "rxn" + File.separator + "reactionevaluation-reaction.rxn";
@@ -176,10 +168,6 @@ public class CDKTavernaTestData {
 				reactionEvaluationEductOne = CDKIOReader.readFromSDV2000File(path);
 				reactionEvaluationEductOne = CMLChemFileWrapper
 						.wrapChemModelArrayInResolvedChemModelArray(reactionEvaluationEductOne);
-				// for (int i = 0; i < reactionEvaluationEductOne.length; i++) {
-				// reactionEvaluationEductOne[i].setProperty(FileNameGenerator.FILENAME,
-				// fileNameGenerator.addFileNameToFileNameList(JUNITTESTINGFILENAME, fileNameGenerator.getNewFileNameList()));
-				// }
 			}
 			path = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data" + File.separator
 					+ "sdf" + File.separator + "reactionevaluationedukt2B1-3.sdf";
@@ -188,26 +176,49 @@ public class CDKTavernaTestData {
 				reactionEvaluationEductTwo = CDKIOReader.readFromSDV2000File(path);
 				reactionEvaluationEductTwo = CMLChemFileWrapper
 						.wrapChemModelArrayInResolvedChemModelArray(reactionEvaluationEductTwo);
-				for (int i = 0; i < reactionEvaluationEductTwo.length; i++) {
-					// reactionEvaluationEductTwo[i].setProperty(FileNameGenerator.FILENAME,
-					// fileNameGenerator.addFileNameToFileNameList(JUNITTESTINGFILENAME, fileNameGenerator.getNewFileNameList()));
-				}
+			}
+			path = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data" + File.separator
+					+ "sdf" + File.separator + "ConnectivityCheckSample.sdf";
+			file = new File(path);
+			if (file.exists()) {
+				connectivityCheckSample = CDKIOReader.readFromMDLV2000File(path);
+			}
+			path = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data" + File.separator
+					+ "sdf" + File.separator + "strangeElement.sdf";
+			file = new File(path);
+			if (file.exists()) {
+				cmlStrangeChemFile = CDKIOReader.readFromMDLV2000File(path);
+			}
+			path = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data" + File.separator
+					+ "sdf" + File.separator + "AtomSignatureTest.sdf";
+			file = new File(path);
+			if (file.exists()) {
+				atomSignatureSample = CDKIOReader.readFromMDLV2000File(path);
 			}
 			path = "." + File.separator + "target" + File.separator + "test-classes" + File.separator + "data" + File.separator
 					+ "sdf" + File.separator + "reactionevaluationresult-a1-3b1-3.sdf";
 			file = new File(path);
 			if (file.exists()) {
 				reactionEvaluationResult = CDKIOReader.readFromSDV2000File(path);
-				for (int i = 0; i < reactionEvaluationResult.length; i++) {
-					// reactionEvaluationResult[i].setProperty(FileNameGenerator.FILENAME,
-					// fileNameGenerator.addFileNameToFileNameList(JUNITTESTINGFILENAME, fileNameGenerator.getNewFileNameList()));
-				}
 			}
 			pathToWriteInUnitTestFiles = pathToWriteInUnitTestFiles + File.separator + "original_Data.txt";
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new Exception("Test data could not be created: " + e);
 		}
+	}
+
+	/**
+	 * Returns the CMLChemFile for the junit-test
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public static CMLChemFile[] getatomSignatureSample() throws Exception {
+		if (!defaultDataLoaded) {
+			loadDefaultDataForTests();
+		}
+		return atomSignatureSample;
 	}
 
 	public static String[] getAromaticityOfDefaultTestData() {
@@ -225,6 +236,19 @@ public class CDKTavernaTestData {
 			loadDefaultDataForTests();
 		}
 		return smiles;
+	}
+
+	/**
+	 * Returns the CMLChemFile for the junit-test
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public static CMLChemFile[] getconnectivityCheckSample() throws Exception {
+		if (!defaultDataLoaded) {
+			loadDefaultDataForTests();
+		}
+		return connectivityCheckSample;
 	}
 
 	/**
@@ -281,10 +305,6 @@ public class CDKTavernaTestData {
 		if (!defaultDataLoaded) {
 			loadDefaultDataForTests();
 		}
-		for (int i = 0; i < cmlChemFileWith3DCoordinates.length; i++) {
-			// cmlChemFileWith3DCoordinates[i].setProperty(FileNameGenerator.FILENAME,
-			// fileNameGenerator.addFileNameToFileNameList("JunitTesting", fileNameGenerator.getNewFileNameList()));
-		}
 		return cmlChemFileWith3DCoordinates;
 	}
 
@@ -305,6 +325,19 @@ public class CDKTavernaTestData {
 			pathToWriteInUnitTestFiles = "target" + File.separator + "test_file_errors" + File.separator;
 		}
 		return pathToWriteInUnitTestFiles;
+	}
+
+	/**
+	 * Returns the CMLChemFile for the junit-test
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public static CMLChemFile[] getcmlStrangeChemFile() throws Exception {
+		if (!defaultDataLoaded) {
+			loadDefaultDataForTests();
+		}
+		return cmlStrangeChemFile;
 	}
 
 	public static void setDescpitorValue(String descriptorValue) {
@@ -358,16 +391,5 @@ public class CDKTavernaTestData {
 		}
 		return reactionEvaluationResult;
 	}
-
-	// public static DBConnector getDatabaseConnector(String sqlStatement) {
-	// String url = "jdbc:postgresql://localhost:5433/mol";
-	// DBConnector connector = new DBConnector();
-	// connector.setDbURL(url);
-	// connector.setUserName("postgres");
-	// // Here add the password for your postgres installation
-	// connector.setUserPassword("");
-	// connector.setSqlStatement(sqlStatement);
-	// return connector;
-	// }
 
 }

@@ -28,7 +28,7 @@ package org.openscience.cdk.applications.taverna.io;
 import java.io.StringWriter;
 
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.io.MDLWriter;
+import org.openscience.cdk.io.MDLV2000Writer;
 
 /**
  * @author Egon Willighagen
@@ -43,7 +43,7 @@ public class CDKIOWriter {
 	 */
 	public static String convertToMDLMolfile(CMLChemFile file) throws Exception {
 		StringWriter writer = new StringWriter();
-		MDLWriter molWriter = new MDLWriter(writer);
+		MDLV2000Writer molWriter = new MDLV2000Writer(writer);
 		molWriter.write(file);
 		molWriter.close();
 		return writer.toString();

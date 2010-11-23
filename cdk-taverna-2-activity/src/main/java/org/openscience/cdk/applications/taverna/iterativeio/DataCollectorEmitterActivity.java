@@ -107,7 +107,7 @@ public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 			idxFile.delete();
 			datFile.delete();
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while reading cache data!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during reading cache data!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while reading cache data!");
 		}
 		// Congfigure output

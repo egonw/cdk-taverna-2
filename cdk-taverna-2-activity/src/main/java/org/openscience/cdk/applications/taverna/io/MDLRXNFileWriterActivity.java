@@ -82,7 +82,7 @@ public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFi
 		try {
 			reactionList = CDKObjectHandler.getReactionList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);

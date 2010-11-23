@@ -46,7 +46,7 @@ import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
-import org.openscience.cdk.io.MDLWriter;
+import org.openscience.cdk.io.MDLV2000Writer;
 
 public class StructureToMDLMolStringConverterActivity extends AbstractCDKActivity implements IFileReader {
 
@@ -86,14 +86,14 @@ public class StructureToMDLMolStringConverterActivity extends AbstractCDKActivit
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		List<String> molStringList = new ArrayList<String>();
 		for (CMLChemFile cml : chemFileList) {
 			try {
 				StringWriter stringWriter = new StringWriter();
-				MDLWriter writer = new MDLWriter(stringWriter);
+				MDLV2000Writer writer = new MDLV2000Writer(stringWriter);
 				writer.write(cml);
 				writer.close();
 				molStringList.add(stringWriter.toString());

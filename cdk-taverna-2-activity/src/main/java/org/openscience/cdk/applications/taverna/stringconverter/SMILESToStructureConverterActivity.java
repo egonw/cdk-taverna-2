@@ -95,7 +95,7 @@ public class SMILESToStructureConverterActivity extends AbstractCDKActivity impl
 					som = (IMoleculeSet) reader.read(new MoleculeSet());
 					reader.close();
 				} catch (Exception e) {
-					ErrorLogger.getInstance().writeError("Error while reading SMILES file!", this.getActivityName(), e);
+					ErrorLogger.getInstance().writeError("Error during reading SMILES file!", this.getActivityName(), e);
 					throw new CDKTavernaException(this.getActivityName(), "Error while reading SMILES file!");
 				}
 				IMoleculeSet som2D = new MoleculeSet();
@@ -124,7 +124,7 @@ public class SMILESToStructureConverterActivity extends AbstractCDKActivity impl
 			}
 		}
 		if (dataList.isEmpty()) {
-			throw new CDKTavernaException(this.getActivityName(), "Error while converting SMILES");
+			throw new CDKTavernaException(this.getActivityName(), "Error during converting SMILES");
 		}
 		T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);

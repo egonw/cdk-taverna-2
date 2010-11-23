@@ -106,7 +106,7 @@ public class ReactionSplitterActivity extends AbstractCDKActivity {
 		try {
 			reactionList = CDKObjectHandler.getReactionList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		for (IReaction r : reactionList) {
@@ -124,7 +124,7 @@ public class ReactionSplitterActivity extends AbstractCDKActivity {
 				outputs.put(this.RESULT_PORTS[i], containerRef);
 			}
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
 		return outputs;

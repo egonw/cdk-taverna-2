@@ -38,15 +38,14 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 
 /**
- * Class which represents the SMILES file reader activity.
+ * Class which represents the create fingerprint item list from QSAR vector activity.
  * 
  * @author Andreas Truzskowski
  * 
  */
-public class CreateFingerprintItemListFromQSARVectorActivity extends AbstractCDKActivity implements IFileReader {
+public class CreateFingerprintItemListFromQSARVectorActivity extends AbstractCDKActivity {
 
 	public static final String CREATE_FINGERPRINT_ITEMLIST_FROM_QSAR_VECTOR_ACTIVITY = "Create Fingerprint Item List From QSAR Vector";
 
@@ -81,7 +80,7 @@ public class CreateFingerprintItemListFromQSARVectorActivity extends AbstractCDK
 		try {
 			vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(vectorData);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		ArrayList<String> descriptorNames;
@@ -89,15 +88,15 @@ public class CreateFingerprintItemListFromQSARVectorActivity extends AbstractCDK
 		try {
 			descriptorNames = (ArrayList<String>) CDKObjectHandler.getObject(nameData);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		List<FingerprintItem> fingerprintList = null;
 		try {
 			QSARVectorUtility vectorUtility = new QSARVectorUtility();
-			fingerprintList = vectorUtility.createFingerprintItemListFRomQSARVector(vectorMap, descriptorNames);
+			fingerprintList = vectorUtility.createFingerprintItemListFromQSARVector(vectorMap, descriptorNames);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while creating fingerprint items!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during creating fingerprint items!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		try {
@@ -105,7 +104,7 @@ public class CreateFingerprintItemListFromQSARVectorActivity extends AbstractCDK
 			T2Reference containerRef = referenceService.register(fingerprintData, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
 		return outputs;

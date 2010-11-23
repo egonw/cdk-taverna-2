@@ -107,7 +107,7 @@ public class WriteMoleculeAsJPGActivity extends AbstractCDKActivity implements I
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
@@ -119,7 +119,7 @@ public class WriteMoleculeAsJPGActivity extends AbstractCDKActivity implements I
 				BufferedImage image = Draw2DStructure.drawMolecule(molecule, 800, 600);
 				ImageIO.write(image, "jpg", file);
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error while rendering image!", this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError("Error during rendering image!", this.getActivityName(), e);
 				throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 			}
 		}

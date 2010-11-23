@@ -48,6 +48,12 @@ import org.openscience.cdk.qsar.result.IntegerResult;
 import org.openscience.cdk.reaction.enumerator.tools.ErrorLogger;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
+/**
+ * Class which represents the Rule OF Five filter activity.
+ * 
+ * @author Thomas Kuhn
+ *
+ */
 public class RuleOfFiveFilter extends AbstractCDKActivity {
 
 	private static RuleOfFiveDescriptor descriptor;

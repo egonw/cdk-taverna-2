@@ -112,7 +112,7 @@ public abstract class AbstractBondDescriptor extends AbstractCDKActivity {
 		try {
 			inputList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		if (descriptor == null) {
@@ -138,7 +138,7 @@ public abstract class AbstractBondDescriptor extends AbstractCDKActivity {
 					calculatedList.add(file);
 
 				} catch (Exception e) {
-					ErrorLogger.getInstance().writeError("Error while calculating QSAR descriptor!", this.getActivityName(), e);
+					ErrorLogger.getInstance().writeError("Error during calculating QSAR descriptor!", this.getActivityName(), e);
 					notCalculatedList.add(file);
 				}
 			}
@@ -163,8 +163,8 @@ public abstract class AbstractBondDescriptor extends AbstractCDKActivity {
 			containerRef = referenceService.register(dataArray, 1, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while configurating output ports!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output ports!");
+			ErrorLogger.getInstance().writeError("Error during configurating output ports!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error during configurating output ports!");
 		}
 		return outputs;
 	}

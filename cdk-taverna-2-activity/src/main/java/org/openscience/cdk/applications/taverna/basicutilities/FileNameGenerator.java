@@ -48,7 +48,7 @@ public class FileNameGenerator {
 	 * @return
 	 */
 	public synchronized static File getNewFile(String path, String extension) {
-		return getNewFile(path, extension, null);
+		return getNewFile(path, extension, null, null);
 	}
 
 	/**
@@ -61,6 +61,32 @@ public class FileNameGenerator {
 	 * @return
 	 */
 	public synchronized static File getNewFile(String path, String extension, Integer iteration) {
+		return getNewFile(path, extension, null, iteration);
+	}
+
+	/**
+	 * Generates a unique filen from the given parameters.
+	 * 
+	 * @param path
+	 *            Path to the file
+	 * @param extension
+	 *            The file extension
+	 * @return
+	 */
+	public synchronized static File getNewFile(String path, String extension, String name) {
+		return getNewFile(path, extension, name, null);
+	}
+
+	/**
+	 * Generates a unique filen from the given parameters.
+	 * 
+	 * @param path
+	 *            Path to the file
+	 * @param extension
+	 *            The file extension
+	 * @return
+	 */
+	public synchronized static File getNewFile(String path, String extension, String name, Integer iteration) {
 		String filename = "";
 		File file = null;
 		Integer idx = 1;
@@ -72,9 +98,12 @@ public class FileNameGenerator {
 		if (iteration != null) {
 			filename += iteration + "_";
 		}
+		if (name != null) {
+			filename += name + "_";
+		}
 		filename += dateformat.format(new Date());
 		String temp;
-		String key = path + "_" + iteration;
+		String key = path + "_" + iteration + "_" + name;
 		if (usedFilesTable.get(key) != null) {
 			idx = usedFilesTable.get(key);
 		}
@@ -87,8 +116,7 @@ public class FileNameGenerator {
 		try {
 			file.createNewFile();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ErrorLogger.getInstance().writeError("Error during creating file!", "FileNameGenerator", e);
 		}
 		return file;
 	}
@@ -115,8 +143,7 @@ public class FileNameGenerator {
 		try {
 			file.createNewFile();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ErrorLogger.getInstance().writeError("Error during creating file!", "FileNameGenerator", e);
 		}
 		return file;
 	}
