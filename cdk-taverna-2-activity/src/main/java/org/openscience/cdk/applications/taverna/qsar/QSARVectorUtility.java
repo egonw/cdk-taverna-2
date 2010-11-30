@@ -493,6 +493,28 @@ public class QSARVectorUtility {
 		stats.add(stat);
 		return stats;
 	}
+	
+	public HashMap<String, Integer> getCalculatedDescritorDistribution(Map<UUID, Map<String, Object>> vectorMap, ArrayList<String> descriptorNames) {
+		HashMap<String, Integer> calculatedDescriptorDistribution = new HashMap<String, Integer>();
+		for(String name : descriptorNames) {
+			Integer value = 0;
+			calculatedDescriptorDistribution.put(name, value);
+		}
+		List<UUID> uuids = getUUIDs(vectorMap);
+		// Calculate distribution
+		for (UUID uuid : uuids) {
+			HashSet<Integer> notCalculatedColumns = this.getCorruptedColumns(vectorMap, descriptorNames, uuid);
+			for (int i = 0; i < descriptorNames.size(); i++) {
+				if (!notCalculatedColumns.contains(i)) {
+					 String name = descriptorNames.get(i);
+					 Integer value = calculatedDescriptorDistribution.get(name);
+					 value++;
+					 calculatedDescriptorDistribution.put(name, value);
+				}
+			}
+		}
+		return calculatedDescriptorDistribution;
+	}
 
 	/**
 	 * @return Curated QSAR vector map.

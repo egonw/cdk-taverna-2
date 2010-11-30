@@ -46,10 +46,9 @@ import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 
-public class MDLSDFileStringToStructureConverterActivity extends AbstractCDKActivity implements IFileReader {
+public class MDLSDFileStringToStructureConverterActivity extends AbstractCDKActivity {
 
 	public static final String MDL_SDFILE_STRING_CONVERTER_ACTIVITY = "MDL SDFile String to Structures Converter";
 

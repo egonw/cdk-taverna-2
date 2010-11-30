@@ -45,10 +45,9 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLV2000Writer;
 
-public class StructureToMDLMolStringConverterActivity extends AbstractCDKActivity implements IFileReader {
+public class StructureToMDLMolStringConverterActivity extends AbstractCDKActivity {
 
 	public static final String MDL_MOL_STRING_CONVERTER_ACTIVITY = "Structure to MDL Mol String Converter";
 

@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna.miscellaneous;
+package org.openscience.cdk.applications.taverna.qsar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,49 +36,52 @@ import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
-import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
+import org.openscience.cdk.applications.taverna.qsar.descriptors.atomic.AtomDegree;
+import org.openscience.cdk.applications.taverna.qsar.descriptors.atompair.PiContactDetection;
+import org.openscience.cdk.applications.taverna.qsar.descriptors.bond.AtomicNumberDifference;
+import org.openscience.cdk.applications.taverna.qsar.descriptors.molecular.RuleOfFive;
+import org.openscience.cdk.applications.taverna.qsar.descriptors.protein.TaeAminoAcid;
 
 /**
- * Test class for the ReactionReactantSplitter activity.
+ * Test class for the QSAR descriptor threaded activity.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class ReactionReactantSplitterActivityTest extends CDKTavernaTestCases {
+public class QSARDescriptorThreadedActivityTest extends CDKTavernaTestCases {
 
 	private CDKActivityConfigurationBean configBean;
 
-	private AbstractCDKActivity activity = new ReactionReactantSplitterActivity();
+	private AbstractCDKActivity activity = new QSARDescriptorThreadedActivity();
 
-	public ReactionReactantSplitterActivityTest() {
-		super(ReactionReactantSplitterActivity.REACTION_REACTANT_SPLITTER_ACTIVITY);
+	public QSARDescriptorThreadedActivityTest() {
+		super(QSARDescriptorThreadedActivity.QSAR_DESCRIPTOR_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS, 2);
-		configBean.setActivityName(ReactionReactantSplitterActivity.REACTION_REACTANT_SPLITTER_ACTIVITY);
+		ArrayList<Class<? extends AbstractCDKActivity>> selectedClasses = new ArrayList<Class<? extends AbstractCDKActivity>>();
+		selectedClasses.add(AtomDegree.class);
+		selectedClasses.add(PiContactDetection.class);
+		selectedClasses.add(AtomicNumberDifference.class);
+		selectedClasses.add(RuleOfFive.class);
+		selectedClasses.add(TaeAminoAcid.class);
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CHOSEN_QSARDESCRIPTORS, selectedClasses);
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, Runtime.getRuntime()
+				.availableProcessors());
+		configBean.setActivityName(QSARDescriptorActivity.QSAR_DESCRIPTOR_ACTIVITY);
 	}
 
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
 		Map<String, Object> inputs = new HashMap<String, Object>();
-		List<byte[]> data = new ArrayList<byte[]>();
-		data.add(CDKObjectHandler.getBytes(CDKTavernaTestData.getReactionEvaluationReaction()));
+		List<byte[]> data = CDKObjectHandler.getBytesList(CDKTavernaTestData.getCMLChemFile());
 		inputs.put(activity.getINPUT_PORTS()[0], data);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[1], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
-		byte[] objectData = (byte[]) outputs.get(activity.getRESULT_PORTS()[0]);
-		CMLChemFile chemFile = (CMLChemFile) CDKObjectHandler.getObject(objectData);
-		assertEquals(1, ChemFileManipulator.getAllAtomContainers(chemFile).size());
-		objectData = (byte[]) outputs.get(activity.getRESULT_PORTS()[1]);
-		chemFile = (CMLChemFile) CDKObjectHandler.getObject(objectData);
-		assertEquals(1, ChemFileManipulator.getAllAtomContainers(chemFile).size());
+		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
 	}
 
 	public void cleanUp() {
@@ -102,7 +105,7 @@ public class ReactionReactantSplitterActivityTest extends CDKTavernaTestCases {
 	 * @return TestSuite
 	 */
 	public static Test suite() {
-		return new TestSuite(ReactionReactantSplitterActivityTest.class);
+		return new TestSuite(QSARDescriptorThreadedActivityTest.class);
 	}
 
 }

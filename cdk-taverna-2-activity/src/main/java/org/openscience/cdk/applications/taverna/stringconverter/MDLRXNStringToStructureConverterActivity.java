@@ -45,10 +45,9 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLRXNV2000Reader;
 
-public class MDLRXNStringToStructureConverterActivity extends AbstractCDKActivity implements IFileReader {
+public class MDLRXNStringToStructureConverterActivity extends AbstractCDKActivity {
 
 	public static final String MDL_RXN_STRING_CONVERTER_ACTIVITY = "MDL RXN String to Structures Converter";
 

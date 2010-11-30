@@ -38,57 +38,56 @@ import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 /**
- * Test class for the ReactionReactantSplitter activity.
+ * Test class for the tag molecules with UUID activity.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class ReactionReactantSplitterActivityTest extends CDKTavernaTestCases {
+public class TagMoleculesWithUUIDActivityTest extends CDKTavernaTestCases {
 
 	private CDKActivityConfigurationBean configBean;
 
-	private AbstractCDKActivity activity = new ReactionReactantSplitterActivity();
+	private AbstractCDKActivity activity = new TagMoleculesWithUUIDActivity();
 
-	public ReactionReactantSplitterActivityTest() {
-		super(ReactionReactantSplitterActivity.REACTION_REACTANT_SPLITTER_ACTIVITY);
+	public TagMoleculesWithUUIDActivityTest() {
+		super(TagMoleculesWithUUIDActivity.TAG_MOLECULES_WITH_UUID_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS, 2);
-		configBean.setActivityName(ReactionReactantSplitterActivity.REACTION_REACTANT_SPLITTER_ACTIVITY);
+		configBean.setActivityName(TagMoleculesWithUUIDActivity.TAG_MOLECULES_WITH_UUID_ACTIVITY);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
 		Map<String, Object> inputs = new HashMap<String, Object>();
+		CMLChemFile[] chemFiles = CDKTavernaTestData.getCMLChemFile();
 		List<byte[]> data = new ArrayList<byte[]>();
-		data.add(CDKObjectHandler.getBytes(CDKTavernaTestData.getReactionEvaluationReaction()));
+		for (CMLChemFile chemFile : chemFiles) {
+			data.add(CDKObjectHandler.getBytes(chemFile));
+		}
 		inputs.put(activity.getINPUT_PORTS()[0], data);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[1], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
-		byte[] objectData = (byte[]) outputs.get(activity.getRESULT_PORTS()[0]);
-		CMLChemFile chemFile = (CMLChemFile) CDKObjectHandler.getObject(objectData);
-		assertEquals(1, ChemFileManipulator.getAllAtomContainers(chemFile).size());
-		objectData = (byte[]) outputs.get(activity.getRESULT_PORTS()[1]);
-		chemFile = (CMLChemFile) CDKObjectHandler.getObject(objectData);
-		assertEquals(1, ChemFileManipulator.getAllAtomContainers(chemFile).size());
-	}
-
-	public void cleanUp() {
+		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
+		List<byte[]> objectData = (List<byte[]>) outputs.get(activity.getRESULT_PORTS()[0]);
+		List<CMLChemFile> resultChemFiles = CDKObjectHandler.getChemFileList(objectData);
+		for (int i = 0; i < resultChemFiles.size(); i++) {
+			IAtomContainer resultContainer = ChemFileManipulator.getAllAtomContainers(resultChemFiles.get(i)).get(0);
+			Assert.assertEquals(true, resultContainer.getProperty(CDKTavernaConstants.MOLECULEID) != null);
+		}
 	}
 
 	public void executeTest() {
 		try {
 			this.makeConfigBean();
 			this.executeAsynch();
-			this.cleanUp();
 		} catch (Exception e) {
 			e.printStackTrace();
 			// This test causes an error
@@ -102,7 +101,7 @@ public class ReactionReactantSplitterActivityTest extends CDKTavernaTestCases {
 	 * @return TestSuite
 	 */
 	public static Test suite() {
-		return new TestSuite(ReactionReactantSplitterActivityTest.class);
+		return new TestSuite(TagMoleculesWithUUIDActivityTest.class);
 	}
 
 }

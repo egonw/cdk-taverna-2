@@ -19,76 +19,67 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna.miscellaneous;
+package org.openscience.cdk.applications.taverna.qsar;
 
-import java.util.ArrayList;
+import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 
-import org.junit.Assert;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
-import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
-import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 /**
- * Test class for the ReactionReactantSplitter activity.
+ * Test class for the calculate QSAR vector statistics activity.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class ReactionReactantSplitterActivityTest extends CDKTavernaTestCases {
+public class CalculateQSARVectorStatisticsActivityTest extends CDKTavernaTestCases {
 
 	private CDKActivityConfigurationBean configBean;
 
-	private AbstractCDKActivity activity = new ReactionReactantSplitterActivity();
+	private AbstractCDKActivity loadActivity = new CSVToQSARVectorActivity();
+	private AbstractCDKActivity statActivity = new CalculateQSARVectorStatisticsActivity();
 
-	public ReactionReactantSplitterActivityTest() {
-		super(ReactionReactantSplitterActivity.REACTION_REACTANT_SPLITTER_ACTIVITY);
+	public CalculateQSARVectorStatisticsActivityTest() {
+		super(CurateQSARVectorActivity.CURATE_QSAR_VECTOR_COLUMNS_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS, 2);
-		configBean.setActivityName(ReactionReactantSplitterActivity.REACTION_REACTANT_SPLITTER_ACTIVITY);
+		// TODO read resource
+		File[] csvFile = new File[] { new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
+				+ "data" + File.separator + "qsar" + File.separator + "notcuratedqsar.csv") };
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, csvFile);
+		configBean.setActivityName(CSVToQSARVectorActivity.CSV_TO_QSAR_VECTOR_ACTIVITY);
 	}
 
 	public void executeAsynch() throws Exception {
-		activity.configure(configBean);
+		statActivity.configure(configBean);
+		loadActivity.configure(configBean);
+		// leave empty. No ports used
 		Map<String, Object> inputs = new HashMap<String, Object>();
-		List<byte[]> data = new ArrayList<byte[]>();
-		data.add(CDKObjectHandler.getBytes(CDKTavernaTestData.getReactionEvaluationReaction()));
-		inputs.put(activity.getINPUT_PORTS()[0], data);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[1], byte[].class);
-		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
-		byte[] objectData = (byte[]) outputs.get(activity.getRESULT_PORTS()[0]);
-		CMLChemFile chemFile = (CMLChemFile) CDKObjectHandler.getObject(objectData);
-		assertEquals(1, ChemFileManipulator.getAllAtomContainers(chemFile).size());
-		objectData = (byte[]) outputs.get(activity.getRESULT_PORTS()[1]);
-		chemFile = (CMLChemFile) CDKObjectHandler.getObject(objectData);
-		assertEquals(1, ChemFileManipulator.getAllAtomContainers(chemFile).size());
+		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[0], byte[].class);
+		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[1], byte[].class);
+		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(loadActivity, inputs, expectedOutputTypes);
+		inputs = outputs;
+		expectedOutputTypes = new HashMap<String, Class<?>>();
+		expectedOutputTypes.put(statActivity.getRESULT_PORTS()[0], byte[].class);
+		outputs = ActivityInvoker.invokeAsyncActivity(statActivity, inputs, expectedOutputTypes);
 	}
 
-	public void cleanUp() {
-	}
-
-	public void executeTest() {
+	@Override
+	protected void executeTest() {
 		try {
 			this.makeConfigBean();
 			this.executeAsynch();
-			this.cleanUp();
 		} catch (Exception e) {
 			e.printStackTrace();
 			// This test causes an error
@@ -102,7 +93,7 @@ public class ReactionReactantSplitterActivityTest extends CDKTavernaTestCases {
 	 * @return TestSuite
 	 */
 	public static Test suite() {
-		return new TestSuite(ReactionReactantSplitterActivityTest.class);
+		return new TestSuite(CalculateQSARVectorStatisticsActivityTest.class);
 	}
 
 }

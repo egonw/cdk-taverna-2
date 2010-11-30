@@ -10,6 +10,8 @@ import javax.swing.JButton;
 import javax.swing.border.BevelBorder;
 
 public class ART2aView extends JPanel {
+
+	private static final long serialVersionUID = 1L;
 	private JTextField numberOfClassificationsTextField;
 	private JTextField upperVigilanceLimitTextField;
 	private JTextField lowerVigilanceLimitTextField;
@@ -17,6 +19,7 @@ public class ART2aView extends JPanel {
 	private JCheckBox scaleFingerprintItemsCheckBox;
 	private JTextField pathTextField;
 	private JButton pathButton;
+	
 	public ART2aView() {
 		setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		setPreferredSize(new Dimension(420, 147));

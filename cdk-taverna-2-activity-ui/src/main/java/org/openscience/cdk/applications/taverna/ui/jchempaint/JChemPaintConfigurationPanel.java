@@ -78,7 +78,7 @@ public class JChemPaintConfigurationPanel extends ActivityConfigurationPanel<Abs
 			} else {
 				model = this.file.getChemSequence(0).getChemModel(0);
 			}
-			this.jcpPanel = new JChemPaintPanel(model, "applet", false, null);
+			this.jcpPanel = new JChemPaintPanel(model);
 			this.add(this.jcpPanel);
 			this.revalidate();
 			this.refreshConfiguration();

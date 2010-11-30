@@ -16,10 +16,7 @@ import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.Preferences;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKFileFilter;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.ui.io.FileReaderConfigurationPanel;
-import org.openscience.cdk.applications.taverna.ui.io.FileWriterConfigurationPanel;
 
 public class ART2aClassificationConfigurationPanel extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {

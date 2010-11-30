@@ -94,7 +94,7 @@ public class CSVFileWriterActivity extends AbstractCDKActivity implements IItera
 			PrintWriter writer = new PrintWriter(new FileWriter(file, !oneFilePerIteration));
 			for (int i = 0; i < strings.size(); i++) {
 				String s = strings.get(i);
-				if (this.iteration > 1 && !oneFilePerIteration && i == 0) {
+				if (this.iteration > 1 && s.startsWith("\"ID\"")&& s.startsWith("Descriptor Name") && !oneFilePerIteration && i == 0) {
 					continue;
 				}
 				writer.write(s + "\n");

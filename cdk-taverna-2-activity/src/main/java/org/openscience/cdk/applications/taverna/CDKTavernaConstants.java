@@ -48,7 +48,7 @@ public class CDKTavernaConstants {
 	public static final String PROPERTY_FILE_EXTENSION = "FILE EXTENSION";
 	public static final String PROPERTY_SUPPORT_MULTI_FILE = "SUPPORT MULTI FILE";
 	public static final String PROPERTY_FILE_EXTENSION_DESCRIPTION = "FILE EXTENSION DESCRIPTION";
-	public static final String PROPERTY_REACTANT_PORTS = "PROPERTY REACTANT PORTS";
+	public static final String PROPERTY_NUMBER_OF_PORTS = "PROPERTY REACTANT PORTS";
 	public static final String PROPERTY_CMLCHEMFILE = "PROPERTY CMLCHEMFILE";
 	public static final String PROPERTY_CHOSEN_QSARDESCRIPTORS = "PROPERTY CHOSEN QSARDESCRIPTORS";
 	public static final String PROPERTY_ITERATIVE_READ_SIZE = "PROPERTY ITERATIVE READ SIZE";
@@ -62,7 +62,6 @@ public class CDKTavernaConstants {
 	public static final String PROPERTY_LOWER_VIGILANCE_LIMIT = "LOWER VIGILANCE LIMIT";
 	public static final String PROPERTY_MAXIMUM_CLASSIFICATION_TIME = "MAXIMUM CLASSIFICATION TIME";
 	public static final String PROPERTY_SCALE_FINGERPRINT_ITEMS = "SCALE FINGERPRINT ITEMS";
-	public static final String PROPERTY_NUMBER_OF_FINGERPRINT_ITEMS = "NUMBER OF FINGERPRINT ITEMS";
 	public static final String PROPERTY_QSAR_VECTOR_CURATION_TYPE = "QSAR VECTOR CURATION TYPE";
 	public static final String PROPERTY_QSAR_VECTOR_MIN_MAX_CURATION = "QSAR VECTOR MIN MAX CURATION";
 	// --------------------Miscellaneous-------------------------------------

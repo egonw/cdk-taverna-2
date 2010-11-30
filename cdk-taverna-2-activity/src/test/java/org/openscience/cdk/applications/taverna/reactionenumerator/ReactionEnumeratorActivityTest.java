@@ -58,7 +58,7 @@ public class ReactionEnumeratorActivityTest extends CDKTavernaTestCases {
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_REACTANT_PORTS, new Integer(2));
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS, new Integer(2));
 		configBean.setActivityName(ReactionEnumeratorActivity.REACTION_ENUMERATOR_ACTIVITY);
 	}
 

@@ -33,62 +33,52 @@ import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 import org.junit.Assert;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
-import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 /**
- * Test class for the ReactionReactantSplitter activity.
+ * Test class for the add implicit hydrogens activity.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class ReactionReactantSplitterActivityTest extends CDKTavernaTestCases {
+public class AddImplicitHydrogensActivityTest extends CDKTavernaTestCases {
 
 	private CDKActivityConfigurationBean configBean;
 
-	private AbstractCDKActivity activity = new ReactionReactantSplitterActivity();
+	private AbstractCDKActivity activity = new AddImplicitHydrogensActivity();
 
-	public ReactionReactantSplitterActivityTest() {
-		super(ReactionReactantSplitterActivity.REACTION_REACTANT_SPLITTER_ACTIVITY);
+	public AddImplicitHydrogensActivityTest() {
+		super(AddImplicitHydrogensActivity.ADD_IMPLICIT_HYDROGENS_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS, 2);
-		configBean.setActivityName(ReactionReactantSplitterActivity.REACTION_REACTANT_SPLITTER_ACTIVITY);
+		configBean.setActivityName(AddImplicitHydrogensActivity.ADD_IMPLICIT_HYDROGENS_ACTIVITY);
 	}
 
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
 		Map<String, Object> inputs = new HashMap<String, Object>();
+		CMLChemFile[] chemFiles = CDKTavernaTestData.getCMLChemFile();
 		List<byte[]> data = new ArrayList<byte[]>();
-		data.add(CDKObjectHandler.getBytes(CDKTavernaTestData.getReactionEvaluationReaction()));
+		for (CMLChemFile chemFile : chemFiles) {
+			data.add(CDKObjectHandler.getBytes(chemFile));
+		}
 		inputs.put(activity.getINPUT_PORTS()[0], data);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[1], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
-		byte[] objectData = (byte[]) outputs.get(activity.getRESULT_PORTS()[0]);
-		CMLChemFile chemFile = (CMLChemFile) CDKObjectHandler.getObject(objectData);
-		assertEquals(1, ChemFileManipulator.getAllAtomContainers(chemFile).size());
-		objectData = (byte[]) outputs.get(activity.getRESULT_PORTS()[1]);
-		chemFile = (CMLChemFile) CDKObjectHandler.getObject(objectData);
-		assertEquals(1, ChemFileManipulator.getAllAtomContainers(chemFile).size());
-	}
-
-	public void cleanUp() {
+		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
+		// Only check for exceptions
 	}
 
 	public void executeTest() {
 		try {
 			this.makeConfigBean();
 			this.executeAsynch();
-			this.cleanUp();
 		} catch (Exception e) {
 			e.printStackTrace();
 			// This test causes an error
@@ -102,7 +92,7 @@ public class ReactionReactantSplitterActivityTest extends CDKTavernaTestCases {
 	 * @return TestSuite
 	 */
 	public static Test suite() {
-		return new TestSuite(ReactionReactantSplitterActivityTest.class);
+		return new TestSuite(AddImplicitHydrogensActivityTest.class);
 	}
 
 }

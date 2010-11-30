@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- */package org.openscience.cdk.applications.taverna.filter;
+ */package org.openscience.cdk.applications.taverna.miscellaneous;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,25 +41,25 @@ import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomType;
+import org.openscience.cdk.tools.CDKHydrogenAdder;
 import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 
 /**
- * Class which represents the atom type filter activity. It tries to type each atom of the given structures and separates the
- * structures in typeable and not typeable ones.
+ * Class which represents the add implicit hydrogens activity.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class AtomTypeFilterActivity extends AbstractCDKActivity {
+public class AddImplicitHydrogensActivity extends AbstractCDKActivity {
 
-	public static final String ATOMTYPE_FILTER_ACTIVITY = "Atom Type Filter";
+	public static final String ADD_IMPLICIT_HYDROGENS_ACTIVITY = "Add Implicit Hydrogens";
 
 	/**
 	 * Creates a new instance.
 	 */
-	public AtomTypeFilterActivity() {
+	public AddImplicitHydrogensActivity() {
 		this.INPUT_PORTS = new String[] { "Structures", };
-		this.RESULT_PORTS = new String[] { "Typed Structures", "NOT Typed Structures" };
+		this.RESULT_PORTS = new String[] { "Modified Structures" };
 	}
 
 	@Override
@@ -69,19 +69,17 @@ public class AtomTypeFilterActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		for (String name : this.RESULT_PORTS) {
-			addOutput(name, 1);
-		}
+		addOutput(this.RESULT_PORTS[0], 1);
 	}
 
 	@Override
 	public String getActivityName() {
-		return AtomTypeFilterActivity.ATOMTYPE_FILTER_ACTIVITY;
+		return AddImplicitHydrogensActivity.ADD_IMPLICIT_HYDROGENS_ACTIVITY;
 	}
 
 	@Override
 	public String getDescription() {
-		return "Descriptions: " + AtomTypeFilterActivity.ATOMTYPE_FILTER_ACTIVITY;
+		return "Descriptions: " + AddImplicitHydrogensActivity.ADD_IMPLICIT_HYDROGENS_ACTIVITY;
 	}
 
 	@Override
@@ -91,7 +89,7 @@ public class AtomTypeFilterActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getFolderName() {
-		return CDKTavernaConstants.FILTER_FOLDER_NAME;
+		return CDKTavernaConstants.MISCELLANEOUS_FOLDER_NAME;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -101,8 +99,7 @@ public class AtomTypeFilterActivity extends AbstractCDKActivity {
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		List<CMLChemFile> typedList = new ArrayList<CMLChemFile>();
-		List<CMLChemFile> notTypedList = new ArrayList<CMLChemFile>();
+		List<CMLChemFile> taggedMoleculesList = new ArrayList<CMLChemFile>();
 		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
 		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
 				context);
@@ -121,32 +118,38 @@ public class AtomTypeFilterActivity extends AbstractCDKActivity {
 					this.getConfiguration().getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
-		for (IAtomContainer cont : containers) {
-			IAtom tmpAtom = null;
+		for (int i = 0; i < containers.length; i++) {
 			try {
-				CDKAtomTypeMatcher tmpMatcher = CDKAtomTypeMatcher.getInstance(cont.getBuilder());
-				for (int i = 0; i < cont.getAtomCount(); i++) {
-					tmpAtom = cont.getAtom(i);
-					if (tmpAtom.getAtomTypeName() == null) {
-						IAtomType tmpType = tmpMatcher.findMatchingAtomType(cont, tmpAtom);
-						AtomTypeManipulator.configure(tmpAtom, tmpType);
+				IAtomContainer aAtomContainer = containers[i];
+				CDKAtomTypeMatcher tmpMatcher = CDKAtomTypeMatcher.getInstance(aAtomContainer.getBuilder());
+				CDKHydrogenAdder tmpAdder = CDKHydrogenAdder.getInstance(aAtomContainer.getBuilder());
+				for (int j = 0; j < aAtomContainer.getAtomCount(); j++) {
+					IAtom tmpAtom = aAtomContainer.getAtom(j);
+					try {
+						if (tmpAtom.getAtomTypeName() == null) {
+							IAtomType tmpType = tmpMatcher.findMatchingAtomType(aAtomContainer, tmpAtom);
+							AtomTypeManipulator.configure(tmpAtom, tmpType);
+						}
+						tmpAdder.addImplicitHydrogens(aAtomContainer, tmpAtom);
+					} catch (Exception e) {
+						ErrorLogger.getInstance().writeError(
+								"Atom with element " + tmpAtom.getSymbol()
+										+ " could not be typed! Use Atom Type Filter to avoid this problem!",
+								this.getActivityName(), e);
 					}
 				}
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeMessage("Atom with element " + tmpAtom.getSymbol() + " could not be typed!");
-				notTypedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(cont));
-				continue;
+				ErrorLogger.getInstance().writeError("Error during adding implicit hydrogens!", this.getActivityName(), e);
 			}
-			typedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(cont));
+			taggedMoleculesList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(containers[i]));
 		}
 		// Congfigure output
 		try {
-			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(typedList), 1, true, context);
+			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(taggedMoleculesList), 1, true,
+					context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
-			containerRef = referenceService.register(CDKObjectHandler.getBytesList(notTypedList), 1, true, context);
-			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during configuring output ports.",
+			ErrorLogger.getInstance().writeError("Error while configuring output ports.",
 					this.getConfiguration().getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}

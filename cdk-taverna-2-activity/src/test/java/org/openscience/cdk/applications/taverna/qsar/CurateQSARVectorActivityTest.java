@@ -77,8 +77,8 @@ public class CurateQSARVectorActivityTest extends CDKTavernaTestCases {
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(loadActivity, inputs, expectedOutputTypes);
 		// leave empty. No ports used
 		inputs = outputs;
-		int[] vectorMapAsserts = {9,0,6};
-		int[] descriptorNamesAssert = {67,245,103};
+		int[] vectorMapAsserts = { 9, 0, 6 };
+		int[] descriptorNamesAssert = { 67, 245, 103 };
 		for (int i = 0; i < 3; i++) {
 			configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_QSAR_VECTOR_CURATION_TYPE, i);
 			expectedOutputTypes = new HashMap<String, Class<?>>();

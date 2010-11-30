@@ -44,9 +44,8 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 
-public class StructureToCMLStringConverterActivity extends AbstractCDKActivity implements IFileReader {
+public class StructureToCMLStringConverterActivity extends AbstractCDKActivity {
 
 	public static final String CML_STRING_CONVERTER_ACTIVITY = "Structure to CML String Converter";
 

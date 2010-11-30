@@ -37,6 +37,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.applications.taverna.interfaces.IPortNumber;
 
 /**
  * Class which represents the merge QSAR vectors activity.
@@ -44,7 +45,7 @@ import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
  * @author Andreas Truzskowski
  * 
  */
-public class MergeQSARVectorsActivity extends AbstractCDKActivity {
+public class MergeQSARVectorsActivity extends AbstractCDKActivity implements IPortNumber {
 
 	public static final String MERGE_QSAR_VECTORS_ACTIVITY = "Merge QSAR Vectors";
 
@@ -58,8 +59,7 @@ public class MergeQSARVectorsActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addInputPorts() {
-		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(
-				CDKTavernaConstants.PROPERTY_NUMBER_OF_FINGERPRINT_ITEMS);
+		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
 		for (int i = 1; i <= numberOfPorts; i++) {
 			addInput(this.INPUT_PORTS[0] + "_" + i, 0, true, null, byte[].class);
 			addInput(this.INPUT_PORTS[1] + "_" + i, 0, true, null, byte[].class);
@@ -81,8 +81,7 @@ public class MergeQSARVectorsActivity extends AbstractCDKActivity {
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
-		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(
-				CDKTavernaConstants.PROPERTY_NUMBER_OF_FINGERPRINT_ITEMS);
+		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
 		List<Map<UUID, Map<String, Object>>> vectorMapList = new ArrayList<Map<UUID, Map<String, Object>>>();
 		List<List<String>> descriptorNameList = new ArrayList<List<String>>();
 		String names[] = new String[numberOfPorts];
@@ -153,7 +152,7 @@ public class MergeQSARVectorsActivity extends AbstractCDKActivity {
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(CDKTavernaConstants.PROPERTY_NUMBER_OF_FINGERPRINT_ITEMS, 2);
+		properties.put(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS, 2);
 		return properties;
 	}
 

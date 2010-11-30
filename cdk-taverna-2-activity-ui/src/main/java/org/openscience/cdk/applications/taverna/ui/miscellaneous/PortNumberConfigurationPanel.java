@@ -57,9 +57,10 @@ public class PortNumberConfigurationPanel extends ActivityConfigurationPanel<Abs
 		try {
 			this.removeAll();
 			this.setLayout(new GridLayout(2, 0, 1, 1));
-			JLabel label = new JLabel("Number of reactant ports:");
+			JLabel label = new JLabel("Number of ports:");
 			this.add(label);
-			this.portTextField = new JTextField("2");
+			int numberOfPorts = (Integer) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
+			this.portTextField = new JTextField("" + numberOfPorts);
 			this.add(this.portTextField);
 			this.refreshConfiguration();
 		} catch (Exception e) {
@@ -90,7 +91,7 @@ public class PortNumberConfigurationPanel extends ActivityConfigurationPanel<Abs
 	@Override
 	public boolean isConfigurationChanged() {
 		int numberOfPorts = Integer.parseInt(this.portTextField.getText());
-		int oldValue = (Integer) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_REACTANT_PORTS);
+		int oldValue = (Integer) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
 		return !(numberOfPorts == oldValue);
 	}
 
@@ -98,7 +99,7 @@ public class PortNumberConfigurationPanel extends ActivityConfigurationPanel<Abs
 	public void noteConfiguration() {
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
 		int numberOfPorts = Integer.parseInt(this.portTextField.getText());
-		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_REACTANT_PORTS, new Integer(numberOfPorts));
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS, new Integer(numberOfPorts));
 	}
 
 	@Override

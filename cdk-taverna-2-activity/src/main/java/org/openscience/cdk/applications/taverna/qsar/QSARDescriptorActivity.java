@@ -62,7 +62,7 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 	public QSARDescriptorActivity() {
 		super();
 		this.INPUT_PORTS = new String[] { "Structures" };
-		this.RESULT_PORTS = new String[] { "Calculated Structures" };
+		this.RESULT_PORTS = new String[] { "Calculated Structures", "Time CSV" };
 	}
 
 	@Override
@@ -107,8 +107,10 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 		InvocationContext context = this.callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
+		ArrayList<String> durationList = new ArrayList<String>();
 		ArrayList<Class<? extends AbstractCDKActivity>> classes = (ArrayList<Class<? extends AbstractCDKActivity>>) this
 				.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_CHOSEN_QSARDESCRIPTORS);
+		List<IAtomContainer> moleculeList = new ArrayList<IAtomContainer>();
 		if (classes == null || classes.isEmpty()) {
 			throw new CDKTavernaException(this.getActivityName(), "No QSAR descriptors chosen!");
 		}
@@ -117,17 +119,18 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during deserializion of object!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		if (chemFileList.isEmpty()) {
-			return null;
+			throw new CDKTavernaException(this.getActivityName(), "Chemfile list is empty!");
 		}
-		List<IAtomContainer> moleculeList = new ArrayList<IAtomContainer>();
+
 		for (Iterator<CMLChemFile> iter = chemFileList.iterator(); iter.hasNext();) {
 			CMLChemFile file = iter.next();
 			moleculeList.addAll(ChemFileManipulator.getAllAtomContainers(file));
 		}
+		durationList.add("Descriptor Name;Duration;");
 		for (Class<? extends AbstractCDKActivity> clazz : classes) {
 			AbstractCDKActivity descriptorActivity = null;
 			try {
@@ -137,9 +140,13 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 						this.getActivityName(), e);
 				continue;
 			}
+			long startTime = System.currentTimeMillis();
 			if (descriptorActivity instanceof AbstractAtomicDescriptor) {
 				IAtomicDescriptor descriptor = ((AbstractAtomicDescriptor) descriptorActivity).getDescriptor();
 				for (IAtomContainer molecule : moleculeList) {
+					if (molecule.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
+						throw new Exception("Molecule contains no ID!");
+					}
 					try {
 						for (int j = 0; j < molecule.getAtomCount(); j++) {
 							DescriptorValue value = descriptor.calculate(molecule.getAtom(j), molecule);
@@ -147,7 +154,7 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 						}
 					} catch (Exception e) {
 						ErrorLogger.getInstance().writeError(
-								"Error during calculating QSAR descriptor: " + descriptor.getClass() + "!",
+								"Error during calculation of QSAR descriptor: " + descriptor.getClass() + "!",
 								descriptor.toString(), e);
 					}
 				}
@@ -164,7 +171,7 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 						}
 					} catch (Exception e) {
 						ErrorLogger.getInstance().writeError(
-								"Error during calculating QSAR descriptor: " + descriptor.getClass() + "!",
+								"Error during calculation of QSAR descriptor: " + descriptor.getClass() + "!",
 								descriptor.toString(), e);
 					}
 				}
@@ -180,7 +187,7 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 						}
 					} catch (Exception e) {
 						ErrorLogger.getInstance().writeError(
-								"Error during calculating QSAR descriptor: " + descriptor.getClass() + "!",
+								"Error during calculation of QSAR descriptor: " + descriptor.getClass() + "!",
 								descriptor.toString(), e);
 					}
 				}
@@ -194,7 +201,7 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 						}
 					} catch (Exception e) {
 						ErrorLogger.getInstance().writeError(
-								"Error during calculating QSAR descriptor: " + descriptor.getClass() + "!",
+								"Error during calculation of QSAR descriptor: " + descriptor.getClass() + "!",
 								descriptor.toString(), e);
 					}
 				}
@@ -206,7 +213,7 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 						molecule.setProperty(value.getSpecification(), value);
 					} catch (Exception e) {
 						ErrorLogger.getInstance().writeError(
-								"Error during calculating QSAR descriptor: " + descriptor.getClass() + "!",
+								"Error during calculation of QSAR descriptor: " + descriptor.getClass() + "!",
 								descriptor.toString(), e);
 					}
 				}
@@ -214,6 +221,10 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 				throw new CDKTavernaException("QSARDescreiptorWorker", "Unknown descriptor type: "
 						+ descriptorActivity.getActivityName());
 			}
+			long duration = System.currentTimeMillis() - startTime;
+			String durationString = descriptorActivity.getActivityName() + ";" + String.format("%4f", duration / 1000.0) + "s;";
+			durationList.add(durationString);
+
 		}
 		try {
 			List<CMLChemFile> chemFiles = CMLChemFileWrapper.wrapAtomContainerListInChemModelList(moleculeList);
@@ -221,9 +232,11 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 			// Congfigure output
 			T2Reference containerRef = referenceService.register(moleculeDataArray, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
+			containerRef = referenceService.register(durationList, 1, true, context);
+			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
+			ErrorLogger.getInstance().writeError("Error during configuration of output port!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error during configuration of output port!");
 		}
 		return outputs;
 	}

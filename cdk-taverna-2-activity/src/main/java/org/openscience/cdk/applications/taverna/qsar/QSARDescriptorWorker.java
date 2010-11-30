@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
@@ -43,7 +44,7 @@ import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
  * Class which represents the QSAR descriptor worker.
  * 
  * @author Andreas Truszkowski
- *
+ * 
  */
 public class QSARDescriptorWorker extends Thread {
 
@@ -83,9 +84,14 @@ public class QSARDescriptorWorker extends Thread {
 							this.getClass().getSimpleName(), e);
 					continue;
 				}
+
 				if (descriptorActivity instanceof AbstractAtomicDescriptor) {
 					IAtomicDescriptor descriptor = ((AbstractAtomicDescriptor) descriptorActivity).getDescriptor();
 					for (IAtomContainer molecule : moleculeList) {
+						if (molecule.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
+							ErrorLogger.getInstance().writeError("Molecule contains no ID!", this.getClass().getSimpleName());
+							throw new CDKTavernaException(this.getClass().getSimpleName(), "Molecule contains no ID!");
+						}
 						try {
 							for (int j = 0; j < molecule.getAtomCount(); j++) {
 								DescriptorValue value = descriptor.calculate(molecule.getAtom(j), molecule);
@@ -163,9 +169,10 @@ public class QSARDescriptorWorker extends Thread {
 				}
 			}
 			chemFiles = CMLChemFileWrapper.wrapAtomContainerListInChemModelList(moleculeList);
-				this.moleculeDataArray = CDKObjectHandler.getBytesList(chemFiles);
+			this.moleculeDataArray = CDKObjectHandler.getBytesList(chemFiles);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during calculation of QSAR descriptors!", this.getClass().getSimpleName(), e);
+			ErrorLogger.getInstance().writeError("Error during calculation of QSAR descriptors!",
+					this.getClass().getSimpleName(), e);
 		}
 		this.owner.workerDone(this.moleculeDataArray);
 	}

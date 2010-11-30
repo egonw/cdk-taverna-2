@@ -99,7 +99,7 @@ public class ReactionEnumeratorConfigurationPanel extends
 	@Override
 	public boolean isConfigurationChanged() {
 		int numberOfPorts = Integer.parseInt(this.portTextField.getText());
-		int oldValue = (Integer) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_REACTANT_PORTS);
+		int oldValue = (Integer) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
 		if (!(numberOfPorts == oldValue)) {
 			return true;
 		} else if (this.useMultiMatchCheckerCheckBox.isSelected() != (this.configBean
@@ -116,7 +116,7 @@ public class ReactionEnumeratorConfigurationPanel extends
 	public void noteConfiguration() {
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
 		int numberOfPorts = Integer.parseInt(this.portTextField.getText());
-		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_REACTANT_PORTS, new Integer(numberOfPorts));
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS, new Integer(numberOfPorts));
 		if (this.useMultiMatchCheckerCheckBox.isSelected()) {
 			this.configBean.addAdditionalProperty(ReactionEnumeratorActivity.USE_MULTI_MATCH_CHECKER, true);
 		} else {

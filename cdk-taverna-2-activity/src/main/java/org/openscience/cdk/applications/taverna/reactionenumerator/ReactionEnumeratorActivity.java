@@ -63,7 +63,7 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addInputPorts() {
-		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_REACTANT_PORTS);
+		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
 		for (int i = 0; i < numberOfPorts; i++) {
 			addInput(ReactionEnumeratorActivity.REACTANT_PORT + " " + (i + 1), 1, true, null, byte[].class);
 		}
@@ -85,7 +85,7 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 		LinkedList<IAtomContainer[]> reactants = new LinkedList<IAtomContainer[]>();
 		IReaction reaction = null;
 		List<byte[]> dataList;
-		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_REACTANT_PORTS);
+		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
 		ReactionEnumerator enumerator = new ReactionEnumerator();
 		// TODO remove
 		enumerator.setCreate2DCoordinates(true);
@@ -155,7 +155,7 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
 		properties.put(ReactionEnumeratorActivity.USE_MULTI_MATCH_CHECKER, true);
 		properties.put(ReactionEnumeratorActivity.USE_VARIABLE_REGION_CHECKER, true);
-		properties.put(CDKTavernaConstants.PROPERTY_REACTANT_PORTS, new Integer(2));
+		properties.put(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS, new Integer(2));
 		return properties;
 	}
 

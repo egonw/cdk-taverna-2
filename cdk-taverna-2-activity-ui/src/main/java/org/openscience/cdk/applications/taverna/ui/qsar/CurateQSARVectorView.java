@@ -9,10 +9,13 @@ import java.awt.Dimension;
 import javax.swing.border.BevelBorder;
 
 public class CurateQSARVectorView extends JPanel {
+
+	private static final long serialVersionUID = 1L;
 	private JRadioButton rdbtnDynamicCuration;
 	private JRadioButton rdbtnCurateOnlyColumns;
 	private JRadioButton rdbtnCurateOnlyRows;
 	private JCheckBox chckbxRemoveMinmaxValue;
+	
 	public CurateQSARVectorView() {
 		setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		setPreferredSize(new Dimension(300, 150));

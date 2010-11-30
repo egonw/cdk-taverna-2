@@ -45,11 +45,10 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.io.MDLRXNWriter;
 
-public class ReactionToMDLRXNStringConverterActivity extends AbstractCDKActivity implements IFileReader {
+public class ReactionToMDLRXNStringConverterActivity extends AbstractCDKActivity {
 
 	public static final String MDL_RXN_STRING_CONVERTER_ACTIVITY = "Reaction to MDL RXN String Converter";
 

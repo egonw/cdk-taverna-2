@@ -43,10 +43,11 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.category.AreaRenderer;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.statistics.SimpleHistogramDataset;
+import org.jfree.data.statistics.HistogramDataset;
 
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
@@ -93,6 +94,10 @@ public class ChartTool {
 	 * Render the description of the x-axis diagonal
 	 */
 	private boolean renderXAxisDescriptionDiagonal = false;
+	/**
+	 * Render the legend of the chart.
+	 */
+	private boolean renderLegend = true;
 	/**
 	 * Map which stores for each file (containing the diagram) a table with some information about the diagram
 	 */
@@ -193,6 +198,21 @@ public class ChartTool {
 	}
 
 	/**
+	 * @return the isRenderLegend
+	 */
+	public boolean isRenderLegend() {
+		return renderLegend;
+	}
+
+	/**
+	 * @param renderLegend
+	 *            true if the legend should be drawn.
+	 */
+	public void setRenderLegend(boolean renderLegend) {
+		this.renderLegend = renderLegend;
+	}
+
+	/**
 	 * @return the renderXAxisDescriptionDiagonal
 	 */
 	public boolean isRenderXAxisDescriptionDiagonal() {
@@ -221,6 +241,82 @@ public class ChartTool {
 	// end
 
 	// region Public Methods
+
+	/**
+	 * Method which exports a dataset to a chart. This chart gets stored temporarily as jpg.
+	 * 
+	 * @param dataSet
+	 *            Dataset from which a chart will be generated
+	 * @param title
+	 *            Title of the chart
+	 * @return File which contains the jpg
+	 * @throws IOException
+	 * @throws DocumentException
+	 */
+	public File exportToAreaChart(DefaultCategoryDataset dataSet, String title) throws IOException, DocumentException {
+		File file = File.createTempFile("ClusterChart", ".jpg");
+		JFreeChart chart = ChartFactory.createAreaChart(title, this.descriptionXAxis, this.descriptionYAxis, dataSet,
+				this.plotOrientation, this.renderLegend, false, false);
+		// set the background color for the chart...
+		chart.setBackgroundPaint(Color.white);
+		chart.setAntiAlias(true);
+		// get a reference to the plot for further customization...
+		CategoryPlot plot = (CategoryPlot) chart.getPlot();
+		plot.setBackgroundPaint(Color.lightGray);
+		plot.setDomainGridlinePaint(Color.white);
+		plot.setDomainGridlinesVisible(true);
+		plot.setRangeGridlinePaint(Color.white);
+
+		// set the range axis to display integers only...
+		final NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+
+		rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+
+		// disable bar outlines...
+		AreaRenderer renderer = (AreaRenderer) plot.getRenderer();
+
+		// set up gradient paints for series...
+		// GradientPaint gp0 = new GradientPaint(0.0f, 0.0f, Color.blue,
+		// 0.0f, 0.0f, new Color(0, 0, 64));
+		// GradientPaint gp1 = new GradientPaint(0.0f, 0.0f, Color.red,
+		// 0.0f, 0.0f, new Color(0, 0, 64));
+		// GradientPaint gp2 = new GradientPaint(0.0f, 0.0f, Color.yellow,
+		// 0.0f, 0.0f, new Color(0, 0, 64));
+		// GradientPaint gp3 = new GradientPaint(0.0f, 0.0f, Color.green,
+		// 0.0f, 0.0f, new Color(0, 0, 64));
+		// GradientPaint gp4 = new GradientPaint(0.0f, 0.0f, Color.pink,
+		// 0.0f, 0.0f, new Color(0, 0, 64));
+		renderer.setSeriesPaint(0, Color.blue);
+		renderer.setSeriesPaint(1, Color.yellow);
+		renderer.setSeriesPaint(2, Color.red);
+		renderer.setSeriesPaint(3, Color.darkGray);
+		renderer.setSeriesPaint(4, Color.green);
+
+		if (renderXAxisDescriptionDiagonal) {
+			CategoryAxis domainAxis = plot.getDomainAxis();
+			domainAxis.setCategoryLabelPositions(CategoryLabelPositions.createUpRotationLabelPositions(Math.PI / 6.0));
+		}
+		ChartUtilities.saveChartAsJPEG(file, chart, this.barChartWidth, this.barChartHeight);
+
+		// DOMImplementation domImpl
+		// = GenericDOMImplementation.getDOMImplementation();
+		// // Create an instance of org.w3c.dom.Document
+		// org.w3c.dom.Document document = domImpl.createDocument(null, "svg", null);
+		// // Create an instance of the SVG Generator
+		// SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+		// // set the precision to avoid a null pointer exception in Batik 1.5
+		// svgGenerator.getGeneratorContext().setPrecision(6);
+		// // Ask the chart to render into the SVG Graphics2D implementation
+		// chart.draw(svgGenerator, new Rectangle2D.Double(0, 0, this.barChartWidth, this.barChartHeight), null);
+		// // Finally, stream out SVG to a file using UTF-8 character to
+		// // byte encoding
+		// boolean useCSS = true;
+		// Writer out = new OutputStreamWriter(new FileOutputStream(svgfile), "UTF-8");
+		// svgGenerator.stream(out, useCSS);
+
+		return file;
+	}
+
 	/**
 	 * Method which exports a dataset to a chart. This chart gets stored temporarily as jpg.
 	 * 
@@ -234,8 +330,8 @@ public class ChartTool {
 	 */
 	public File exportToBarChart(DefaultCategoryDataset dataSet, String title) throws IOException, DocumentException {
 		File file = File.createTempFile("ClusterChart", ".jpg");
-		JFreeChart chart = ChartFactory.createBarChart3D(title, this.descriptionXAxis, this.descriptionYAxis, dataSet,
-				this.plotOrientation, true, false, false);
+		JFreeChart chart = ChartFactory.createBarChart(title, this.descriptionXAxis, this.descriptionYAxis, dataSet,
+				this.plotOrientation, this.renderLegend, false, false);
 		// set the background color for the chart...
 		chart.setBackgroundPaint(Color.white);
 
@@ -308,11 +404,10 @@ public class ChartTool {
 	 * @throws IOException
 	 * @throws DocumentException
 	 */
-	public File exportToHistogrammChart(SimpleHistogramDataset dataSet, String title, String fileName) throws IOException,
-			DocumentException {
-		File file = File.createTempFile(fileName, ".jpg");
+	public File exportToHistogrammChart(HistogramDataset dataSet, String title) throws IOException, DocumentException {
+		File file = File.createTempFile("HistogrammChart", ".jpg");
 		JFreeChart chart = ChartFactory.createHistogram(title, this.descriptionXAxis, this.descriptionYAxis, dataSet,
-				this.plotOrientation, true, false, false);
+				this.plotOrientation, this.renderLegend, false, false);
 		// set the background color for the chart...
 		chart.setBackgroundPaint(Color.white);
 

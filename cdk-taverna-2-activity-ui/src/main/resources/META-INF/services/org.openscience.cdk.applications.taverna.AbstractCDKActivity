@@ -25,6 +25,7 @@ org.openscience.cdk.applications.taverna.miscellaneous.ReactionSplitterActivity
 org.openscience.cdk.applications.taverna.miscellaneous.UUIDGeneratorActivity
 org.openscience.cdk.applications.taverna.miscellaneous.AromaticityDetectorActivity
 org.openscience.cdk.applications.taverna.miscellaneous.AddExplicitHydrogensActivity
+org.openscience.cdk.applications.taverna.miscellaneous.AddImplicitHydrogensActivity
 org.openscience.cdk.applications.taverna.miscellaneous.TagMoleculesWithUUIDActivity
 org.openscience.cdk.applications.taverna.filter.AtomTypeFilterActivity
 org.openscience.cdk.applications.taverna.filter.DoubletsFilterActivity

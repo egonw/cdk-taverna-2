@@ -154,6 +154,40 @@ public class ErrorLogger {
 	}
 
 	/**
+	 * Writes an error to the log file.
+	 * 
+	 * @param aError
+	 *            Error description.
+	 * @param aName
+	 *            Name of the class.
+	 */
+	public void writeError(final String aError, final String aName) {
+		Date tmpDate = Calendar.getInstance().getTime();
+		this.errorOccured = true;
+		try {
+			if (this.file == null) {
+				this.file = new File(this.filename);
+				if (!this.file.exists()) {
+					this.file.createNewFile();
+				}
+				this.writer = new PrintStream(this.file);
+			}
+		} catch (Exception e) {
+			// Very bad! Only print stack trace and return.
+			e.printStackTrace();
+			return;
+		}
+		this.writer.println();
+
+		this.writer.println();
+		this.writer.flush();
+		// Write to console
+		System.out.println(tmpDate.toString() + ":");
+		System.out.println("Error  : " + aError);
+		System.out.println("Class  : " + aName);
+	}
+	
+	/**
 	 * Writes an error to the log file and writes the molecule to hard disk.
 	 * 
 	 * @param aError

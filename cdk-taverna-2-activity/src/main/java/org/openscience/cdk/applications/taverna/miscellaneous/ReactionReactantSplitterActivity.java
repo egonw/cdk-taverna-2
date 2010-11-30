@@ -63,7 +63,7 @@ public class ReactionReactantSplitterActivity extends AbstractCDKActivity implem
 
 	@Override
 	protected void addOutputPorts() {
-		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_REACTANT_PORTS);
+		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
 		this.RESULT_PORTS = new String[numberOfPorts];
 		for (int i = 0; i < numberOfPorts; i++) {
 			this.RESULT_PORTS[i] = "Reactant " + (i + 1);
@@ -84,7 +84,7 @@ public class ReactionReactantSplitterActivity extends AbstractCDKActivity implem
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(CDKTavernaConstants.PROPERTY_REACTANT_PORTS, 2);
+		properties.put(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS, 2);
 		return properties;
 	}
 
@@ -100,7 +100,7 @@ public class ReactionReactantSplitterActivity extends AbstractCDKActivity implem
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<IReaction> reactionList;
-		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_REACTANT_PORTS);
+		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
 		CMLChemFile[] resultList = new CMLChemFile[numberOfPorts];
 		for (int i = 0; i < resultList.length; i++) {
 			resultList[i] = new CMLChemFile();

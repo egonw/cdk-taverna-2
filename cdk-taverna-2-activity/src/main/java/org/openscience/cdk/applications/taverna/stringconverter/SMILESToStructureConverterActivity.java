@@ -47,12 +47,11 @@ import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.io.SMILESReader;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
 
-public class SMILESToStructureConverterActivity extends AbstractCDKActivity implements IFileReader {
+public class SMILESToStructureConverterActivity extends AbstractCDKActivity {
 
 	public static final String SMILES_CONVERTER_ACTIVITY = "SMILES to Structures Converter";
 
