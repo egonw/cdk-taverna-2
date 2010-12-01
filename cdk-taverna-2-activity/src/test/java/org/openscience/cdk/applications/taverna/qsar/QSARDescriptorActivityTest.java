@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -36,12 +37,14 @@ import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
+import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.qsar.descriptors.atomic.AtomDegree;
 import org.openscience.cdk.applications.taverna.qsar.descriptors.atompair.PiContactDetection;
 import org.openscience.cdk.applications.taverna.qsar.descriptors.bond.AtomicNumberDifference;
 import org.openscience.cdk.applications.taverna.qsar.descriptors.molecular.RuleOfFive;
 import org.openscience.cdk.applications.taverna.qsar.descriptors.protein.TaeAminoAcid;
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 /**
  * Test class for the QSAAR descriptor activity.
@@ -74,7 +77,13 @@ public class QSARDescriptorActivityTest extends CDKTavernaTestCases {
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
 		Map<String, Object> inputs = new HashMap<String, Object>();
-		List<byte[]> data = CDKObjectHandler.getBytesList(CDKTavernaTestData.getCMLChemFile());
+		CMLChemFile[] chemFiles = CDKTavernaTestData.getCMLChemFile();
+		for (CMLChemFile chemFile : chemFiles) {
+			IAtomContainer container = chemFile.getChemSequence(0).getChemModel(0).getMoleculeSet().getAtomContainer(0);
+			UUID uuid = UUID.randomUUID();
+			container.setProperty(CDKTavernaConstants.MOLECULEID, uuid);
+		}
+		List<byte[]> data = CDKObjectHandler.getBytesList(chemFiles);
 		inputs.put(activity.getINPUT_PORTS()[0], data);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);

@@ -9,8 +9,8 @@
 	<name>CDK-Taverna 2 activity</name>
 	
 	<scm>
-		<connection>scm:svn:https://cdktaverna2.svn.sourceforge.net/svnroot/cdktaverna2/tags/cdk-taverna2-0.2-snapshot</connection>
-		<developerConnection>scm:svn:https://cdktaverna2.svn.sourceforge.net/svnroot/cdktaverna2/tags/cdk-taverna2-0.2-snapshot</developerConnection>
+		<connection>scm:svn:https://cdktaverna2.svn.sourceforge.net/svnroot/cdktaverna2/tags/cdk-taverna2-0.3</connection>
+		<developerConnection>scm:svn:https://cdktaverna2.svn.sourceforge.net/svnroot/cdktaverna2/tags/cdk-taverna2-0.3</developerConnection>
  	</scm>
 	
 <distributionManagement>
