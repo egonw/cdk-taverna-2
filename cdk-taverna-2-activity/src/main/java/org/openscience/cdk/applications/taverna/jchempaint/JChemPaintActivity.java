@@ -21,6 +21,8 @@
  */
 package org.openscience.cdk.applications.taverna.jchempaint;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +39,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.io.CMLReader;
 
 /**
  * Class which represents the JChemPaint activity.
@@ -95,12 +98,16 @@ public class JChemPaintActivity extends AbstractCDKActivity {
 		List<byte[]> dataList = new ArrayList<byte[]>();
 		// Read ChemFile
 		try {
-			CMLChemFile chemFile = (CMLChemFile) this.getConfiguration().getAdditionalProperty(
+			File file = (File) this.getConfiguration().getAdditionalProperty(
 					CDKTavernaConstants.PROPERTY_CMLCHEMFILE);
-			if (chemFile == null) {
+			if (file == null) {
 				throw new CDKTavernaException(JChemPaintActivity.JCHEMPAINT_ACTIVITY, "No molecules found!");
 			}
-			cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(chemFile);
+			CMLChemFile cmlChemFile = new CMLChemFile();
+			CMLReader reader = new CMLReader(new FileInputStream(file));
+			cmlChemFile = (CMLChemFile) reader.read(cmlChemFile);
+			reader.close();
+			cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(cmlChemFile);
 			if (cmlChemFileList.isEmpty()) {
 				throw new CDKTavernaException(JChemPaintActivity.JCHEMPAINT_ACTIVITY, "No molecules found!");
 			}

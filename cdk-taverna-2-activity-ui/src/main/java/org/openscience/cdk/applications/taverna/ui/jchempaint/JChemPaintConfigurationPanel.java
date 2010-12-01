@@ -23,11 +23,15 @@ package org.openscience.cdk.applications.taverna.ui.jchempaint;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.PrintWriter;
 
 import javax.swing.JOptionPane;
 
 import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityConfigurationPanel;
 
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.ChemModel;
 import org.openscience.cdk.ChemSequence;
 import org.openscience.cdk.Molecule;
@@ -36,8 +40,15 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
+import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
+import org.openscience.cdk.applications.taverna.io.CDKIOFileWriter;
+import org.openscience.cdk.applications.taverna.io.CDKIOReader;
+import org.openscience.cdk.applications.taverna.io.CDKIOWriter;
 import org.openscience.cdk.interfaces.IChemModel;
 import org.openscience.cdk.interfaces.IMoleculeSet;
+import org.openscience.cdk.io.CMLReader;
+import org.openscience.cdk.io.CMLWriter;
 import org.openscience.cdk.tools.manipulator.ChemSequenceManipulator;
 import org.openscience.jchempaint.JChemPaintPanel;
 
@@ -55,7 +66,7 @@ public class JChemPaintConfigurationPanel extends ActivityConfigurationPanel<Abs
 	private CDKActivityConfigurationBean configBean;
 
 	private JChemPaintPanel jcpPanel = null;
-	private CMLChemFile file = null;
+	private File file = null;
 
 	public JChemPaintConfigurationPanel(AbstractCDKActivity activity) {
 		this.activity = activity;
@@ -68,20 +79,21 @@ public class JChemPaintConfigurationPanel extends ActivityConfigurationPanel<Abs
 			this.removeAll();
 			this.setLayout(new GridLayout());
 			this.setPreferredSize(new Dimension(800, 600));
-			this.file = (CMLChemFile) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_CMLCHEMFILE);
+			this.file = (File) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_CMLCHEMFILE);
 			IChemModel model = null;
-			if (file == null) {
-				model = new ChemModel();
-				IMoleculeSet molSet = new MoleculeSet();
-				molSet.addAtomContainer(new Molecule());
-				model.setMoleculeSet(molSet);
+			if (this.file == null || !this.file.exists()) {
+				Molecule container  = new Molecule();
+				model = CMLChemFileWrapper.wrapAtomContainerInChemModel(container).getChemSequence(0).getChemModel(0);
 			} else {
-				model = this.file.getChemSequence(0).getChemModel(0);
+				CMLChemFile cmlChemFile = new CMLChemFile();
+				CMLReader reader = new CMLReader(new FileInputStream(this.file));
+				cmlChemFile = (CMLChemFile) reader.read(cmlChemFile);
+				reader.close();
+				model = cmlChemFile.getChemSequence(0).getChemModel(0);
 			}
 			this.jcpPanel = new JChemPaintPanel(model);
 			this.add(this.jcpPanel);
 			this.revalidate();
-			this.refreshConfiguration();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -109,16 +121,24 @@ public class JChemPaintConfigurationPanel extends ActivityConfigurationPanel<Abs
 		if (this.file == null) {
 			return false;
 		}
-		CMLChemFile file = (CMLChemFile) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_CMLCHEMFILE);
+		File file = (File) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_CMLCHEMFILE);
 		return !this.file.equals(file);
 	}
 
 	@Override
 	public void noteConfiguration() {
-		this.file = new CMLChemFile();
+		this.file = FileNameGenerator.getNewFile(FileNameGenerator.getCacheDir(), ".cml");
 		ChemSequence sequence = new ChemSequence();
 		sequence.addChemModel(JChemPaintConfigurationPanel.this.jcpPanel.getChemModel());
-		this.file.addChemSequence(sequence);
+		CMLChemFile chemFile = new CMLChemFile();
+		chemFile.addChemSequence(sequence);
+		try {
+			PrintWriter writer = new PrintWriter(this.file);
+			writer.write(chemFile.toCML());
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CMLCHEMFILE, this.file);
 	}
