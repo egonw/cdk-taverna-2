@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.xml.stream.XMLStreamReader;
 
@@ -35,31 +34,29 @@ import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.category.DefaultCategoryDataset;
 import org.openscience.cdk.applications.art2aclassification.Art2aClassificator;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.basicutilities.ChartTool;
-import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.io.XMLFileIO;
 
 /**
- * Class which represents the ART-2a result to PDF activity.
+ * Class which represents the ART-2a result to CSV activity.
+ * This worker extracts content from a given set of ART2A classification results and creates a String list in the comma separated value format.
  * 
  * @author Andreas Truzskowski
  * 
  */
-public class ART2aResultAsPDF extends AbstractCDKActivity {
+public class ART2aResultAsCSV extends AbstractCDKActivity {
 
-	public static final String ART2A_RESULT_AS_PDF_ACTIVITY = "ART-2a Result As PDF";
+	public static final String ART2A_RESULT_AS_CSV_ACTIVITY = "ART-2a Result As CSV";
 
 	/**
 	 * Creates a new instance.
 	 */
-	public ART2aResultAsPDF() {
+	public ART2aResultAsCSV() {
 		this.INPUT_PORTS = new String[] { "ART-2a Files" };
+		this.RESULT_PORTS = new String[] { "ART-2a CSV" };
 	}
 
 	@Override
@@ -69,17 +66,17 @@ public class ART2aResultAsPDF extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		// empty
+		addOutput(this.RESULT_PORTS[0], 1);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
-		List<String> resultFileNames = new ArrayList<String>();
-		List<String> pdfTitle = new ArrayList<String>();
+		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
+		List<String> result = new ArrayList<String>();
 		List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
 				context);
 		if (files == null || files.size() == 0) {
@@ -90,81 +87,64 @@ public class ART2aResultAsPDF extends AbstractCDKActivity {
 			StringBuffer buffer;
 			Art2aClassificator classificator;
 			XMLFileIO xmlFileIO = new XMLFileIO();
-			ChartTool chartTool = new ChartTool();
-			chartTool.setBarChartHeight(450);
-			chartTool.setBarChartWidth(750);
-			chartTool.setPlotOrientation(PlotOrientation.VERTICAL);
-			chartTool.setDescriptionXAxis("(Class number/Number of Vectors/Interangle)");
-			chartTool.setDescriptionYAxis("Number of vectors");
-			chartTool.setRenderXAxisDescriptionDiagonal(true);
-			int classNumberWithMaxOfVectors = 0;
-			int maxVectorsInClass = 0;
-			ArrayList<File> tempFileList = new ArrayList<File>();
-			TreeMap<Double, Integer> treeMap = new TreeMap<Double, Integer>();
-			Map.Entry<Double, Integer> entry;
-			DefaultCategoryDataset dataSet;
-			String numberOfVectorsInClass = "Number of vectors in class";
-			pdfTitle.add("This file contains charts from the ART2A Classification");
-			pdfTitle.add("The header of each chart contains the following informations; ");
-			pdfTitle.add("(Filename/Vigilance Parameter/Number of detected classes/Number of epochs)");
+			int maxNumberOfDetectedClasses = 0;
+			result.add("FileName;VigilanceParameter;NumberOfDetectedClasses;ConvergenceFlag;ClassificationComplete;InputScalingFactor;LearningParameter;NumberOfEpochs");
 			for (String fileName : files) {
+				buffer = new StringBuffer();
+				buffer.append(fileName);
+				buffer.append(";");
+				
 				xmlReader = xmlFileIO.getXMLStreamReaderWithCompression(fileName);
 				xmlReader.next();
-				classificator = new Art2aClassificator(xmlReader, true);
+				classificator = new Art2aClassificator(xmlReader, true);	
+				
+				buffer.append(classificator.getVigilanceParameter());
+				buffer.append(";");
+				buffer.append(classificator.getNumberOfDetectedClasses());
+				buffer.append(";");
+				buffer.append(classificator.getConvergenceFlag());
+				buffer.append(";");
+				buffer.append(classificator.getClassificationCompleteFlag());
+				buffer.append(";");
+				buffer.append(classificator.getInputScalingFactor());
+				buffer.append(";");
+				buffer.append(classificator.getLearningParameter());
+				buffer.append(";");
+				buffer.append(classificator.getNumberOfEpochs());
+				buffer.append(";");
+				
+				// Add the number of vectors in class
+				for (int i = 0; i < classificator.getNumberOfDetectedClasses(); i++) {
+					buffer.append(classificator.getNumberOfVectorsInClass(i));
+					buffer.append(";");
+				}
+				result.add(buffer.toString());
+				if (classificator.getNumberOfDetectedClasses() > maxNumberOfDetectedClasses) {
+					maxNumberOfDetectedClasses = classificator.getNumberOfDetectedClasses();
+				}
 				xmlReader.close();
 				xmlFileIO.closeXMLStreamReader();
-				classNumberWithMaxOfVectors = 0;
-				maxVectorsInClass = 0;
-				for (int i = 0; i < classificator.getNumberOfDetectedClasses(); i++) {
-					if (maxVectorsInClass < classificator.getNumberOfVectorsInClass(i)) {
-						maxVectorsInClass = classificator.getNumberOfVectorsInClass(i);
-						classNumberWithMaxOfVectors = i;
-					}
-				}
-				treeMap.clear();
-				for (int j = 0; j < classificator.getNumberOfDetectedClasses(); j++) {
-					treeMap.put(classificator.getInterAngleOfClasses(classNumberWithMaxOfVectors, j), j);
-				}
-				dataSet = new DefaultCategoryDataset();
-				while (treeMap.size() > 0) {
-					entry = treeMap.pollFirstEntry();
-					buffer = new StringBuffer();
-					buffer.append("(");
-					buffer.append(entry.getValue());
-					buffer.append("/");
-					buffer.append(classificator.getNumberOfVectorsInClass(entry.getValue()));
-					buffer.append("/");
-					buffer.append(entry.getKey().intValue());
-					buffer.append(")");
-					dataSet.addValue(classificator.getNumberOfVectorsInClass(entry.getValue()), numberOfVectorsInClass, buffer
-							.toString());
-				}
-				buffer = new StringBuffer();
-				buffer.append("(");
-				buffer.append(fileName);
-				buffer.append("/");
-				buffer.append(classificator.getVigilanceParameter());
-				buffer.append("/");
-				buffer.append(classificator.getNumberOfDetectedClasses());
-				buffer.append("/");
-				buffer.append(classificator.getNumberOfEpochs());
-				buffer.append(")");
-				tempFileList.add(chartTool.exportToBarChart(dataSet, buffer.toString()));
 			}
-			File file = new File(files.get(0));
-			file = FileNameGenerator.getNewFile(file.getParent(), ".pdf", "Art2aClassificationResult");
-			chartTool.setPdfPageInPortrait(false);
-			chartTool.exportToChartsToPDF(tempFileList, file, pdfTitle);
-			resultFileNames.add(file.getAbsolutePath());
+			buffer = new StringBuffer();
+			buffer.append(result.get(0));
+			for (int i = 0; i < maxNumberOfDetectedClasses; i++) {
+				buffer.append(";");
+				buffer.append("NumberOfVectorsInClass_");
+				buffer.append(i);
+			}
+			result.set(0, buffer.toString());
+		
+			T2Reference containerRef = referenceService.register(result, 1, true, context);
+			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return outputs;
 	}
 
 	@Override
 	public String getActivityName() {
-		return ART2aResultAsPDF.ART2A_RESULT_AS_PDF_ACTIVITY;
+		return ART2aResultAsCSV.ART2A_RESULT_AS_CSV_ACTIVITY;
 	}
 
 	@Override
@@ -176,7 +156,7 @@ public class ART2aResultAsPDF extends AbstractCDKActivity {
 
 	@Override
 	public String getDescription() {
-		return "Description: " + ART2aResultAsPDF.ART2A_RESULT_AS_PDF_ACTIVITY;
+		return "Description: " + ART2aResultAsCSV.ART2A_RESULT_AS_CSV_ACTIVITY;
 	}
 
 	@Override

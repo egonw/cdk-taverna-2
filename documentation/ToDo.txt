@@ -1,26 +1,26 @@
 07.06.2010:
-- Add RuleOfFive filter to QSARDescriptorActivity
-- Check RuleOfFive filter test failure 
+- Add RuleOfFive filter to QSARDescriptorActivity -> Done
+- Check RuleOfFive filter test failure -> Done
 - Add missing unit tests (Isomorphism, ...) -> Done
 
 19.07.2010
 - AnyAtom subgraph H matching problem -> Done
-- Add vector generator unit test
+- Add vector generator unit test -> Done
 - Add CML IO unit test -> done
 - Adapt enumerator lib to new cdk version (atom value, timeout, ..) -> done
 - Add reaction and molecule 2d coord generator (remove state from reaction enumerator activtiy/ drawpdf)
 
 25.08.2010
 - Add String converter -> Done
-- Iterative workflow execution
+- Iterative workflow execution -> Done
 
 02.09.2010
-- Interrupting SDF reading if an error occurs in a molecule 
-- QSAR Descriptor bug (not calculated structures)
+- Interrupting SDF reading if an error occurs in a molecule -> Done
+- QSAR Descriptor bug (not calculated structures) -> Done
 
 19.10.2010
-- Rework the iterative multi rxn file reader
-- Exception handling in QSARDescriptorActivity
+- Rework the iterative multi rxn file reader 
+- Exception handling in QSARDescriptorActivity -> Done
 
 25.10.2010
-- Handle empty lists!! (String converter)
+- Handle empty lists!! (String converter) -> Done

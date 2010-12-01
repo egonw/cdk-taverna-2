@@ -24,4 +24,9 @@
 - Several bug fixes
 - Logging and exception handling
 
-
+0.3
+- Added/Fixed QSAR activities 
+- Added ART-2a classification activities
+- Added Curation activities
+- Added Implicit/Explicit hydrogen adder activities
+- Many many bug fixes 

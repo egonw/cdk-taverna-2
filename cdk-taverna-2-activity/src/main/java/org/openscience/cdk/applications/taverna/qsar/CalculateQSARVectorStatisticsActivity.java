@@ -100,52 +100,52 @@ public class CalculateQSARVectorStatisticsActivity extends AbstractCDKActivity {
 		try {
 			QSARVectorUtility vectorUtility = new QSARVectorUtility();
 			statistics = vectorUtility.calculateQSARVectorStatistics(vectorMap, descriptorNames);
-			HashMap<String, Integer> calculatedDescriptorDistribution = vectorUtility.getCalculatedDescritorDistribution(
-					vectorMap, descriptorNames);
-			int numberOfMolecules = vectorUtility.getUUIDs(vectorMap).size();
-			int[] distribution = new int[numberOfMolecules + 1];
-			for (String name : descriptorNames) {
-				int value = calculatedDescriptorDistribution.get(name);
-				distribution[value]++;
-			}
-			HashSet<String> tempNameSet = new HashSet<String>();
-			for (String name : descriptorNames) {
-				tempNameSet.add(name);
-			}
-			ArrayList<String> sortedDescriptorNames = new ArrayList<String>();
-			for (int i = numberOfMolecules; i >= 0; i--) {
-				LinkedList<String> tempNames = new LinkedList<String>();
-				for (String name : tempNameSet) {
-					int value = calculatedDescriptorDistribution.get(name);
-					if (value == i) {
-						tempNames.add(name);
-					}
-				}
-				for (String name : tempNames) {
-					tempNameSet.remove(name);
-					sortedDescriptorNames.add(name);
-				}
-			}
-			DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
-
-			for (int i = 0; i < sortedDescriptorNames.size(); i++) {
-				String name = sortedDescriptorNames.get(i);
-				int value = calculatedDescriptorDistribution.get(name);
-				dataSet.addValue(value, ""+ value, Integer.valueOf(i + 1));
-				
-
-			}
-			ChartTool chartTool = new ChartTool();
-			chartTool.setBarChartHeight(500);
-			chartTool.setBarChartWidth(840);
-			chartTool.setPlotOrientation(PlotOrientation.VERTICAL);
-			chartTool.setDescriptionYAxis("Ratio in percent");
-			chartTool.setDescriptionXAxis("(Class number/Number of Vectors/Interangle)");
-			chartTool.setRenderXAxisDescriptionDiagonal(true);
-			chartTool.setRenderLegend(false);
-			List<File> chartFiles = new LinkedList<File>();
-			chartFiles.add(chartTool.exportToAreaChart(dataSet, "QSAR Vector Statistics"));
-			chartTool.exportToChartsToPDF(chartFiles, new File("testpdf.pdf"), statistics);
+//			HashMap<String, Integer> calculatedDescriptorDistribution = vectorUtility.getCalculatedDescritorDistribution(
+//					vectorMap, descriptorNames);
+//			int numberOfMolecules = vectorUtility.getUUIDs(vectorMap).size();
+//			int[] distribution = new int[numberOfMolecules + 1];
+//			for (String name : descriptorNames) {
+//				int value = calculatedDescriptorDistribution.get(name);
+//				distribution[value]++;
+//			}
+//			HashSet<String> tempNameSet = new HashSet<String>();
+//			for (String name : descriptorNames) {
+//				tempNameSet.add(name);
+//			}
+//			ArrayList<String> sortedDescriptorNames = new ArrayList<String>();
+//			for (int i = numberOfMolecules; i >= 0; i--) {
+//				LinkedList<String> tempNames = new LinkedList<String>();
+//				for (String name : tempNameSet) {
+//					int value = calculatedDescriptorDistribution.get(name);
+//					if (value == i) {
+//						tempNames.add(name);
+//					}
+//				}
+//				for (String name : tempNames) {
+//					tempNameSet.remove(name);
+//					sortedDescriptorNames.add(name);
+//				}
+//			}
+//			DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
+//
+//			for (int i = 0; i < sortedDescriptorNames.size(); i++) {
+//				String name = sortedDescriptorNames.get(i);
+//				int value = calculatedDescriptorDistribution.get(name);
+//				dataSet.addValue(value, ""+ value, Integer.valueOf(i + 1));
+//				
+//
+//			}
+//			ChartTool chartTool = new ChartTool();
+//			chartTool.setBarChartHeight(500);
+//			chartTool.setBarChartWidth(840);
+//			chartTool.setPlotOrientation(PlotOrientation.VERTICAL);
+//			chartTool.setDescriptionYAxis("Ratio in percent");
+//			chartTool.setDescriptionXAxis("(Class number/Number of Vectors/Interangle)");
+//			chartTool.setRenderXAxisDescriptionDiagonal(true);
+//			chartTool.setRenderLegend(false);
+//			List<File> chartFiles = new LinkedList<File>();
+//			chartFiles.add(chartTool.exportToAreaChart(dataSet, "QSAR Vector Statistics"));
+//			chartTool.exportToChartsToPDF(chartFiles, new File("testpdf.pdf"), statistics);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError("Error during curating QSAR vector!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());

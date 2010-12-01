@@ -119,6 +119,7 @@ org.openscience.cdk.applications.taverna.qsar.CalculateQSARVectorStatisticsActiv
 org.openscience.cdk.applications.taverna.classification.art2a.ART2aClassificationActivity
 org.openscience.cdk.applications.taverna.classification.art2a.tools.ART2aResultAsPDFFileReader
 org.openscience.cdk.applications.taverna.classification.art2a.tools.ART2aResultAsPDF
+org.openscience.cdk.applications.taverna.classification.art2a.tools.ART2aResultAsCSV
 org.openscience.cdk.applications.taverna.classification.art2a.tools.ART2aResultConsideringDifferentOriginsAsPDF
 org.openscience.cdk.applications.taverna.reactionenumerator.ReactionEnumeratorActivity
 org.openscience.cdk.applications.taverna.reactionenumerator.ReactionEnumeratorSubgraphFilterActivity
