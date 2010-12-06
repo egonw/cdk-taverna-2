@@ -45,6 +45,7 @@ public class QSARDescriptorConfigurationPanel extends
 	private JTextField threadsTextField = null;
 	private HashMap<Class<? extends AbstractCDKActivity>, JCheckBox> selectionMap = null;
 	private ArrayList<Class<? extends AbstractCDKActivity>> selectedClasses = new ArrayList<Class<? extends AbstractCDKActivity>>();
+	private JCheckBox showProgressCheckBox = null;
 
 	public QSARDescriptorConfigurationPanel(AbstractCDKActivity activity) {
 		this.activity = activity;
@@ -125,6 +126,9 @@ public class QSARDescriptorConfigurationPanel extends
 			}
 			buttonPanel.add(threadsLabel);
 			buttonPanel.add(this.threadsTextField);
+			this.showProgressCheckBox = new JCheckBox("Show progress?");
+			boolean showProgress = (Boolean) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS);
+			this.showProgressCheckBox.setSelected(showProgress);
 			this.add(selectionPanel, BorderLayout.CENTER);
 			this.add(buttonPanel, BorderLayout.SOUTH);
 			for (Entry<Class<? extends AbstractCDKActivity>, JCheckBox> entry : this.selectionMap.entrySet()) {
@@ -215,6 +219,10 @@ public class QSARDescriptorConfigurationPanel extends
 		if (numberOfThreads != newValue) {
 			return true;
 		}
+		boolean showProgress = (Boolean) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS);
+		if(showProgress != this.showProgressCheckBox.isSelected()) {
+			return true;
+		}
 		return false;
 	}
 
@@ -224,6 +232,8 @@ public class QSARDescriptorConfigurationPanel extends
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CHOSEN_QSARDESCRIPTORS, this.getSelectedClasses());
 		int newValue = Integer.parseInt(this.threadsTextField.getText());
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, newValue);
+		boolean showProgress = this.showProgressCheckBox.isSelected();
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS, showProgress);
 	}
 
 	@Override
