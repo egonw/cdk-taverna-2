@@ -129,6 +129,7 @@ public class QSARDescriptorConfigurationPanel extends
 			this.showProgressCheckBox = new JCheckBox("Show progress?");
 			boolean showProgress = (Boolean) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS);
 			this.showProgressCheckBox.setSelected(showProgress);
+			buttonPanel.add(this.showProgressCheckBox);
 			this.add(selectionPanel, BorderLayout.CENTER);
 			this.add(buttonPanel, BorderLayout.SOUTH);
 			for (Entry<Class<? extends AbstractCDKActivity>, JCheckBox> entry : this.selectionMap.entrySet()) {
