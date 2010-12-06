@@ -75,7 +75,7 @@ public abstract class AbstractAtompairDescriptor extends AbstractCDKActivity {
 		}
 	}
 
-	protected abstract IAtomPairDescriptor getDescriptor();
+	public abstract IAtomPairDescriptor getDescriptor();
 
 	@Override
 	public String getActivityName() {

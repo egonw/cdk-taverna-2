@@ -41,7 +41,7 @@ import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 /**
- * Class which represents the tag molecules with UUID activity. 
+ * Class which represents the tag molecules with UUID activity.
  * 
  * @author Andreas Truszkowski
  * 

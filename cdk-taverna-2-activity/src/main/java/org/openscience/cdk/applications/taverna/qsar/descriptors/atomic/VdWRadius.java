@@ -44,7 +44,7 @@ public class VdWRadius extends AbstractAtomicDescriptor {
 	 * 
 	 * @see org.openscience.cdk.applications.taverna.qsar.descriptors.atomic.AbstractAtomicDescriptor#getDescriptor()
 	 */
-	protected IAtomicDescriptor getDescriptor() {
+	public IAtomicDescriptor getDescriptor() {
 		try {
 			return new VdWRadiusDescriptor();
 		} catch (IOException e) {

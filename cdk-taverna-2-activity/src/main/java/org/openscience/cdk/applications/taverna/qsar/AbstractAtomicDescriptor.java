@@ -97,7 +97,7 @@ public abstract class AbstractAtomicDescriptor extends AbstractCDKActivity {
 		return CDKTavernaConstants.QSAR_ATOMIC_DESCRIPTOR_FOLDER_NAME;
 	}
 
-	protected abstract IAtomicDescriptor getDescriptor();
+	public abstract IAtomicDescriptor getDescriptor();
 
 	@SuppressWarnings("unchecked")
 	@Override

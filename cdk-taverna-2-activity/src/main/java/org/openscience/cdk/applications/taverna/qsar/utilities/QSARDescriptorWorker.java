@@ -19,26 +19,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna.qsar;
+package org.openscience.cdk.applications.taverna.qsar.utilities;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
-import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.applications.taverna.qsar.AbstractAtomicDescriptor;
+import org.openscience.cdk.applications.taverna.qsar.AbstractAtomicProtonDescriptor;
+import org.openscience.cdk.applications.taverna.qsar.AbstractAtompairDescriptor;
+import org.openscience.cdk.applications.taverna.qsar.AbstractBondDescriptor;
+import org.openscience.cdk.applications.taverna.qsar.AbstractMolecularDescriptor;
+import org.openscience.cdk.applications.taverna.qsar.QSARDescriptorThreadedActivity;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.qsar.DescriptorValue;
 import org.openscience.cdk.qsar.IAtomPairDescriptor;
 import org.openscience.cdk.qsar.IAtomicDescriptor;
 import org.openscience.cdk.qsar.IBondDescriptor;
 import org.openscience.cdk.qsar.IMolecularDescriptor;
-import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 /**
  * Class which represents the QSAR descriptor worker.
@@ -48,50 +47,39 @@ import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
  */
 public class QSARDescriptorWorker extends Thread {
 
-	private QSARDescriptorThreadedActivity owner = null;
-	private ArrayList<Class<? extends AbstractCDKActivity>> classes = null;
-	private List<byte[]> moleculeDataArray = null;
+	public static final String FINISHED = "Finished...";
 
-	public QSARDescriptorWorker(QSARDescriptorThreadedActivity owner, ArrayList<Class<? extends AbstractCDKActivity>> classes,
-			List<byte[]> moleculeDataArray) {
+	private QSARDescriptorThreadedActivity owner = null;
+	private String current = "";
+	private long startTime = 0;
+
+	public QSARDescriptorWorker(QSARDescriptorThreadedActivity owner) {
 		this.owner = owner;
-		this.classes = classes;
-		this.moleculeDataArray = moleculeDataArray;
 	}
 
 	@Override
 	public void run() {
+		ArrayList<IAtomContainer> moleculeArray = new ArrayList<IAtomContainer>();
 		try {
-			List<CMLChemFile> chemFiles = null;
-			try {
-				chemFiles = CDKObjectHandler.getChemFileList(this.moleculeDataArray);
-			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error during deserializing object!", this.toString(), e);
-				this.owner.workerDone(new ArrayList<byte[]>());
-				return;
-			}
-			List<IAtomContainer> moleculeList = new ArrayList<IAtomContainer>();
-			for (Iterator<CMLChemFile> iter = chemFiles.iterator(); iter.hasNext();) {
-				CMLChemFile file = iter.next();
-				moleculeList.addAll(ChemFileManipulator.getAllAtomContainers(file));
-			}
-			for (Class<? extends AbstractCDKActivity> clazz : classes) {
-				AbstractCDKActivity descriptorActivity = null;
+			QSARDescriptorWork work = null;
+			while ((work = this.owner.getWork()) != null) {
+				IAtomContainer molecule = work.molecule;
+				Class<? extends AbstractCDKActivity> descriptorClass = work.descriptorClass;
 				try {
-					descriptorActivity = clazz.newInstance();
-				} catch (Exception e) {
-					ErrorLogger.getInstance().writeError("Error during instantiation of descriptor: " + clazz.getSimpleName(),
-							this.getClass().getSimpleName(), e);
-					continue;
-				}
-
-				if (descriptorActivity instanceof AbstractAtomicDescriptor) {
-					IAtomicDescriptor descriptor = ((AbstractAtomicDescriptor) descriptorActivity).getDescriptor();
-					for (IAtomContainer molecule : moleculeList) {
-						if (molecule.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
-							ErrorLogger.getInstance().writeError("Molecule contains no ID!", this.getClass().getSimpleName());
-							throw new CDKTavernaException(this.getClass().getSimpleName(), "Molecule contains no ID!");
-						}
+					AbstractCDKActivity descriptorActivity = null;
+					startTime = System.nanoTime();
+					current = descriptorClass.getSimpleName();
+					this.owner.showProgress();
+					try {
+						descriptorActivity = descriptorClass.newInstance();
+					} catch (Exception e) {
+						ErrorLogger.getInstance().writeError(
+								"Error during instantiation of descriptor: " + descriptorClass.getSimpleName(),
+								this.getClass().getSimpleName(), e);
+						continue;
+					}
+					if (descriptorActivity instanceof AbstractAtomicDescriptor) {
+						IAtomicDescriptor descriptor = ((AbstractAtomicDescriptor) descriptorActivity).getDescriptor();
 						try {
 							for (int j = 0; j < molecule.getAtomCount(); j++) {
 								DescriptorValue value = descriptor.calculate(molecule.getAtom(j), molecule);
@@ -102,10 +90,8 @@ public class QSARDescriptorWorker extends Thread {
 									"Error during calculating QSAR descriptor: " + descriptor.getClass() + "!",
 									descriptor.toString(), e);
 						}
-					}
-				} else if (descriptorActivity instanceof AbstractAtomicProtonDescriptor) {
-					IAtomicDescriptor descriptor = ((AbstractAtomicProtonDescriptor) descriptorActivity).getDescriptor();
-					for (IAtomContainer molecule : moleculeList) {
+					} else if (descriptorActivity instanceof AbstractAtomicProtonDescriptor) {
+						IAtomicDescriptor descriptor = ((AbstractAtomicProtonDescriptor) descriptorActivity).getDescriptor();
 						try {
 							for (int j = 0; j < molecule.getAtomCount(); j++) {
 								// Calculates only the value if the atom has the symbol H
@@ -119,10 +105,8 @@ public class QSARDescriptorWorker extends Thread {
 									"Error during calculating QSAR descriptor: " + descriptor.getClass() + "!",
 									descriptor.toString(), e);
 						}
-					}
-				} else if (descriptorActivity instanceof AbstractAtompairDescriptor) {
-					IAtomPairDescriptor descriptor = ((AbstractAtompairDescriptor) descriptorActivity).getDescriptor();
-					for (IAtomContainer molecule : moleculeList) {
+					} else if (descriptorActivity instanceof AbstractAtompairDescriptor) {
+						IAtomPairDescriptor descriptor = ((AbstractAtompairDescriptor) descriptorActivity).getDescriptor();
 						try {
 							for (int j = 0; j < molecule.getAtomCount(); j++) {
 								for (int i = 0; i < molecule.getAtomCount(); i++) {
@@ -136,10 +120,8 @@ public class QSARDescriptorWorker extends Thread {
 									"Error during calculating QSAR descriptor: " + descriptor.getClass() + "!",
 									descriptor.toString(), e);
 						}
-					}
-				} else if (descriptorActivity instanceof AbstractBondDescriptor) {
-					IBondDescriptor descriptor = ((AbstractBondDescriptor) descriptorActivity).getDescriptor();
-					for (IAtomContainer molecule : moleculeList) {
+					} else if (descriptorActivity instanceof AbstractBondDescriptor) {
+						IBondDescriptor descriptor = ((AbstractBondDescriptor) descriptorActivity).getDescriptor();
 						try {
 							for (int j = 0; j < molecule.getBondCount(); j++) {
 								DescriptorValue value = descriptor.calculate(molecule.getBond(j), molecule);
@@ -150,10 +132,8 @@ public class QSARDescriptorWorker extends Thread {
 									"Error during calculating QSAR descriptor: " + descriptor.getClass() + "!",
 									descriptor.toString(), e);
 						}
-					}
-				} else if (descriptorActivity instanceof AbstractMolecularDescriptor) {
-					IMolecularDescriptor descriptor = ((AbstractMolecularDescriptor) descriptorActivity).getDescriptor();
-					for (IAtomContainer molecule : moleculeList) {
+					} else if (descriptorActivity instanceof AbstractMolecularDescriptor) {
+						IMolecularDescriptor descriptor = ((AbstractMolecularDescriptor) descriptorActivity).getDescriptor();
 						try {
 							DescriptorValue value = descriptor.calculate(molecule);
 							molecule.setProperty(value.getSpecification(), value);
@@ -162,19 +142,32 @@ public class QSARDescriptorWorker extends Thread {
 									"Error during calculating QSAR descriptor: " + descriptor.getClass() + "!",
 									descriptor.toString(), e);
 						}
+					} else {
+						throw new CDKTavernaException("QSARDescreiptorWorker", "Unknown descriptor type: "
+								+ descriptorActivity.getActivityName());
 					}
-				} else {
-					throw new CDKTavernaException("QSARDescreiptorWorker", "Unknown descriptor type: "
-							+ descriptorActivity.getActivityName());
+				} catch (Exception e) {
+					ErrorLogger.getInstance().writeError("Error during calculation of QSAR descriptors!",
+							this.getClass().getSimpleName(), e);
+				} finally {
+					long duration = System.nanoTime() - startTime;
+					this.owner.setTime(descriptorClass, duration);
+					this.owner.releaseDescriptor(descriptorClass);
+					moleculeArray.add(molecule);
 				}
 			}
-			chemFiles = CMLChemFileWrapper.wrapAtomContainerListInChemModelList(moleculeList);
-			this.moleculeDataArray = CDKObjectHandler.getBytesList(chemFiles);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during calculation of QSAR descriptors!",
-					this.getClass().getSimpleName(), e);
+			e.printStackTrace();
+			ErrorLogger.getInstance().writeError("Serious QSAR descriptor calculation error!", this.getClass().getSimpleName());
+		} finally {
+			this.current = QSARDescriptorWorker.FINISHED;
+			this.owner.showProgress();
+			this.owner.workerDone(moleculeArray);
 		}
-		this.owner.workerDone(this.moleculeDataArray);
+	}
+
+	public String getCurrent() {
+		return this.current;
 	}
 
 }

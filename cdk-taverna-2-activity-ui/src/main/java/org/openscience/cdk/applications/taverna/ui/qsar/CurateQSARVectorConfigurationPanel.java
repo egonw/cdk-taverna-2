@@ -3,7 +3,7 @@ package org.openscience.cdk.applications.taverna.ui.qsar;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
-import org.openscience.cdk.applications.taverna.qsar.QSARVectorUtility;
+import org.openscience.cdk.applications.taverna.qsar.utilities.QSARVectorUtility;
 
 import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityConfigurationPanel;
 

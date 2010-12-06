@@ -72,6 +72,7 @@ public class QSARVectorGeneratorActivityTest extends CDKTavernaTestCases {
 		selectedClasses.add(RuleOfFive.class);
 		selectedClasses.add(TaeAminoAcid.class);
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CHOSEN_QSARDESCRIPTORS, selectedClasses);
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS, false);
 		configBean.setActivityName(QSARDescriptorActivity.QSAR_DESCRIPTOR_ACTIVITY);
 	}
 

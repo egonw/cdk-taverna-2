@@ -98,8 +98,7 @@ public class JChemPaintActivity extends AbstractCDKActivity {
 		List<byte[]> dataList = new ArrayList<byte[]>();
 		// Read ChemFile
 		try {
-			File file = (File) this.getConfiguration().getAdditionalProperty(
-					CDKTavernaConstants.PROPERTY_CMLCHEMFILE);
+			File file = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_CMLCHEMFILE);
 			if (file == null) {
 				throw new CDKTavernaException(JChemPaintActivity.JCHEMPAINT_ACTIVITY, "No molecules found!");
 			}

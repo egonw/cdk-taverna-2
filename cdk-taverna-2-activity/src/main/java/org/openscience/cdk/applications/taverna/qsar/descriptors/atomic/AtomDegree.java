@@ -38,7 +38,7 @@ import org.openscience.cdk.qsar.descriptors.atomic.AtomDegreeDescriptor;
 public class AtomDegree extends AbstractAtomicDescriptor {
 
 	@Override
-	protected IAtomicDescriptor getDescriptor() {
+	public IAtomicDescriptor getDescriptor() {
 		return new AtomDegreeDescriptor();
 	}
 

@@ -164,5 +164,5 @@ public abstract class AbstractMolecularDescriptor extends AbstractCDKActivity {
 		return outputs;
 	}
 
-	protected abstract IMolecularDescriptor getDescriptor();
+	public abstract IMolecularDescriptor getDescriptor();
 }

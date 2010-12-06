@@ -73,6 +73,7 @@ public class QSARDescriptorThreadedActivityTest extends CDKTavernaTestCases {
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CHOSEN_QSARDESCRIPTORS, selectedClasses);
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, Runtime.getRuntime()
 				.availableProcessors());
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS, false);
 		configBean.setActivityName(QSARDescriptorActivity.QSAR_DESCRIPTOR_ACTIVITY);
 	}
 

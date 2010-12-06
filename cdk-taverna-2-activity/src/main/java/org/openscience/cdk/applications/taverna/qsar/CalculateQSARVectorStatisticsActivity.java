@@ -21,11 +21,8 @@
  */
 package org.openscience.cdk.applications.taverna.qsar;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -35,14 +32,12 @@ import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.category.DefaultCategoryDataset;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.applications.taverna.basicutilities.ChartTool;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.applications.taverna.qsar.utilities.QSARVectorUtility;
 
 /**
  * Class which represents the calculate QSAR Vector statistics activity.
@@ -100,52 +95,52 @@ public class CalculateQSARVectorStatisticsActivity extends AbstractCDKActivity {
 		try {
 			QSARVectorUtility vectorUtility = new QSARVectorUtility();
 			statistics = vectorUtility.calculateQSARVectorStatistics(vectorMap, descriptorNames);
-//			HashMap<String, Integer> calculatedDescriptorDistribution = vectorUtility.getCalculatedDescritorDistribution(
-//					vectorMap, descriptorNames);
-//			int numberOfMolecules = vectorUtility.getUUIDs(vectorMap).size();
-//			int[] distribution = new int[numberOfMolecules + 1];
-//			for (String name : descriptorNames) {
-//				int value = calculatedDescriptorDistribution.get(name);
-//				distribution[value]++;
-//			}
-//			HashSet<String> tempNameSet = new HashSet<String>();
-//			for (String name : descriptorNames) {
-//				tempNameSet.add(name);
-//			}
-//			ArrayList<String> sortedDescriptorNames = new ArrayList<String>();
-//			for (int i = numberOfMolecules; i >= 0; i--) {
-//				LinkedList<String> tempNames = new LinkedList<String>();
-//				for (String name : tempNameSet) {
-//					int value = calculatedDescriptorDistribution.get(name);
-//					if (value == i) {
-//						tempNames.add(name);
-//					}
-//				}
-//				for (String name : tempNames) {
-//					tempNameSet.remove(name);
-//					sortedDescriptorNames.add(name);
-//				}
-//			}
-//			DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
-//
-//			for (int i = 0; i < sortedDescriptorNames.size(); i++) {
-//				String name = sortedDescriptorNames.get(i);
-//				int value = calculatedDescriptorDistribution.get(name);
-//				dataSet.addValue(value, ""+ value, Integer.valueOf(i + 1));
-//				
-//
-//			}
-//			ChartTool chartTool = new ChartTool();
-//			chartTool.setBarChartHeight(500);
-//			chartTool.setBarChartWidth(840);
-//			chartTool.setPlotOrientation(PlotOrientation.VERTICAL);
-//			chartTool.setDescriptionYAxis("Ratio in percent");
-//			chartTool.setDescriptionXAxis("(Class number/Number of Vectors/Interangle)");
-//			chartTool.setRenderXAxisDescriptionDiagonal(true);
-//			chartTool.setRenderLegend(false);
-//			List<File> chartFiles = new LinkedList<File>();
-//			chartFiles.add(chartTool.exportToAreaChart(dataSet, "QSAR Vector Statistics"));
-//			chartTool.exportToChartsToPDF(chartFiles, new File("testpdf.pdf"), statistics);
+			// HashMap<String, Integer> calculatedDescriptorDistribution = vectorUtility.getCalculatedDescritorDistribution(
+			// vectorMap, descriptorNames);
+			// int numberOfMolecules = vectorUtility.getUUIDs(vectorMap).size();
+			// int[] distribution = new int[numberOfMolecules + 1];
+			// for (String name : descriptorNames) {
+			// int value = calculatedDescriptorDistribution.get(name);
+			// distribution[value]++;
+			// }
+			// HashSet<String> tempNameSet = new HashSet<String>();
+			// for (String name : descriptorNames) {
+			// tempNameSet.add(name);
+			// }
+			// ArrayList<String> sortedDescriptorNames = new ArrayList<String>();
+			// for (int i = numberOfMolecules; i >= 0; i--) {
+			// LinkedList<String> tempNames = new LinkedList<String>();
+			// for (String name : tempNameSet) {
+			// int value = calculatedDescriptorDistribution.get(name);
+			// if (value == i) {
+			// tempNames.add(name);
+			// }
+			// }
+			// for (String name : tempNames) {
+			// tempNameSet.remove(name);
+			// sortedDescriptorNames.add(name);
+			// }
+			// }
+			// DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
+			//
+			// for (int i = 0; i < sortedDescriptorNames.size(); i++) {
+			// String name = sortedDescriptorNames.get(i);
+			// int value = calculatedDescriptorDistribution.get(name);
+			// dataSet.addValue(value, ""+ value, Integer.valueOf(i + 1));
+			//
+			//
+			// }
+			// ChartTool chartTool = new ChartTool();
+			// chartTool.setBarChartHeight(500);
+			// chartTool.setBarChartWidth(840);
+			// chartTool.setPlotOrientation(PlotOrientation.VERTICAL);
+			// chartTool.setDescriptionYAxis("Ratio in percent");
+			// chartTool.setDescriptionXAxis("(Class number/Number of Vectors/Interangle)");
+			// chartTool.setRenderXAxisDescriptionDiagonal(true);
+			// chartTool.setRenderLegend(false);
+			// List<File> chartFiles = new LinkedList<File>();
+			// chartFiles.add(chartTool.exportToAreaChart(dataSet, "QSAR Vector Statistics"));
+			// chartTool.exportToChartsToPDF(chartFiles, new File("testpdf.pdf"), statistics);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError("Error during curating QSAR vector!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());

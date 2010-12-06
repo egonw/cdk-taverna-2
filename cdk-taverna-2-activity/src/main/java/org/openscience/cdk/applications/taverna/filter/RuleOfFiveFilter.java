@@ -52,7 +52,7 @@ import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
  * Class which represents the Rule OF Five filter activity.
  * 
  * @author Thomas Kuhn
- *
+ * 
  */
 public class RuleOfFiveFilter extends AbstractCDKActivity {
 

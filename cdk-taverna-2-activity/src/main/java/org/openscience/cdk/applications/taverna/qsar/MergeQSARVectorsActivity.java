@@ -38,6 +38,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IPortNumber;
+import org.openscience.cdk.applications.taverna.qsar.utilities.QSARVectorUtility;
 
 /**
  * Class which represents the merge QSAR vectors activity.

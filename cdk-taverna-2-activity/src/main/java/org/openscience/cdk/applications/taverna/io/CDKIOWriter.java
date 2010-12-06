@@ -35,7 +35,7 @@ import org.openscience.cdk.io.MDLV2000Writer;
  * 
  */
 public class CDKIOWriter {
-	
+
 	/**
 	 * Converts the CML string into a MDL mol file.
 	 * 

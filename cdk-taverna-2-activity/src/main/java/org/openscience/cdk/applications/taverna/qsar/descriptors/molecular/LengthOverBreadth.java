@@ -43,7 +43,7 @@ public class LengthOverBreadth extends AbstractMolecularDescriptor {
 	 * 
 	 * @see org.openscience.cdk.applications.taverna.qsar.descriptors.bond.AbstractBondDescriptor#getDescriptor()
 	 */
-	protected IMolecularDescriptor getDescriptor() {
+	public IMolecularDescriptor getDescriptor() {
 		return new LengthOverBreadthDescriptor();
 	}
 

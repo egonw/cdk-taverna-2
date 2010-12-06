@@ -37,6 +37,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.applications.taverna.qsar.utilities.QSARVectorUtility;
 
 /**
  * Class which implements a local worker for the cdk-taverna-2 project which provides the possibility to generate a CSV from

@@ -42,7 +42,7 @@ public class RDFProton_GHR_topol extends AbstractAtomicProtonDescriptor {
 	 * 
 	 * @see org.openscience.cdk.applications.taverna.qsar.descriptors.atomic.AbstractAtomicDescriptor#getDescriptor()
 	 */
-	protected IAtomicDescriptor getDescriptor() {
+	public IAtomicDescriptor getDescriptor() {
 		return new RDFProtonDescriptor_GHR_topol();
 	}
 

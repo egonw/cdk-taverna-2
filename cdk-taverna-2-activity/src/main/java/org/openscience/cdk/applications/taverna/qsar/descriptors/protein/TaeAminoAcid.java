@@ -42,7 +42,7 @@ public class TaeAminoAcid extends AbstractMolecularDescriptor {
 	 * 
 	 * @see org.openscience.cdk.applications.taverna.qsar.descriptors.bond.AbstractBondDescriptor#getDescriptor()
 	 */
-	protected IMolecularDescriptor getDescriptor() {
+	public IMolecularDescriptor getDescriptor() {
 		return new org.openscience.cdk.qsar.descriptors.protein.TaeAminoAcidDescriptor();
 	}
 

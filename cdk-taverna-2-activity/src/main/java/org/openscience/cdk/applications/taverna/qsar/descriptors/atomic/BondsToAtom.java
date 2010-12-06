@@ -42,7 +42,7 @@ public class BondsToAtom extends AbstractAtomicDescriptor {
 	 * 
 	 * @see org.openscience.cdk.applications.taverna.qsar.descriptors.atomic.AbstractAtomicDescriptor#getDescriptor()
 	 */
-	protected IAtomicDescriptor getDescriptor() {
+	public IAtomicDescriptor getDescriptor() {
 		return new BondsToAtomDescriptor();
 	}
 

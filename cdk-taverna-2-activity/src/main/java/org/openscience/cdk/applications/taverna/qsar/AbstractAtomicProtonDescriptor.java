@@ -75,7 +75,7 @@ public abstract class AbstractAtomicProtonDescriptor extends AbstractCDKActivity
 		}
 	}
 
-	protected abstract IAtomicDescriptor getDescriptor();
+	public abstract IAtomicDescriptor getDescriptor();
 
 	@Override
 	public String getActivityName() {

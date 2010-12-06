@@ -21,10 +21,17 @@
  */
 package org.openscience.cdk.applications.taverna.qsar;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.UUID;
+
+import javax.swing.JLabel;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ReferenceService;
@@ -34,13 +41,22 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
+import org.openscience.cdk.applications.taverna.CMLChemFile;
+import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
+import org.openscience.cdk.applications.taverna.qsar.utilities.QSARDescriptorWork;
+import org.openscience.cdk.applications.taverna.qsar.utilities.QSARDescriptorWorker;
+import org.openscience.cdk.applications.taverna.qsar.utilities.QSARProgressFrame;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 /**
  * Class which represents the QSAR descriptor threaded *Experimental* activity.
  * 
  * @author Andreas Trusykowski
- *
+ * 
  */
 public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 
@@ -49,12 +65,19 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 	private QSARDescriptorWorker[] workers = null;
 	private AsynchronousActivityCallback callback = null;
 	private int numberOfCompletedWorkers = 0;
-	private ArrayList<byte[]> resultData = null;
+	private HashMap<UUID, IAtomContainer> resultMap = new HashMap<UUID, IAtomContainer>();
+	private QSARProgressFrame progressFrame = null;
+	private int currentProgress = 0;
+	private int moleculesCalculated = 0;
+	private HashMap<Class<? extends AbstractCDKActivity>, Double> timeMap = new HashMap<Class<? extends AbstractCDKActivity>, Double>();
+	private ArrayList<Class<? extends AbstractCDKActivity>> descriptorsToDo = null;
+	private HashMap<Class<? extends AbstractCDKActivity>, LinkedList<IAtomContainer>> workToDoMap = new HashMap<Class<? extends AbstractCDKActivity>, LinkedList<IAtomContainer>>();
+	private HashSet<Class<? extends AbstractCDKActivity>> availableDescriptorsSet = new HashSet<Class<? extends AbstractCDKActivity>>();
 
 	public QSARDescriptorThreadedActivity() {
 		super();
 		this.INPUT_PORTS = new String[] { "Structures" };
-		this.RESULT_PORTS = new String[] { "Calculated Structures" };
+		this.RESULT_PORTS = new String[] { "Calculated Structures", "Time CSV" };
 	}
 
 	@Override
@@ -78,6 +101,7 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> additionalProperties = new HashMap<String, Object>();
 		additionalProperties.put(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, Runtime.getRuntime().availableProcessors());
+		additionalProperties.put(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS, true);
 		return additionalProperties;
 	}
 
@@ -95,36 +119,74 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback) throws Exception {
 		this.callback = callback;
+		this.workToDoMap.clear();
+		this.availableDescriptorsSet.clear();
+		ArrayList<String> durationList = new ArrayList<String>();
 		InvocationContext context = this.callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		this.numberOfCompletedWorkers = 0;
-		this.resultData = new ArrayList<byte[]>();
-		ArrayList<Class<? extends AbstractCDKActivity>> classes = (ArrayList<Class<? extends AbstractCDKActivity>>) this
-				.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_CHOSEN_QSARDESCRIPTORS);
-		if (classes == null || classes.isEmpty()) {
+		this.descriptorsToDo = (ArrayList<Class<? extends AbstractCDKActivity>>) ((ArrayList<Class<? extends AbstractCDKActivity>>) this
+				.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_CHOSEN_QSARDESCRIPTORS)).clone();
+		if (this.descriptorsToDo == null || this.descriptorsToDo.isEmpty()) {
 			throw new CDKTavernaException(this.getActivityName(), "No QSAR descriptors chosen!");
 		}
 		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.getINPUT_PORTS()[0]),
 				byte[].class, context);
-		// Prepare worker
+		// Prepare work
+		int numberOfCalculations = 0;
+		LinkedList<IAtomContainer> molecules = null;
+		try {
+			List<CMLChemFile> chemFiles = CDKObjectHandler.getChemFileList(dataArray);
+			molecules = new LinkedList<IAtomContainer>();
+			for (CMLChemFile chemFile : chemFiles) {
+				molecules.addAll(ChemFileManipulator.getAllAtomContainers(chemFile));
+			}
+			// Check for ID
+			for (IAtomContainer atomContainer : molecules) {
+				if (atomContainer.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
+					ErrorLogger.getInstance().writeError("Molecule contains no ID!", this.getClass().getSimpleName());
+					throw new CDKTavernaException(this.getClass().getSimpleName(), "Molecule contains no ID!");
+				} else {
+					UUID uuid = (UUID) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID);
+					this.resultMap.put(uuid, atomContainer);
+				}
+			}
+			// Clone molecules
+			for (Class<? extends AbstractCDKActivity> descriptor : this.descriptorsToDo) {
+				this.availableDescriptorsSet.add(descriptor);
+				LinkedList<IAtomContainer> moleculesClone = new LinkedList<IAtomContainer>();
+				for (IAtomContainer atomContainer : molecules) {
+					moleculesClone.add((IAtomContainer) atomContainer.clone());
+					numberOfCalculations++;
+				}
+				this.workToDoMap.put(descriptor, moleculesClone);
+			}
+
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error during object deserialization!", this.toString(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error during object deserialization!");
+		}
+		// Show progress frame
 		int numberOfThreads = (Integer) this.getConfiguration().getAdditionalProperty(
 				CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS);
+		if ((Boolean) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS) == true) {
+			this.progressFrame = new QSARProgressFrame(numberOfThreads);
+			this.progressFrame.setVisible(true);
+			this.progressFrame.getProgressBar().setMinimum(0);
+			this.progressFrame.getProgressBar().setMaximum(numberOfCalculations);
+			this.progressFrame.getProgressBar().setValue(0);
+			FileNameGenerator.centerWindowOnScreen(this.progressFrame);
+			this.currentProgress = 0;
+		}
+		// Prepare worker
 		if (dataArray.size() < numberOfThreads) {
 			numberOfThreads = dataArray.size();
 		}
 		this.workers = new QSARDescriptorWorker[numberOfThreads];
-		int dataSizePerThread = dataArray.size() / numberOfThreads;
 		for (int i = 0; i < numberOfThreads; i++) {
-			List<byte[]> tempData = null;
-			if (i < numberOfThreads - 1) {
-				tempData = dataArray.subList(i * dataSizePerThread, (i + 1) * dataSizePerThread);
-			} else {
-				tempData = dataArray.subList(i * dataSizePerThread, dataArray.size());
-			}
-			this.workers[i] = new QSARDescriptorWorker(this, classes, tempData);
+			this.workers[i] = new QSARDescriptorWorker(this);
 			this.workers[i].start();
 		}
-
 		// Wait for workers
 		synchronized (this) {
 			this.wait();
@@ -132,18 +194,69 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 		// Congfigure output
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		try {
-			T2Reference containerRef = referenceService.register(this.resultData, 1, true, context);
+			durationList.add("Descriptor Name;Duration(in s);");
+			for (Entry<Class<? extends AbstractCDKActivity>, Double> entry : this.timeMap.entrySet()) {
+				String name = entry.getKey().getSimpleName();
+				double duration = entry.getValue();
+				String value = String.format("%4f", duration / 1000.0);
+				String durationString = name + ";" + value + ";";
+				durationList.add(durationString);
+			}
+			ArrayList<CMLChemFile> results = new ArrayList<CMLChemFile>();
+			for (Entry<UUID, IAtomContainer> entry : this.resultMap.entrySet()) {
+				results.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(entry.getValue()));
+			}
+
+			List<byte[]> resultData = CDKObjectHandler.getBytesList(results);
+			T2Reference containerRef = referenceService.register(resultData, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
+			containerRef = referenceService.register(durationList, 1, true, context);
+			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
 		}
+		if ((Boolean) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS) == true) {
+			this.progressFrame.dispose();
+		}
 		return outputs;
 	}
 
-	public void workerDone(List<byte[]> dataArray) {
+	/**
+	 * Updates the duration of target descriptor.
+	 * 
+	 * @param clazz
+	 *            DescriptorClass
+	 * @param time
+	 *            Duration
+	 */
+	public synchronized void setTime(Class<? extends AbstractCDKActivity> clazz, long time) {
+		if (this.timeMap.get(clazz) == null) {
+			double millis = time / Math.pow(10, 6);
+			this.timeMap.put(clazz, millis);
+		} else {
+			double millis = time / Math.pow(10, 6);
+			double currentTime = (Double) this.timeMap.get(clazz) + millis;
+			this.timeMap.put(clazz, currentTime);
+		}
+	}
+
+	/**
+	 * Final point for the workers.
+	 * 
+	 * @param results
+	 *            Described molecules.
+	 */
+	public synchronized void workerDone(List<IAtomContainer> results) {
+		// Merge results
+		for (IAtomContainer result : results) {
+			UUID uuid = (UUID) result.getProperty(CDKTavernaConstants.MOLECULEID);
+			IAtomContainer target = this.resultMap.get(uuid);
+			for (Entry<Object, Object> property : result.getProperties().entrySet()) {
+				target.setProperty(property.getKey(), property.getValue());
+			}
+		}
 		this.numberOfCompletedWorkers++;
-		this.resultData.addAll(dataArray);
 		if (this.numberOfCompletedWorkers == this.workers.length) {
 			synchronized (this) {
 				this.notify();
@@ -151,8 +264,71 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 		}
 	}
 
-	public AsynchronousActivityCallback getCallback() {
-		return callback;
+	/**
+	 * Manages the work for the worker and locks used descriptors.
+	 * 
+	 * @return Work for the Workers.
+	 */
+	public synchronized QSARDescriptorWork getWork() {
+		QSARDescriptorWork work = null;
+		LinkedList<Class<? extends AbstractCDKActivity>> emptyWork = new LinkedList<Class<? extends AbstractCDKActivity>>();
+
+		for (Class<? extends AbstractCDKActivity> descriptor : this.descriptorsToDo) {
+			boolean available = false;
+			if (this.availableDescriptorsSet.contains(descriptor)) {
+				available = true;
+			}
+			if (available) {
+				LinkedList<IAtomContainer> molecules = this.workToDoMap.get(descriptor);
+				if (molecules.isEmpty()) {
+					emptyWork.add(descriptor);
+					continue;
+				}
+				this.availableDescriptorsSet.remove(descriptor);
+				work = new QSARDescriptorWork();
+				work.descriptorClass = descriptor;
+				work.molecule = molecules.remove();
+				break;
+			}
+		}
+		for (Class<? extends AbstractCDKActivity> descriptor : emptyWork) {
+			this.descriptorsToDo.remove(descriptor);
+		}
+		if (work != null) {
+			this.currentProgress++;
+			this.moleculesCalculated++;
+		}
+		return work;
+	}
+
+	/**
+	 * Releases the lock on descriptors.
+	 * 
+	 * @param descriptorClass
+	 */
+	public synchronized void releaseDescriptor(Class<? extends AbstractCDKActivity> descriptorClass) {
+		this.availableDescriptorsSet.add(descriptorClass);
+	}
+
+	/**
+	 * Displays the progress in the progress frame.
+	 */
+	public void showProgress() {
+		if (!(Boolean) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS) == true) {
+			return;
+		}
+		for (int i = 0; i < this.workers.length; i++) {
+			JLabel progressLabel = this.progressFrame.getStateLabels()[i];
+			String state = this.workers[i].getCurrent();
+			progressLabel.setText("Worker " + (i + 1) + ": " + state);
+			if (state.equals(QSARDescriptorWorker.FINISHED)) {
+				progressLabel.setBackground(Color.GREEN);
+			} else {
+				progressLabel.setBackground(Color.YELLOW);
+			}
+		}
+		this.progressFrame.getProgressBar().setValue(this.currentProgress);
+		this.progressFrame.getProgressLabel().setText(this.moleculesCalculated + " descriptor values calculated!");
 	}
 
 }

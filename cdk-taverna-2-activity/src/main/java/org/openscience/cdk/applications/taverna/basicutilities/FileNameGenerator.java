@@ -21,6 +21,9 @@
  */
 package org.openscience.cdk.applications.taverna.basicutilities;
 
+import java.awt.Component;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -206,5 +209,11 @@ public class FileNameGenerator {
 		}
 		// The directory is now empty so delete it
 		return dir.delete();
+	}
+
+	public static void centerWindowOnScreen(Component window) {
+		Point center = new Point((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2, (int) Toolkit
+				.getDefaultToolkit().getScreenSize().getHeight() / 2);
+		window.setLocation((center.x - window.getWidth() / 2), (center.y - window.getHeight() / 2));
 	}
 }

@@ -43,25 +43,25 @@ import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 
 /**
- * Class which represents the CSV to QSAR vector activity.
+ * Class which represents the merge CSV To QSAR vector activity.
  * 
  * @author Andreas Truzskowski
  * 
  */
-public class CSVToQSARVectorActivity extends AbstractCDKActivity implements IFileReader {
+public class MergeCSVsToQSARVectorActivity extends AbstractCDKActivity implements IFileReader {
 
-	public static final String CSV_TO_QSAR_VECTOR_ACTIVITY = "CSV To QSAR Vector";
+	public static final String MERGE_CSV_TO_QSAR_VECTOR_ACTIVITY = "Merge CSVs To QSAR Vector";
 
 	/**
 	 * Creates a new instance.
 	 */
-	public CSVToQSARVectorActivity() {
-		this.RESULT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
+	public MergeCSVsToQSARVectorActivity() {
+		this.RESULT_PORTS = new String[] { "Merged Descriptor Vector", "Merged Descriptor Names" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		// empty
+		// Empty
 	}
 
 	@Override
@@ -76,50 +76,53 @@ public class CSVToQSARVectorActivity extends AbstractCDKActivity implements IFil
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
+		Map<UUID, Map<String, Object>> vectorMap = new HashMap<UUID, Map<String, Object>>();
+		ArrayList<String> descriptorNames = new ArrayList<String>();
 		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (files == null || files.length == 0) {
 			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
 		}
-		// No multi file selection supported
-		File file = files[0];
-		Map<UUID, Map<String, Object>> vectorMap = new HashMap<UUID, Map<String, Object>>();
-		Map<String, Object> descriptorResultMap;
-		ArrayList<String> descriptorNames = new ArrayList<String>();
-		LineNumberReader reader = null;
-		try {
-			reader = new LineNumberReader(new FileReader(file));
-		} catch (FileNotFoundException e) {
-			ErrorLogger.getInstance().writeError(file.getPath() + "does not exist!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), file.getPath() + "does not exist!");
-		}
-		String line = "";
-		try {
-			boolean readDescriptorNames = true;
-			while ((line = reader.readLine()) != null) {
-				String[] items = this.getItems(line);
-				// First line contains the descriptor names
-				if (readDescriptorNames) {
-					// Skip first item because it contains only the id
-					for (int i = 1; i < items.length; i++) {
-						descriptorNames.add(items[i]);
-					}
-					readDescriptorNames = false;
-				} else {
-					// Read values
-					descriptorResultMap = new HashMap<String, Object>();
-					String uuidString = items[0];
-					for (int i = 0; i < descriptorNames.size(); i++) {
-						String key = descriptorNames.get(i);
-						Double value = Double.parseDouble(items[i + 1]);
-						descriptorResultMap.put(key, value);
-					}
-					vectorMap.put(UUID.fromString(uuidString), descriptorResultMap);
-				}
+		// Multi file selection supported
+		for (File file : files) {
+			Map<String, Object> descriptorResultMap;
+			LineNumberReader reader = null;
+			try {
+				reader = new LineNumberReader(new FileReader(file));
+			} catch (FileNotFoundException e) {
+				ErrorLogger.getInstance().writeError(file.getPath() + "does not exist!", this.getActivityName(), e);
+				throw new CDKTavernaException(this.getActivityName(), file.getPath() + "does not exist!");
 			}
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during reading CSV file: " + file.getPath() + "!",
-					this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while reading CSV file: " + file.getPath() + "!");
+			String line = "";
+			try {
+				boolean readDescriptorNames = true;
+				while ((line = reader.readLine()) != null) {
+					String[] items = this.getItems(line);
+					// First line contains the descriptor names
+					if (readDescriptorNames) {
+						// Skip first item because it contains only the id
+						for (int i = 1; i < items.length; i++) {
+							if (!descriptorNames.contains(items[i])) {
+								descriptorNames.add(items[i]);
+							}
+						}
+						readDescriptorNames = false;
+					} else {
+						// Read values
+						descriptorResultMap = new HashMap<String, Object>();
+						String uuidString = items[0];
+						for (int i = 0; i < descriptorNames.size(); i++) {
+							String key = descriptorNames.get(i);
+							Double value = Double.parseDouble(items[i + 1]);
+							descriptorResultMap.put(key, value);
+						}
+						vectorMap.put(UUID.fromString(uuidString), descriptorResultMap);
+					}
+				}
+			} catch (Exception e) {
+				ErrorLogger.getInstance().writeError("Error during reading CSV file: " + file.getPath() + "!",
+						this.getActivityName(), e);
+				throw new CDKTavernaException(this.getActivityName(), "Error while reading CSV file: " + file.getPath() + "!");
+			}
 		}
 		try {
 			byte[] vectorData = CDKObjectHandler.getBytes(vectorMap);
@@ -151,7 +154,7 @@ public class CSVToQSARVectorActivity extends AbstractCDKActivity implements IFil
 
 	@Override
 	public String getActivityName() {
-		return CSVToQSARVectorActivity.CSV_TO_QSAR_VECTOR_ACTIVITY;
+		return MergeCSVsToQSARVectorActivity.MERGE_CSV_TO_QSAR_VECTOR_ACTIVITY;
 	}
 
 	@Override
@@ -159,12 +162,13 @@ public class CSVToQSARVectorActivity extends AbstractCDKActivity implements IFil
 		HashMap<String, Object> properties = new HashMap<String, Object>();
 		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".csv");
 		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "Any CSV File");
+		properties.put(CDKTavernaConstants.PROPERTY_SUPPORT_MULTI_FILE, true);
 		return properties;
 	}
 
 	@Override
 	public String getDescription() {
-		return "Description: " + CSVToQSARVectorActivity.CSV_TO_QSAR_VECTOR_ACTIVITY;
+		return "Description: " + MergeCSVsToQSARVectorActivity.MERGE_CSV_TO_QSAR_VECTOR_ACTIVITY;
 	}
 
 	@Override

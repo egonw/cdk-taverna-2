@@ -64,6 +64,7 @@ public class CDKTavernaConstants {
 	public static final String PROPERTY_SCALE_FINGERPRINT_ITEMS = "SCALE FINGERPRINT ITEMS";
 	public static final String PROPERTY_QSAR_VECTOR_CURATION_TYPE = "QSAR VECTOR CURATION TYPE";
 	public static final String PROPERTY_QSAR_VECTOR_MIN_MAX_CURATION = "QSAR VECTOR MIN MAX CURATION";
+	public static final String PROPERTY_SHOW_PROGRESS = "SHOW PROGRESS";
 	// --------------------Miscellaneous-------------------------------------
 	public static final String MOLECULEID = "MOLECULEID";
 }

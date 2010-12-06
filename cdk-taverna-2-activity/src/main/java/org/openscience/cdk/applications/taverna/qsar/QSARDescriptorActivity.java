@@ -21,6 +21,7 @@
  */
 package org.openscience.cdk.applications.taverna.qsar;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,6 +40,9 @@ import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
+import org.openscience.cdk.applications.taverna.qsar.utilities.QSARDescriptorWorker;
+import org.openscience.cdk.applications.taverna.qsar.utilities.QSARProgressFrame;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.qsar.DescriptorValue;
 import org.openscience.cdk.qsar.IAtomPairDescriptor;
@@ -56,6 +60,9 @@ import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 public class QSARDescriptorActivity extends AbstractCDKActivity {
 
 	public static final String QSAR_DESCRIPTOR_ACTIVITY = "QSAR Descriptor";
+
+	private QSARProgressFrame progressFrame = null;
+	private int currentProgress = 0;
 
 	private AsynchronousActivityCallback callback = null;
 
@@ -85,7 +92,7 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> additionalProperties = new HashMap<String, Object>();
-		additionalProperties.put(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, Runtime.getRuntime().availableProcessors());
+		additionalProperties.put(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS, true);
 		return additionalProperties;
 	}
 
@@ -131,6 +138,17 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 			moleculeList.addAll(ChemFileManipulator.getAllAtomContainers(file));
 		}
 		durationList.add("Descriptor Name;Duration;");
+		// Setup progress frame
+		if ((Boolean) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS) == true) {
+			int numberOfCalculations = classes.size() * moleculeList.size();
+			this.progressFrame = new QSARProgressFrame(1);
+			this.progressFrame.setVisible(true);
+			this.progressFrame.getProgressBar().setMinimum(0);
+			this.progressFrame.getProgressBar().setMaximum(numberOfCalculations);
+			this.progressFrame.getProgressBar().setValue(0);
+			FileNameGenerator.centerWindowOnScreen(this.progressFrame);
+			this.currentProgress = 0;
+		}
 		for (Class<? extends AbstractCDKActivity> clazz : classes) {
 			AbstractCDKActivity descriptorActivity = null;
 			try {
@@ -141,10 +159,16 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 				continue;
 			}
 			long startTime = System.currentTimeMillis();
+			if ((Boolean) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS) == true) {
+				this.progressFrame.getStateLabels()[0].setText("Worker 1: " + clazz.getSimpleName());
+				this.progressFrame.getStateLabels()[0].setBackground(Color.YELLOW);
+			}
 			if (descriptorActivity instanceof AbstractAtomicDescriptor) {
 				IAtomicDescriptor descriptor = ((AbstractAtomicDescriptor) descriptorActivity).getDescriptor();
 				for (IAtomContainer molecule : moleculeList) {
 					if (molecule.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
+						ErrorLogger.getInstance().writeError(
+								"Molecule contains no ID! Use \"Tag Molecules With UUID\" activity!", this.getActivityName());
 						throw new Exception("Molecule contains no ID!");
 					}
 					try {
@@ -156,6 +180,10 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 						ErrorLogger.getInstance().writeError(
 								"Error during calculation of QSAR descriptor: " + descriptor.getClass() + "!",
 								descriptor.toString(), e);
+					}
+					if ((Boolean) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS) == true) {
+						this.progressFrame.getProgressBar().setValue(this.currentProgress);
+						this.currentProgress++;
 					}
 				}
 			} else if (descriptorActivity instanceof AbstractAtomicProtonDescriptor) {
@@ -174,6 +202,10 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 								"Error during calculation of QSAR descriptor: " + descriptor.getClass() + "!",
 								descriptor.toString(), e);
 					}
+					if ((Boolean) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS) == true) {
+						this.progressFrame.getProgressBar().setValue(this.currentProgress);
+						this.currentProgress++;
+					}
 				}
 			} else if (descriptorActivity instanceof AbstractAtompairDescriptor) {
 				IAtomPairDescriptor descriptor = ((AbstractAtompairDescriptor) descriptorActivity).getDescriptor();
@@ -190,6 +222,10 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 								"Error during calculation of QSAR descriptor: " + descriptor.getClass() + "!",
 								descriptor.toString(), e);
 					}
+					if ((Boolean) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS) == true) {
+						this.progressFrame.getProgressBar().setValue(this.currentProgress);
+						this.currentProgress++;
+					}
 				}
 			} else if (descriptorActivity instanceof AbstractBondDescriptor) {
 				IBondDescriptor descriptor = ((AbstractBondDescriptor) descriptorActivity).getDescriptor();
@@ -204,6 +240,10 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 								"Error during calculation of QSAR descriptor: " + descriptor.getClass() + "!",
 								descriptor.toString(), e);
 					}
+					if ((Boolean) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS) == true) {
+						this.progressFrame.getProgressBar().setValue(this.currentProgress);
+						this.currentProgress++;
+					}
 				}
 			} else if (descriptorActivity instanceof AbstractMolecularDescriptor) {
 				IMolecularDescriptor descriptor = ((AbstractMolecularDescriptor) descriptorActivity).getDescriptor();
@@ -216,6 +256,10 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 								"Error during calculation of QSAR descriptor: " + descriptor.getClass() + "!",
 								descriptor.toString(), e);
 					}
+					if ((Boolean) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS) == true) {
+						this.progressFrame.getProgressBar().setValue(this.currentProgress);
+						this.currentProgress++;
+					}
 				}
 			} else {
 				throw new CDKTavernaException("QSARDescreiptorWorker", "Unknown descriptor type: "
@@ -224,7 +268,10 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 			long duration = System.currentTimeMillis() - startTime;
 			String durationString = descriptorActivity.getActivityName() + ";" + String.format("%4f", duration / 1000.0) + "s;";
 			durationList.add(durationString);
-
+		}
+		if ((Boolean) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS) == true) {
+			this.progressFrame.getStateLabels()[0].setText("Worker 1: " + QSARDescriptorWorker.FINISHED);
+			this.progressFrame.getStateLabels()[0].setBackground(Color.GREEN);
 		}
 		try {
 			List<CMLChemFile> chemFiles = CMLChemFileWrapper.wrapAtomContainerListInChemModelList(moleculeList);
@@ -237,6 +284,9 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError("Error during configuration of output port!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error during configuration of output port!");
+		}
+		if ((Boolean) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS) == true) {
+			this.progressFrame.dispose();
 		}
 		return outputs;
 	}

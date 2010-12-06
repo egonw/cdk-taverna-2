@@ -116,6 +116,7 @@ org.openscience.cdk.applications.taverna.qsar.CurateQSARVectorActivity
 org.openscience.cdk.applications.taverna.qsar.CreateFingerprintItemListFromQSARVectorActivity
 org.openscience.cdk.applications.taverna.qsar.MergeQSARVectorsActivity
 org.openscience.cdk.applications.taverna.qsar.CalculateQSARVectorStatisticsActivity
+org.openscience.cdk.applications.taverna.qsar.MergeCSVsToQSARVectorActivity
 org.openscience.cdk.applications.taverna.classification.art2a.ART2aClassificationActivity
 org.openscience.cdk.applications.taverna.classification.art2a.tools.ART2aResultAsPDFFileReader
 org.openscience.cdk.applications.taverna.classification.art2a.tools.ART2aResultAsPDF

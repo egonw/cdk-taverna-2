@@ -42,7 +42,7 @@ public class PiContactDetection extends AbstractAtompairDescriptor {
 	 * 
 	 * @see org.openscience.cdk.applications.taverna.qsar.descriptors.atomic.AbstractAtomicDescriptor#getDescriptor()
 	 */
-	protected IAtomPairDescriptor getDescriptor() {
+	public IAtomPairDescriptor getDescriptor() {
 		return new PiContactDetectionDescriptor();
 	}
 }

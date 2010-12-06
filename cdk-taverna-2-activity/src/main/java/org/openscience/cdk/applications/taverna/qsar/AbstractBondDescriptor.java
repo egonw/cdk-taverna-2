@@ -75,7 +75,7 @@ public abstract class AbstractBondDescriptor extends AbstractCDKActivity {
 		}
 	}
 
-	protected abstract IBondDescriptor getDescriptor();
+	public abstract IBondDescriptor getDescriptor();
 
 	@Override
 	public String getActivityName() {

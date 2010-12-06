@@ -42,7 +42,7 @@ public class BondSigmaElectronegativity extends AbstractBondDescriptor {
 	 * 
 	 * @see org.openscience.cdk.applications.taverna.qsar.descriptors.bond.AbstractBondDescriptor#getDescriptor()
 	 */
-	protected IBondDescriptor getDescriptor() {
+	public IBondDescriptor getDescriptor() {
 		return new BondSigmaElectronegativityDescriptor();
 	}
 

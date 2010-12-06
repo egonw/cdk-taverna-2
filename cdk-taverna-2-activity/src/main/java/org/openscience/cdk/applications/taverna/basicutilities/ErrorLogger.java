@@ -186,7 +186,7 @@ public class ErrorLogger {
 		System.out.println("Error  : " + aError);
 		System.out.println("Class  : " + aName);
 	}
-	
+
 	/**
 	 * Writes an error to the log file and writes the molecule to hard disk.
 	 * 

@@ -41,8 +41,8 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.io.XMLFileIO;
 
 /**
- * Class which represents the ART-2a result to CSV activity.
- * This worker extracts content from a given set of ART2A classification results and creates a String list in the comma separated value format.
+ * Class which represents the ART-2a result to CSV activity. This worker extracts content from a given set of ART2A classification
+ * results and creates a String list in the comma separated value format.
  * 
  * @author Andreas Truzskowski
  * 
@@ -93,11 +93,11 @@ public class ART2aResultAsCSV extends AbstractCDKActivity {
 				buffer = new StringBuffer();
 				buffer.append(fileName);
 				buffer.append(";");
-				
+
 				xmlReader = xmlFileIO.getXMLStreamReaderWithCompression(fileName);
 				xmlReader.next();
-				classificator = new Art2aClassificator(xmlReader, true);	
-				
+				classificator = new Art2aClassificator(xmlReader, true);
+
 				buffer.append(classificator.getVigilanceParameter());
 				buffer.append(";");
 				buffer.append(classificator.getNumberOfDetectedClasses());
@@ -112,7 +112,7 @@ public class ART2aResultAsCSV extends AbstractCDKActivity {
 				buffer.append(";");
 				buffer.append(classificator.getNumberOfEpochs());
 				buffer.append(";");
-				
+
 				// Add the number of vectors in class
 				for (int i = 0; i < classificator.getNumberOfDetectedClasses(); i++) {
 					buffer.append(classificator.getNumberOfVectorsInClass(i));
@@ -133,7 +133,7 @@ public class ART2aResultAsCSV extends AbstractCDKActivity {
 				buffer.append(i);
 			}
 			result.set(0, buffer.toString());
-		
+
 			T2Reference containerRef = referenceService.register(result, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
