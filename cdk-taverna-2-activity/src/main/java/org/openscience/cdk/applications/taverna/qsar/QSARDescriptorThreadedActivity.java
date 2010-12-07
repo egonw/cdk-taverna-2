@@ -121,6 +121,7 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 		this.callback = callback;
 		this.workToDoMap.clear();
 		this.availableDescriptorsSet.clear();
+		this.resultMap.clear();
 		ArrayList<String> durationList = new ArrayList<String>();
 		InvocationContext context = this.callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();

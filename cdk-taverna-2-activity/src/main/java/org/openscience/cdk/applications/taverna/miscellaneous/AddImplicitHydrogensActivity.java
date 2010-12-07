@@ -138,10 +138,10 @@ public class AddImplicitHydrogensActivity extends AbstractCDKActivity {
 								this.getActivityName(), e);
 					}
 				}
+				taggedMoleculesList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(containers[i]));
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError("Error during adding implicit hydrogens!", this.getActivityName(), e);
 			}
-			taggedMoleculesList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(containers[i]));
 		}
 		// Congfigure output
 		try {

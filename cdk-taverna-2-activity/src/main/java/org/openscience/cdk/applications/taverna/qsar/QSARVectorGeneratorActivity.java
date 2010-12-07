@@ -102,14 +102,15 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 		IDescriptorResult result;
 		DescriptorValue dValue;
 		Object[] keys;
-		try {
-			for (CMLChemFile chemFile : chemFileList) {
-				List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(chemFile);
-				for (IAtomContainer atomContainer : moleculeList) {
-					if (atomContainer.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
-						throw new Exception("Molecule contains no ID!");
-					}
-					descritorResultMap = new HashMap<String, Object>();
+		for (CMLChemFile chemFile : chemFileList) {
+			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(chemFile);
+			for (IAtomContainer atomContainer : moleculeList) {
+				descritorResultMap = new HashMap<String, Object>();
+				if (atomContainer.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
+					throw new CDKTavernaException(this.getActivityName(), "Molecule contains no ID!");
+				}
+				HashSet<String> tempDescriptorNames = new HashSet<String>();
+				try {
 					// Add the bond descriptor to the descriptor map
 					for (int i = 0; i < atomContainer.getBondCount(); i++) {
 						IBond bond = atomContainer.getBond(i);
@@ -122,19 +123,19 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 								descriptorName += "." + i;
 								result = dValue.getValue();
 								if (result instanceof DoubleResult) {
-									descriptorNames.add(descriptorName);
+									tempDescriptorNames.add(descriptorName);
 									descritorResultMap.put(descriptorName, ((DoubleResult) result).doubleValue());
 								} else if (result instanceof IntegerResult) {
-									descriptorNames.add(descriptorName);
+									tempDescriptorNames.add(descriptorName);
 									descritorResultMap.put(descriptorName, ((IntegerResult) result).intValue());
 								} else if (result instanceof IntegerArrayResult) {
 									for (int j = 0; j < ((IntegerArrayResult) result).length(); j++) {
-										descriptorNames.add(descriptorName + "." + j);
+										tempDescriptorNames.add(descriptorName + "." + j);
 										descritorResultMap.put(descriptorName + "." + j, ((IntegerArrayResult) result).get(j));
 									}
 								} else if (result instanceof DoubleArrayResult) {
 									for (int j = 0; j < ((DoubleArrayResult) result).length(); j++) {
-										descriptorNames.add(descriptorName + "." + j);
+										tempDescriptorNames.add(descriptorName + "." + j);
 										descritorResultMap.put(descriptorName + "." + j, ((DoubleArrayResult) result).get(j));
 									}
 								}
@@ -153,19 +154,19 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 								result = dValue.getValue();
 								descriptorName += "." + i;
 								if (result instanceof DoubleResult) {
-									descriptorNames.add(descriptorName);
+									tempDescriptorNames.add(descriptorName);
 									descritorResultMap.put(descriptorName, ((DoubleResult) result).doubleValue());
 								} else if (result instanceof IntegerResult) {
-									descriptorNames.add(descriptorName);
+									tempDescriptorNames.add(descriptorName);
 									descritorResultMap.put(descriptorName, ((IntegerResult) result).intValue());
 								} else if (result instanceof IntegerArrayResult) {
 									for (int j = 0; j < ((IntegerArrayResult) result).length(); j++) {
-										descriptorNames.add(descriptorName + "." + j);
+										tempDescriptorNames.add(descriptorName + "." + j);
 										descritorResultMap.put(descriptorName + "." + j, ((IntegerArrayResult) result).get(j));
 									}
 								} else if (result instanceof DoubleArrayResult) {
 									for (int j = 0; j < ((DoubleArrayResult) result).length(); j++) {
-										descriptorNames.add(descriptorName + "." + j);
+										tempDescriptorNames.add(descriptorName + "." + j);
 										descritorResultMap.put(descriptorName + "." + j, ((DoubleArrayResult) result).get(j));
 									}
 								}
@@ -181,28 +182,35 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 									descriptorSpecificationSplitter)[1];
 							result = dValue.getValue();
 							if (result instanceof DoubleResult) {
-								descriptorNames.add(descriptorName);
+								tempDescriptorNames.add(descriptorName);
 								descritorResultMap.put(descriptorName, ((DoubleResult) result).doubleValue());
 							} else if (result instanceof IntegerResult) {
-								descriptorNames.add(descriptorName);
+								tempDescriptorNames.add(descriptorName);
 								descritorResultMap.put(descriptorName, ((IntegerResult) result).intValue());
 							} else if (result instanceof IntegerArrayResult) {
 								for (int i = 0; i < ((IntegerArrayResult) result).length(); i++) {
-									descriptorNames.add(descriptorName + "." + i);
+									tempDescriptorNames.add(descriptorName + "." + i);
 									descritorResultMap.put(descriptorName + "." + i, ((IntegerArrayResult) result).get(i));
 								}
 							} else if (result instanceof DoubleArrayResult) {
 								for (int i = 0; i < ((DoubleArrayResult) result).length(); i++) {
-									descriptorNames.add(descriptorName + "." + i);
+									tempDescriptorNames.add(descriptorName + "." + i);
 									descritorResultMap.put(descriptorName + "." + i, ((DoubleArrayResult) result).get(i));
 								}
 							}
 						}
 					}
-					vectorMap.put((UUID) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID), descritorResultMap);
+				} catch (Exception e) {
+					UUID uuid = (UUID) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID);
+					ErrorLogger.getInstance().writeError(
+							"Error during generation of QSAR Vector for molecule: " + uuid.toString(), this.getActivityName(), e);
+					continue;
 				}
+				vectorMap.put((UUID) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID), descritorResultMap);
+				this.descriptorNames.addAll(tempDescriptorNames);
 			}
-
+		}
+		try {
 			byte[] vectorData = CDKObjectHandler.getBytes(vectorMap);
 			T2Reference containerRef = referenceService.register(vectorData, 0, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
@@ -214,8 +222,8 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 			containerRef = referenceService.register(nameData, 0, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
+			ErrorLogger.getInstance().writeError("Error during configuration of output port!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error during configuration of output port!");
 		}
 		// Return results
 		return outputs;
