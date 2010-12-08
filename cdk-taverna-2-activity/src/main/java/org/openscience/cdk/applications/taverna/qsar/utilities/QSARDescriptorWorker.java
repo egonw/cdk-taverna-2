@@ -21,8 +21,6 @@
  */
 package org.openscience.cdk.applications.taverna.qsar.utilities;
 
-import java.util.ArrayList;
-
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
@@ -59,7 +57,6 @@ public class QSARDescriptorWorker extends Thread {
 
 	@Override
 	public void run() {
-		ArrayList<IAtomContainer> moleculeArray = new ArrayList<IAtomContainer>();
 		try {
 			QSARDescriptorWork work = null;
 			while ((work = this.owner.getWork()) != null) {
@@ -153,7 +150,7 @@ public class QSARDescriptorWorker extends Thread {
 					long duration = System.nanoTime() - startTime;
 					this.owner.setTime(descriptorClass, duration);
 					this.owner.releaseDescriptor(descriptorClass);
-					moleculeArray.add(molecule);
+					this.owner.publishResult(molecule);
 				}
 			}
 		} catch (Exception e) {
@@ -162,8 +159,12 @@ public class QSARDescriptorWorker extends Thread {
 		} finally {
 			this.current = QSARDescriptorWorker.FINISHED;
 			this.owner.showProgress();
-			this.owner.workerDone(moleculeArray);
+			this.owner.workerDone(this);
 		}
+	}
+
+	public long getStartTime() {
+		return startTime;
 	}
 
 	public String getCurrent() {
