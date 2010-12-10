@@ -124,7 +124,7 @@ public class ErrorLogger {
 	 * @param aException
 	 *            The exception.
 	 */
-	public void writeError(final String aError, final String aName, final Exception aException) {
+	public synchronized void writeError(final String aError, final String aName, final Exception aException) {
 		Date tmpDate = Calendar.getInstance().getTime();
 		this.errorOccured = true;
 		try {
@@ -161,7 +161,7 @@ public class ErrorLogger {
 	 * @param aName
 	 *            Name of the class.
 	 */
-	public void writeError(final String aError, final String aName) {
+	public synchronized void writeError(final String aError, final String aName) {
 		Date tmpDate = Calendar.getInstance().getTime();
 		this.errorOccured = true;
 		try {
@@ -199,7 +199,8 @@ public class ErrorLogger {
 	 * @param aMolecule
 	 *            The molecule which produces the error.
 	 */
-	public void writeError(final String aError, final String aName, final Exception aException, final IAtomContainer aMolecule) {
+	public synchronized void writeError(final String aError, final String aName, final Exception aException,
+			final IAtomContainer aMolecule) {
 		this.writeError(aError, aName, aException);
 		SimpleDateFormat tmpSDF = new SimpleDateFormat("dd.MM.yyyy_HH.mm.ss");
 		String tmpDate = tmpSDF.format(new Date());
@@ -212,7 +213,7 @@ public class ErrorLogger {
 	 * @param aMessage
 	 *            The message.
 	 */
-	public void writeMessage(String aMessage) {
+	public synchronized void writeMessage(String aMessage) {
 		errorOccured = true;
 		Date tmpDate = Calendar.getInstance().getTime();
 		try {
@@ -241,7 +242,7 @@ public class ErrorLogger {
 	 * @param aMolecule
 	 *            Molcelue to write to hard disk
 	 */
-	public void writeMolecule(IAtomContainer aMolecule) {
+	public synchronized void writeMolecule(IAtomContainer aMolecule) {
 		this.writeMolecule(aMolecule, "", true);
 	}
 
@@ -254,7 +255,7 @@ public class ErrorLogger {
 	 * @param aName
 	 *            Name of the molecule on hard disk.
 	 */
-	public void writeMolecule(IAtomContainer aMolecule, String aName) {
+	public synchronized void writeMolecule(IAtomContainer aMolecule, String aName) {
 		this.writeMolecule(aMolecule, aName, false);
 	}
 
@@ -269,7 +270,7 @@ public class ErrorLogger {
 	 * @param aAddTimestamp
 	 *            True if the current time shall be added to the name.
 	 */
-	public void writeMolecule(IAtomContainer aMolecule, String aName, boolean aAddTimestamp) {
+	public synchronized void writeMolecule(IAtomContainer aMolecule, String aName, boolean aAddTimestamp) {
 		errorOccured = true;
 		if (!this.logMolecules) {
 			return;
@@ -340,7 +341,7 @@ public class ErrorLogger {
 	/**
 	 * Close writer. Use setPath() to reset Writer.
 	 */
-	public void closeErrorHandler() {
+	public synchronized void closeErrorHandler() {
 		if (this.writer != null) {
 			this.writer.close();
 		}

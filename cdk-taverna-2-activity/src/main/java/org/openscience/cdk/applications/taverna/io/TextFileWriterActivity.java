@@ -90,16 +90,16 @@ public class TextFileWriterActivity extends AbstractCDKActivity implements IIter
 				this.file = FileNameGenerator.getNewFile(directory.getPath(), extension);
 			}
 		}
-		for (String s : strings) {
-			try {
-				PrintWriter writer = new PrintWriter(new FileWriter(file, !oneFilePerIteration));
+		try {
+			PrintWriter writer = new PrintWriter(new FileWriter(file, !oneFilePerIteration));
+			for (String s : strings) {
 				writer.write(s + "\n");
-				writer.close();
-			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error writing text file: " + file.getPath() + "!", this.getActivityName(),
-						e);
 			}
+			writer.close();
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error writing text file: " + file.getPath() + "!", this.getActivityName(), e);
 		}
+
 		return null;
 	}
 

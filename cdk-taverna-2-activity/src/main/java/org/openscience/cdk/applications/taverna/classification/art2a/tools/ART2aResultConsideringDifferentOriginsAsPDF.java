@@ -92,6 +92,7 @@ public class ART2aResultConsideringDifferentOriginsAsPDF extends AbstractCDKActi
 		// Prepare relation table data
 		ArrayList<String> subjectNames = new ArrayList<String>();
 		HashMap<String, Integer> foundSubjectsTable;
+		HashMap<String, Integer> numberOfSubjectsInTable = new HashMap<String, Integer>();
 		HashMap<UUID, String> subjectTable = new HashMap<UUID, String>();
 		String currentName = null;
 		String uuidString = null;
@@ -104,6 +105,13 @@ public class ART2aResultConsideringDifferentOriginsAsPDF extends AbstractCDKActi
 				uuidString = entry.replaceAll("> <ENTRY> ", "");
 				UUID uuid = UUID.fromString(uuidString);
 				subjectTable.put(uuid, currentName);
+				Integer value = numberOfSubjectsInTable.get(currentName);
+				if (value == null) {
+					value = 1;
+				} else {
+					value++;
+				}
+				numberOfSubjectsInTable.put(currentName, value);
 			}
 		}
 		try {
@@ -131,7 +139,6 @@ public class ART2aResultConsideringDifferentOriginsAsPDF extends AbstractCDKActi
 					DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
 					int numberOfClasses = classificator.getNumberOfDetectedClasses();
 					for (int i = 0; i < numberOfClasses; i++) {
-
 						foundSubjectsTable = new HashMap<String, Integer>();
 						List<Object> items = classificator.getCorrespondingObjectsOfClass(i);
 						for (Object item : items) {
@@ -140,18 +147,17 @@ public class ART2aResultConsideringDifferentOriginsAsPDF extends AbstractCDKActi
 							Integer value = foundSubjectsTable.get(subject);
 							if (value == null) {
 								value = 1;
-								foundSubjectsTable.put(subject, value);
 							} else {
 								value++;
-								foundSubjectsTable.put(subject, value);
 							}
+							foundSubjectsTable.put(subject, value);
 						}
 						for (int j = 0; j < subjectNames.size(); j++) {
 							String name = subjectNames.get(j);
 							double proportion = 0;
 							if (foundSubjectsTable.get(name) != null) {
 								int value = foundSubjectsTable.get(name);
-								proportion = value / (double) items.size() * 100.0;
+								proportion = value / (double) numberOfSubjectsInTable.get(name) * 100.0;
 							}
 							String interangle = null;
 							if (i == 0) {

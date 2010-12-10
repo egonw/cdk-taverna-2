@@ -188,15 +188,15 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 			this.workers[i] = new QSARDescriptorWorker(this);
 			this.workers[i].start();
 		}
-//		// Setup timeout check
-//		Timer timer = new Timer();
-//		timer.schedule(new TimerTask() {
-//
-//			@Override
-//			public void run() {
-//				QSARDescriptorThreadedActivity.this.checkForTimeout();
-//			}
-//		}, 1000, 1000); // Check for timeout every minute
+		// // Setup timeout check
+		// Timer timer = new Timer();
+		// timer.schedule(new TimerTask() {
+		//
+		// @Override
+		// public void run() {
+		// QSARDescriptorThreadedActivity.this.checkForTimeout();
+		// }
+		// }, 1000, 1000); // Check for timeout every minute
 		// Wait for workers
 		synchronized (this) {
 			this.wait();
@@ -232,23 +232,23 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 		return outputs;
 	}
 
-//	private void checkForTimeout() {
-//		double timeout = 100.0;
-//		for (int i = 0; i < this.workers.length; i++) {
-//			long time = System.nanoTime() - this.workers[i].getStartTime();
-//			double millis = time / Math.pow(10, 6);
-//			if (millis > timeout) {
-//				try {
-//					this.workers[i].sleep(1000);
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//						this.workers[i] = new QSARDescriptorWorker(this);
-//				this.workers[i].start();
-//			}
-//		}
-//	}
+	// private void checkForTimeout() {
+	// double timeout = 100.0;
+	// for (int i = 0; i < this.workers.length; i++) {
+	// long time = System.nanoTime() - this.workers[i].getStartTime();
+	// double millis = time / Math.pow(10, 6);
+	// if (millis > timeout) {
+	// try {
+	// this.workers[i].sleep(1000);
+	// } catch (InterruptedException e) {
+	// // TODO Auto-generated catch block
+	// e.printStackTrace();
+	// }
+	// this.workers[i] = new QSARDescriptorWorker(this);
+	// this.workers[i].start();
+	// }
+	// }
+	// }
 
 	/**
 	 * Updates the duration of target descriptor.
@@ -336,7 +336,7 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 	 * @param result
 	 *            Calculated molecule.
 	 */
-	public void publishResult(IAtomContainer result) {
+	public synchronized void publishResult(IAtomContainer result) {
 		// Merge result
 		UUID uuid = (UUID) result.getProperty(CDKTavernaConstants.MOLECULEID);
 		IAtomContainer target = this.resultMap.get(uuid);

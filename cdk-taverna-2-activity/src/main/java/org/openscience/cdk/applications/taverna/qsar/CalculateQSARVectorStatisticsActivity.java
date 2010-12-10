@@ -95,6 +95,7 @@ public class CalculateQSARVectorStatisticsActivity extends AbstractCDKActivity {
 		try {
 			QSARVectorUtility vectorUtility = new QSARVectorUtility();
 			statistics = vectorUtility.calculateQSARVectorStatistics(vectorMap, descriptorNames);
+			// System.out.println();
 			// HashMap<String, Integer> calculatedDescriptorDistribution = vectorUtility.getCalculatedDescritorDistribution(
 			// vectorMap, descriptorNames);
 			// int numberOfMolecules = vectorUtility.getUUIDs(vectorMap).size();
@@ -126,8 +127,7 @@ public class CalculateQSARVectorStatisticsActivity extends AbstractCDKActivity {
 			// for (int i = 0; i < sortedDescriptorNames.size(); i++) {
 			// String name = sortedDescriptorNames.get(i);
 			// int value = calculatedDescriptorDistribution.get(name);
-			// dataSet.addValue(value, ""+ value, Integer.valueOf(i + 1));
-			//
+			// dataSet.addValue(value, "" + value, Integer.valueOf(i + 1));
 			//
 			// }
 			// ChartTool chartTool = new ChartTool();

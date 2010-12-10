@@ -24,3 +24,6 @@
 
 25.10.2010
 - Handle empty lists!! (String converter) -> Done
+
+9.12.2010
+- Change directory and file management for temp files in the charttool
