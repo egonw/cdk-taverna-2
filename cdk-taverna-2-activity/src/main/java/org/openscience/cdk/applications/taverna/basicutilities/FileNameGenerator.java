@@ -106,7 +106,7 @@ public class FileNameGenerator {
 		}
 		filename += dateformat.format(new Date());
 		String temp;
-		String key = path + "_" + iteration + "_" + name;
+		String key = path + "_" + iteration + "_" + name + extension;
 		if (usedFilesTable.get(key) != null) {
 			idx = usedFilesTable.get(key);
 		}

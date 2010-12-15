@@ -47,6 +47,7 @@ import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.isomorphism.UniversalIsomorphismTester;
 import org.openscience.cdk.isomorphism.matchers.QueryAtomContainer;
 import org.openscience.cdk.isomorphism.matchers.QueryAtomContainerCreator;
+import org.openscience.cdk.reaction.enumerator.tools.Tools;
 import org.openscience.cdk.reaction.enumerator.tools.VariableRegionChecker;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
@@ -160,7 +161,8 @@ public class ReactionEnumeratorSubgraphFilterActivity extends AbstractCDKActivit
 						if (variableRegionData != null) {
 							VariableRegionChecker.expandMoleculeFromVariableRegionData(variableRegionData, queryClone);
 						}
-						QueryAtomContainer query = QueryAtomContainerCreator.createAnyAtomForPseudoAtomQueryContainer(queryClone);
+						IAtomContainer container = Tools.addExplicitHydrogens(queryClone);
+						QueryAtomContainer query = QueryAtomContainerCreator.createAnyAtomForPseudoAtomQueryContainer(container);
 						if (UniversalIsomorphismTester.isSubgraph(molecule, query)) {
 							calculatedList.add(file);
 						} else {

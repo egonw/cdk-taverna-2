@@ -48,8 +48,9 @@ public class QSARDescriptorWorker extends Thread {
 	public static final String FINISHED = "Finished...";
 
 	private QSARDescriptorThreadedActivity owner = null;
-	private String current = "";
+	private String currentSate = "";
 	private long startTime = 0;
+	private boolean done = false;
 
 	public QSARDescriptorWorker(QSARDescriptorThreadedActivity owner) {
 		this.owner = owner;
@@ -65,7 +66,7 @@ public class QSARDescriptorWorker extends Thread {
 				try {
 					AbstractCDKActivity descriptorActivity = null;
 					startTime = System.nanoTime();
-					current = descriptorClass.getSimpleName();
+					currentSate = descriptorClass.getSimpleName();
 					this.owner.showProgress();
 					try {
 						descriptorActivity = descriptorClass.newInstance();
@@ -157,18 +158,26 @@ public class QSARDescriptorWorker extends Thread {
 			e.printStackTrace();
 			ErrorLogger.getInstance().writeError("Serious QSAR descriptor calculation error!", this.getClass().getSimpleName());
 		} finally {
-			this.current = QSARDescriptorWorker.FINISHED;
+			this.currentSate = QSARDescriptorWorker.FINISHED;
 			this.owner.showProgress();
-			this.owner.workerDone(this);
+			this.done = true;
+			this.owner.workerDone();
 		}
 	}
 
-	public long getStartTime() {
-		return startTime;
+
+	/**
+	 * @return whether all work for this worker is done.
+	 */
+	public boolean isDone() {
+		return done;
 	}
 
-	public String getCurrent() {
-		return this.current;
+	/**
+	 * @return the current progress state.
+	 */
+	public String getCurrentState() {
+		return this.currentSate;
 	}
 
 }

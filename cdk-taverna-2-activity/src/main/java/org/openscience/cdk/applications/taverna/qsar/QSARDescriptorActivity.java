@@ -93,6 +93,7 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> additionalProperties = new HashMap<String, Object>();
 		additionalProperties.put(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS, true);
+		additionalProperties.put(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, 1);
 		return additionalProperties;
 	}
 

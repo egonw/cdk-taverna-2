@@ -64,7 +64,6 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 
 	private QSARDescriptorWorker[] workers = null;
 	private AsynchronousActivityCallback callback = null;
-	private int numberOfCompletedWorkers = 0;
 	private HashMap<UUID, IAtomContainer> resultMap = new HashMap<UUID, IAtomContainer>();
 	private QSARProgressFrame progressFrame = null;
 	private int currentProgress = 0;
@@ -125,7 +124,6 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 		ArrayList<String> durationList = new ArrayList<String>();
 		InvocationContext context = this.callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
-		this.numberOfCompletedWorkers = 0;
 		this.descriptorsToDo = (ArrayList<Class<? extends AbstractCDKActivity>>) ((ArrayList<Class<? extends AbstractCDKActivity>>) this
 				.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_CHOSEN_QSARDESCRIPTORS)).clone();
 		if (this.descriptorsToDo == null || this.descriptorsToDo.isEmpty()) {
@@ -275,9 +273,15 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 	 * @param results
 	 *            Described molecules.
 	 */
-	public synchronized void workerDone(QSARDescriptorWorker worker) {
-		this.numberOfCompletedWorkers++;
-		if (this.numberOfCompletedWorkers == this.workers.length) {
+	public synchronized void workerDone() {
+		boolean allDone = true;
+		for (QSARDescriptorWorker worker : this.workers) {
+			if (!worker.isDone()) {
+				allDone = false;
+				break;
+			}
+		}
+		if (allDone) {
 			synchronized (this) {
 				this.notify();
 			}
@@ -354,7 +358,7 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 		}
 		for (int i = 0; i < this.workers.length; i++) {
 			JLabel progressLabel = this.progressFrame.getStateLabels()[i];
-			String state = this.workers[i].getCurrent();
+			String state = this.workers[i].getCurrentState();
 			progressLabel.setText("Worker " + (i + 1) + ": " + state);
 			if (state.equals(QSARDescriptorWorker.FINISHED)) {
 				progressLabel.setBackground(Color.GREEN);

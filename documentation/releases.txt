@@ -30,3 +30,9 @@
 - Added Curation activities
 - Added Implicit/Explicit hydrogen adder activities
 - Many many bug fixes 
+
+0.3.1
+- Fixed bug in the FileNameGenerator 
+- Fixed bug in the ReactionEnumeratorSubgraphFilterActivity class. Explicit hydrogens were not added to the query molecule.
+- Added the GetMolecularWeightDistributionFromQSARVector activity.
+
