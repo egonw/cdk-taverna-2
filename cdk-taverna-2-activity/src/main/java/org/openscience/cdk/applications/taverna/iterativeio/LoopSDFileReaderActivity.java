@@ -111,7 +111,7 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 		// Read SDfile
 		File file = ((File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE))[0];
 		if (file == null) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
 		ArrayList<byte[]> dataList = new ArrayList<byte[]>();
 		try {
@@ -134,7 +134,7 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 							dataList.add(CDKObjectHandler.getBytes(cmlChemFile));
 							counter++;
 						} catch (Exception e) {
-							ErrorLogger.getInstance().writeError("Error during reading molecule: \n" + SDFilePart,
+							ErrorLogger.getInstance().writeError("Error reading molecule: \n" + SDFilePart,
 									this.getActivityName(), e);
 						} finally {
 							SDFilePart = "";
@@ -150,8 +150,8 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 				}
 			} while (line != null && counter < readSize);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during reading SDF files!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while reading SDF files!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath(), this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath());
 		}
 		T2Reference reference = referenceService.register(dataList, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], reference);

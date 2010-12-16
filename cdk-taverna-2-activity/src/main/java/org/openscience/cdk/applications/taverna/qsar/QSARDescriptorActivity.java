@@ -127,11 +127,11 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializion of object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		if (chemFileList.isEmpty()) {
-			throw new CDKTavernaException(this.getActivityName(), "Chemfile list is empty!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.DATA_CONTAINS_NO_MOLECULE);
 		}
 
 		for (Iterator<CMLChemFile> iter = chemFileList.iterator(); iter.hasNext();) {
@@ -168,9 +168,8 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 				IAtomicDescriptor descriptor = ((AbstractAtomicDescriptor) descriptorActivity).getDescriptor();
 				for (IAtomContainer molecule : moleculeList) {
 					if (molecule.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
-						ErrorLogger.getInstance().writeError(
-								"Molecule contains no ID! Use \"Tag Molecules With UUID\" activity!", this.getActivityName());
-						throw new Exception("Molecule contains no ID!");
+						ErrorLogger.getInstance().writeError(CDKTavernaException.MOLECULE_NOT_TAGGED_WITH_UUID, this.getActivityName());
+						throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.MOLECULE_NOT_TAGGED_WITH_UUID);
 					}
 					try {
 						for (int j = 0; j < molecule.getAtomCount(); j++) {
@@ -283,8 +282,8 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 			containerRef = referenceService.register(durationList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during configuration of output port!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error during configuration of output port!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
 		if ((Boolean) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS) == true) {
 			this.progressFrame.dispose();

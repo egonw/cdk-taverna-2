@@ -83,7 +83,7 @@ public class MDLSDFileWriterActivity extends AbstractCDKActivity implements IIte
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		if (chemFileList.isEmpty()) {
@@ -91,7 +91,7 @@ public class MDLSDFileWriterActivity extends AbstractCDKActivity implements IIte
 		}
 		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (directory == null) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_OUTPUT_DIRECTORY_CHOSEN);
 		}
 		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 		Boolean oneFilePerIteration = (Boolean) this.getConfiguration().getAdditionalProperty(
@@ -110,7 +110,8 @@ public class MDLSDFileWriterActivity extends AbstractCDKActivity implements IIte
 			}
 			writer.close();
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error writing SD file: " + file.getPath() + "!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + file.getPath() + "!",
+					this.getActivityName(), e);
 		}
 		return null;
 	}

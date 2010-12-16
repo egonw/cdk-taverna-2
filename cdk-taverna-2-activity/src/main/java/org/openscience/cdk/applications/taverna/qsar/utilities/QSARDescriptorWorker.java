@@ -165,7 +165,6 @@ public class QSARDescriptorWorker extends Thread {
 		}
 	}
 
-
 	/**
 	 * @return whether all work for this worker is done.
 	 */

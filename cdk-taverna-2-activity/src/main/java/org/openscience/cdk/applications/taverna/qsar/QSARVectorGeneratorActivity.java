@@ -92,7 +92,7 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		Map<UUID, Map<String, Object>> vectorMap = new HashMap<UUID, Map<String, Object>>();
@@ -107,7 +107,7 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 			for (IAtomContainer atomContainer : moleculeList) {
 				descritorResultMap = new HashMap<String, Object>();
 				if (atomContainer.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
-					throw new CDKTavernaException(this.getActivityName(), "Molecule contains no ID!");
+					throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.MOLECULE_NOT_TAGGED_WITH_UUID);
 				}
 				HashSet<String> tempDescriptorNames = new HashSet<String>();
 				try {
@@ -222,8 +222,8 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 			containerRef = referenceService.register(nameData, 0, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during configuration of output port!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error during configuration of output port!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
 		// Return results
 		return outputs;

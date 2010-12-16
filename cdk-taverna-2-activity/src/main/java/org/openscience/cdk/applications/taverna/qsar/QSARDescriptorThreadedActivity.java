@@ -144,7 +144,7 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 			for (IAtomContainer atomContainer : molecules) {
 				if (atomContainer.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
 					ErrorLogger.getInstance().writeError("Molecule contains no ID!", this.getClass().getSimpleName());
-					throw new CDKTavernaException(this.getClass().getSimpleName(), "Molecule contains no ID!");
+					throw new CDKTavernaException(this.getClass().getSimpleName(), CDKTavernaException.MOLECULE_NOT_TAGGED_WITH_UUID);
 				} else {
 					UUID uuid = (UUID) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID);
 					this.resultMap.put(uuid, atomContainer);
@@ -162,8 +162,8 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 			}
 
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during object deserialization!", this.toString(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error during object deserialization!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.toString(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OBJECT_DESERIALIZATION_ERROR);
 		}
 		// Show progress frame
 		int numberOfThreads = (Integer) this.getConfiguration().getAdditionalProperty(
@@ -221,8 +221,8 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 			containerRef = referenceService.register(durationList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
 		if ((Boolean) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS) == true) {
 			this.progressFrame.dispose();

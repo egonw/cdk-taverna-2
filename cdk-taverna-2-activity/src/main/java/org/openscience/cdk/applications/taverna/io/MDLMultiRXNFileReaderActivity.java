@@ -81,7 +81,7 @@ public class MDLMultiRXNFileReaderActivity extends AbstractCDKActivity implement
 		// Read RXN file
 		File file = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (file == null) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
 		try {
 			LineNumberReader lineReader = new LineNumberReader(new FileReader(file));
@@ -105,16 +105,16 @@ public class MDLMultiRXNFileReaderActivity extends AbstractCDKActivity implement
 				}
 			}
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error reading multi RXN file: " + file.getPath(), this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error reading multi RXN file: " + file.getPath());
+			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath(), this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath());
 		}
 		// Congfigure output
 		try {
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(reactionList), 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
 		// Return results
 		return outputs;

@@ -82,7 +82,7 @@ public class GetMolecularWeightDistributionFromQSARVectorActivity extends Abstra
 		try {
 			vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(vectorData);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		ArrayList<String> descriptorNames;
@@ -90,7 +90,7 @@ public class GetMolecularWeightDistributionFromQSARVectorActivity extends Abstra
 		try {
 			descriptorNames = (ArrayList<String>) CDKObjectHandler.getObject(nameData);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		if (!descriptorNames.contains("weight")) {
@@ -127,7 +127,7 @@ public class GetMolecularWeightDistributionFromQSARVectorActivity extends Abstra
 				weightDistributionCSV.add(i + ";" + weightDistribution[i] + ";");
 			}
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during erxtraction of molecular weight from QSAR vector!",
+			ErrorLogger.getInstance().writeError("Error during extraction of molecular weight from QSAR vector!",
 					this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
@@ -137,8 +137,8 @@ public class GetMolecularWeightDistributionFromQSARVectorActivity extends Abstra
 			containerRef = referenceService.register(molIdSWeightCSV, 1, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
 		return outputs;
 	}

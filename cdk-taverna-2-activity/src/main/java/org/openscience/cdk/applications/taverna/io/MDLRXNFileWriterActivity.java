@@ -82,12 +82,12 @@ public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFi
 		try {
 			reactionList = CDKObjectHandler.getReactionList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (directory == null) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_OUTPUT_DIRECTORY_CHOSEN);
 		}
 		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 		for (IReaction reaction : reactionList) {
@@ -97,8 +97,8 @@ public class MDLRXNFileWriterActivity extends AbstractCDKActivity implements IFi
 				writer.write(reaction);
 				writer.close();
 			} catch (Exception e) {
-				ErrorLogger.getInstance()
-						.writeError("Error writing RXN file: " + file.getPath() + "!", this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + file.getPath() + "!",
+						this.getActivityName(), e);
 			}
 		}
 		return null;

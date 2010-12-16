@@ -81,7 +81,7 @@ public class CreateFingerprintItemListFromQSARVectorActivity extends AbstractCDK
 		try {
 			vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(vectorData);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		ArrayList<String> descriptorNames;
@@ -89,7 +89,7 @@ public class CreateFingerprintItemListFromQSARVectorActivity extends AbstractCDK
 		try {
 			descriptorNames = (ArrayList<String>) CDKObjectHandler.getObject(nameData);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		List<FingerprintItem> fingerprintList = null;
@@ -97,7 +97,7 @@ public class CreateFingerprintItemListFromQSARVectorActivity extends AbstractCDK
 			QSARVectorUtility vectorUtility = new QSARVectorUtility();
 			fingerprintList = vectorUtility.createFingerprintItemListFromQSARVector(vectorMap, descriptorNames);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during creating fingerprint items!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during fingerprint items creation !", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		try {
@@ -105,8 +105,8 @@ public class CreateFingerprintItemListFromQSARVectorActivity extends AbstractCDK
 			T2Reference containerRef = referenceService.register(fingerprintData, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
 		return outputs;
 	}

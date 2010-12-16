@@ -85,7 +85,7 @@ public class StructureToMDLMolStringConverterActivity extends AbstractCDKActivit
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		List<String> molStringList = new ArrayList<String>();
@@ -98,11 +98,11 @@ public class StructureToMDLMolStringConverterActivity extends AbstractCDKActivit
 				molStringList.add(stringWriter.toString());
 			} catch (Exception e) {
 				notConverted.add(cml);
-				ErrorLogger.getInstance().writeError("Error converting MDL mol String!", this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.CONVERTION_ERROR, this.getActivityName(), e);
 			}
 		}
 		if (molStringList.isEmpty()) {
-			throw new CDKTavernaException(this.getActivityName(), "Error while converting MDL Mol Strings");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.CONVERTION_ERROR);
 		}
 		T2Reference containerRef = referenceService.register(molStringList, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);

@@ -126,12 +126,12 @@ public class ART2aClassificationActivity extends AbstractCDKActivity {
 		try {
 			fingerprintItemList = CDKObjectHandler.getFingerprintList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while deserializing objects!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (directory == null) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_OUTPUT_DIRECTORY_CHOSEN);
 		}
 		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 		FingerprintItem[] fingerprintItemArray = new FingerprintItem[fingerprintItemList.size()];

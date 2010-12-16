@@ -94,7 +94,7 @@ public class SMILESToStructureConverterActivity extends AbstractCDKActivity {
 					som = (IMoleculeSet) reader.read(new MoleculeSet());
 					reader.close();
 				} catch (Exception e) {
-					ErrorLogger.getInstance().writeError("Error during reading SMILES file!", this.getActivityName(), e);
+					ErrorLogger.getInstance().writeError("Error reading SMILES file!", this.getActivityName(), e);
 					throw new CDKTavernaException(this.getActivityName(), "Error while reading SMILES file!");
 				}
 				IMoleculeSet som2D = new MoleculeSet();
@@ -105,7 +105,7 @@ public class SMILESToStructureConverterActivity extends AbstractCDKActivity {
 						str.generateCoordinates();
 						som2D.addMolecule(str.getMolecule());
 					} catch (Exception e) {
-						ErrorLogger.getInstance().writeError("Error generating 2D Coordinate!", this.getActivityName(), e);
+						ErrorLogger.getInstance().writeError(CDKTavernaException.GENERATE_2D_COORDINATES_ERROR, this.getActivityName(), e);
 					}
 				}
 				for (int i = 0; i < som2D.getMoleculeCount(); i++) {
@@ -113,8 +113,9 @@ public class SMILESToStructureConverterActivity extends AbstractCDKActivity {
 						CMLChemFile cmlChemFile = CMLChemFileWrapper.wrapInChemModel(som2D.getMolecule(i));
 						dataList.add(CDKObjectHandler.getBytes(cmlChemFile));
 					} catch (Exception e) {
-						ErrorLogger.getInstance().writeError("Error creating output data!", this.getActivityName(), e);
-						throw new CDKTavernaException(this.getActivityName(), "Error creating output data!");
+						ErrorLogger.getInstance().writeError(CDKTavernaException.SERIALIZING_OUTPUT_DATA_ERROR,
+								this.getActivityName(), e);
+						throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.SERIALIZING_OUTPUT_DATA_ERROR);
 					}
 				}
 			} catch (Exception e) {
@@ -123,7 +124,7 @@ public class SMILESToStructureConverterActivity extends AbstractCDKActivity {
 			}
 		}
 		if (dataList.isEmpty()) {
-			throw new CDKTavernaException(this.getActivityName(), "Error during converting SMILES");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.CONVERTION_ERROR);
 		}
 		T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);

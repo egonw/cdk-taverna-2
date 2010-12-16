@@ -108,19 +108,11 @@ public class RuleOfFiveFilter extends AbstractCDKActivity {
 		List<CMLChemFile> unmatchedList = new ArrayList<CMLChemFile>();
 		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
 				context);
-		for (byte[] data : dataArray) {
-			Object obj;
-			try {
-				obj = CDKObjectHandler.getObject(data);
-			} catch (Exception e) {
-				throw new CDKTavernaException(this.getConfiguration().getActivityName(), "Error while deserializing object");
-			}
-			if (obj instanceof CMLChemFile) {
-				inputList.add((CMLChemFile) obj);
-			} else {
-				throw new CDKTavernaException(this.getConfiguration().getActivityName(),
-						CDKTavernaException.WRONG_INPUT_PORT_TYPE);
-			}
+		try {
+			inputList = CDKObjectHandler.getChemFileList(dataArray);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		if (descriptor == null) {
 			descriptor = new RuleOfFiveDescriptor();

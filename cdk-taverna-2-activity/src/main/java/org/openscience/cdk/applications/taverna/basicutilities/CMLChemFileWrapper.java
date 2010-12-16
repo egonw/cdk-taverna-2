@@ -60,7 +60,7 @@ public class CMLChemFileWrapper {
 			atomContainer = listOfAtomContainerTemp.get(0);
 		} else {
 			throw new CDKTavernaException("CMLChemFileWrapper",
-					"ConvertCMLChemFileListToAtomContainerArray: More than one molecules within one CMLChemfile");
+					"WrapChemModelInAtomContainer: More than one molecules within one CMLChemfile");
 		}
 		return atomContainer;
 	}
@@ -196,18 +196,13 @@ public class CMLChemFileWrapper {
 	 * @throws Exception
 	 */
 	public static IAtomContainer[] convertCMLChemFileListToAtomContainerArray(List<CMLChemFile> cmlChemFileList) throws Exception {
-		IAtomContainer[] atomContainerArray = new AtomContainer[cmlChemFileList.size()];
-		List<IAtomContainer> listOfAtomContainerTemp = null;
-		for (int i = 0; i < atomContainerArray.length; i++) {
-			listOfAtomContainerTemp = ChemFileManipulator.getAllAtomContainers(cmlChemFileList.get(i));
-			if (listOfAtomContainerTemp.size() == 1) {
-				atomContainerArray[i] = listOfAtomContainerTemp.get(0);
-			} else {
-				// FIXME Exception handling
-				throw new CDKTavernaException("CMLChemFileWrapper",
-						"ConvertCMLChemFileListToAtomContainerArray: More than one molecules within one CMLChemfile");
-			}
+		IAtomContainer[] atomContainerArray;
+		List<IAtomContainer> listOfAtomContainerTemp = new ArrayList<IAtomContainer>();
+		for (int i = 0; i < cmlChemFileList.size(); i++) {
+			listOfAtomContainerTemp.addAll(ChemFileManipulator.getAllAtomContainers(cmlChemFileList.get(i)));
 		}
+		atomContainerArray = new AtomContainer[listOfAtomContainerTemp.size()];
+		atomContainerArray = listOfAtomContainerTemp.toArray(atomContainerArray);
 		return atomContainerArray;
 	}
 

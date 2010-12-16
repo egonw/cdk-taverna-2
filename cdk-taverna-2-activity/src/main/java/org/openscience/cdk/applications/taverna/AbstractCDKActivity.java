@@ -109,7 +109,7 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 					AbstractCDKActivity.this.iteration++;
 					outputs = AbstractCDKActivity.this.work(inputs, callback);
 				} catch (Exception e) {
-					ErrorLogger.getInstance().writeError("Not catched exception.", "AbstractCDKActivity", e);
+					ErrorLogger.getInstance().writeError(CDKTavernaException.NOT_CATCHED_EXCEPTION, "AbstractCDKActivity", e);
 					callback.fail(e.getMessage());
 				}
 				if (outputs == null) {

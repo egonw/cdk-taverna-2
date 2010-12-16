@@ -80,7 +80,7 @@ public class MergeCSVsToQSARVectorActivity extends AbstractCDKActivity implement
 		ArrayList<String> descriptorNames = new ArrayList<String>();
 		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (files == null || files.length == 0) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
 		// Multi file selection supported
 		for (File file : files) {
@@ -119,9 +119,9 @@ public class MergeCSVsToQSARVectorActivity extends AbstractCDKActivity implement
 					}
 				}
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error during reading CSV file: " + file.getPath() + "!",
+				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!",
 						this.getActivityName(), e);
-				throw new CDKTavernaException(this.getActivityName(), "Error while reading CSV file: " + file.getPath() + "!");
+				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!");
 			}
 		}
 		try {
@@ -132,8 +132,8 @@ public class MergeCSVsToQSARVectorActivity extends AbstractCDKActivity implement
 			containerRef = referenceService.register(nameData, 0, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
 		return outputs;
 	}

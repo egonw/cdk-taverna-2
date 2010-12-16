@@ -95,11 +95,11 @@ public class MDLMolStringToStructureConverterActivity extends AbstractCDKActivit
 				}
 			} catch (Exception e) {
 				notConverted.add(mol);
-				ErrorLogger.getInstance().writeError("Error converting MDL mol String!", this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.CONVERTION_ERROR, this.getActivityName(), e);
 			}
 		}
 		if (dataList.isEmpty()) {
-			throw new CDKTavernaException(this.getActivityName(), "Error while converting MDL Mol Strings");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.CONVERTION_ERROR);
 		}
 		T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);

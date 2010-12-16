@@ -80,7 +80,7 @@ public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 		UUID id = UUID.fromString((String) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
 				context));
 		if (id == null) {
-			throw new CDKTavernaException(DATA_COLLECTOR_EMITTER_ACTIVITY, "UUID not set!");
+			throw new CDKTavernaException(DATA_COLLECTOR_EMITTER_ACTIVITY, CDKTavernaException.MOLECULE_NOT_TAGGED_WITH_UUID);
 		}
 		try {
 			// close old writer
@@ -107,8 +107,8 @@ public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 			idxFile.delete();
 			datFile.delete();
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during reading cache data!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while reading cache data!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_CACHE_DATA_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_CACHE_DATA_ERROR);
 		}
 		// Congfigure output
 		T2Reference containerRef = referenceService.register(dataList, 1, true, context);

@@ -51,7 +51,7 @@ public class RendererFactory {
 			renderer.getRenderer2DModel().setShowEndCarbons(false);
 			renderer.getRenderer2DModel().setShowAromaticity(false);
 		} catch (IOException e) {
-			ErrorLogger.getInstance().writeError("Error during initializing renderer!", "Renderer Factory", e);
+			ErrorLogger.getInstance().writeError("Error during rendererinitializion!", "Renderer Factory", e);
 		}
 		return renderer;
 

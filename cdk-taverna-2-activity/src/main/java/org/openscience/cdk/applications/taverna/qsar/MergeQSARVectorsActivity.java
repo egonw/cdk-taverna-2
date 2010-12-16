@@ -94,7 +94,7 @@ public class MergeQSARVectorsActivity extends AbstractCDKActivity implements IPo
 				vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(vectorData);
 				vectorMapList.add(vectorMap);
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 				throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 			}
 			ArrayList<String> descriptorNames;
@@ -104,7 +104,7 @@ public class MergeQSARVectorsActivity extends AbstractCDKActivity implements IPo
 				descriptorNames = (ArrayList<String>) CDKObjectHandler.getObject(nameData);
 				descriptorNameList.add(descriptorNames);
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 				throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 			}
 			String name = (String) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[2] + "_" + i), String.class,
@@ -139,8 +139,8 @@ public class MergeQSARVectorsActivity extends AbstractCDKActivity implements IPo
 			containerRef = referenceService.register(idTable, 1, true, context);
 			outputs.put(this.RESULT_PORTS[2], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
 		return outputs;
 	}

@@ -105,7 +105,7 @@ public class WriteMoleculeAsPDFActivity extends AbstractCDKActivity implements I
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
@@ -118,7 +118,7 @@ public class WriteMoleculeAsPDFActivity extends AbstractCDKActivity implements I
 			File file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
 			DrawPDF.drawMoleculesAsPDF(containerList, file);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during drawing molecule image into pdf!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error drawing molecule image into pdf!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		return null;

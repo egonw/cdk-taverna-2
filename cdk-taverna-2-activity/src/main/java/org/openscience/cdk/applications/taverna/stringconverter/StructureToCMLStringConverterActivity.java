@@ -83,7 +83,7 @@ public class StructureToCMLStringConverterActivity extends AbstractCDKActivity {
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		List<String> cmlStringList = new ArrayList<String>();
@@ -92,11 +92,11 @@ public class StructureToCMLStringConverterActivity extends AbstractCDKActivity {
 				cmlStringList.add(cml.toCML());
 			} catch (Exception e) {
 				notConverted.add(cml);
-				ErrorLogger.getInstance().writeError("Error converting CML String!", this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.CONVERTION_ERROR, this.getActivityName(), e);
 			}
 		}
 		if (cmlStringList.isEmpty()) {
-			throw new CDKTavernaException(this.getActivityName(), "Error while converting CML strings");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.CONVERTION_ERROR);
 		}
 		T2Reference containerRef = referenceService.register(cmlStringList, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);

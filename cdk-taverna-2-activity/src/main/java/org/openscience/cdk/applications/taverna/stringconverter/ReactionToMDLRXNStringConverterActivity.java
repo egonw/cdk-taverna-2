@@ -86,7 +86,7 @@ public class ReactionToMDLRXNStringConverterActivity extends AbstractCDKActivity
 		try {
 			rxnFileList = CDKObjectHandler.getReactionList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		List<String> rxnStringList = new ArrayList<String>();
@@ -99,11 +99,11 @@ public class ReactionToMDLRXNStringConverterActivity extends AbstractCDKActivity
 				rxnStringList.add(stringWriter.toString());
 			} catch (Exception e) {
 				notConverted.add((Reaction) rxn);
-				ErrorLogger.getInstance().writeError("Error converting MDL RXN String!", this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.CONVERTION_ERROR, this.getActivityName(), e);
 			}
 		}
 		if (rxnStringList.isEmpty()) {
-			throw new CDKTavernaException(this.getActivityName(), "Error while converting MDL RXN Strings");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.CONVERTION_ERROR);
 		}
 		T2Reference containerRef = referenceService.register(rxnStringList, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);

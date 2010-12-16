@@ -102,15 +102,15 @@ public class DoubletsFilterActivity extends AbstractCDKActivity {
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object.", this.getConfiguration().getActivityName(),
-					e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR,
+					this.getConfiguration().getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		IAtomContainer[] containers;
 		try {
 			containers = CMLChemFileWrapper.convertCMLChemFileListToAtomContainerArray(chemFileList);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during converting CML chem file list.",
+			ErrorLogger.getInstance().writeError(CDKTavernaException.CML_FILE_CONVERSION_ERROR,
 					this.getConfiguration().getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
@@ -127,7 +127,7 @@ public class DoubletsFilterActivity extends AbstractCDKActivity {
 					}
 				}
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error while searching for isomorphs.",
+				ErrorLogger.getInstance().writeError("Error during search for isomorphs.",
 						this.getConfiguration().getActivityName(), e);
 			}
 			if (!doublet) {
@@ -143,7 +143,7 @@ public class DoubletsFilterActivity extends AbstractCDKActivity {
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(filteredList), 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while configuring output ports.",
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR,
 					this.getConfiguration().getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}

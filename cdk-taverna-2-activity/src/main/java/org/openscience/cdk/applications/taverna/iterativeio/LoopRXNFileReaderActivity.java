@@ -111,7 +111,7 @@ public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements II
 		if (this.fileList == null) {
 			File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 			if (files == null || files.length == 0) {
-				throw new CDKTavernaException(this.getActivityName(), "Error, no file(s) chosen!");
+				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 			}
 			this.fileList = new ArrayList<File>();
 			for (File f : files) {
@@ -127,9 +127,9 @@ public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements II
 				reader.close();
 				dataList.add(CDKObjectHandler.getBytes(reaction));
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error during reading RXN file: " + file.getPath() + "!",
+				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!",
 						this.getActivityName(), e);
-				throw new CDKTavernaException(this.getActivityName(), "Error while reading RXN file: " + file.getPath() + "!");
+				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!");
 			}
 			if (fileList.isEmpty()) {
 				state = FINISHED;

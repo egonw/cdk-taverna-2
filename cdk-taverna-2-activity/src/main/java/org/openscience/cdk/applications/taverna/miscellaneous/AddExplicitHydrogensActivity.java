@@ -102,15 +102,15 @@ public class AddExplicitHydrogensActivity extends AbstractCDKActivity {
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object.", this.getConfiguration().getActivityName(),
-					e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR,
+					this.getConfiguration().getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		IAtomContainer[] containers;
 		try {
 			containers = CMLChemFileWrapper.convertCMLChemFileListToAtomContainerArray(chemFileList);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during converting CML chem file list.",
+			ErrorLogger.getInstance().writeError(CDKTavernaException.CML_FILE_CONVERSION_ERROR,
 					this.getConfiguration().getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
@@ -119,7 +119,7 @@ public class AddExplicitHydrogensActivity extends AbstractCDKActivity {
 				Tools.addExplicitHydrogens(containers[i]);
 				taggedMoleculesList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(containers[i]));
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error during adding explicit hydrogens!", this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError("Error adding explicit hydrogens!", this.getActivityName(), e);
 			}
 		}
 		// Congfigure output
@@ -128,7 +128,7 @@ public class AddExplicitHydrogensActivity extends AbstractCDKActivity {
 					context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while configuring output ports.",
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR,
 					this.getConfiguration().getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}

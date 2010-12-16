@@ -78,7 +78,7 @@ public class DataCollectorAcceptorActivity extends AbstractCDKActivity {
 		UUID id = UUID.fromString((String) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[1]), String.class,
 				context));
 		if (id == null) {
-			throw new CDKTavernaException(this.getActivityName(), "UUID not set!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.MOLECULE_NOT_TAGGED_WITH_UUID);
 		}
 		DataOutputStream dataStream;
 		DataOutputStream idxStream;
@@ -86,8 +86,8 @@ public class DataCollectorAcceptorActivity extends AbstractCDKActivity {
 			dataStream = Preferences.getInstance().getDataCollectorDataStream(id);
 			idxStream = Preferences.getInstance().createDataCollectorIdxStream(id);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during initializing data stream!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while initializing data stream!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.STREAM_INITIALIZATION_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.STREAM_INITIALIZATION_ERROR);
 		}
 		try {
 			for (byte[] data : dataArray) {
@@ -97,8 +97,8 @@ public class DataCollectorAcceptorActivity extends AbstractCDKActivity {
 			idxStream.flush();
 			dataStream.flush();
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during writing cache data!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while writing cache data!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_CACHE_DATA_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRITE_CACHE_DATA_ERROR);
 		}
 		// Return results
 		return outputs;

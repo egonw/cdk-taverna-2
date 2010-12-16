@@ -40,6 +40,7 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ChartTool;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.applications.taverna.io.XMLFileIO;
@@ -78,7 +79,7 @@ public class ART2aResultAsPDFFileReader extends AbstractCDKActivity implements I
 		List<String> pdfTitle = new ArrayList<String>();
 		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (files == null || files.length == 0) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
 		try {
 			XMLStreamReader xmlReader;
@@ -152,7 +153,8 @@ public class ART2aResultAsPDFFileReader extends AbstractCDKActivity implements I
 			chartTool.exportToChartsToPDF(tempFileList, file, pdfTitle);
 			resultFileNames.add(file.getAbsolutePath());
 		} catch (Exception e) {
-			e.printStackTrace();
+			ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_ART2A_RESULT_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_ART2A_RESULT_ERROR);
 		}
 		return null;
 	}

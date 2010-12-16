@@ -31,6 +31,8 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.UUID;
 
+import org.openscience.cdk.applications.taverna.CDKTavernaException;
+
 /**
  * Class which provides methods for a centralized file name handling within the cdk-taverna project
  * 
@@ -119,7 +121,7 @@ public class FileNameGenerator {
 		try {
 			file.createNewFile();
 		} catch (IOException e) {
-			ErrorLogger.getInstance().writeError("Error during creating file!", "FileNameGenerator", e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.FILE_CREATION_ERROR, "FileNameGenerator", e);
 		}
 		return file;
 	}
@@ -146,7 +148,7 @@ public class FileNameGenerator {
 		try {
 			file.createNewFile();
 		} catch (IOException e) {
-			ErrorLogger.getInstance().writeError("Error during creating file!", "FileNameGenerator", e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.FILE_CREATION_ERROR, "FileNameGenerator", e);
 		}
 		return file;
 	}

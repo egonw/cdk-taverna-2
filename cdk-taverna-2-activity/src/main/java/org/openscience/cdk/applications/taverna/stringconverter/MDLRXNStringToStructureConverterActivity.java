@@ -90,11 +90,11 @@ public class MDLRXNStringToStructureConverterActivity extends AbstractCDKActivit
 				dataList.add(CDKObjectHandler.getBytes(reaction));
 			} catch (Exception e) {
 				notConverted.add(string);
-				ErrorLogger.getInstance().writeError("Error converting MDL RXN String!", this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.CONVERTION_ERROR, this.getActivityName(), e);
 			}
 		}
 		if (dataList.isEmpty()) {
-			throw new CDKTavernaException(this.getActivityName(), "Error while converting MDL RXN Strings");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.CONVERTION_ERROR);
 		}
 		T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);

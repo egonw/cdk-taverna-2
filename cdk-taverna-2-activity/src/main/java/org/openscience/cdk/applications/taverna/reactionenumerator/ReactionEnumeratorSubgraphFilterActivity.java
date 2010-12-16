@@ -120,14 +120,14 @@ public class ReactionEnumeratorSubgraphFilterActivity extends AbstractCDKActivit
 		try {
 			inputList = CDKObjectHandler.getChemFileList(dataInputOne);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		Object obj;
 		try {
 			obj = CDKObjectHandler.getObject(dataInputTwo);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		if (obj instanceof CMLChemFile) {
@@ -171,8 +171,8 @@ public class ReactionEnumeratorSubgraphFilterActivity extends AbstractCDKActivit
 					}
 				} catch (Exception e) {
 					notCalculatedList.add(file);
-					ErrorLogger.getInstance().writeError("Error during testing for subgraph isomorphism!",
-							this.getActivityName(), e);
+					ErrorLogger.getInstance()
+							.writeError("Error during test for subgraph isomorphism!", this.getActivityName(), e);
 				}
 			}
 		}
@@ -183,8 +183,8 @@ public class ReactionEnumeratorSubgraphFilterActivity extends AbstractCDKActivit
 			containerRef = referenceService.register(CDKObjectHandler.getBytesList(notCalculatedList), 1, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
 		return outputs;
 	}

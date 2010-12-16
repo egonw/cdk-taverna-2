@@ -39,6 +39,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.io.CMLReader;
 
 /**
@@ -100,7 +101,7 @@ public class JChemPaintActivity extends AbstractCDKActivity {
 		try {
 			File file = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_CMLCHEMFILE);
 			if (file == null) {
-				throw new CDKTavernaException(JChemPaintActivity.JCHEMPAINT_ACTIVITY, "No molecules found!");
+				throw new CDKTavernaException(JChemPaintActivity.JCHEMPAINT_ACTIVITY, CDKTavernaException.NO_FILE_CHOSEN);
 			}
 			CMLChemFile cmlChemFile = new CMLChemFile();
 			CMLReader reader = new CMLReader(new FileInputStream(file));
@@ -108,7 +109,8 @@ public class JChemPaintActivity extends AbstractCDKActivity {
 			reader.close();
 			cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(cmlChemFile);
 			if (cmlChemFileList.isEmpty()) {
-				throw new CDKTavernaException(JChemPaintActivity.JCHEMPAINT_ACTIVITY, "No molecules found!");
+				throw new CDKTavernaException(JChemPaintActivity.JCHEMPAINT_ACTIVITY,
+						CDKTavernaException.DATA_CONTAINS_NO_MOLECULE);
 			}
 			// Congfigure output
 			for (CMLChemFile c : cmlChemFileList) {
@@ -117,8 +119,8 @@ public class JChemPaintActivity extends AbstractCDKActivity {
 			T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ErrorLogger.getInstance().writeError("Error in JChemPaint activity!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error in JChemPaint activity!");
 		}
 		// Return results
 		return outputs;

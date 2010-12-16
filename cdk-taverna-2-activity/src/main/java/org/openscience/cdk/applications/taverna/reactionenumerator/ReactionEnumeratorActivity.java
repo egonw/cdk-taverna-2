@@ -102,7 +102,7 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 			try {
 				list = CDKObjectHandler.getChemFileList(dataList);
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 				throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 			}
 			IAtomContainer[] containerArray = new AtomContainer[list.size()];
@@ -110,7 +110,7 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 				try {
 					containerArray[j] = CMLChemFileWrapper.wrapChemModelInAtomContainer(list.get(j));
 				} catch (Exception e) {
-					ErrorLogger.getInstance().writeError("Error during wrapping IAtomContainer in ChemModel!",
+					ErrorLogger.getInstance().writeError(CDKTavernaException.WRAPPING_ATOMCONTAINER_IN_CHEMMODEL_ERROR,
 							this.getActivityName(), e);
 					throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 				}
@@ -123,7 +123,7 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 		try {
 			reaction = CDKObjectHandler.getReactionList(data).get(0);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		try {
@@ -137,7 +137,7 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 				}
 			}
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during enumerating reactions!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during reaction enumeration!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		T2Reference containerRef = referenceService.register(dataList, 1, true, context);

@@ -81,10 +81,8 @@ public class MoleculeConnectivityCheckerActivity extends AbstractCDKActivity {
 		ReferenceService referenceService = context.getReferenceService();
 		ArrayList<CMLChemFile> accepted = new ArrayList<CMLChemFile>();
 		ArrayList<CMLChemFile> rejected = new ArrayList<CMLChemFile>();
-
 		IMolecule nonPartitionedMolecule = null;
 		IMoleculeSet molSet = null;
-
 		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
 				context);
 		List<CMLChemFile> chemFileList = null;
@@ -96,10 +94,8 @@ public class MoleculeConnectivityCheckerActivity extends AbstractCDKActivity {
 		Integer cutoffvalue = (Integer) this.getConfiguration().getAdditionalProperty(
 				CDKTavernaConstants.PROPERTY_ATOM_COUNT_CUTOFF);
 		for (CMLChemFile cml : chemFileList) {
-
 			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(cml);
 			for (IAtomContainer atomContainer : moleculeList) {
-
 				nonPartitionedMolecule = (IMolecule) atomContainer;
 				// TODO Copy all properties?
 				Map<Object, Object> properties = nonPartitionedMolecule.getProperties();
@@ -117,7 +113,6 @@ public class MoleculeConnectivityCheckerActivity extends AbstractCDKActivity {
 
 			}
 		}
-
 		try {
 			List<byte[]> acceptedList = CDKObjectHandler.getBytesList(accepted);
 			T2Reference containerRef = referenceService.register(acceptedList, 1, true, context);
@@ -125,8 +120,8 @@ public class MoleculeConnectivityCheckerActivity extends AbstractCDKActivity {
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (IOException ex) {
 
-			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), ex);
-			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), ex);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
 
 		try {
@@ -135,8 +130,8 @@ public class MoleculeConnectivityCheckerActivity extends AbstractCDKActivity {
 			T2Reference containerRef2 = referenceService.register(rejectedList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef2);
 		} catch (IOException ex) {
-			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), ex);
-			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), ex);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
 		// Return results
 		return outputs;

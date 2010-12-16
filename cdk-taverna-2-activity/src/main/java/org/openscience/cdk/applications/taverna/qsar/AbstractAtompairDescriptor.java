@@ -112,14 +112,14 @@ public abstract class AbstractAtompairDescriptor extends AbstractCDKActivity {
 		try {
 			inputList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		if (descriptor == null) {
 			descriptor = getDescriptor();
 			if (descriptor == null) {
 				throw new CDKTavernaException(this.getConfiguration().getActivityName(),
-						"The descriptor could not be initialized!");
+						CDKTavernaException.DESCRIPTOR_INITIALIZION_ERROR);
 			}
 		}
 		for (Iterator<CMLChemFile> iter = inputList.iterator(); iter.hasNext();) {
@@ -140,7 +140,8 @@ public abstract class AbstractAtompairDescriptor extends AbstractCDKActivity {
 					calculatedList.add(file);
 
 				} catch (Exception e) {
-					ErrorLogger.getInstance().writeError("Error during calculating QSAR descriptor!", this.getActivityName(), e);
+					ErrorLogger.getInstance().writeError(CDKTavernaException.DESCRIPTOR_CALCULATION_ERROR,
+							this.getActivityName(), e);
 					notCalculatedList.add(file);
 				}
 			}
@@ -164,8 +165,8 @@ public abstract class AbstractAtompairDescriptor extends AbstractCDKActivity {
 			containerRef = referenceService.register(dataArray, 1, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during configurating output ports!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output ports!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
 		return outputs;
 	}

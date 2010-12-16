@@ -91,7 +91,7 @@ public class AtomSignatureActivity extends AbstractCDKActivity {
 			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(cml);
 			for (IAtomContainer atomContainer : moleculeList) {
 				if (atomContainer.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
-					throw new CDKTavernaException(this.getActivityName(), "Molecule is not tagged with an UUID!");
+					throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.MOLECULE_NOT_TAGGED_WITH_UUID);
 				}
 				UUID uuid = (UUID) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID);
 				for (IAtom atom : atomContainer.atoms()) {

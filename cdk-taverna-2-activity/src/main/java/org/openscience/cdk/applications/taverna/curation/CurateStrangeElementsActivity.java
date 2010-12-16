@@ -113,8 +113,8 @@ public class CurateStrangeElementsActivity extends AbstractCDKActivity {
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (IOException ex) {
 
-			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), ex);
-			throw new CDKTavernaException(this.getActivityName(), "Error during configurating output port!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), ex);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
 
 		try {
@@ -123,8 +123,8 @@ public class CurateStrangeElementsActivity extends AbstractCDKActivity {
 			T2Reference containerRef2 = referenceService.register(discardedList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[1], containerRef2);
 		} catch (IOException ex) {
-			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), ex);
-			throw new CDKTavernaException(this.getActivityName(), "Error during configurating output port!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), ex);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
 		return outputs;
 	}

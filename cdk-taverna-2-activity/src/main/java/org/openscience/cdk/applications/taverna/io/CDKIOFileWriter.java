@@ -99,6 +99,7 @@ public class CDKIOFileWriter {
 	 */
 	public static void writeFile(String[] content, String fileName, String path) throws Exception {
 		PrintWriter pw = null;
+		File file = null;
 		try {
 			// Splits the filename because it could contain directories
 			// FIXME Check for linux!!!
@@ -113,15 +114,17 @@ public class CDKIOFileWriter {
 			String uniquifyFileName = "_" + System.currentTimeMillis() + "_" + RandomNumbersTool.randomInt(0, 100000);
 			fileName = fileName.substring(0, fileName.length() - 4) + uniquifyFileName
 					+ fileName.substring(fileName.length() - 4);
-			Writer fw = new FileWriter(path + fileName);
+
+			file = new File(path + fileName);
+			Writer fw = new FileWriter(file);
 			Writer bw = new BufferedWriter(fw);
 			pw = new PrintWriter(bw);
 			for (int i = 0; i < content.length; i++) {
 				pw.print(content[i]);
 			}
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Could not write file.", "CDKIOFileWriter", e);
-			throw new CDKTavernaException("CDKIOFileWriter", "Could not write File");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + file.getPath(), "CDKIOFileWriter", e);
+			throw new CDKTavernaException("CDKIOFileWriter", CDKTavernaException.WRITE_FILE_ERROR + file.getPath());
 		} finally {
 			if (pw != null) {
 				pw.close();
@@ -129,21 +132,21 @@ public class CDKIOFileWriter {
 		}
 	}
 
-	public static void writeFile(String[] content, String fileName) throws Exception {
+	public static void writeFile(String[] content, String filename) throws Exception {
 		PrintWriter pw = null;
 		try {
 			String uniquifyFileName = "_" + System.currentTimeMillis() + "_" + RandomNumbersTool.randomInt(0, 100000);
-			fileName = fileName.substring(0, fileName.length() - 4) + uniquifyFileName
-					+ fileName.substring(fileName.length() - 4);
-			Writer fw = new FileWriter(fileName);
+			filename = filename.substring(0, filename.length() - 4) + uniquifyFileName
+					+ filename.substring(filename.length() - 4);
+			Writer fw = new FileWriter(filename);
 			Writer bw = new BufferedWriter(fw);
 			pw = new PrintWriter(bw);
 			for (int i = 0; i < content.length; i++) {
 				pw.print(content[i]);
 			}
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Could not write file.", "CDKIOFileWriter", e);
-			throw new CDKTavernaException("CDKIOFileWriter", "Could not write File");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + filename, "CDKIOFileWriter", e);
+			throw new CDKTavernaException("CDKIOFileWriter", CDKTavernaException.WRITE_FILE_ERROR + filename);
 		} finally {
 			if (pw != null) {
 				pw.close();
@@ -163,7 +166,7 @@ public class CDKIOFileWriter {
 		File file = new File(path);
 		if (!file.exists()) {
 			if (!file.mkdirs()) {
-				throw new CDKTavernaException("CDKIOFileWriter", "Could not create the directory: " + file.getPath());
+				throw new CDKTavernaException("CDKIOFileWriter", CDKTavernaException.CREATE_DIRECTORY_ERROR + file.getPath());
 			}
 		}
 	}

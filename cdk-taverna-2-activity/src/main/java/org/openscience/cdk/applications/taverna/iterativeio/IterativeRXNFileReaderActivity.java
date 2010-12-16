@@ -105,12 +105,11 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity implemen
 		// Read RXNfile
 		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (files == null || files.length == 0) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no file(s) chosen!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
 		List<T2Reference> outputList = new ArrayList<T2Reference>();
 		try {
 			List<Reaction> reactions = new LinkedList<Reaction>();
-
 			int counter = 0;
 			for (int i = 0; i < files.length; i++) {
 				try {
@@ -118,7 +117,7 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity implemen
 					reactions.add((Reaction) reader.read(new Reaction()));
 					reader.close();
 				} catch (Exception e) {
-					ErrorLogger.getInstance().writeError("Error in RXN file: " + files[i].getPath() + "!",
+					ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + files[i].getPath() + "!",
 							this.getActivityName(), e);
 				}
 				counter++;
@@ -134,8 +133,8 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity implemen
 				}
 			}
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during reading RXN files!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while reading RXN files!");
+			ErrorLogger.getInstance().writeError("Error reading RXN files!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), "Error reading RXN files!");
 		}
 		T2Reference containerRef = referenceService.register(outputList, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);

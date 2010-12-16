@@ -82,7 +82,7 @@ public class CMLFileReaderActivity extends AbstractCDKActivity implements IFileR
 		// Read SDfile
 		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (files == null || files.length == 0) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
 		for (File file : files) {
 			try {
@@ -95,7 +95,8 @@ public class CMLFileReaderActivity extends AbstractCDKActivity implements IFileR
 					dataList.add(CDKObjectHandler.getBytes(c));
 				}
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error reading CML file: " + file.getPath(), this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath(),
+						this.getActivityName(), e);
 			}
 		}
 		T2Reference containerRef = referenceService.register(dataList, 1, true, context);

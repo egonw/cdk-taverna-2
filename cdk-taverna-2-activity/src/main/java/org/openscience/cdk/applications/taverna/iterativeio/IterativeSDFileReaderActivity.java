@@ -75,7 +75,7 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity implement
 		// Read SDfile
 		File file = ((File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE))[0];
 		if (file == null) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
 		List<T2Reference> outputList = new ArrayList<T2Reference>();
 		int index = 0;
@@ -119,8 +119,8 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity implement
 			T2Reference containerRef = referenceService.register(outputList, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error reading SDF file!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error reading SDF file!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath(), this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath());
 		}
 		// Return results
 		return outputs;

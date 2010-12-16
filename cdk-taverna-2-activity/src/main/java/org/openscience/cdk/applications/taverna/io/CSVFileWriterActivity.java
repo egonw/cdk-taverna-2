@@ -78,7 +78,7 @@ public class CSVFileWriterActivity extends AbstractCDKActivity implements IItera
 				context);
 		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (directory == null) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_OUTPUT_DIRECTORY_CHOSEN);
 		}
 		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 		Boolean oneFilePerIteration = (Boolean) this.getConfiguration().getAdditionalProperty(
@@ -102,8 +102,9 @@ public class CSVFileWriterActivity extends AbstractCDKActivity implements IItera
 			}
 			writer.close();
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error writing csv file: " + file.getPath() + "!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error writing csv file: " + file.getPath() + "!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + file.getPath() + "!",
+					this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRITE_FILE_ERROR + file.getPath() + "!");
 		}
 		return null;
 	}

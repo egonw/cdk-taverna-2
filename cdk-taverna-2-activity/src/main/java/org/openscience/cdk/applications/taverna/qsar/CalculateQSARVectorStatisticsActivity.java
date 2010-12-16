@@ -80,7 +80,7 @@ public class CalculateQSARVectorStatisticsActivity extends AbstractCDKActivity {
 		try {
 			vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(vectorData);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		ArrayList<String> descriptorNames;
@@ -142,15 +142,15 @@ public class CalculateQSARVectorStatisticsActivity extends AbstractCDKActivity {
 			// chartFiles.add(chartTool.exportToAreaChart(dataSet, "QSAR Vector Statistics"));
 			// chartTool.exportToChartsToPDF(chartFiles, new File("testpdf.pdf"), statistics);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during curating QSAR vector!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during QSAR vector statistics calculation!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		try {
 			T2Reference containerRef = referenceService.register(statistics, 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
 		return outputs;
 	}

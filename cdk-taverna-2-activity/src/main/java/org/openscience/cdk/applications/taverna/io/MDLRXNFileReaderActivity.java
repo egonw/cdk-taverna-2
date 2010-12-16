@@ -79,7 +79,7 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFi
 		// Read RXN file
 		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (files == null || files.length == 0) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
 		for (File file : files) {
 			try {
@@ -87,7 +87,8 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFi
 				reactions.add((Reaction) reader.read(new Reaction()));
 				reader.close();
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error reading RXN file: \n" + file.getPath(), this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath(),
+						this.getActivityName(), e);
 			}
 		}
 		// Congfigure output
@@ -95,8 +96,8 @@ public class MDLRXNFileReaderActivity extends AbstractCDKActivity implements IFi
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(reactions), 1, true, context);
 			outputs.put(this.RESULT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during configurating output port!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
 		// Return results
 		return outputs;

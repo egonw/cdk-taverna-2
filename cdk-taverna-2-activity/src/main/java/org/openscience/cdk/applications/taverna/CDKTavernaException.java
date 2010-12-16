@@ -25,10 +25,32 @@ public class CDKTavernaException extends Exception {
 
 	private static final long serialVersionUID = 4460231083206706250L;
 
-	public static final String WRONG_INPUT_PORT_TYPE = "Incorrect input port type";
-
+	public static final String WRONG_INPUT_PORT_TYPE = "Incorrect input port type!";
+	public static final String NOT_CATCHED_EXCEPTION = "Not catched exception!";
+	public static final String FILE_CREATION_ERROR = "Error during fille creation!";
+	public static final String OBJECT_DESERIALIZATION_ERROR = "Error during object deseralization!";
+	public static final String NO_OUTPUT_DIRECTORY_CHOSEN = "Error, no output directory chosen!";
+	public static final String NO_FILE_CHOSEN = "Error, no file chosen!";
+	public static final String PROCESS_ART2A_RESULT_ERROR = "Could not process ART-2a results!";
+	public static final String OUTPUT_PORT_CONFIGURATION_ERROR = "Error during output port configuration!";
+	public static final String CML_FILE_CONVERSION_ERROR = "Error during CML file conversion!";
+	public static final String WRITE_FILE_ERROR = "Error writing file: ";
+	public static final String CREATE_DIRECTORY_ERROR = "Could not create the directory: ";
+	public static final String READ_FILE_ERROR = "Error reading file: ";
+	public static final String GENERATE_2D_COORDINATES_ERROR = "Error during 2D Coordinate generation!";
+	public static final String SERIALIZING_OUTPUT_DATA_ERROR = "Error during output data creation/serializion!";
+	public static final String WRAPPING_ATOMCONTAINER_IN_CHEMMODEL_ERROR = "Error wrapping IAtomContainer in ChemModel!";
+	public static final String STREAM_INITIALIZATION_ERROR = "Error during data stream initializion!";
+	public static final String WRITE_CACHE_DATA_ERROR = "Error writing cache data!";
+	public static final String READ_CACHE_DATA_ERROR = "Error reading cache data!";
+	public static final String DESCRIPTOR_INITIALIZION_ERROR = "The descriptor could not be initialized!";
+	public static final String DESCRIPTOR_CALCULATION_ERROR = "Error during QSAR descriptor calculation!";
+	public static final String MOLECULE_NOT_TAGGED_WITH_UUID = "Molecule contains no ID! Use \"Tag Molecules With UUID\" activity!";
+	public static final String DATA_CONTAINS_NO_MOLECULE = "Data contains no molecules!";
+	public static final String CONVERTION_ERROR = "Error during data convertion!";
+	
 	public CDKTavernaException(String activityName, String type) {
-		super(type + " in " + activityName + " activity.");
+		super(type + " Class: " + activityName + ".");
 	}
 
 }

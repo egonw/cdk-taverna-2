@@ -107,7 +107,7 @@ public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity imp
 		// Read SDfile
 		File file = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (file == null) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
 		List<T2Reference> outputList = new ArrayList<T2Reference>();
 		try {
@@ -144,8 +144,9 @@ public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity imp
 				}
 			} while (line != null);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error reading RXN file: " + file.getPath() + "!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error reading RXN file: " + file.getPath() + "!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!",
+					this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!");
 		}
 		T2Reference containerRef = referenceService.register(outputList, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);

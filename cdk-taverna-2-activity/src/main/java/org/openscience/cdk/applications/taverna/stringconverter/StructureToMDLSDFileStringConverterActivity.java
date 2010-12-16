@@ -86,7 +86,7 @@ public class StructureToMDLSDFileStringConverterActivity extends AbstractCDKActi
 		try {
 			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during deserializing object!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		List<String> sdfStringList = new ArrayList<String>();
@@ -97,7 +97,7 @@ public class StructureToMDLSDFileStringConverterActivity extends AbstractCDKActi
 				writer.write(cml);
 			} catch (Exception e) {
 				notConverted.add(cml);
-				ErrorLogger.getInstance().writeError("Error converting MDL SD file String!", this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.CONVERTION_ERROR, this.getActivityName(), e);
 			}
 		}
 		try {
@@ -108,7 +108,7 @@ public class StructureToMDLSDFileStringConverterActivity extends AbstractCDKActi
 		}
 		sdfStringList.add(stringWriter.toString());
 		if (sdfStringList.isEmpty()) {
-			throw new CDKTavernaException(this.getActivityName(), "Error while converting MDL SDFile Strings");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.CONVERTION_ERROR);
 		}
 		T2Reference containerRef = referenceService.register(sdfStringList, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);

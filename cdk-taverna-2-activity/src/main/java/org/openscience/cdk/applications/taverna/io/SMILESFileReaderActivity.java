@@ -84,7 +84,7 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 		// Read SMILES file
 		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (files == null || files.length == 0) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no file chosen!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
 		for (File file : files) {
 			IMoleculeSet som = null;
@@ -93,7 +93,7 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 				som = (IMoleculeSet) reader.read(new MoleculeSet());
 				reader.close();
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error during reading SMILES file: " + file.getPath() + "!",
+				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!",
 						this.getActivityName(), e);
 			}
 			IMoleculeSet som2D = new MoleculeSet();
@@ -104,7 +104,8 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 					str.generateCoordinates();
 					som2D.addMolecule(str.getMolecule());
 				} catch (Exception e) {
-					ErrorLogger.getInstance().writeError("Error generating 2D Coordinate!", this.getActivityName(), e);
+					ErrorLogger.getInstance().writeError(CDKTavernaException.GENERATE_2D_COORDINATES_ERROR,
+							this.getActivityName(), e);
 				}
 			}
 			for (int i = 0; i < som2D.getMoleculeCount(); i++) {
@@ -112,9 +113,9 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 					cmlChemFile = CMLChemFileWrapper.wrapInChemModel(som2D.getMolecule(i));
 					dataArray.addAll(CDKObjectHandler.getBytesList(CMLChemFileWrapper.wrapInChemModelList(cmlChemFile)));
 				} catch (Exception e) {
-					ErrorLogger.getInstance().writeError("Error during creating/serializing output data!",
+					ErrorLogger.getInstance().writeError(CDKTavernaException.SERIALIZING_OUTPUT_DATA_ERROR,
 							this.getActivityName(), e);
-					throw new CDKTavernaException(this.getActivityName(), "Error while creating/serializing output data!");
+					throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.SERIALIZING_OUTPUT_DATA_ERROR);
 				}
 			}
 		}

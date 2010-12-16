@@ -147,7 +147,7 @@ public class QSARDescriptorConfigurationPanel extends
 			}
 			this.repaint();
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during setting up configuration panel!", this.getClass().getSimpleName(),
+			ErrorLogger.getInstance().writeError("Error setting up configuration panel!", this.getClass().getSimpleName(),
 					e);
 		}
 

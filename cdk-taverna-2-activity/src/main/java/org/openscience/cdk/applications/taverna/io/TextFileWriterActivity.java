@@ -78,7 +78,7 @@ public class TextFileWriterActivity extends AbstractCDKActivity implements IIter
 				context);
 		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (directory == null) {
-			throw new CDKTavernaException(this.getActivityName(), "Error, no output directory chosen!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_OUTPUT_DIRECTORY_CHOSEN);
 		}
 		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 		Boolean oneFilePerIteration = (Boolean) this.getConfiguration().getAdditionalProperty(
@@ -97,7 +97,8 @@ public class TextFileWriterActivity extends AbstractCDKActivity implements IIter
 			}
 			writer.close();
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error writing text file: " + file.getPath() + "!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + file.getPath() + "!",
+					this.getActivityName(), e);
 		}
 
 		return null;
