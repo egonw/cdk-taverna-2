@@ -30,6 +30,8 @@ import org.openscience.cdk.applications.taverna.ui.miscellaneous.PortNumberConfi
 import org.openscience.cdk.applications.taverna.ui.qsar.CurateQSARVectorConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.qsar.QSARDescriptorConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.reactionenumerator.ReactionEnumeratorConfigurationPanel;
+import org.openscience.cdk.applications.taverna.ui.weka.WekaClusteringConfigurationPanelController;
+import org.openscience.cdk.applications.taverna.weka.WekaClusteringActivity;
 
 public class CDKConfigurationPanelFactory {
 
@@ -59,6 +61,8 @@ public class CDKConfigurationPanelFactory {
 			return new ART2aClassificationConfigurationPanel(activity);
 		} else if (activity instanceof CurateQSARVectorActivity) {
 			return new CurateQSARVectorConfigurationPanel(activity);
+		}else if (activity instanceof WekaClusteringActivity) {
+			return new WekaClusteringConfigurationPanelController(activity);
 		}
 		
 		

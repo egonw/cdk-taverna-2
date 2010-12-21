@@ -43,6 +43,7 @@ public class CDKTavernaConstants {
 	public static final String CURATION_FOLDER_NAME = "Molecule Curation";
 	public static final String DATABASE_FOLDER_NAME = "Database";
 	public static final String ART2A_FOLDER_NAME = "ART-2a Classification";
+	public static final String WEKA_FOLDER_NAME = "Weka";
 	// --------------------Properties-------------------------------------
 	public static final String PROPERTY_FILE = "FILE";
 	public static final String PROPERTY_FILE_EXTENSION = "FILE EXTENSION";
@@ -57,7 +58,6 @@ public class CDKTavernaConstants {
 	public static final String PROPERTY_ONE_FILE_PER_ITERATION = "ONE FILE PER ITERATION";
 	public static final String PROPERTY_ATOM_SIGNATURE_HEIGHT = "ATOM SIGNATURE HEIGHT";
 	public static final String PROPERTY_NUMBER_OF_USED_THREADS = "NUMBER OF USED THREADS";
-	public static final String PROPERTY_NUMBER_OF_CLASSIFICATIONS = "NUMBER OF CLASSIFICATIONS";
 	public static final String PROPERTY_UPPER_VIGILANCE_LIMIT = "UPPER VIGILANCE LIMIT";
 	public static final String PROPERTY_LOWER_VIGILANCE_LIMIT = "LOWER VIGILANCE LIMIT";
 	public static final String PROPERTY_MAXIMUM_CLASSIFICATION_TIME = "MAXIMUM CLASSIFICATION TIME";
@@ -65,6 +65,9 @@ public class CDKTavernaConstants {
 	public static final String PROPERTY_QSAR_VECTOR_CURATION_TYPE = "QSAR VECTOR CURATION TYPE";
 	public static final String PROPERTY_QSAR_VECTOR_MIN_MAX_CURATION = "QSAR VECTOR MIN MAX CURATION";
 	public static final String PROPERTY_SHOW_PROGRESS = "SHOW PROGRESS";
+	public static final String PROPERTY_CLUSTERING_JOB_DATA = "CLUSTERING_JOB_DATA";
+	public static final String PROPERTY_NUMBER_OF_CLASSIFICATIONS = "NUMBER OF CLASSIFICATIONS";
+	
 	// --------------------Miscellaneous-------------------------------------
 	public static final String MOLECULEID = "MOLECULEID";
 }

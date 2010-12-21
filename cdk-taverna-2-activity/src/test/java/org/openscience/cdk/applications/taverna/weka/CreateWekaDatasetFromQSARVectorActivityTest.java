@@ -19,11 +19,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna.qsar;
+package org.openscience.cdk.applications.taverna.weka;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import junit.framework.Test;
@@ -31,12 +30,14 @@ import junit.framework.TestSuite;
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 
 import org.junit.Assert;
-import org.openscience.cdk.applications.art2aclassification.FingerprintItem;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.qsar.CSVToQSARVectorActivity;
+
+import weka.core.Instances;
 
 /**
  * Test class for the MDL SD file reader activity.
@@ -44,29 +45,28 @@ import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
  * @author Andreas Truszkowski
  * 
  */
-public class CreateFingerprintItemListFromQSARVectorActivityTest extends CDKTavernaTestCases {
+public class CreateWekaDatasetFromQSARVectorActivityTest extends CDKTavernaTestCases {
 
 	private CDKActivityConfigurationBean configBean;
 
 	private AbstractCDKActivity loadActivity = new CSVToQSARVectorActivity();
-	private AbstractCDKActivity fingerprintActivity = new CreateFingerprintItemListFromQSARVectorActivity();
+	private AbstractCDKActivity wekaDatasetActivity = new CreateWekaDatasetFromQSARVectorActivity();
 
-	public CreateFingerprintItemListFromQSARVectorActivityTest() {
-		super(CreateFingerprintItemListFromQSARVectorActivity.CREATE_FINGERPRINT_ITEMLIST_FROM_QSAR_VECTOR_ACTIVITY);
+	public CreateWekaDatasetFromQSARVectorActivityTest() {
+		super(CreateWekaDatasetFromQSARVectorActivity.CREATE_WEKA_DATASET_FROM_QSAR_VECTOR_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
 		// TODO read resource
 		File[] csvFile = new File[] { new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-				+ "data" + File.separator + "qsar" + File.separator + "qsar.csv") };
+				+ "data" + File.separator + "qsar" + File.separator + "curatedQSARbig.csv") };
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, csvFile);
 		configBean.setActivityName(CSVToQSARVectorActivity.CSV_TO_QSAR_VECTOR_ACTIVITY);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
-		fingerprintActivity.configure(configBean);
+		wekaDatasetActivity.configure(configBean);
 		loadActivity.configure(configBean);
 		// leave empty. No ports used
 		Map<String, Object> inputs = new HashMap<String, Object>();
@@ -77,12 +77,13 @@ public class CreateFingerprintItemListFromQSARVectorActivityTest extends CDKTave
 		// leave empty. No ports used
 		inputs = outputs;
 		expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(fingerprintActivity.getRESULT_PORTS()[0], byte[].class);
-		outputs = ActivityInvoker.invokeAsyncActivity(fingerprintActivity, inputs, expectedOutputTypes);
+		expectedOutputTypes.put(wekaDatasetActivity.getRESULT_PORTS()[0], byte[].class);
+		outputs = ActivityInvoker.invokeAsyncActivity(wekaDatasetActivity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
-		List<byte[]> objectData = (List<byte[]>) outputs.get(fingerprintActivity.getRESULT_PORTS()[0]);
-		List<FingerprintItem> vectorMap = (List<FingerprintItem>) CDKObjectHandler.getFingerprintList(objectData);
-		Assert.assertEquals(9, vectorMap.size());
+		byte[] objectData = (byte[]) outputs.get(wekaDatasetActivity.getRESULT_PORTS()[0]);
+		Instances instances = CDKObjectHandler.getInstancesObject(objectData);
+		Assert.assertEquals(48, instances.numAttributes());
+		Assert.assertEquals(700, instances.numInstances());
 	}
 
 	@Override
@@ -103,7 +104,7 @@ public class CreateFingerprintItemListFromQSARVectorActivityTest extends CDKTave
 	 * @return TestSuite
 	 */
 	public static Test suite() {
-		return new TestSuite(CreateFingerprintItemListFromQSARVectorActivityTest.class);
+		return new TestSuite(CreateWekaDatasetFromQSARVectorActivityTest.class);
 	}
 
 }

@@ -35,4 +35,9 @@
 - Fixed bug in the FileNameGenerator 
 - Fixed bug in the ReactionEnumeratorSubgraphFilterActivity class. Explicit hydrogens were not added to the query molecule.
 - Added the GetMolecularWeightDistributionFromQSARVector activity.
+- Changed exception error messages
 
+0.3.2
+- Added the weka machine learning library
+- Added weka clustering activity
+- Added weka clustering visualisation (PDF) activities

@@ -32,6 +32,7 @@ public class CDKTavernaException extends Exception {
 	public static final String NO_OUTPUT_DIRECTORY_CHOSEN = "Error, no output directory chosen!";
 	public static final String NO_FILE_CHOSEN = "Error, no file chosen!";
 	public static final String PROCESS_ART2A_RESULT_ERROR = "Could not process ART-2a results!";
+	public static final String PROCESS_WEKA_RESULT_ERROR = "Could not process Weka results!";
 	public static final String OUTPUT_PORT_CONFIGURATION_ERROR = "Error during output port configuration!";
 	public static final String CML_FILE_CONVERSION_ERROR = "Error during CML file conversion!";
 	public static final String WRITE_FILE_ERROR = "Error writing file: ";
@@ -48,6 +49,9 @@ public class CDKTavernaException extends Exception {
 	public static final String MOLECULE_NOT_TAGGED_WITH_UUID = "Molecule contains no ID! Use \"Tag Molecules With UUID\" activity!";
 	public static final String DATA_CONTAINS_NO_MOLECULE = "Data contains no molecules!";
 	public static final String CONVERTION_ERROR = "Error during data convertion!";
+	public static final String CLUSTERING_ERROR = "Error during clustering process!";
+	public static final String NO_CLUSTERING_DATA_AVAILABLE = "Error, no clustering data available!";
+	public static final String LOADING_CLUSTERING_DATA_ERROR = "Error loadin clustering data!";
 	
 	public CDKTavernaException(String activityName, String type) {
 		super(type + " Class: " + activityName + ".");

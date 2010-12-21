@@ -144,4 +144,7 @@ org.openscience.cdk.applications.taverna.iterativeio.DataCollectorEmitterActivit
 org.openscience.cdk.applications.taverna.curation.MoleculeConnectivityCheckerActivity
 org.openscience.cdk.applications.taverna.curation.CurateStrangeElementsActivity
 org.openscience.cdk.applications.taverna.curation.AtomSignatureActivity
-
+org.openscience.cdk.applications.taverna.weka.ExtractClusteringResultAsPDFActivity
+org.openscience.cdk.applications.taverna.weka.CreateWekaDatasetFromQSARVectorActivity
+org.openscience.cdk.applications.taverna.weka.WekaClusteringActivity
+org.openscience.cdk.applications.taverna.weka.ClusteringResultConsideringDifferentOriginsAsPDF
