@@ -26,6 +26,9 @@
 package org.openscience.cdk.applications.taverna.weka.utilities;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.zip.Deflater;
@@ -35,6 +38,7 @@ import org.openscience.cdk.applications.art2aclassification.FingerprintItem;
 
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
+import weka.clusterers.Clusterer;
 import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
@@ -56,7 +60,7 @@ public class WekaTools {
 	 * @param descriptorNames
 	 * @return The Weka Instances dataset
 	 */
-	public static Instances createInstancesFromFingerprintArray(FingerprintItem[] fingerprintItems, List<String> descriptorNames) {
+	public Instances createInstancesFromFingerprintArray(FingerprintItem[] fingerprintItems, List<String> descriptorNames) {
 		FastVector attributes = new FastVector(descriptorNames.size() + 1);
 		Attribute idAttr = new Attribute("ID", (FastVector) null);
 		attributes.addElement(idAttr);
@@ -87,7 +91,7 @@ public class WekaTools {
 	 *            String to be compressed
 	 * @return Compressed Base64 string or null if string could not be compressed
 	 */
-	public static String compressIntoBase64String(String aString) {
+	public String compressIntoBase64String(String aString) {
 
 		// Region: Checks
 
@@ -123,7 +127,7 @@ public class WekaTools {
 	 *            Base64 string (result string of method Utility.compressIntoBase64String())
 	 * @return Decompressed string or null if string could not be decompressed
 	 */
-	public static String decompressBase64String(String aBase64String) {
+	public String decompressBase64String(String aBase64String) {
 		if (aBase64String == null || aBase64String.isEmpty()) {
 			return null;
 		}
@@ -154,7 +158,7 @@ public class WekaTools {
 	 * @return Weka remover filter which is configured to remove the identifier from the instance
 	 * @throws Exception
 	 */
-	public static Remove getIDRemover(Instances instances) throws Exception {
+	public Remove getIDRemover(Instances instances) throws Exception {
 		Remove removeFilter = new Remove();
 		String[] removerOptionArray = new String[2];
 		removerOptionArray[0] = "-R";
@@ -173,7 +177,7 @@ public class WekaTools {
 	 * @return Weka remover filter which is configured to get the identifier from the instance
 	 * @throws Exception
 	 */
-	public static Remove getIDGetter(Instances instances) throws Exception {
+	public Remove getIDGetter(Instances instances) throws Exception {
 		Remove removeFilter = new Remove();
 		String[] removerOptionArray = new String[3];
 		removerOptionArray[0] = "-R";
@@ -182,5 +186,110 @@ public class WekaTools {
 		removeFilter.setOptions(removerOptionArray);
 		removeFilter.setInputFormat(instances);
 		return removeFilter;
+	}
+
+	public double[][] generateSilhouettePlot(Instances dataset, Clusterer clusterer) throws Exception {
+		HashMap<Integer, List<Vector>> vectorMap = new HashMap<Integer, List<Vector>>();
+		HashMap<Vector, Instance> vectorToInstanceMap = new HashMap<Vector, Instance>();
+		int[] numberOfVectorsInClass = new int[clusterer.numberOfClusters()];
+		// build vector map
+		for (int j = 0; j < dataset.numInstances(); j++) {
+			Instance instance = dataset.instance(j);
+			int cluster = clusterer.clusterInstance(instance);
+			numberOfVectorsInClass[cluster]++;
+			List<Vector> vectorList;
+			if (vectorMap.get(cluster) == null) {
+				vectorList = new ArrayList<Vector>();
+				vectorMap.put(cluster, vectorList);
+			} else {
+				vectorList = vectorMap.get(cluster);
+			}
+			Vector vector = new Vector();
+			for (int k = 0; k < instance.numAttributes(); k++) {
+				vector.addValue(instance.value(k));
+			}
+			vectorList.add(vector);
+			vectorToInstanceMap.put(vector, instance);
+		}
+		// Calculate distances within a cluster
+		double[][] a = new double[clusterer.numberOfClusters()][];
+		for (int j = 0; j < clusterer.numberOfClusters(); j++) {
+			List<Vector> vectorOne = vectorMap.get(j);
+			List<Vector> vectorTwo = vectorMap.get(j);
+			a[j] = new double[vectorOne.size()];
+			for (int k = 0; k < vectorOne.size(); k++) {
+				for (int l = 0; l < vectorTwo.size(); l++) {
+					if (k != l) {
+						Vector result = vectorOne.get(k).subtraction(vectorTwo.get(l));
+						a[j][k] += result.length();
+					}
+				}
+				a[j][k] /= numberOfVectorsInClass[j];
+			}
+		}
+		// Calculate distance to nearest cluster
+		double[][] b = new double[clusterer.numberOfClusters()][];
+		double[][] s = new double[clusterer.numberOfClusters()][];
+		for (int j = 0; j < clusterer.numberOfClusters(); j++) {
+			List<Vector> vectorOne = vectorMap.get(j);
+			b[j] = new double[vectorOne.size()];
+			s[j] = new double[vectorOne.size()];
+			for (int k = 0; k < vectorOne.size(); k++) {
+				int nearestCluster = this.getNearestCluster(j, clusterer.distributionForInstance(vectorToInstanceMap
+						.get(vectorOne.get(k))));
+				List<Vector> vectorTwo = vectorMap.get(nearestCluster);
+				for (int l = 0; l < vectorTwo.size(); l++) {
+					Vector result = vectorOne.get(k).subtraction(vectorTwo.get(l));
+					b[j][k] += result.length();
+				}
+				b[j][k] /= numberOfVectorsInClass[nearestCluster];
+				// Calculate silhouette width
+				if (a[j][k] < b[j][k]) {
+					s[j][k] = 1 - a[j][k] / b[j][k];
+				}
+				if (a[j][k] > b[j][k]) {
+					s[j][k] = b[j][k] / a[j][k] - 1;
+				}
+			}
+		}
+		return s;
+	}
+
+	/**
+	 * Determines the nearest cluster.
+	 * 
+	 * @param cluster
+	 *            Current cluster
+	 * @param distribution
+	 *            Likelihood distribution of the cluster membership.
+	 * @return Nearest cluster.
+	 */
+	private int getNearestCluster(int cluster, double[] distribution) {
+		int nearestCluster;
+		if (cluster == 0) {
+			nearestCluster = 1;
+		} else {
+			nearestCluster = 0;
+		}
+		for (int i = 0; i < distribution.length; i++) {
+			if (i != cluster) {
+				if (distribution[nearestCluster] < distribution[i]) {
+					nearestCluster = i;
+				}
+			}
+		}
+		return nearestCluster;
+	}
+
+	public String getOptionsFromFile(File file, String clustererName) {
+		String name = file.getName();
+		String[] parts = name.split("_");
+		for (String part : parts) {
+			if (part.startsWith(clustererName)) {
+				return part.replaceAll(clustererName, "");
+			}
+		}
+		return "";
+
 	}
 }

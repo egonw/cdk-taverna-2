@@ -82,8 +82,8 @@ public class SimpleKMeansFrame extends AbstractConfigurationFrame {
 
 	@Override
 	public boolean checkValues() {
-		if (this.checkTextFieldValue("Number of clusters", this.numberOfClustersTextField, 1, Integer.MAX_VALUE)
-				&& this.checkTextFieldValue("Number of iterations", this.numberOfIterationsTextField, 1, Integer.MAX_VALUE)) {
+		if (this.checkTextFieldValueInt("Number of clusters", this.numberOfClustersTextField, 1, Integer.MAX_VALUE)
+				&& this.checkTextFieldValueInt("Number of iterations", this.numberOfIterationsTextField, 1, Integer.MAX_VALUE)) {
 			return true;
 		}
 		return false;

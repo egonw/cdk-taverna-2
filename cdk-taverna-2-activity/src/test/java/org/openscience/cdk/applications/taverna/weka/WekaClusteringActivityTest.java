@@ -45,12 +45,11 @@ import org.openscience.cdk.applications.taverna.qsar.CSVToQSARVectorActivity;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
 import weka.clusterers.Clusterer;
-import weka.clusterers.EM;
 import weka.core.Instances;
 import weka.filters.Filter;
 
 /**
- * Test class for the MDL SD file reader activity.
+ * Test class for the weka clustering activity.
  * 
  * @author Andreas Truszkowski
  * 
@@ -79,58 +78,68 @@ public class WekaClusteringActivityTest extends CDKTavernaTestCases {
 		configBean.setActivityName(CSVToQSARVectorActivity.CSV_TO_QSAR_VECTOR_ACTIVITY);
 		clusteringConfigBean = new CDKActivityConfigurationBean();
 		clusteringConfigBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.dir);
-//		clusteringConfigBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_CLUSTERS, 5);
-//		clusteringConfigBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_ITERATIONS, 10);
+		String jobData = "weka.clusterers.EM;-N;5;-I;100;-M;0.00001;weka.clusterers.FarthestFirst;-N;5;weka.clusterers.HierarchicalClusterer;-N;5;-L;SINGLE;weka.clusterers.SimpleKMeans;-N;5;-I;100;weka.clusterers.XMeans;-I;1;-M;1000;-J;1000;-L;2;-H;4;";
+		clusteringConfigBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CLUSTERING_JOB_DATA, jobData);
 		clusteringConfigBean.setActivityName(WekaClusteringActivity.WEKA_CLUSTERING_ACTIVITY);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
-//		wekaDatasetActivity.configure(configBean);
-//		loadActivity.configure(configBean);
-//		wekaClusteringActivity.configure(clusteringConfigBean);
-//		// load QSAR vectors
-//		Map<String, Object> inputs = new HashMap<String, Object>();
-//		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-//		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[0], byte[].class);
-//		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[1], byte[].class);
-//		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(loadActivity, inputs, expectedOutputTypes);
-//		inputs = outputs;
-//		expectedOutputTypes = new HashMap<String, Class<?>>();
-//		expectedOutputTypes.put(wekaDatasetActivity.getRESULT_PORTS()[0], byte[].class);
-//		outputs = ActivityInvoker.invokeAsyncActivity(wekaDatasetActivity, inputs, expectedOutputTypes);
-//		byte[] datasetData = (byte[]) outputs.get(wekaDatasetActivity.getRESULT_PORTS()[0]);
-//		Instances dataset = CDKObjectHandler.getInstancesObject(datasetData);
-//		inputs = outputs;
-//		// Cluster
-//		int[][] expectedValues = { { 278, 206, 46, 146, 24 }, { 65, 177, 194, 82, 182 }, { 670, 1, 2, 2, 25 } };
-//		for (int j = 0; j < WekaClusteringActivity.clustererNames.length; j++) {
-////			clusteringConfigBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_SELECTED_CLUSTERER, j);
-//			expectedOutputTypes = new HashMap<String, Class<?>>();
-//			expectedOutputTypes.put(wekaClusteringActivity.getRESULT_PORTS()[0], String.class);
-//			outputs = ActivityInvoker.invokeAsyncActivity(wekaClusteringActivity, inputs, expectedOutputTypes);
-//			List<String> files = (List<String>) outputs.get(wekaClusteringActivity.getRESULT_PORTS()[0]);
-//			Assert.assertEquals(3, files.size());
-//			// Load clusterer
-//			ObjectInputStream reader = new ObjectInputStream(new BufferedInputStream(new FileInputStream(files.get(2))));
-//			Clusterer clusterer = (Clusterer) reader.readObject();
-//			reader.close();
-//			// load data
-//			BufferedReader buffReader = new BufferedReader(new FileReader(files.get(0)));
-//			dataset = new Instances(buffReader);
-//			buffReader.close();
-//			// Instances ids = Filter.useFilter(dataset, WekaTools.getIDGetter(dataset));
-//			dataset = Filter.useFilter(dataset, WekaTools.getIDRemover(dataset));
-//			// Test clusterer
-//			int[] numberOfVectorsInClass = new int[clusterer.numberOfClusters()];
-//			for (int i = 0; i < dataset.numInstances(); i++) {
-//				numberOfVectorsInClass[clusterer.clusterInstance(dataset.instance(i))]++;
-//			}
-//			Assert.assertEquals(5, clusterer.numberOfClusters());
-//			for (int i = 0; i < clusterer.numberOfClusters(); i++) {
-//				Assert.assertEquals(expectedValues[j][i], numberOfVectorsInClass[i]);
-//			}
-//		}
+		wekaDatasetActivity.configure(configBean);
+		loadActivity.configure(configBean);
+		wekaClusteringActivity.configure(clusteringConfigBean);
+		// load QSAR vectors
+		Map<String, Object> inputs = new HashMap<String, Object>();
+		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
+		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[0], byte[].class);
+		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[1], byte[].class);
+		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(loadActivity, inputs, expectedOutputTypes);
+		inputs = outputs;
+		expectedOutputTypes = new HashMap<String, Class<?>>();
+		expectedOutputTypes.put(wekaDatasetActivity.getRESULT_PORTS()[0], byte[].class);
+		outputs = ActivityInvoker.invokeAsyncActivity(wekaDatasetActivity, inputs, expectedOutputTypes);
+		byte[] datasetData = (byte[]) outputs.get(wekaDatasetActivity.getRESULT_PORTS()[0]);
+		Instances dataset = CDKObjectHandler.getInstancesObject(datasetData);
+		inputs = outputs;
+		// Cluster
+		expectedOutputTypes = new HashMap<String, Class<?>>();
+		expectedOutputTypes.put(wekaClusteringActivity.getRESULT_PORTS()[0], String.class);
+		outputs = ActivityInvoker.invokeAsyncActivity(wekaClusteringActivity, inputs, expectedOutputTypes);
+		List<String> files = (List<String>) outputs.get(wekaClusteringActivity.getRESULT_PORTS()[0]);
+		// Test results
+		HashMap<String, Integer[]> resultMap = new HashMap<String, Integer[]>();
+		resultMap.put("XMeans", new Integer[] { 47, 178, 175, 300 });
+		resultMap.put("FarthestFirst", new Integer[] { 670, 1, 2, 2, 25 });
+		resultMap.put("SimpleKMeans", new Integer[] { 278, 206, 46, 146, 24 });
+		resultMap.put("EM", new Integer[] { 68, 172, 200, 64, 196 });
+		resultMap.put("HierarchicalClusterer", new Integer[] { 695, 2, 1, 1, 1 });
+		Assert.assertEquals(7, files.size());
+		WekaTools tool = new WekaTools();
+		for (int i = 0; i < 5; i++) {
+			// Load clusterer
+			ObjectInputStream reader = new ObjectInputStream(new BufferedInputStream(new FileInputStream(files.get(2 + i))));
+			Clusterer clusterer = (Clusterer) reader.readObject();
+			reader.close();
+			// load data
+			BufferedReader buffReader = new BufferedReader(new FileReader(files.get(0)));
+			dataset = new Instances(buffReader);
+			buffReader.close();
+			// Instances ids = Filter.useFilter(dataset, WekaTools.getIDGetter(dataset));
+			dataset = Filter.useFilter(dataset, tool.getIDRemover(dataset));
+			// Test clusterer
+			int[] numberOfVectorsInClass = new int[clusterer.numberOfClusters()];
+			for (int j = 0; j < dataset.numInstances(); j++) {
+				numberOfVectorsInClass[clusterer.clusterInstance(dataset.instance(j))]++;
+			}
+			Integer[] expectedValues = resultMap.get(clusterer.getClass().getSimpleName());
+			Assert.assertEquals(expectedValues.length, clusterer.numberOfClusters());
+			for (int j = 0; j < clusterer.numberOfClusters(); j++) {
+				Assert.assertEquals(expectedValues[j].intValue(), numberOfVectorsInClass[j]);
+			}
+		}
 	}
 
 	@Override

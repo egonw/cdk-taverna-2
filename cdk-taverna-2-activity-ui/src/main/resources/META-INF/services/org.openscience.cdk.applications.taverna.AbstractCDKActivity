@@ -148,3 +148,6 @@ org.openscience.cdk.applications.taverna.weka.ExtractClusteringResultAsPDFActivi
 org.openscience.cdk.applications.taverna.weka.CreateWekaDatasetFromQSARVectorActivity
 org.openscience.cdk.applications.taverna.weka.WekaClusteringActivity
 org.openscience.cdk.applications.taverna.weka.ClusteringResultConsideringDifferentOriginsAsPDF
+org.openscience.cdk.applications.taverna.weka.ExtractClusteringStatisticsActivity
+org.openscience.cdk.applications.taverna.weka.GenerateSilhouettePlotFromClusteringResultAsPDFActivity
+org.openscience.cdk.applications.taverna.weka.GenerateSilhouettePlotFromClusteringResultAsCSVActivity

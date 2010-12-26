@@ -125,6 +125,7 @@ public class WekaClusteringConfigurationPanelController extends
 			return false;
 		}
 		if(this.file == null || !this.file.exists()) {
+			JOptionPane.showMessageDialog(this, "Please choose valid directory!", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		return true;

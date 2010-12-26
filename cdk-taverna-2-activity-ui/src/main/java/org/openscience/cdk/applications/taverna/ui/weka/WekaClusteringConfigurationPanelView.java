@@ -1,20 +1,19 @@
 package org.openscience.cdk.applications.taverna.ui.weka;
 
-import javax.swing.JPanel;
 import java.awt.BorderLayout;
-import javax.swing.JComboBox;
-import javax.swing.SpringLayout;
 import java.awt.Dimension;
-import javax.swing.border.BevelBorder;
-import javax.swing.JButton;
-import javax.swing.SwingConstants;
 import java.awt.FlowLayout;
-import javax.swing.JScrollBar;
-import java.awt.GridLayout;
-import javax.swing.JScrollPane;
-import javax.swing.JList;
+
 import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.SpringLayout;
+import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
 
 public class WekaClusteringConfigurationPanelView extends JPanel {
 	private JComboBox clustererComboBox;

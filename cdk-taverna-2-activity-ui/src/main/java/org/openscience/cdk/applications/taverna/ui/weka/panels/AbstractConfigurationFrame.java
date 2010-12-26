@@ -51,9 +51,25 @@ public abstract class AbstractConfigurationFrame extends JDialog {
 
 	public abstract String[] getOptions();
 
-	public boolean checkTextFieldValue(String name, JTextField textField, int minValue, int maxValue) {
+	public boolean checkTextFieldValueInt(String name, JTextField textField, int minValue, int maxValue) {
 		try {
 			int value = Integer.parseInt(textField.getText());
+			if (value < minValue || value > maxValue) {
+				JOptionPane.showMessageDialog(this, "Please enter a valid number! Field: " + name, "Illegal Argument",
+						JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this, "Please enter a valid number! Field: " + name, "Illegal Argument",
+					JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean checkTextFieldValueDouble(String name, JTextField textField, int minValue, int maxValue) {
+		try {
+			double value = Double.parseDouble(textField.getText());
 			if (value < minValue || value > maxValue) {
 				JOptionPane.showMessageDialog(this, "Please enter a valid number! Field: " + name, "Illegal Argument",
 						JOptionPane.ERROR_MESSAGE);

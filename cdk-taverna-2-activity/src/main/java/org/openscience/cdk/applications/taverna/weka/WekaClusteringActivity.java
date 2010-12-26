@@ -41,16 +41,12 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
-import org.openscience.cdk.applications.taverna.qsar.utilities.QSARDescriptorWorker;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaClusteringWorker;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
 import weka.clusterers.Clusterer;
-import weka.clusterers.EM;
-import weka.clusterers.FarthestFirst;
-import weka.clusterers.SimpleKMeans;
 import weka.core.Instances;
-import weka.core.OptionHandler;
+import weka.core.SerializationHelper;
 import weka.core.converters.ConverterUtils.DataSink;
 import weka.filters.Filter;
 
@@ -72,7 +68,7 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 	 */
 	public WekaClusteringActivity() {
 		this.INPUT_PORTS = new String[] { "Weka Dataset" };
-		this.RESULT_PORTS = new String[] { "Clustering Files" };
+		this.RESULT_PORTS = new String[] { "Weka Clustering Files" };
 	}
 
 	@Override
@@ -146,7 +142,8 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 					this.getActivityName(), e);
 		}
 		try {
-			dataset = Filter.useFilter(dataset, WekaTools.getIDRemover(dataset));
+			WekaTools tools = new WekaTools();
+			dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			// Setup worker
 			this.workers = new WekaClusteringWorker[jobClustererNames.size()];
 			for (int i = 0; i < jobClustererNames.size(); i++) {
@@ -171,9 +168,7 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 		try {
 			emModelFile = FileNameGenerator.getNewFile(directory.getPath(), ".model", clusterer.getClass().getSimpleName()
 					+ options);
-			ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(emModelFile)));
-			oos.writeObject(clusterer);
-			oos.close();
+			SerializationHelper.write(emModelFile.getPath(), clusterer);
 			resultFiles.add(emModelFile.getPath());
 
 		} catch (Exception e) {

@@ -124,7 +124,7 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 	}
 
 	/**
-	 * Abstract method with does the work.
+	 * Abstract method which does the work.
 	 */
 	public abstract Map<String, T2Reference> work(final Map<String, T2Reference> inputs,
 			final AsynchronousActivityCallback callback) throws Exception;

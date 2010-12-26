@@ -1,5 +1,5 @@
 /*
- erm we* Copyright (C) 2010 by Andreas Truszkowski <ATruszkowski@gmx.de>
+ * Copyright (C) 2010 by Andreas Truszkowski <ATruszkowski@gmx.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -22,6 +22,7 @@
 package org.openscience.cdk.applications.taverna.weka;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,58 +33,53 @@ import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 import org.junit.Assert;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
-import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.applications.taverna.qsar.CSVToQSARVectorActivity;
-
-import weka.core.Instances;
+import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 
 /**
- * Test class for the create weka dataset from QSAR vector activity.
+ * Test class for the create extract clustering result as PDF activity.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class CreateWekaDatasetFromQSARVectorActivityTest extends CDKTavernaTestCases {
+public class ExtractClusteringResultAsPDFActivityTest extends CDKTavernaTestCases {
 
 	private CDKActivityConfigurationBean configBean;
 
-	private AbstractCDKActivity loadActivity = new CSVToQSARVectorActivity();
-	private AbstractCDKActivity wekaDatasetActivity = new CreateWekaDatasetFromQSARVectorActivity();
+	private AbstractCDKActivity wekaActivity = new ExtractClusteringResultAsPDFActivity();
+	private ArrayList<String> files = new ArrayList<String>();
+	private File dir = null;
 
-	public CreateWekaDatasetFromQSARVectorActivityTest() {
-		super(CreateWekaDatasetFromQSARVectorActivity.CREATE_WEKA_DATASET_FROM_QSAR_VECTOR_ACTIVITY);
+	public ExtractClusteringResultAsPDFActivityTest() {
+		super(ExtractClusteringResultAsPDFActivity.EXTRACT_CLUSTERING_RESULT_AS_PDF_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		// TODO read resource
-		File[] csvFile = new File[] { new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-				+ "data" + File.separator + "qsar" + File.separator + "curatedQSARbig.csv") };
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, csvFile);
-		configBean.setActivityName(CSVToQSARVectorActivity.CSV_TO_QSAR_VECTOR_ACTIVITY);
+		this.configBean.setActivityName(this.wekaActivity.getActivityName());
+		this.dir = new File("." + File.separator + "Test" + File.separator);
+		this.dir.mkdir();
+		File input = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
+				+ File.separator + "weka" + File.separator + "data.arff");
+		File output = new File(this.dir.getPath() + File.separator + "data.arff");
+		FileNameGenerator.copyFile(input, output);
+		files.add(output.getPath());
+		files.add("");
+		input = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
+				+ File.separator + "weka" + File.separator + "clusterer.model");
+		output = new File(this.dir.getPath() + File.separator + "clusterer.model");
+		FileNameGenerator.copyFile(input, output);
+		files.add(output.getPath());
 	}
 
 	public void executeAsynch() throws Exception {
-		wekaDatasetActivity.configure(configBean);
-		loadActivity.configure(configBean);
-		// leave empty. No ports used
+		wekaActivity.configure(configBean);
 		Map<String, Object> inputs = new HashMap<String, Object>();
+		inputs.put(wekaActivity.getINPUT_PORTS()[0], files);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[1], byte[].class);
-		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(loadActivity, inputs, expectedOutputTypes);
-		// leave empty. No ports used
-		inputs = outputs;
-		expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(wekaDatasetActivity.getRESULT_PORTS()[0], byte[].class);
-		outputs = ActivityInvoker.invokeAsyncActivity(wekaDatasetActivity, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
-		byte[] objectData = (byte[]) outputs.get(wekaDatasetActivity.getRESULT_PORTS()[0]);
-		Instances instances = CDKObjectHandler.getInstancesObject(objectData);
-		Assert.assertEquals(48, instances.numAttributes());
-		Assert.assertEquals(700, instances.numInstances());
+		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(wekaActivity, inputs, expectedOutputTypes);
+		Assert.assertEquals("Unexpected outputs", 0, outputs.size());
+		// Only check for exceptions
 	}
 
 	@Override
@@ -91,11 +87,19 @@ public class CreateWekaDatasetFromQSARVectorActivityTest extends CDKTavernaTestC
 		try {
 			this.makeConfigBean();
 			this.executeAsynch();
+			this.cleanUp();
 		} catch (Exception e) {
 			e.printStackTrace();
 			// This test causes an error
 			assertEquals(false, true);
 		}
+	}
+
+	public void cleanUp() {
+		for (File file : this.dir.listFiles()) {
+			file.delete();
+		}
+		this.dir.delete();
 	}
 
 	/**
@@ -104,7 +108,7 @@ public class CreateWekaDatasetFromQSARVectorActivityTest extends CDKTavernaTestC
 	 * @return TestSuite
 	 */
 	public static Test suite() {
-		return new TestSuite(CreateWekaDatasetFromQSARVectorActivityTest.class);
+		return new TestSuite(ExtractClusteringResultAsPDFActivityTest.class);
 	}
 
 }

@@ -48,14 +48,16 @@ import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
-import weka.clusterers.ClusterEvaluation;
 import weka.clusterers.Clusterer;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.OptionHandler;
+import weka.core.SerializationHelper;
+import weka.core.converters.ArffSaver;
 import weka.filters.Filter;
 
 /**
- * Class which represents the the ART-2a result considering different origins to PDF activity.
+ * Class which represents the the clustering result considering different origins to PDF activity.
  * 
  * @author Andreas Truzskowski
  * 
@@ -139,25 +141,22 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 		chartTool.setRenderXAxisDescriptionDiagonal(true);
 		ArrayList<File> tempFileList = new ArrayList<File>();
 		for (int i = 2; i < files.size(); i++) { // The first two file are data files
+			tempFileList.clear();
+			WekaTools tools = new WekaTools();
 			try {
 				// Load clusterer
-				ObjectInputStream reader = new ObjectInputStream(new BufferedInputStream(new FileInputStream(files.get(i))));
-				clusterer = (Clusterer) reader.readObject();
-				reader.close();
+				clusterer = (Clusterer) SerializationHelper.read(files.get(i));
 				// load data
 				BufferedReader buffReader = new BufferedReader(new FileReader(files.get(0)));
 				dataset = new Instances(buffReader);
 				buffReader.close();
-				ids = Filter.useFilter(dataset, WekaTools.getIDGetter(dataset));
-				dataset = Filter.useFilter(dataset, WekaTools.getIDRemover(dataset));
+				ids = Filter.useFilter(dataset, tools.getIDGetter(dataset));
+				dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			} catch (Exception e) {
 				ErrorLogger.getInstance()
 						.writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR, this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR);
 			}
-			// pdfTitle.add("This file contains charts from the ART2A Classification");
-			// pdfTitle.add("The header of each chart contains the following informations: ");
-			// pdfTitle.add("(Filename/Vigilance Parameter/Number of detected classes/Number of epochs)");
 			File file = new File(".");
 			try {
 				DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
@@ -211,18 +210,24 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 				ErrorLogger.getInstance().writeError("Error during evaluation of clustering results in file: " + file.getPath(),
 						this.getActivityName(), e);
 			}
-		}
-		try {
-			File file = new File(files.get(0));
-			file = FileNameGenerator.getNewFile(file.getParent(), ".pdf", clusterer.getClass().getSimpleName()
-					+ "ClassificationResult");
-			pdfTitle.add("(Clusterer name/Number of detected classes)");
-			chartTool.setPdfPageInPortrait(false);
-			chartTool.exportToChartsToPDF(tempFileList, file, pdfTitle);
-			resultFileNames.add(file.getAbsolutePath());
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
+			try {
+				file = new File(files.get(0));
+				String optionString = "";
+				for (String o : ((OptionHandler) clusterer).getOptions()) {
+					optionString += o;
+				}
+				String name = clusterer.getClass().getSimpleName();
+				file = FileNameGenerator.getNewFile(file.getParent(), ".pdf", name
+						+ tools.getOptionsFromFile(new File(files.get(i)), name) + "-ClassificationResult");
+				pdfTitle.add("(Clusterer name/Number of detected classes)");
+				chartTool.setPdfPageInPortrait(false);
+				chartTool.exportToChartsToPDF(tempFileList, file, pdfTitle);
+				resultFileNames.add(file.getAbsolutePath());
+
+			} catch (Exception e) {
+				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(), e);
+				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
+			}
 		}
 		return null;
 	}

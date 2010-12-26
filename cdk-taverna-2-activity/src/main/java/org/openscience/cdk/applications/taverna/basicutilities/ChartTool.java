@@ -46,8 +46,10 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.AreaRenderer;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.statistics.HistogramDataset;
+import org.jfree.data.xy.XYDataset;
 
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
@@ -287,8 +289,8 @@ public class ChartTool {
 		// GradientPaint gp4 = new GradientPaint(0.0f, 0.0f, Color.pink,
 		// 0.0f, 0.0f, new Color(0, 0, 64));
 		renderer.setSeriesPaint(0, Color.blue);
-		renderer.setSeriesPaint(1, Color.yellow);
-		renderer.setSeriesPaint(2, Color.red);
+		renderer.setSeriesPaint(1, Color.red);
+		renderer.setSeriesPaint(2, Color.yellow);
 		renderer.setSeriesPaint(3, Color.darkGray);
 		renderer.setSeriesPaint(4, Color.green);
 
@@ -339,7 +341,7 @@ public class ChartTool {
 		CategoryPlot plot = (CategoryPlot) chart.getPlot();
 		plot.setBackgroundPaint(Color.lightGray);
 		plot.setDomainGridlinePaint(Color.white);
-		plot.setDomainGridlinesVisible(true);
+		plot.setDomainGridlinesVisible(false);
 		plot.setRangeGridlinePaint(Color.white);
 
 		// set the range axis to display integers only...
@@ -393,6 +395,33 @@ public class ChartTool {
 		return file;
 	}
 
+	public File exportToXYChart(XYDataset dataSet, String title) throws IOException, DocumentException {
+		File file = File.createTempFile("ClusterChart", ".jpg");
+		JFreeChart chart = ChartFactory.createScatterPlot("Scatter Plot Demo 1",
+                "X", "Y", dataSet, PlotOrientation.VERTICAL, true, false, false);
+
+        XYPlot plot = (XYPlot) chart.getPlot();
+        plot.setNoDataMessage("NO DATA");
+        plot.setDomainZeroBaselineVisible(true);
+        plot.setRangeZeroBaselineVisible(true);
+
+        XYLineAndShapeRenderer renderer
+                = (XYLineAndShapeRenderer) plot.getRenderer();
+        renderer.setSeriesOutlinePaint(0, Color.black);
+        renderer.setUseOutlinePaint(true);
+        NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
+        domainAxis.setAutoRangeIncludesZero(false);
+        domainAxis.setTickMarkInsideLength(2.0f);
+        domainAxis.setTickMarkOutsideLength(0.0f);
+
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setTickMarkInsideLength(2.0f);
+        rangeAxis.setTickMarkOutsideLength(0.0f);
+
+		ChartUtilities.saveChartAsJPEG(file, chart, this.barChartWidth, this.barChartHeight);
+		return file;
+	}
+	
 	/**
 	 * Method which exports a dataset to a chart. This chart gets stored temporarily as jpg.
 	 * 

@@ -1,4 +1,5 @@
 org.openscience.cdk.applications.taverna.ui.weka.panels.clustering.EMFrame
 org.openscience.cdk.applications.taverna.ui.weka.panels.clustering.FarthestFirstFrame
+org.openscience.cdk.applications.taverna.ui.weka.panels.clustering.HierarchicalClustererFrame
 org.openscience.cdk.applications.taverna.ui.weka.panels.clustering.SimpleKMeansFrame
 org.openscience.cdk.applications.taverna.ui.weka.panels.clustering.XMeansFrame

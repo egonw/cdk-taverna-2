@@ -25,6 +25,8 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -211,6 +213,23 @@ public class FileNameGenerator {
 		}
 		// The directory is now empty so delete it
 		return dir.delete();
+	}
+
+	/**
+	 * Copies target file.
+	 * 
+	 * @param inputFile
+	 * @param outputFile
+	 * @throws IOException
+	 */
+	public synchronized static void copyFile(File inputFile, File outputFile) throws IOException {
+		FileReader in = new FileReader(inputFile);
+		FileWriter out = new FileWriter(outputFile);
+		int c;
+		while ((c = in.read()) != -1)
+			out.write(c);
+		in.close();
+		out.close();
 	}
 
 	public static void centerWindowOnScreen(Component window) {

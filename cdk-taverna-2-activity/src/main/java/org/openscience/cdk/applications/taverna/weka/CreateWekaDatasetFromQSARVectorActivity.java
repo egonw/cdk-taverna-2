@@ -98,12 +98,13 @@ public class CreateWekaDatasetFromQSARVectorActivity extends AbstractCDKActivity
 		}
 		Instances dataset = null;
 		try {
+			WekaTools tools = new WekaTools();
 			QSARVectorUtility vectorUtility = new QSARVectorUtility();
 			List<FingerprintItem> fingerprintList = vectorUtility.createFingerprintItemListFromQSARVector(vectorMap,
 					descriptorNames);
 			FingerprintItem[] itemArray = fingerprintList.toArray(new FingerprintItem[0]);
 			Art2aClassificator.scaleFingerprintVectorComponentsToIntervalZeroOne(itemArray);
-			dataset = WekaTools.createInstancesFromFingerprintArray(itemArray, descriptorNames);
+			dataset = tools.createInstancesFromFingerprintArray(itemArray, descriptorNames);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError("Error during fingerprint items creation !", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());

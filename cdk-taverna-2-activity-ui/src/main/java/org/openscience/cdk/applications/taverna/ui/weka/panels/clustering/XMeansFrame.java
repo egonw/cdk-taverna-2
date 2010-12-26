@@ -162,16 +162,16 @@ public class XMeansFrame extends AbstractConfigurationFrame {
 
 	@Override
 	public boolean checkValues() {
-		if (this.checkTextFieldValue("Maximum number of overall iterations", this.iterationsOverallTextField, 1,
+		if (this.checkTextFieldValueInt("Maximum number of overall iterations", this.iterationsOverallTextField, 1,
 				Integer.MAX_VALUE)
-				&& this.checkTextFieldValue("Maximum number of iterations in the kMeans loop in the Improve-Parameter part",
+				&& this.checkTextFieldValueInt("Maximum number of iterations in the kMeans loop in the Improve-Parameter part",
 						this.iterationsImproveParametersTextField, 1, Integer.MAX_VALUE)
-				&& this.checkTextFieldValue(
+				&& this.checkTextFieldValueInt(
 						"Maximum number of iterations in the kMeans loop for the splitted centroids in the Improve-Structure part",
 						this.iterationsImproveParametersTextField, 1, Integer.MAX_VALUE)
-				&& this.checkTextFieldValue("Minimum number of clusters", this.iterationsImproveParametersTextField, 1,
+				&& this.checkTextFieldValueInt("Minimum number of clusters", this.iterationsImproveParametersTextField, 1,
 						Integer.MAX_VALUE)
-				&& this.checkTextFieldValue("Maximum number of clusters", this.iterationsImproveParametersTextField, 1,
+				&& this.checkTextFieldValueInt("Maximum number of clusters", this.iterationsImproveParametersTextField, 1,
 						Integer.MAX_VALUE)) {
 			return true;
 		}

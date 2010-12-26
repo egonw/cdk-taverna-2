@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,14 +59,14 @@ import weka.filters.Filter;
  * @author Andreas Truzskowski
  * 
  */
-public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
+public class GenerateSilhouettePlotFromClusteringResultAsPDFActivity extends AbstractCDKActivity {
 
-	public static final String EXTRACT_CLUSTERING_RESULT_AS_PDF_ACTIVITY = "Extract Clustering Result As PDF";
+	public static final String GENERATE_SILHOUETTE_PLOT_FROM_CLUSTERING_RESULT_AS_PDF_ACTIVITY = "Generate Silhouette Plot From Clustering Result As PDF";
 
 	/**
 	 * Creates a new instance.
 	 */
-	public ExtractClusteringResultAsPDFActivity() {
+	public GenerateSilhouettePlotFromClusteringResultAsPDFActivity() {
 		this.INPUT_PORTS = new String[] { "Weka Clustering Files" };
 	}
 
@@ -79,6 +80,18 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 		// empty
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.openscience.cdk.applications.taverna.AbstractCDKActivity#work(java.util.Map,
+	 * net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback)
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.openscience.cdk.applications.taverna.AbstractCDKActivity#work(java.util.Map,
+	 * net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback)
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
@@ -102,8 +115,8 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 		chartTool.setDescriptionYAxis("Number of vectors");
 		chartTool.setRenderXAxisDescriptionDiagonal(true);
 		ArrayList<File> tempFileList = new ArrayList<File>();
-		WekaTools tools = new WekaTools();
 		for (int i = 2; i < files.size(); i++) { // The first two file are data files
+			WekaTools tools = new WekaTools();
 			try {
 				// Load clusterer
 				clusterer = (Clusterer) SerializationHelper.read(files.get(i));
@@ -118,29 +131,26 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR);
 			}
 			try {
-				String row = "Number of vectors in class";
-				int[] numberOfVectorsInClass = new int[clusterer.numberOfClusters()];
-				for (int j = 0; j < dataset.numInstances(); j++) {
-					numberOfVectorsInClass[clusterer.clusterInstance(dataset.instance(j))]++;
-				}
-				DefaultCategoryDataset chartDataSet = new DefaultCategoryDataset();
+				double[][] s = tools.generateSilhouettePlot(dataset, clusterer);
+				// Generate chart
+				tempFileList.clear();
 				for (int j = 0; j < clusterer.numberOfClusters(); j++) {
-					String column = "(" + (j + 1) + "/" + numberOfVectorsInClass[j] + ")";
-					chartDataSet.addValue(numberOfVectorsInClass[j], row, column);
+					Arrays.sort(s[j]);
+					DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
+					for (int k = 0; k < s[j].length; k++) {
+						dataSet.addValue(s[j][k], "Silhouette width", "" + (k + 1));
+					}
+					tempFileList.add(chartTool.exportToBarChart(dataSet, clusterer.getClass().getSimpleName() + " - Cluster "
+							+ (j + 1)));
 				}
-				tempFileList.add(chartTool.exportToBarChart(chartDataSet, "Weka Clustering Result"));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
 				File file = new File(files.get(0));
 				String name = clusterer.getClass().getSimpleName();
 				file = FileNameGenerator.getNewFile(file.getParent(), ".pdf", name
-						+ tools.getOptionsFromFile(new File(files.get(i)), name) + "-Result");
+						+ tools.getOptionsFromFile(new File(files.get(i)), name) + "-Silhouette");
 				chartTool.setPdfPageInPortrait(false);
-
-				pdfTitle.add("Weka " + clusterer.getClass().getSimpleName() + " Clustering Result");
 				chartTool.exportToChartsToPDF(tempFileList, file, pdfTitle);
+				// resultFileNames.add(file.getAbsolutePath());
+				System.out.println();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -150,7 +160,7 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getActivityName() {
-		return ExtractClusteringResultAsPDFActivity.EXTRACT_CLUSTERING_RESULT_AS_PDF_ACTIVITY;
+		return GenerateSilhouettePlotFromClusteringResultAsPDFActivity.GENERATE_SILHOUETTE_PLOT_FROM_CLUSTERING_RESULT_AS_PDF_ACTIVITY;
 	}
 
 	@Override
@@ -161,7 +171,8 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getDescription() {
-		return "Description: " + ExtractClusteringResultAsPDFActivity.EXTRACT_CLUSTERING_RESULT_AS_PDF_ACTIVITY;
+		return "Description: "
+				+ GenerateSilhouettePlotFromClusteringResultAsPDFActivity.GENERATE_SILHOUETTE_PLOT_FROM_CLUSTERING_RESULT_AS_PDF_ACTIVITY;
 	}
 
 	@Override
