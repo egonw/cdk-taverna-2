@@ -50,7 +50,7 @@ public class CDKServiceProvider implements ServiceDescriptionProvider {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void cleanCache() {
 		String cacheDir = FileNameGenerator.getCacheDir();
 		File cache = new File(cacheDir);

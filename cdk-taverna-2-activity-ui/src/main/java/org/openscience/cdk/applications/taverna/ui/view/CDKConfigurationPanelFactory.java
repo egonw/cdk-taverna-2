@@ -61,11 +61,10 @@ public class CDKConfigurationPanelFactory {
 			return new ART2aClassificationConfigurationPanel(activity);
 		} else if (activity instanceof CurateQSARVectorActivity) {
 			return new CurateQSARVectorConfigurationPanel(activity);
-		}else if (activity instanceof WekaClusteringActivity) {
+		} else if (activity instanceof WekaClusteringActivity) {
 			return new WekaClusteringConfigurationPanelController(activity);
 		}
-		
-		
+
 		return new EmptyConfigurationPanel();
 	}
 

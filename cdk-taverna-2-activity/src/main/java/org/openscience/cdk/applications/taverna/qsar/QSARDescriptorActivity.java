@@ -168,7 +168,8 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 				IAtomicDescriptor descriptor = ((AbstractAtomicDescriptor) descriptorActivity).getDescriptor();
 				for (IAtomContainer molecule : moleculeList) {
 					if (molecule.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
-						ErrorLogger.getInstance().writeError(CDKTavernaException.MOLECULE_NOT_TAGGED_WITH_UUID, this.getActivityName());
+						ErrorLogger.getInstance().writeError(CDKTavernaException.MOLECULE_NOT_TAGGED_WITH_UUID,
+								this.getActivityName());
 						throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.MOLECULE_NOT_TAGGED_WITH_UUID);
 					}
 					try {

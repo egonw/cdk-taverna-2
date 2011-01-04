@@ -79,8 +79,7 @@ public class ART2aClassificationConfigurationPanel extends
 			this.view.getPathButton().setIcon(icon);
 			this.add(this.view);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error setting up configuration panel!", this.getClass().getSimpleName(),
-					e);
+			ErrorLogger.getInstance().writeError("Error setting up configuration panel!", this.getClass().getSimpleName(), e);
 		}
 	}
 
@@ -194,8 +193,8 @@ public class ART2aClassificationConfigurationPanel extends
 				throw new CDKTavernaException(this.getClass().getSimpleName(), "Invalid Number");
 			}
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(this, "Please enter a valid floating point number number beetween 0.0 and 1.0!", "Error",
-					JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Please enter a valid floating point number number beetween 0.0 and 1.0!",
+					"Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 

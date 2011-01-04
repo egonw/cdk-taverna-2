@@ -27,7 +27,6 @@ package org.openscience.cdk.applications.taverna;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;

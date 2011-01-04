@@ -51,7 +51,7 @@ import org.openscience.cdk.applications.taverna.io.XMLFileIO;
 
 /**
  * Test class for the ART2aClassification activity.
- *  
+ * 
  * @author Andreas Truszkowski
  */
 public class ART2aClassificationActivityTest extends CDKTavernaTestCases {
@@ -141,21 +141,21 @@ public class ART2aClassificationActivityTest extends CDKTavernaTestCases {
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		ArrayList<String> files = (ArrayList<String>) outputs.get(activity.getRESULT_PORTS()[0]);
 		XMLFileIO xmlFileIO = new XMLFileIO();
-		for (int i = 0; i <files.size(); i++) {
+		for (int i = 0; i < files.size(); i++) {
 			String fileName = files.get(i);
 			XMLStreamReader xmlReader = xmlFileIO.getXMLStreamReaderWithCompression(fileName);
 			xmlReader.next();
 			Art2aClassificator classificator = new Art2aClassificator(xmlReader, true);
 			xmlReader.close();
 			xmlFileIO.closeXMLStreamReader();
-			if(i == 0) {
+			if (i == 0) {
 				int[] vectorsInClasses = { 4, 36, 50, 60 };
 				for (int j = 0; j < vectorsInClasses.length; j++) {
 					assertEquals(vectorsInClasses[j], classificator.getNumberOfVectorsInClass(j));
 				}
 			}
-			if(i == 1) {
-				int[] vectorsInClasses = {  1, 1, 4, 3, 1, 36, 45, 59 };
+			if (i == 1) {
+				int[] vectorsInClasses = { 1, 1, 4, 3, 1, 36, 45, 59 };
 				for (int j = 0; j < vectorsInClasses.length; j++) {
 					assertEquals(vectorsInClasses[j], classificator.getNumberOfVectorsInClass(j));
 				}

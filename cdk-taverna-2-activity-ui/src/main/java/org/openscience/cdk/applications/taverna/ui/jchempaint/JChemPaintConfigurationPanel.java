@@ -74,7 +74,7 @@ public class JChemPaintConfigurationPanel extends ActivityConfigurationPanel<Abs
 			this.file = (File) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_CMLCHEMFILE);
 			IChemModel model = null;
 			if (this.file == null || !this.file.exists()) {
-				Molecule container  = new Molecule();
+				Molecule container = new Molecule();
 				model = CMLChemFileWrapper.wrapAtomContainerInChemModel(container).getChemSequence(0).getChemModel(0);
 			} else {
 				CMLChemFile cmlChemFile = new CMLChemFile();

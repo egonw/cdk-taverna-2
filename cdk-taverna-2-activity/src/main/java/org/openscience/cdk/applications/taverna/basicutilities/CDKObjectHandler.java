@@ -181,18 +181,18 @@ public class CDKObjectHandler {
 		if (data == null) {
 			throw new Exception("DataArray == null");
 		}
-			Object obj = null;
-			try {
-				obj = CDKObjectHandler.getObject(data);
-			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, "CDKObjectHandler", e);
-				throw new Exception(CDKTavernaException.WRONG_INPUT_PORT_TYPE);
-			}
-			if (obj instanceof Instances) {
-				instances = (Instances) obj;
-			} else {
-				throw new Exception(CDKTavernaException.WRONG_INPUT_PORT_TYPE + " Type: " + obj.toString());
-			}
+		Object obj = null;
+		try {
+			obj = CDKObjectHandler.getObject(data);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, "CDKObjectHandler", e);
+			throw new Exception(CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+		}
+		if (obj instanceof Instances) {
+			instances = (Instances) obj;
+		} else {
+			throw new Exception(CDKTavernaException.WRONG_INPUT_PORT_TYPE + " Type: " + obj.toString());
+		}
 		return instances;
 	}
 

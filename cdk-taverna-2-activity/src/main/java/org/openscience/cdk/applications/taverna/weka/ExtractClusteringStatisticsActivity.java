@@ -21,12 +21,9 @@
  */
 package org.openscience.cdk.applications.taverna.weka;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
@@ -92,7 +89,7 @@ public class ExtractClusteringStatisticsActivity extends AbstractCDKActivity {
 		Instances dataset = null;
 		Clusterer clusterer = null;
 		WekaTools tools = new WekaTools();
-		for (int i = 2; i < files.size(); i++) { // The first two file are data files
+		for (int i = 2; i < files.size(); i++) { // The first two files are data files
 			try {
 				// Load clusterer
 				clusterer = (Clusterer) SerializationHelper.read(files.get(i));

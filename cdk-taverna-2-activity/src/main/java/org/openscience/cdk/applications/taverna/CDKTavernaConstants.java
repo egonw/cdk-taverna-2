@@ -67,7 +67,7 @@ public class CDKTavernaConstants {
 	public static final String PROPERTY_SHOW_PROGRESS = "SHOW PROGRESS";
 	public static final String PROPERTY_CLUSTERING_JOB_DATA = "CLUSTERING_JOB_DATA";
 	public static final String PROPERTY_NUMBER_OF_CLASSIFICATIONS = "NUMBER OF CLASSIFICATIONS";
-	
+
 	// --------------------Miscellaneous-------------------------------------
 	public static final String MOLECULEID = "MOLECULEID";
 }

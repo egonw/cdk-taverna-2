@@ -21,12 +21,9 @@
  */
 package org.openscience.cdk.applications.taverna.weka;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +50,6 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.OptionHandler;
 import weka.core.SerializationHelper;
-import weka.core.converters.ArffSaver;
 import weka.filters.Filter;
 
 /**

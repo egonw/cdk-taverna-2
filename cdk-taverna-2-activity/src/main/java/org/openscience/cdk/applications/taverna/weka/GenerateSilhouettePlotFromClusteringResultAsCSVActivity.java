@@ -21,12 +21,9 @@
  */
 package org.openscience.cdk.applications.taverna.weka;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -111,8 +108,8 @@ public class GenerateSilhouettePlotFromClusteringResultAsCSVActivity extends Abs
 				// Generate csv
 				File file = new File(files.get(0));
 				String name = clusterer.getClass().getSimpleName();
-				file = FileNameGenerator.getNewFile(file.getParent(), ".csv", name + tools.getOptionsFromFile(new File(files.get(i)), name)
-						+ "-Silhouette");
+				file = FileNameGenerator.getNewFile(file.getParent(), ".csv", name
+						+ tools.getOptionsFromFile(new File(files.get(i)), name) + "-Silhouette");
 				String line = "";
 				PrintWriter writer = new PrintWriter(file);
 				line += "Cluster;Index;SilhouetteWidth;";

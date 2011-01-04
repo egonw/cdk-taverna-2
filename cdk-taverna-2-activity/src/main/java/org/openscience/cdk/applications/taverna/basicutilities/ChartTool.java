@@ -397,31 +397,30 @@ public class ChartTool {
 
 	public File exportToXYChart(XYDataset dataSet, String title) throws IOException, DocumentException {
 		File file = File.createTempFile("ClusterChart", ".jpg");
-		JFreeChart chart = ChartFactory.createScatterPlot("Scatter Plot Demo 1",
-                "X", "Y", dataSet, PlotOrientation.VERTICAL, true, false, false);
+		JFreeChart chart = ChartFactory.createScatterPlot("Scatter Plot Demo 1", "X", "Y", dataSet, PlotOrientation.VERTICAL,
+				true, false, false);
 
-        XYPlot plot = (XYPlot) chart.getPlot();
-        plot.setNoDataMessage("NO DATA");
-        plot.setDomainZeroBaselineVisible(true);
-        plot.setRangeZeroBaselineVisible(true);
+		XYPlot plot = (XYPlot) chart.getPlot();
+		plot.setNoDataMessage("NO DATA");
+		plot.setDomainZeroBaselineVisible(true);
+		plot.setRangeZeroBaselineVisible(true);
 
-        XYLineAndShapeRenderer renderer
-                = (XYLineAndShapeRenderer) plot.getRenderer();
-        renderer.setSeriesOutlinePaint(0, Color.black);
-        renderer.setUseOutlinePaint(true);
-        NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
-        domainAxis.setAutoRangeIncludesZero(false);
-        domainAxis.setTickMarkInsideLength(2.0f);
-        domainAxis.setTickMarkOutsideLength(0.0f);
+		XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
+		renderer.setSeriesOutlinePaint(0, Color.black);
+		renderer.setUseOutlinePaint(true);
+		NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
+		domainAxis.setAutoRangeIncludesZero(false);
+		domainAxis.setTickMarkInsideLength(2.0f);
+		domainAxis.setTickMarkOutsideLength(0.0f);
 
-        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-        rangeAxis.setTickMarkInsideLength(2.0f);
-        rangeAxis.setTickMarkOutsideLength(0.0f);
+		NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+		rangeAxis.setTickMarkInsideLength(2.0f);
+		rangeAxis.setTickMarkOutsideLength(0.0f);
 
 		ChartUtilities.saveChartAsJPEG(file, chart, this.barChartWidth, this.barChartHeight);
 		return file;
 	}
-	
+
 	/**
 	 * Method which exports a dataset to a chart. This chart gets stored temporarily as jpg.
 	 * 

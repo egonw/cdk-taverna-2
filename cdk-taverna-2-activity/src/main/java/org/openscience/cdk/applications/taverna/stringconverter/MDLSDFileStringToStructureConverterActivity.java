@@ -99,7 +99,7 @@ public class MDLSDFileStringToStructureConverterActivity extends AbstractCDKActi
 			}
 		}
 		if (dataList.isEmpty()) {
-			throw new CDKTavernaException(this.getActivityName(),CDKTavernaException.CONVERTION_ERROR);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.CONVERTION_ERROR);
 		}
 		T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 		outputs.put(this.RESULT_PORTS[0], containerRef);

@@ -105,7 +105,8 @@ public class SMILESToStructureConverterActivity extends AbstractCDKActivity {
 						str.generateCoordinates();
 						som2D.addMolecule(str.getMolecule());
 					} catch (Exception e) {
-						ErrorLogger.getInstance().writeError(CDKTavernaException.GENERATE_2D_COORDINATES_ERROR, this.getActivityName(), e);
+						ErrorLogger.getInstance().writeError(CDKTavernaException.GENERATE_2D_COORDINATES_ERROR,
+								this.getActivityName(), e);
 					}
 				}
 				for (int i = 0; i < som2D.getMoleculeCount(); i++) {

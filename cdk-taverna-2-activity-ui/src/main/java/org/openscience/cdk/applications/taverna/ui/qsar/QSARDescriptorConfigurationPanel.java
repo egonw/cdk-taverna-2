@@ -147,8 +147,7 @@ public class QSARDescriptorConfigurationPanel extends
 			}
 			this.repaint();
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error setting up configuration panel!", this.getClass().getSimpleName(),
-					e);
+			ErrorLogger.getInstance().writeError("Error setting up configuration panel!", this.getClass().getSimpleName(), e);
 		}
 
 	}
@@ -221,7 +220,7 @@ public class QSARDescriptorConfigurationPanel extends
 			return true;
 		}
 		boolean showProgress = (Boolean) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS);
-		if(showProgress != this.showProgressCheckBox.isSelected()) {
+		if (showProgress != this.showProgressCheckBox.isSelected()) {
 			return true;
 		}
 		return false;

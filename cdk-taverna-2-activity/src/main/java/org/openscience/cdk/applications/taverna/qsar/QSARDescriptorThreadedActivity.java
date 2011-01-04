@@ -144,7 +144,8 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 			for (IAtomContainer atomContainer : molecules) {
 				if (atomContainer.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
 					ErrorLogger.getInstance().writeError("Molecule contains no ID!", this.getClass().getSimpleName());
-					throw new CDKTavernaException(this.getClass().getSimpleName(), CDKTavernaException.MOLECULE_NOT_TAGGED_WITH_UUID);
+					throw new CDKTavernaException(this.getClass().getSimpleName(),
+							CDKTavernaException.MOLECULE_NOT_TAGGED_WITH_UUID);
 				} else {
 					UUID uuid = (UUID) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID);
 					this.resultMap.put(uuid, atomContainer);

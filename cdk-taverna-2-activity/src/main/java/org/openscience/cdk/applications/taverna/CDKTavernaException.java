@@ -52,7 +52,7 @@ public class CDKTavernaException extends Exception {
 	public static final String CLUSTERING_ERROR = "Error during clustering process!";
 	public static final String NO_CLUSTERING_DATA_AVAILABLE = "Error, no clustering data available!";
 	public static final String LOADING_CLUSTERING_DATA_ERROR = "Error loadin clustering data!";
-	
+
 	public CDKTavernaException(String activityName, String type) {
 		super(type + " Class: " + activityName + ".");
 	}
