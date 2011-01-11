@@ -26,14 +26,17 @@ import java.awt.Dimension;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
+import org.openscience.cdk.applications.taverna.ui.weka.WekaClusteringConfigurationPanelController;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractConfigurationFrame;
 
 import weka.clusterers.Clusterer;
 import weka.clusterers.HierarchicalClusterer;
+import javax.swing.SwingConstants;
 
 /**
  * Hierarchical clusterer configuration frame.
@@ -47,44 +50,65 @@ public class HierarchicalClustererFrame extends AbstractConfigurationFrame {
 	private static final String[] LINK_TYPES = { "SINGLE", "COMPLETE", "AVERAGE", "MEAN", "CENTROID", "WARD", "ADJCOMLPETE",
 			"NEIGHBOR_JOINING" };
 	private final JLabel numberOfClustersLabel = new JLabel("Number of clusters:");
-	private final JTextField numberOfClustersTextField = new JTextField();
+	private final JTextField minNumberOfClustersTextField = new JTextField();
 	private final JLabel lblLinkType = new JLabel("Link Type:");
 	private final JComboBox comboBox = new JComboBox(LINK_TYPES);
+	private final JTextField maxNumberOfClustersTextField = new JTextField();
+	private final JLabel label = new JLabel("-");
 
 	public HierarchicalClustererFrame() {
+		maxNumberOfClustersTextField.setText("10");
+		maxNumberOfClustersTextField.setColumns(10);
 		setSize(new Dimension(350, 134));
-		numberOfClustersTextField.setText("5");
-		numberOfClustersTextField.setColumns(10);
+		minNumberOfClustersTextField.setText("2");
+		minNumberOfClustersTextField.setColumns(10);
 
 		JPanel configurationPanel = new JPanel();
 		getContentPane().add(configurationPanel, BorderLayout.CENTER);
 		SpringLayout sl_configurationPanel = new SpringLayout();
+		sl_configurationPanel.putConstraint(SpringLayout.NORTH, label, 8, SpringLayout.NORTH, configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.WEST, label, 0, SpringLayout.EAST, minNumberOfClustersTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.EAST, label, 0, SpringLayout.WEST, maxNumberOfClustersTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.NORTH, maxNumberOfClustersTextField, 5, SpringLayout.NORTH,
+				configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.WEST, maxNumberOfClustersTextField, 22, SpringLayout.EAST,
+				minNumberOfClustersTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.EAST, maxNumberOfClustersTextField, -10, SpringLayout.EAST,
+				configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.EAST, minNumberOfClustersTextField, -64, SpringLayout.EAST,
+				configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.NORTH, comboBox, 31, SpringLayout.NORTH, configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.WEST, numberOfClustersLabel, 10, SpringLayout.WEST, configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.SOUTH, numberOfClustersLabel, -6, SpringLayout.NORTH, comboBox);
+		sl_configurationPanel.putConstraint(SpringLayout.EAST, numberOfClustersLabel, -53, SpringLayout.WEST,
+				minNumberOfClustersTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.WEST, minNumberOfClustersTextField, -96, SpringLayout.EAST,
+				configurationPanel);
 		sl_configurationPanel.putConstraint(SpringLayout.WEST, lblLinkType, 0, SpringLayout.WEST, numberOfClustersLabel);
 		sl_configurationPanel.putConstraint(SpringLayout.SOUTH, lblLinkType, 0, SpringLayout.SOUTH, comboBox);
-		sl_configurationPanel.putConstraint(SpringLayout.NORTH, comboBox, 6, SpringLayout.SOUTH, numberOfClustersLabel);
 		sl_configurationPanel.putConstraint(SpringLayout.WEST, comboBox, -175, SpringLayout.EAST, configurationPanel);
 		sl_configurationPanel.putConstraint(SpringLayout.EAST, comboBox, -10, SpringLayout.EAST, configurationPanel);
-		sl_configurationPanel.putConstraint(SpringLayout.WEST, numberOfClustersLabel, 10, SpringLayout.WEST, configurationPanel);
-		sl_configurationPanel.putConstraint(SpringLayout.EAST, numberOfClustersLabel, -53, SpringLayout.WEST,
-				numberOfClustersTextField);
-		sl_configurationPanel.putConstraint(SpringLayout.SOUTH, numberOfClustersLabel, 0, SpringLayout.SOUTH,
-				numberOfClustersTextField);
-		sl_configurationPanel.putConstraint(SpringLayout.NORTH, numberOfClustersTextField, 5, SpringLayout.NORTH,
-				configurationPanel);
-		sl_configurationPanel.putConstraint(SpringLayout.EAST, numberOfClustersTextField, -10, SpringLayout.EAST,
+		sl_configurationPanel.putConstraint(SpringLayout.NORTH, minNumberOfClustersTextField, 5, SpringLayout.NORTH,
 				configurationPanel);
 		configurationPanel.setLayout(sl_configurationPanel);
 		{
 			configurationPanel.add(numberOfClustersLabel);
 		}
 		{
-			configurationPanel.add(numberOfClustersTextField);
+			configurationPanel.add(minNumberOfClustersTextField);
 		}
 		{
 			configurationPanel.add(lblLinkType);
 		}
 		{
 			configurationPanel.add(comboBox);
+		}
+		{
+			configurationPanel.add(maxNumberOfClustersTextField);
+		}
+		{
+			label.setHorizontalAlignment(SwingConstants.CENTER);
+			configurationPanel.add(label);
 		}
 	}
 
@@ -94,12 +118,21 @@ public class HierarchicalClustererFrame extends AbstractConfigurationFrame {
 	}
 
 	@Override
-	public String[] getOptions() {
-		String[] options = new String[4];
-		options[0] = "-N";
-		options[1] = this.numberOfClustersTextField.getText();
-		options[2] = "-L";
-		options[3] = LINK_TYPES[comboBox.getSelectedIndex()];
+	public String[][] getOptions() {
+		int min = Integer.parseInt(this.minNumberOfClustersTextField.getText());
+		int max = Integer.parseInt(this.maxNumberOfClustersTextField.getText());
+		int numberOfJobs = max - min + 1;
+		int id = WekaClusteringConfigurationPanelController.getJobID();
+		String[][] options = new String[numberOfJobs][];
+		for (int i = 0; i < numberOfJobs; i++) {
+			options[i] = new String[6];
+			options[i][0] = "-N";
+			options[i][1] = "" + (min + i);
+			options[i][2] = "-L";
+			options[i][3] = LINK_TYPES[comboBox.getSelectedIndex()];
+			options[i][4] = "-ID";
+			options[i][5] = "" + id;
+		}
 		return options;
 	}
 
@@ -110,9 +143,17 @@ public class HierarchicalClustererFrame extends AbstractConfigurationFrame {
 
 	@Override
 	public boolean checkValues() {
-		if (this.checkTextFieldValueInt("Number of clusters", this.numberOfClustersTextField, 1, Integer.MAX_VALUE)) {
-			return true;
+		if (!this.checkTextFieldValueInt("Min number of clusters", this.minNumberOfClustersTextField, 2, Integer.MAX_VALUE)
+				|| !this.checkTextFieldValueInt("Max number of clusters", this.maxNumberOfClustersTextField, 2, Integer.MAX_VALUE)) {
+			return false;
 		}
-		return false;
+		int min = Integer.parseInt(this.minNumberOfClustersTextField.getText());
+		int max = Integer.parseInt(this.maxNumberOfClustersTextField.getText());
+		if (max < min) {
+			JOptionPane.showMessageDialog(this, "Max number of clusters has to be greater or equal than the min number!",
+					"Illegal Argument", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		return true;
 	}
 }

@@ -55,7 +55,7 @@ public class TagMoleculesWithUUIDActivity extends AbstractCDKActivity {
 	 */
 	public TagMoleculesWithUUIDActivity() {
 		this.INPUT_PORTS = new String[] { "Structures", };
-		this.RESULT_PORTS = new String[] { "Tagged Structures" };
+		this.OUTPUT_PORTS = new String[] { "Tagged Structures" };
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class TagMoleculesWithUUIDActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@Override
@@ -125,7 +125,7 @@ public class TagMoleculesWithUUIDActivity extends AbstractCDKActivity {
 		try {
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(taggedMoleculesList), 1, true,
 					context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR,
 					this.getConfiguration().getActivityName(), e);

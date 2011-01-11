@@ -55,7 +55,7 @@ public class CreateFingerprintItemListFromQSARVectorActivity extends AbstractCDK
 	 */
 	public CreateFingerprintItemListFromQSARVectorActivity() {
 		this.INPUT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
-		this.RESULT_PORTS = new String[] { "Fingerprint Items" };
+		this.OUTPUT_PORTS = new String[] { "Fingerprint Items" };
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class CreateFingerprintItemListFromQSARVectorActivity extends AbstractCDK
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public class CreateFingerprintItemListFromQSARVectorActivity extends AbstractCDK
 		try {
 			List<byte[]> fingerprintData = CDKObjectHandler.getBytesList(fingerprintList);
 			T2Reference containerRef = referenceService.register(fingerprintData, 1, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);

@@ -56,7 +56,7 @@ public class StructureToMDLMolStringConverterActivity extends AbstractCDKActivit
 	 */
 	public StructureToMDLMolStringConverterActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
-		this.RESULT_PORTS = new String[] { "MDL Mol String", "Not Converted" };
+		this.OUTPUT_PORTS = new String[] { "MDL Mol String", "Not Converted" };
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class StructureToMDLMolStringConverterActivity extends AbstractCDKActivit
 
 	@Override
 	protected void addOutputPorts() {
-		for (String name : this.RESULT_PORTS) {
+		for (String name : this.OUTPUT_PORTS) {
 			addOutput(name, 1);
 		}
 	}
@@ -105,9 +105,9 @@ public class StructureToMDLMolStringConverterActivity extends AbstractCDKActivit
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.CONVERTION_ERROR);
 		}
 		T2Reference containerRef = referenceService.register(molStringList, 1, true, context);
-		outputs.put(this.RESULT_PORTS[0], containerRef);
+		outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		containerRef = referenceService.register(notConverted, 1, true, context);
-		outputs.put(this.RESULT_PORTS[1], containerRef);
+		outputs.put(this.OUTPUT_PORTS[1], containerRef);
 		// Return results
 		return outputs;
 	}

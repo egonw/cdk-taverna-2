@@ -25,14 +25,17 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
+import org.openscience.cdk.applications.taverna.ui.weka.WekaClusteringConfigurationPanelController;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractConfigurationFrame;
 
 import weka.clusterers.Clusterer;
 import weka.clusterers.FarthestFirst;
+import javax.swing.SwingConstants;
 
 /**
  * Farthest First clusterer configuration frame.
@@ -44,32 +47,51 @@ public class FarthestFirstFrame extends AbstractConfigurationFrame {
 
 	private static final long serialVersionUID = 3225727167693843163L;
 	private final JLabel numberOfClustersLabel = new JLabel("Number of clusters:");
-	private final JTextField numberOfClustersTextField = new JTextField();
+	private final JTextField maxNumberOfClustersTextField = new JTextField();
+	private final JLabel label = new JLabel("-");
+	private final JTextField minNumberOfClustersTextField = new JTextField();
 
 	public FarthestFirstFrame() {
 		setSize(new Dimension(350, 105));
-		numberOfClustersTextField.setText("5");
-		numberOfClustersTextField.setColumns(10);
 
 		JPanel configurationPanel = new JPanel();
 		getContentPane().add(configurationPanel, BorderLayout.CENTER);
 		SpringLayout sl_configurationPanel = new SpringLayout();
+		sl_configurationPanel.putConstraint(SpringLayout.NORTH, maxNumberOfClustersTextField, 5, SpringLayout.NORTH,
+				configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.NORTH, minNumberOfClustersTextField, 5, SpringLayout.NORTH,
+				configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.NORTH, label, 8, SpringLayout.NORTH, configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.WEST, label, 0, SpringLayout.EAST, minNumberOfClustersTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.EAST, label, 0, SpringLayout.WEST, maxNumberOfClustersTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.WEST, maxNumberOfClustersTextField, 22, SpringLayout.EAST,
+				minNumberOfClustersTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.EAST, maxNumberOfClustersTextField, -10, SpringLayout.EAST,
+				configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.WEST, minNumberOfClustersTextField, -96, SpringLayout.EAST,
+				configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.EAST, minNumberOfClustersTextField, -64, SpringLayout.EAST,
+				configurationPanel);
 		sl_configurationPanel.putConstraint(SpringLayout.WEST, numberOfClustersLabel, 10, SpringLayout.WEST, configurationPanel);
-		sl_configurationPanel.putConstraint(SpringLayout.EAST, numberOfClustersLabel, -53, SpringLayout.WEST,
-				numberOfClustersTextField);
-		sl_configurationPanel.putConstraint(SpringLayout.SOUTH, numberOfClustersLabel, 0, SpringLayout.SOUTH,
-				numberOfClustersTextField);
-		sl_configurationPanel.putConstraint(SpringLayout.NORTH, numberOfClustersTextField, 5, SpringLayout.NORTH,
-				configurationPanel);
-		sl_configurationPanel.putConstraint(SpringLayout.EAST, numberOfClustersTextField, -10, SpringLayout.EAST,
-				configurationPanel);
+		sl_configurationPanel
+				.putConstraint(SpringLayout.SOUTH, numberOfClustersLabel, -5, SpringLayout.SOUTH, configurationPanel);
+		sl_configurationPanel
+				.putConstraint(SpringLayout.EAST, numberOfClustersLabel, -149, SpringLayout.EAST, configurationPanel);
 		configurationPanel.setLayout(sl_configurationPanel);
 		{
 			configurationPanel.add(numberOfClustersLabel);
 		}
-		{
-			configurationPanel.add(numberOfClustersTextField);
-		}
+		maxNumberOfClustersTextField.setText("10");
+		maxNumberOfClustersTextField.setColumns(10);
+
+		configurationPanel.add(maxNumberOfClustersTextField);
+		label.setHorizontalAlignment(SwingConstants.CENTER);
+
+		configurationPanel.add(label);
+		minNumberOfClustersTextField.setText("2");
+		minNumberOfClustersTextField.setColumns(10);
+
+		configurationPanel.add(minNumberOfClustersTextField);
 	}
 
 	@Override
@@ -78,10 +100,19 @@ public class FarthestFirstFrame extends AbstractConfigurationFrame {
 	}
 
 	@Override
-	public String[] getOptions() {
-		String[] options = new String[2];
-		options[0] = "-N";
-		options[1] = this.numberOfClustersTextField.getText();
+	public String[][] getOptions() {
+		int min = Integer.parseInt(this.minNumberOfClustersTextField.getText());
+		int max = Integer.parseInt(this.maxNumberOfClustersTextField.getText());
+		int numberOfJobs = max - min + 1;
+		int id = WekaClusteringConfigurationPanelController.getJobID();
+		String[][] options = new String[numberOfJobs][];
+		for (int i = 0; i < numberOfJobs; i++) {
+			options[i] = new String[4];
+			options[i][0] = "-N";
+			options[i][1] = "" + (min + i);
+			options[i][2] = "-ID";
+			options[i][3] = "" + id;
+		}
 		return options;
 	}
 
@@ -92,9 +123,17 @@ public class FarthestFirstFrame extends AbstractConfigurationFrame {
 
 	@Override
 	public boolean checkValues() {
-		if (this.checkTextFieldValueInt("Number of clusters", this.numberOfClustersTextField, 1, Integer.MAX_VALUE)) {
-			return true;
+		if (!this.checkTextFieldValueInt("Min number of clusters", this.minNumberOfClustersTextField, 2, Integer.MAX_VALUE)
+				|| !this.checkTextFieldValueInt("Max number of clusters", this.maxNumberOfClustersTextField, 2, Integer.MAX_VALUE)) {
+			return false;
 		}
-		return false;
+		int min = Integer.parseInt(this.minNumberOfClustersTextField.getText());
+		int max = Integer.parseInt(this.maxNumberOfClustersTextField.getText());
+		if (max < min) {
+			JOptionPane.showMessageDialog(this, "Max number of clusters has to be greater or equal than the min number!",
+					"Illegal Argument", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		return true;
 	}
 }

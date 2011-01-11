@@ -65,7 +65,7 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 	 */
 	public WekaClusteringActivity() {
 		this.INPUT_PORTS = new String[] { "Weka Dataset" };
-		this.RESULT_PORTS = new String[] { "Weka Clustering Files" };
+		this.OUTPUT_PORTS = new String[] { "Weka Clustering Files" };
 	}
 
 	@Override
@@ -75,7 +75,7 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@Override
@@ -156,7 +156,7 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 			this.wait();
 		}
 		T2Reference containerRef = referenceService.register(this.resultFiles, 1, true, context);
-		outputs.put(this.RESULT_PORTS[0], containerRef);
+		outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		return outputs;
 	}
 
@@ -172,17 +172,21 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + emModelFile.getPath(),
 					this.getActivityName(), e);
 		}
-		boolean allDone = true;
-		for (WekaClusteringWorker worker : this.workers) {
-			if (!worker.isDone()) {
-				allDone = false;
-				break;
+		try {
+			boolean allDone = true;
+			for (WekaClusteringWorker worker : this.workers) {
+				if (!worker.isDone()) {
+					allDone = false;
+					break;
+				}
 			}
-		}
-		if (allDone) {
-			synchronized (this) {
-				this.notify();
+			if (allDone) {
+				synchronized (this) {
+					this.notify();
+				}
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 

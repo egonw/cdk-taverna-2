@@ -56,7 +56,7 @@ public class JChemPaintActivity extends AbstractCDKActivity {
 	 * Creates a new instance.
 	 */
 	public JChemPaintActivity() {
-		this.RESULT_PORTS = new String[] { "Structures" };
+		this.OUTPUT_PORTS = new String[] { "Structures" };
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class JChemPaintActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@Override
@@ -117,7 +117,7 @@ public class JChemPaintActivity extends AbstractCDKActivity {
 				dataList.add(CDKObjectHandler.getBytes(c));
 			}
 			T2Reference containerRef = referenceService.register(dataList, 1, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError("Error in JChemPaint activity!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error in JChemPaint activity!");

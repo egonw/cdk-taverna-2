@@ -55,7 +55,7 @@ public class QSARVectorToCSVActivity extends AbstractCDKActivity {
 	 */
 	public QSARVectorToCSVActivity() {
 		this.INPUT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
-		this.RESULT_PORTS = new String[] { "CSV String" };
+		this.OUTPUT_PORTS = new String[] { "CSV String" };
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class QSARVectorToCSVActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -102,7 +102,7 @@ public class QSARVectorToCSVActivity extends AbstractCDKActivity {
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		T2Reference containerRef = referenceService.register(csv, 1, true, context);
-		outputs.put(this.RESULT_PORTS[0], containerRef);
+		outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		// Return results
 		return outputs;
 

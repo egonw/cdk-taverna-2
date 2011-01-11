@@ -54,7 +54,7 @@ public class CalculateQSARVectorStatisticsActivity extends AbstractCDKActivity {
 	 */
 	public CalculateQSARVectorStatisticsActivity() {
 		this.INPUT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
-		this.RESULT_PORTS = new String[] { "Statistic Strings" };
+		this.OUTPUT_PORTS = new String[] { "Statistic Strings" };
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class CalculateQSARVectorStatisticsActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@Override
@@ -147,7 +147,7 @@ public class CalculateQSARVectorStatisticsActivity extends AbstractCDKActivity {
 		}
 		try {
 			T2Reference containerRef = referenceService.register(statistics, 1, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);

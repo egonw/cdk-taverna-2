@@ -40,4 +40,6 @@
 0.3.2
 - Added the weka machine learning library
 - Added weka clustering activity
-- Added weka clustering visualisation (PDF) activities
+- Added weka clustering visualisation and statistics (PDF, CSV) activities
+- Added silhouette plot for weka clustering
+- Reworked the chart tool

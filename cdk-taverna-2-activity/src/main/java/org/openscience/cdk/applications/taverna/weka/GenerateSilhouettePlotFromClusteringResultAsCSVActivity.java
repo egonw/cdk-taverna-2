@@ -27,8 +27,10 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ReferenceService;
@@ -89,6 +91,7 @@ public class GenerateSilhouettePlotFromClusteringResultAsCSVActivity extends Abs
 		Instances dataset = null;
 		Clusterer clusterer = null;
 		WekaTools tools = new WekaTools();
+		HashMap<Integer, LinkedList<String>> meanTable = new HashMap<Integer, LinkedList<String>>();
 		for (int i = 2; i < files.size(); i++) { // The first two file are data files
 			try {
 				// Load clusterer
@@ -108,8 +111,9 @@ public class GenerateSilhouettePlotFromClusteringResultAsCSVActivity extends Abs
 				// Generate csv
 				File file = new File(files.get(0));
 				String name = clusterer.getClass().getSimpleName();
-				file = FileNameGenerator.getNewFile(file.getParent(), ".csv", name
-						+ tools.getOptionsFromFile(new File(files.get(i)), name) + "-Silhouette");
+				String options = tools.getOptionsFromFile(new File(files.get(i)), name);
+				int jobID = tools.getIDFromOptions(options);
+				file = FileNameGenerator.getNewFile(file.getParent(), ".csv", name + options + "-Silhouette");
 				String line = "";
 				PrintWriter writer = new PrintWriter(file);
 				line += "Cluster;Index;SilhouetteWidth;";
@@ -122,6 +126,30 @@ public class GenerateSilhouettePlotFromClusteringResultAsCSVActivity extends Abs
 					}
 				}
 				writer.close();
+				// Save mean value
+				LinkedList<String> meanList = meanTable.get(jobID);
+				double mean = tools.calculateSilhouetteMean(s);
+				if (meanList == null) {
+					meanList = new LinkedList<String>();
+					meanTable.put(jobID, meanList);
+				}
+				meanList.add(clusterer.numberOfClusters() + ";" + mean + ";");
+				if (i == (files.size() - 1)) {
+					// Write mean csv
+					file = FileNameGenerator.getNewFile(file.getParent(), ".csv", "Silhouette-Mean");
+					writer = new PrintWriter(file);
+					line = "JobID;NumberOfClusters;Mean;";
+					writer.write(line + "\n");
+					for (Entry<Integer, LinkedList<String>> entry : meanTable.entrySet()) {
+						int id = entry.getKey();
+						LinkedList<String> ml = entry.getValue();
+						for (String m : ml) {
+							line = id + ";" + m;
+							writer.write(line + "\n");
+						}
+					}
+					writer.close();
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

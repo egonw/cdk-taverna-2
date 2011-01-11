@@ -53,7 +53,7 @@ public class CurateQSARVectorActivity extends AbstractCDKActivity {
 	 */
 	public CurateQSARVectorActivity() {
 		this.INPUT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
-		this.RESULT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
+		this.OUTPUT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
 	}
 
 	@Override
@@ -64,8 +64,8 @@ public class CurateQSARVectorActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 0);
-		addOutput(this.RESULT_PORTS[1], 0);
+		addOutput(this.OUTPUT_PORTS[0], 0);
+		addOutput(this.OUTPUT_PORTS[1], 0);
 	}
 
 	@Override
@@ -109,10 +109,10 @@ public class CurateQSARVectorActivity extends AbstractCDKActivity {
 		try {
 			vectorData = CDKObjectHandler.getBytes(curatedVectorMap);
 			T2Reference containerRef = referenceService.register(vectorData, 0, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 			nameData = CDKObjectHandler.getBytes(curatedDescriptorNames);
 			containerRef = referenceService.register(nameData, 0, true, context);
-			outputs.put(this.RESULT_PORTS[1], containerRef);
+			outputs.put(this.OUTPUT_PORTS[1], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);

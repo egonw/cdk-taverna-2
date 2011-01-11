@@ -35,7 +35,7 @@ import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
-import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
@@ -126,17 +126,13 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 			}
 		}
 		Instances dataset = null;
-		Instances ids = null;
+		Instances uuids = null;
 		Clusterer clusterer = null;
 		ChartTool chartTool = new ChartTool();
-		chartTool.setBarChartHeight(500);
-		chartTool.setBarChartWidth(840);
-		chartTool.setPlotOrientation(PlotOrientation.VERTICAL);
-		chartTool.setDescriptionYAxis("Ratio in percent");
-		chartTool.setDescriptionXAxis("(Class number/Number of Vectors)");
-		chartTool.setRenderXAxisDescriptionDiagonal(true);
 		ArrayList<File> tempFileList = new ArrayList<File>();
+		ArrayList<JFreeChart> charts = null;
 		for (int i = 2; i < files.size(); i++) { // The first two file are data files
+			charts = new ArrayList<JFreeChart>();
 			tempFileList.clear();
 			WekaTools tools = new WekaTools();
 			try {
@@ -146,14 +142,13 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 				BufferedReader buffReader = new BufferedReader(new FileReader(files.get(0)));
 				dataset = new Instances(buffReader);
 				buffReader.close();
-				ids = Filter.useFilter(dataset, tools.getIDGetter(dataset));
+				uuids = Filter.useFilter(dataset, tools.getIDGetter(dataset));
 				dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			} catch (Exception e) {
 				ErrorLogger.getInstance()
 						.writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR, this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR);
 			}
-			File file = new File(".");
 			try {
 				DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
 				int numberOfClasses = clusterer.numberOfClusters();
@@ -170,7 +165,7 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 					} else {
 						foundSubjectsTable = distributionTable.get(cluster);
 					}
-					UUID uuid = UUID.fromString(ids.instance(j).stringValue(0));
+					UUID uuid = UUID.fromString(uuids.instance(j).stringValue(0));
 					String subject = subjectTable.get(uuid);
 					Integer value = foundSubjectsTable.get(subject);
 					if (value == null) {
@@ -199,15 +194,17 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 						dataSet.addValue(proportion, name, xAxisHeader);
 					}
 				}
-				String header = "(" + clusterer.getClass().getSimpleName() + "/" + clusterer.numberOfClusters() + ")";
-				file = chartTool.exportToBarChart(dataSet, header);
-				tempFileList.add(file);
+				String name = clusterer.getClass().getSimpleName();
+				String options = tools.getOptionsFromFile(new File(files.get(i)), name);
+				int jobID = tools.getIDFromOptions(options);
+				String header = name + " - JobID: " + jobID;
+				charts.add(chartTool.createBarChart(header, "Ratio in percent", "(Class number/Number of Vectors)", dataSet));
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error during evaluation of clustering results in file: " + file.getPath(),
+				ErrorLogger.getInstance().writeError("Error during evaluation of clustering results in file: " + files.get(i),
 						this.getActivityName(), e);
 			}
 			try {
-				file = new File(files.get(0));
+				File file = new File(files.get(0));
 				String optionString = "";
 				for (String o : ((OptionHandler) clusterer).getOptions()) {
 					optionString += o;
@@ -216,8 +213,7 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 				file = FileNameGenerator.getNewFile(file.getParent(), ".pdf", name
 						+ tools.getOptionsFromFile(new File(files.get(i)), name) + "-ClassificationResult");
 				pdfTitle.add("(Clusterer name/Number of detected classes)");
-				chartTool.setPdfPageInPortrait(false);
-				chartTool.exportToChartsToPDF(tempFileList, file, pdfTitle);
+				chartTool.writeChartAsPDF(file, charts);
 				resultFileNames.add(file.getAbsolutePath());
 
 			} catch (Exception e) {

@@ -35,7 +35,7 @@ import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
-import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.openscience.cdk.applications.art2aclassification.Art2aClassificator;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
@@ -79,7 +79,6 @@ public class ART2aResultConsideringDifferentOriginsAsPDF extends AbstractCDKActi
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
 		List<String> resultFileNames = new ArrayList<String>();
-		List<String> pdfTitle = new ArrayList<String>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
@@ -119,16 +118,7 @@ public class ART2aResultConsideringDifferentOriginsAsPDF extends AbstractCDKActi
 			Art2aClassificator classificator;
 			XMLFileIO xmlFileIO = new XMLFileIO();
 			ChartTool chartTool = new ChartTool();
-			chartTool.setBarChartHeight(500);
-			chartTool.setBarChartWidth(840);
-			chartTool.setPlotOrientation(PlotOrientation.VERTICAL);
-			chartTool.setDescriptionYAxis("Ratio in percent");
-			chartTool.setDescriptionXAxis("(Class number/Number of Vectors/Interangle)");
-			chartTool.setRenderXAxisDescriptionDiagonal(true);
-			ArrayList<File> tempFileList = new ArrayList<File>();
-			pdfTitle.add("This file contains charts from the ART2A Classification");
-			pdfTitle.add("The header of each chart contains the following informations: ");
-			pdfTitle.add("(Filename/Vigilance Parameter/Number of detected classes/Number of epochs)");
+			ArrayList<JFreeChart> charts = new ArrayList<JFreeChart>();
 			for (String fileName : files) {
 				try {
 					xmlReader = xmlFileIO.getXMLStreamReaderWithCompression(fileName);
@@ -172,7 +162,8 @@ public class ART2aResultConsideringDifferentOriginsAsPDF extends AbstractCDKActi
 					}
 					String header = "(" + fileName + "/" + classificator.getVigilanceParameter() + "/"
 							+ classificator.getNumberOfDetectedClasses() + "/" + classificator.getNumberOfEpochs() + ")";
-					tempFileList.add(chartTool.exportToBarChart(dataSet, header));
+					charts.add(chartTool.createBarChart(header, "(Class number/Number Of Vectors/Interangle)",
+							"Number Of Vectors", dataSet));
 				} catch (Exception e) {
 					ErrorLogger.getInstance().writeError(
 							"Error during evaluation of classification results in file: " + fileName, this.getActivityName(), e);
@@ -180,8 +171,7 @@ public class ART2aResultConsideringDifferentOriginsAsPDF extends AbstractCDKActi
 			}
 			File file = new File(files.get(0));
 			file = FileNameGenerator.getNewFile(file.getParent(), ".pdf", "Art2aMergedClassificationResult");
-			chartTool.setPdfPageInPortrait(false);
-			chartTool.exportToChartsToPDF(tempFileList, file, pdfTitle);
+			chartTool.writeChartAsPDF(file, charts);
 			resultFileNames.add(file.getAbsolutePath());
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_ART2A_RESULT_ERROR, this.getActivityName(), e);

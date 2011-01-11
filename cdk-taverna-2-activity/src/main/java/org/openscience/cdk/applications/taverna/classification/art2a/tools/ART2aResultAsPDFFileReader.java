@@ -33,7 +33,7 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
-import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.openscience.cdk.applications.art2aclassification.Art2aClassificator;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
@@ -87,15 +87,9 @@ public class ART2aResultAsPDFFileReader extends AbstractCDKActivity implements I
 			Art2aClassificator classificator;
 			XMLFileIO xmlFileIO = new XMLFileIO();
 			ChartTool chartTool = new ChartTool();
-			chartTool.setBarChartHeight(450);
-			chartTool.setBarChartWidth(750);
-			chartTool.setPlotOrientation(PlotOrientation.VERTICAL);
-			chartTool.setDescriptionXAxis("(Class number/Number of Vectors/Interangle)");
-			chartTool.setDescriptionYAxis("Number of vectors");
-			chartTool.setRenderXAxisDescriptionDiagonal(true);
 			int classNumberWithMaxOfVectors = 0;
 			int maxVectorsInClass = 0;
-			ArrayList<File> tempFileList = new ArrayList<File>();
+			ArrayList<JFreeChart> charts = new ArrayList<JFreeChart>();
 			TreeMap<Double, Integer> treeMap = new TreeMap<Double, Integer>();
 			Map.Entry<Double, Integer> entry;
 			DefaultCategoryDataset dataSet;
@@ -146,11 +140,11 @@ public class ART2aResultAsPDFFileReader extends AbstractCDKActivity implements I
 				buffer.append("/");
 				buffer.append(classificator.getNumberOfEpochs());
 				buffer.append(")");
-				tempFileList.add(chartTool.exportToBarChart(dataSet, buffer.toString()));
+				charts.add(chartTool.createBarChart(buffer.toString(), "(Class number/Number Of Vectors/Interangle)",
+						"Number Of Vectors", dataSet));
 			}
 			File file = FileNameGenerator.getNewFile(files[0].getParent(), ".pdf", "Art2aClassificationResult");
-			chartTool.setPdfPageInPortrait(false);
-			chartTool.exportToChartsToPDF(tempFileList, file, pdfTitle);
+			chartTool.writeChartAsPDF(file, charts);
 			resultFileNames.add(file.getAbsolutePath());
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_ART2A_RESULT_ERROR, this.getActivityName(), e);

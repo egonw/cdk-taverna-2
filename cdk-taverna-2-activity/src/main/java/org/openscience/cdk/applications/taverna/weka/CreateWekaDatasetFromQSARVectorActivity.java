@@ -59,7 +59,7 @@ public class CreateWekaDatasetFromQSARVectorActivity extends AbstractCDKActivity
 	 */
 	public CreateWekaDatasetFromQSARVectorActivity() {
 		this.INPUT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
-		this.RESULT_PORTS = new String[] { "Weka Dataset" };
+		this.OUTPUT_PORTS = new String[] { "Weka Dataset" };
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class CreateWekaDatasetFromQSARVectorActivity extends AbstractCDKActivity
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 0);
+		addOutput(this.OUTPUT_PORTS[0], 0);
 	}
 
 	@Override
@@ -112,7 +112,7 @@ public class CreateWekaDatasetFromQSARVectorActivity extends AbstractCDKActivity
 		try {
 			byte[] datasetData = CDKObjectHandler.getBytes(dataset);
 			T2Reference containerRef = referenceService.register(datasetData, 0, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);

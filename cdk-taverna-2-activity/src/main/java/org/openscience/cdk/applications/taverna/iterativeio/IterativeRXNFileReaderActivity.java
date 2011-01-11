@@ -57,7 +57,7 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity implemen
 	 * Creates a new instance.
 	 */
 	public IterativeRXNFileReaderActivity() {
-		this.RESULT_PORTS = new String[] { "Reaction(s)" };
+		this.OUTPUT_PORTS = new String[] { "Reaction(s)" };
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity implemen
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1, 0);
+		addOutput(this.OUTPUT_PORTS[0], 1, 0);
 	}
 
 	@Override
@@ -126,7 +126,7 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity implemen
 					dataList = CDKObjectHandler.getBytesList(reactions);
 					T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 					outputList.add(i, containerRef);
-					outputs.put(this.RESULT_PORTS[0], containerRef);
+					outputs.put(this.OUTPUT_PORTS[0], containerRef);
 					callback.receiveResult(outputs, new int[] { i });
 					reactions.clear();
 					counter = 0;
@@ -137,7 +137,7 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity implemen
 			throw new CDKTavernaException(this.getActivityName(), "Error reading RXN files!");
 		}
 		T2Reference containerRef = referenceService.register(outputList, 1, true, context);
-		outputs.put(this.RESULT_PORTS[0], containerRef);
+		outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		// Return results
 		return outputs;
 	}

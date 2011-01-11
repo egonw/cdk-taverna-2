@@ -55,7 +55,7 @@ public class DoubletsFilterActivity extends AbstractCDKActivity {
 	 */
 	public DoubletsFilterActivity() {
 		this.INPUT_PORTS = new String[] { "Structures", };
-		this.RESULT_PORTS = new String[] { "Filtered Structures" };
+		this.OUTPUT_PORTS = new String[] { "Filtered Structures" };
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class DoubletsFilterActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@Override
@@ -141,7 +141,7 @@ public class DoubletsFilterActivity extends AbstractCDKActivity {
 		// Congfigure output
 		try {
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(filteredList), 1, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR,
 					this.getConfiguration().getActivityName(), e);

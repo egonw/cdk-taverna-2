@@ -57,7 +57,7 @@ public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 	 */
 	public DataCollectorEmitterActivity() {
 		this.INPUT_PORTS = new String[] { "UUID" };
-		this.RESULT_PORTS = new String[] { "Data" };
+		this.OUTPUT_PORTS = new String[] { "Data" };
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@Override
@@ -112,7 +112,7 @@ public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 		}
 		// Congfigure output
 		T2Reference containerRef = referenceService.register(dataList, 1, true, context);
-		outputs.put(this.RESULT_PORTS[0], containerRef);
+		outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		// Return results
 		return outputs;
 	}

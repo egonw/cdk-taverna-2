@@ -58,7 +58,7 @@ public class MDLMultiRXNFileReaderActivity extends AbstractCDKActivity implement
 	 * Creates a new instance.
 	 */
 	public MDLMultiRXNFileReaderActivity() {
-		this.RESULT_PORTS = new String[] { "Reactions" };
+		this.OUTPUT_PORTS = new String[] { "Reactions" };
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class MDLMultiRXNFileReaderActivity extends AbstractCDKActivity implement
 
 	@Override
 	protected void addOutputPorts() {
-		this.addOutput(this.RESULT_PORTS[0], 1);
+		this.addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@Override
@@ -111,7 +111,7 @@ public class MDLMultiRXNFileReaderActivity extends AbstractCDKActivity implement
 		// Congfigure output
 		try {
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(reactionList), 1, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);

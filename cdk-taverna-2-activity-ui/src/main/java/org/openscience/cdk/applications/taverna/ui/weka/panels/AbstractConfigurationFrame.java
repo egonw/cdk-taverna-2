@@ -87,9 +87,11 @@ public abstract class AbstractConfigurationFrame extends JDialog {
 	public abstract String getName();
 
 	/**
+	 * Note: The jobID has to be the last item.
+	 * 
 	 * @return The options string.
 	 */
-	public abstract String[] getOptions();
+	public abstract String[][] getOptions();
 
 	/**
 	 * Checks whether the JTextFiels is an legal argument.
@@ -117,7 +119,7 @@ public abstract class AbstractConfigurationFrame extends JDialog {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Checks whether the JTextFiels is an legal argument.
 	 * 

@@ -60,7 +60,7 @@ public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements II
 	 * Creates a new instance.
 	 */
 	public LoopRXNFileReaderActivity() {
-		this.RESULT_PORTS = new String[] { "Reactions", "State" };
+		this.OUTPUT_PORTS = new String[] { "Reactions", "State" };
 	}
 
 	@Override
@@ -70,8 +70,8 @@ public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements II
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1);
-		addOutput(this.RESULT_PORTS[1], 0);
+		addOutput(this.OUTPUT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[1], 0);
 	}
 
 	@Override
@@ -136,9 +136,9 @@ public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements II
 			}
 		}
 		T2Reference containerRef = referenceService.register(dataList, 1, true, context);
-		outputs.put(this.RESULT_PORTS[0], containerRef);
+		outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		containerRef = referenceService.register(state, 0, true, context);
-		outputs.put(this.RESULT_PORTS[1], containerRef);
+		outputs.put(this.OUTPUT_PORTS[1], containerRef);
 		// Return results
 		return outputs;
 	}

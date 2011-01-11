@@ -52,6 +52,9 @@ public class CDKTavernaException extends Exception {
 	public static final String CLUSTERING_ERROR = "Error during clustering process!";
 	public static final String NO_CLUSTERING_DATA_AVAILABLE = "Error, no clustering data available!";
 	public static final String LOADING_CLUSTERING_DATA_ERROR = "Error loadin clustering data!";
+	public static final String NO_CLUSTER_INFORMATION_AVAILABLE = "Error, no cluster information for molecule available!";
+	public static final String CLUSTER_MODEL_HAS_NO_ID = "Error, cluster model contains no job ID!";
+	public static final String CANT_CREATE_PDF_FILE = "Error can't create PDF file: ";
 
 	public CDKTavernaException(String activityName, String type) {
 		super(type + " Class: " + activityName + ".");

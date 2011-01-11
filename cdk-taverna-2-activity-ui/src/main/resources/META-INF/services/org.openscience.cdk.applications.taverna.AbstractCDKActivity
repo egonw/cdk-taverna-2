@@ -10,6 +10,7 @@ org.openscience.cdk.applications.taverna.io.MDLSDFileWriterActivity
 org.openscience.cdk.applications.taverna.io.SMILESFileReaderActivity
 org.openscience.cdk.applications.taverna.io.SMILESFileWriterActivity
 org.openscience.cdk.applications.taverna.io.TextFileWriterActivity
+org.openscience.cdk.applications.taverna.io.CSVFileReaderActivity
 org.openscience.cdk.applications.taverna.io.CSVFileWriterActivity
 org.openscience.cdk.applications.taverna.isomorphism.IsomorphismTesterActivity
 org.openscience.cdk.applications.taverna.isomorphism.SubgraphIsomorphismFilterActivity
@@ -148,6 +149,7 @@ org.openscience.cdk.applications.taverna.weka.ExtractClusteringResultAsPDFActivi
 org.openscience.cdk.applications.taverna.weka.CreateWekaDatasetFromQSARVectorActivity
 org.openscience.cdk.applications.taverna.weka.WekaClusteringActivity
 org.openscience.cdk.applications.taverna.weka.ClusteringResultConsideringDifferentOriginsAsPDF
-org.openscience.cdk.applications.taverna.weka.ExtractClusteringStatisticsActivity
+org.openscience.cdk.applications.taverna.weka.ExtractClusteringResultAsCSVActivity
 org.openscience.cdk.applications.taverna.weka.GenerateSilhouettePlotFromClusteringResultAsPDFActivity
 org.openscience.cdk.applications.taverna.weka.GenerateSilhouettePlotFromClusteringResultAsCSVActivity
+org.openscience.cdk.applications.taverna.weka.SplitMoleculesIntoClustersActivity

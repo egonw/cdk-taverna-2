@@ -1,5 +1,7 @@
 package org.openscience.cdk.applications.taverna.weka.utilities;
 
+import java.util.Arrays;
+
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.weka.WekaClusteringActivity;
@@ -35,9 +37,10 @@ public class WekaClusteringWorker extends Thread {
 		}
 		String optionString = "";
 		try {
-			for (String o : options) {
+			for (String o : this.options) {
 				optionString += o;
 			}
+			this.options = Arrays.copyOfRange(this.options, 0, this.options.length - 2);
 			((OptionHandler) clusterer).setOptions(this.options);
 			// Do clustering
 			clusterer.buildClusterer(dataset);

@@ -58,7 +58,7 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 	 * Creates a new instance.
 	 */
 	public MDLSDFileReaderActivity() {
-		this.RESULT_PORTS = new String[] { "Structures" };
+		this.OUTPUT_PORTS = new String[] { "Structures" };
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 		// Congfigure output
 		try {
 			T2Reference containerRef = referenceService.register(dataList, 1, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);

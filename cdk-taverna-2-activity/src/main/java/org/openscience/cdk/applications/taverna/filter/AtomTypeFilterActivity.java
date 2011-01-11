@@ -59,7 +59,7 @@ public class AtomTypeFilterActivity extends AbstractCDKActivity {
 	 */
 	public AtomTypeFilterActivity() {
 		this.INPUT_PORTS = new String[] { "Structures", };
-		this.RESULT_PORTS = new String[] { "Typed Structures", "NOT Typed Structures" };
+		this.OUTPUT_PORTS = new String[] { "Typed Structures", "NOT Typed Structures" };
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class AtomTypeFilterActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		for (String name : this.RESULT_PORTS) {
+		for (String name : this.OUTPUT_PORTS) {
 			addOutput(name, 1);
 		}
 	}
@@ -142,9 +142,9 @@ public class AtomTypeFilterActivity extends AbstractCDKActivity {
 		// Congfigure output
 		try {
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(typedList), 1, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 			containerRef = referenceService.register(CDKObjectHandler.getBytesList(notTypedList), 1, true, context);
-			outputs.put(this.RESULT_PORTS[1], containerRef);
+			outputs.put(this.OUTPUT_PORTS[1], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR,
 					this.getConfiguration().getActivityName(), e);

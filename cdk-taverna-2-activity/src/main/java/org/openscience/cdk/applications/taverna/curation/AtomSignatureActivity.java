@@ -53,7 +53,7 @@ public class AtomSignatureActivity extends AbstractCDKActivity {
 
 	public AtomSignatureActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
-		this.RESULT_PORTS = new String[] { "Atom Signatures" };
+		this.OUTPUT_PORTS = new String[] { "Atom Signatures" };
 
 	}
 
@@ -65,7 +65,7 @@ public class AtomSignatureActivity extends AbstractCDKActivity {
 	@Override
 	protected void addOutputPorts() {
 
-		addOutput(this.RESULT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@Override
@@ -102,7 +102,7 @@ public class AtomSignatureActivity extends AbstractCDKActivity {
 			}
 		}
 		T2Reference containerRef = referenceService.register(allAtomSignatures, 1, true, context);
-		outputs.put(this.RESULT_PORTS[0], containerRef);
+		outputs.put(this.OUTPUT_PORTS[0], containerRef);
 
 		return outputs;
 	}

@@ -29,6 +29,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
@@ -67,9 +68,27 @@ public class WekaClusteringConfigurationPanelController extends
 	private List<String[]> jobOptions = new ArrayList<String[]>();
 	private boolean isChanged = false;
 	private File file = null;
-
+	private volatile static int jobID = 0;
+	private static HashSet<Integer> usedIDs = new HashSet<Integer>();
+	
+	/**
+	 * Action for the clear all button.
+	 */
+	private ActionListener clearAllAction = new ActionListener() {
+		
+		public void actionPerformed(ActionEvent e) {
+			jobClustererIdx.clear();
+			jobOptions.clear();
+			showJobData();
+			isChanged = true;
+		}
+	};
+	
+	/**
+	 * Action for the choose file button.
+	 */
 	private ActionListener chooseFileAction = new ActionListener() {
-
+		
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser openDialog = new JFileChooser(new File(Preferences.getInstance().getCurrentDirectory()));
 			openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -82,6 +101,9 @@ public class WekaClusteringConfigurationPanelController extends
 		}
 	};
 
+	/**
+	 * Action for the remove job button.
+	 */
 	private ActionListener removeJobAction = new ActionListener() {
 
 		public void actionPerformed(ActionEvent e) {
@@ -93,17 +115,34 @@ public class WekaClusteringConfigurationPanelController extends
 		}
 	};
 
+	/**
+	 * Action for the add job button.
+	 */
 	private ActionListener addJobListener = new ActionListener() {
 
 		public void actionPerformed(ActionEvent e) {
+			this.updateUsedOptions(jobOptions);
 			int idx = view.getClustererComboBox().getSelectedIndex();
-			jobClustererIdx.add(idx);
-			jobOptions.add(configFrames.get(idx).getOptions());
+			String[][] options = configFrames.get(idx).getOptions();
+			for (int i = 0; i < options.length; i++) {
+				jobClustererIdx.add(idx);
+				jobOptions.add(options[i]);
+			}
 			showJobData();
 			isChanged = true;
 		}
+		
+		private void updateUsedOptions(List<String[]> jobOptions) {
+			usedIDs.clear();
+			for(String[] options : jobOptions) {
+				usedIDs.add(Integer.parseInt(options[options.length-1]));
+			}
+		}
 	};
 
+	/**
+	 * Action for the configuration button.
+	 */
 	private ActionListener configureAction = new ActionListener() {
 
 		public void actionPerformed(ActionEvent e) {
@@ -139,6 +178,7 @@ public class WekaClusteringConfigurationPanelController extends
 			ImageIcon icon = new ImageIcon(url);
 			this.view.getChooseFileButton().setIcon(icon);
 			this.view.getChooseFileButton().addActionListener(this.chooseFileAction);
+			this.view.getBtnClearAll().addActionListener(this.clearAllAction);
 			this.add(this.view);
 			this.refreshConfiguration();
 		} catch (Exception e) {
@@ -221,7 +261,7 @@ public class WekaClusteringConfigurationPanelController extends
 	}
 
 	/**
-	 * Shows jobs.
+	 * Shows the jobs.
 	 */
 	private void showJobData() {
 		String[] listData = new String[jobClustererIdx.size()];
@@ -242,5 +282,15 @@ public class WekaClusteringConfigurationPanelController extends
 		Point center = new Point((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2, (int) Toolkit
 				.getDefaultToolkit().getScreenSize().getHeight() / 2);
 		window.setLocation((center.x - window.getWidth() / 2), (center.y - window.getHeight() / 2));
+	}
+
+	/**
+	 * @return A new job ID.
+	 */
+	public static int getJobID() {
+		do {
+			jobID++;
+		} while(usedIDs.contains(jobID));
+		return jobID;
 	}
 }

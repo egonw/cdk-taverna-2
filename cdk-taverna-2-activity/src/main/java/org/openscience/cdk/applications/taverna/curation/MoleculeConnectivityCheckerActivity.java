@@ -56,7 +56,7 @@ public class MoleculeConnectivityCheckerActivity extends AbstractCDKActivity {
 
 	public MoleculeConnectivityCheckerActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
-		this.RESULT_PORTS = new String[] { "Accepted", "Rejected" };
+		this.OUTPUT_PORTS = new String[] { "Accepted", "Rejected" };
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class MoleculeConnectivityCheckerActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		for (String name : this.RESULT_PORTS) {
+		for (String name : this.OUTPUT_PORTS) {
 			addOutput(name, 1);
 		}
 	}
@@ -117,7 +117,7 @@ public class MoleculeConnectivityCheckerActivity extends AbstractCDKActivity {
 			List<byte[]> acceptedList = CDKObjectHandler.getBytesList(accepted);
 			T2Reference containerRef = referenceService.register(acceptedList, 1, true, context);
 
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		} catch (IOException ex) {
 
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), ex);
@@ -128,7 +128,7 @@ public class MoleculeConnectivityCheckerActivity extends AbstractCDKActivity {
 
 			List<byte[]> rejectedList = CDKObjectHandler.getBytesList(rejected);
 			T2Reference containerRef2 = referenceService.register(rejectedList, 1, true, context);
-			outputs.put(this.RESULT_PORTS[1], containerRef2);
+			outputs.put(this.OUTPUT_PORTS[1], containerRef2);
 		} catch (IOException ex) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), ex);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);

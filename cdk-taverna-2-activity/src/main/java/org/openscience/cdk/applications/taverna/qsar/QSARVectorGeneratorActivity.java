@@ -65,7 +65,7 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 
 	public QSARVectorGeneratorActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
-		this.RESULT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
+		this.OUTPUT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
 	}
 
 	@Override
@@ -75,8 +75,8 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 0);
-		addOutput(this.RESULT_PORTS[1], 0);
+		addOutput(this.OUTPUT_PORTS[0], 0);
+		addOutput(this.OUTPUT_PORTS[1], 0);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -213,14 +213,14 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 		try {
 			byte[] vectorData = CDKObjectHandler.getBytes(vectorMap);
 			T2Reference containerRef = referenceService.register(vectorData, 0, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 			ArrayList<String> descriptorNamesList = new ArrayList<String>();
 			for (String name : this.descriptorNames) {
 				descriptorNamesList.add(name);
 			}
 			byte[] nameData = CDKObjectHandler.getBytes(descriptorNamesList);
 			containerRef = referenceService.register(nameData, 0, true, context);
-			outputs.put(this.RESULT_PORTS[1], containerRef);
+			outputs.put(this.OUTPUT_PORTS[1], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);

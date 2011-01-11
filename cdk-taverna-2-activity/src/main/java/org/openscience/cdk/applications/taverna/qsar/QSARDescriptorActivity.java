@@ -69,7 +69,7 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 	public QSARDescriptorActivity() {
 		super();
 		this.INPUT_PORTS = new String[] { "Structures" };
-		this.RESULT_PORTS = new String[] { "Calculated Structures", "Time CSV" };
+		this.OUTPUT_PORTS = new String[] { "Calculated Structures", "Time CSV" };
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		for (String name : this.RESULT_PORTS) {
+		for (String name : this.OUTPUT_PORTS) {
 			addOutput(name, 1);
 		}
 	}
@@ -279,9 +279,9 @@ public class QSARDescriptorActivity extends AbstractCDKActivity {
 			List<byte[]> moleculeDataArray = CDKObjectHandler.getBytesList(chemFiles);
 			// Congfigure output
 			T2Reference containerRef = referenceService.register(moleculeDataArray, 1, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 			containerRef = referenceService.register(durationList, 1, true, context);
-			outputs.put(this.RESULT_PORTS[1], containerRef);
+			outputs.put(this.OUTPUT_PORTS[1], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);

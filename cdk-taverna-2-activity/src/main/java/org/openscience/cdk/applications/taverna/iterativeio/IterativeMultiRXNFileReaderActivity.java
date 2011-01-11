@@ -59,7 +59,7 @@ public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity imp
 	 * Creates a new instance.
 	 */
 	public IterativeMultiRXNFileReaderActivity() {
-		this.RESULT_PORTS = new String[] { "Reactions" };
+		this.OUTPUT_PORTS = new String[] { "Reactions" };
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity imp
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1, 0);
+		addOutput(this.OUTPUT_PORTS[0], 1, 0);
 	}
 
 	@Override
@@ -136,7 +136,7 @@ public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity imp
 					}
 					T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 					outputList.add(index, containerRef);
-					outputs.put(this.RESULT_PORTS[0], containerRef);
+					outputs.put(this.OUTPUT_PORTS[0], containerRef);
 					callback.receiveResult(outputs, new int[] { index });
 					index++;
 					counter = 0;
@@ -149,7 +149,7 @@ public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity imp
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!");
 		}
 		T2Reference containerRef = referenceService.register(outputList, 1, true, context);
-		outputs.put(this.RESULT_PORTS[0], containerRef);
+		outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		// Return results
 		return outputs;
 	}

@@ -64,10 +64,10 @@ public class ReactionReactantSplitterActivity extends AbstractCDKActivity implem
 	@Override
 	protected void addOutputPorts() {
 		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
-		this.RESULT_PORTS = new String[numberOfPorts];
+		this.OUTPUT_PORTS = new String[numberOfPorts];
 		for (int i = 0; i < numberOfPorts; i++) {
-			this.RESULT_PORTS[i] = "Reactant " + (i + 1);
-			addOutput(this.RESULT_PORTS[i], 0);
+			this.OUTPUT_PORTS[i] = "Reactant " + (i + 1);
+			addOutput(this.OUTPUT_PORTS[i], 0);
 		}
 	}
 
@@ -122,7 +122,7 @@ public class ReactionReactantSplitterActivity extends AbstractCDKActivity implem
 			for (int i = 0; i < resultList.length; i++) {
 				byte[] dataObject = CDKObjectHandler.getBytes(resultList[i]);
 				T2Reference containerRef = referenceService.register(dataObject, 0, true, context);
-				outputs.put(this.RESULT_PORTS[i], containerRef);
+				outputs.put(this.OUTPUT_PORTS[i], containerRef);
 			}
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);

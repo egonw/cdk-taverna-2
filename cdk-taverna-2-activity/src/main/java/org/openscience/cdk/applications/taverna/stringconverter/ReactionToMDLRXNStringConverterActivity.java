@@ -57,7 +57,7 @@ public class ReactionToMDLRXNStringConverterActivity extends AbstractCDKActivity
 	 */
 	public ReactionToMDLRXNStringConverterActivity() {
 		this.INPUT_PORTS = new String[] { "Reactions" };
-		this.RESULT_PORTS = new String[] { "MDL RXN String", "Not Converted" };
+		this.OUTPUT_PORTS = new String[] { "MDL RXN String", "Not Converted" };
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class ReactionToMDLRXNStringConverterActivity extends AbstractCDKActivity
 
 	@Override
 	protected void addOutputPorts() {
-		for (String name : this.RESULT_PORTS) {
+		for (String name : this.OUTPUT_PORTS) {
 			addOutput(name, 1);
 		}
 	}
@@ -106,9 +106,9 @@ public class ReactionToMDLRXNStringConverterActivity extends AbstractCDKActivity
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.CONVERTION_ERROR);
 		}
 		T2Reference containerRef = referenceService.register(rxnStringList, 1, true, context);
-		outputs.put(this.RESULT_PORTS[0], containerRef);
+		outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		containerRef = referenceService.register(notConverted, 1, true, context);
-		outputs.put(this.RESULT_PORTS[1], containerRef);
+		outputs.put(this.OUTPUT_PORTS[1], containerRef);
 		// Return results
 		return outputs;
 	}

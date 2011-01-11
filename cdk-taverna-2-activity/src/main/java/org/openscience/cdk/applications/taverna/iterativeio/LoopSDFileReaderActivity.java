@@ -62,7 +62,7 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 	 * Creates a new instance.
 	 */
 	public LoopSDFileReaderActivity() {
-		this.RESULT_PORTS = new String[] { "Structures", "State" };
+		this.OUTPUT_PORTS = new String[] { "Structures", "State" };
 	}
 
 	@Override
@@ -72,8 +72,8 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1);
-		addOutput(this.RESULT_PORTS[1], 0);
+		addOutput(this.OUTPUT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[1], 0);
 	}
 
 	@Override
@@ -154,9 +154,9 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath());
 		}
 		T2Reference reference = referenceService.register(dataList, 1, true, context);
-		outputs.put(this.RESULT_PORTS[0], reference);
+		outputs.put(this.OUTPUT_PORTS[0], reference);
 		T2Reference containerRef = referenceService.register(state, 0, true, context);
-		outputs.put(this.RESULT_PORTS[1], containerRef);
+		outputs.put(this.OUTPUT_PORTS[1], containerRef);
 		// Return results
 		return outputs;
 	}

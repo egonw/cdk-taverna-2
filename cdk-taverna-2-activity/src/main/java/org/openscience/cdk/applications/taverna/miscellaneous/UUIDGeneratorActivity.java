@@ -50,7 +50,7 @@ public class UUIDGeneratorActivity extends AbstractCDKActivity implements IFileR
 	 * Creates a new instance.
 	 */
 	public UUIDGeneratorActivity() {
-		this.RESULT_PORTS = new String[] { "UUID" };
+		this.OUTPUT_PORTS = new String[] { "UUID" };
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class UUIDGeneratorActivity extends AbstractCDKActivity implements IFileR
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 0);
+		addOutput(this.OUTPUT_PORTS[0], 0);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class UUIDGeneratorActivity extends AbstractCDKActivity implements IFileR
 		ReferenceService referenceService = context.getReferenceService();
 		this.id = UUID.randomUUID();
 		T2Reference containerRef = referenceService.register(this.id.toString(), 0, true, context);
-		outputs.put(this.RESULT_PORTS[0], containerRef);
+		outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		// Return results
 		return outputs;
 	}

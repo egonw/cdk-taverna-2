@@ -57,7 +57,7 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFi
 	 * Creates a new instance.
 	 */
 	public MDLMolFileReaderActivity() {
-		this.RESULT_PORTS = new String[] { "Structure(s)" };
+		this.OUTPUT_PORTS = new String[] { "Structure(s)" };
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFi
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 0);
+		addOutput(this.OUTPUT_PORTS[0], 0);
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFi
 		T2Reference containerRef;
 		try {
 			containerRef = referenceService.register(CDKObjectHandler.getBytesList(cmlChemFiles), 1, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);

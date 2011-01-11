@@ -32,8 +32,8 @@ import java.util.UUID;
 
 import org.openscience.cdk.applications.art2aclassification.FingerprintItem;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
+import org.openscience.cdk.applications.taverna.basicutilities.CollectionUtilities;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.basicutilities.MapUtilities;
 
 /**
  * Utility class for handling QSAR vectors.
@@ -546,7 +546,7 @@ public class QSARVectorUtility {
 				+ "%";
 		stats.add(stat);
 		stats.add("Descriptor statistics:");
-		List<Map.Entry<String, Integer>> sorted = MapUtilities.sortByValue(this.numberOfErrorsPerDescriptor);
+		List<Map.Entry<String, Integer>> sorted = CollectionUtilities.sortByValue(this.numberOfErrorsPerDescriptor);
 		for (Entry<String, Integer> entry : sorted) {
 			String key = entry.getKey();
 			Integer value = entry.getValue();

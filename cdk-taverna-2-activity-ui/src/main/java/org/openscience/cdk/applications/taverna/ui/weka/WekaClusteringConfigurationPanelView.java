@@ -55,6 +55,7 @@ public class WekaClusteringConfigurationPanelView extends JPanel {
 	private JPanel panel;
 	private JButton chooseFileButton;
 	private JTextField choosenFileTextField;
+	private JButton btnClearAll;
 
 	public WekaClusteringConfigurationPanelView() {
 		setPreferredSize(new Dimension(450, 300));
@@ -132,6 +133,9 @@ public class WekaClusteringConfigurationPanelView extends JPanel {
 		removeJobButton = new JButton("Remove Job");
 		removeJobButton.setHorizontalAlignment(SwingConstants.RIGHT);
 		southPanel.add(removeJobButton);
+		
+		btnClearAll = new JButton("Clear All");
+		southPanel.add(btnClearAll);
 	}
 
 	public JComboBox getClustererComboBox() {
@@ -160,5 +164,8 @@ public class WekaClusteringConfigurationPanelView extends JPanel {
 
 	public JTextField getChoosenFileTextField() {
 		return choosenFileTextField;
+	}
+	public JButton getBtnClearAll() {
+		return btnClearAll;
 	}
 }

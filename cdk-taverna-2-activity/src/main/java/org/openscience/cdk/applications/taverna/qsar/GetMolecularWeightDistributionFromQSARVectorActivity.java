@@ -55,7 +55,7 @@ public class GetMolecularWeightDistributionFromQSARVectorActivity extends Abstra
 	 */
 	public GetMolecularWeightDistributionFromQSARVectorActivity() {
 		this.INPUT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
-		this.RESULT_PORTS = new String[] { "MW Distribution CSV", "MW Molecule IDS CSV" };
+		this.OUTPUT_PORTS = new String[] { "MW Distribution CSV", "MW Molecule IDS CSV" };
 	}
 
 	@Override
@@ -66,8 +66,8 @@ public class GetMolecularWeightDistributionFromQSARVectorActivity extends Abstra
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1);
-		addOutput(this.RESULT_PORTS[1], 1);
+		addOutput(this.OUTPUT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[1], 1);
 	}
 
 	@Override
@@ -133,9 +133,9 @@ public class GetMolecularWeightDistributionFromQSARVectorActivity extends Abstra
 		}
 		try {
 			T2Reference containerRef = referenceService.register(weightDistributionCSV, 1, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 			containerRef = referenceService.register(molIdSWeightCSV, 1, true, context);
-			outputs.put(this.RESULT_PORTS[1], containerRef);
+			outputs.put(this.OUTPUT_PORTS[1], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);

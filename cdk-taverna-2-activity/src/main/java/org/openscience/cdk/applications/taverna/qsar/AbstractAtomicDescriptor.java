@@ -60,7 +60,7 @@ public abstract class AbstractAtomicDescriptor extends AbstractCDKActivity {
 	public AbstractAtomicDescriptor() {
 		super();
 		this.INPUT_PORTS = new String[] { "Structures", "Query Structure" };
-		this.RESULT_PORTS = new String[] { "Calculated Structures", "NOT Calculated Structures" };
+		this.OUTPUT_PORTS = new String[] { "Calculated Structures", "NOT Calculated Structures" };
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public abstract class AbstractAtomicDescriptor extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		for (String name : this.RESULT_PORTS) {
+		for (String name : this.OUTPUT_PORTS) {
 			addOutput(name, 1);
 		}
 	}
@@ -156,7 +156,7 @@ public abstract class AbstractAtomicDescriptor extends AbstractCDKActivity {
 				}
 			}
 			T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 			dataArray = new ArrayList<byte[]>();
 			if (!notCalculatedList.isEmpty()) {
 				for (CMLChemFile c : notCalculatedList) {
@@ -164,7 +164,7 @@ public abstract class AbstractAtomicDescriptor extends AbstractCDKActivity {
 				}
 			}
 			containerRef = referenceService.register(dataArray, 1, true, context);
-			outputs.put(this.RESULT_PORTS[1], containerRef);
+			outputs.put(this.OUTPUT_PORTS[1], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);

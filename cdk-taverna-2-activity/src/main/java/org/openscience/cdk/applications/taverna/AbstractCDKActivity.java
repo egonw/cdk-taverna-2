@@ -52,7 +52,7 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 	/**
 	 * Output port names.
 	 */
-	protected String[] RESULT_PORTS;
+	protected String[] OUTPUT_PORTS;
 
 	/**
 	 * Configuration bean.
@@ -165,7 +165,7 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 	 * @return Result port names/identifiers.
 	 */
 	public String[] getRESULT_PORTS() {
-		return RESULT_PORTS;
+		return OUTPUT_PORTS;
 	}
 
 }

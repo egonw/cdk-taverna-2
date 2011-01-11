@@ -56,7 +56,7 @@ public class CSVToQSARVectorActivity extends AbstractCDKActivity implements IFil
 	 * Creates a new instance.
 	 */
 	public CSVToQSARVectorActivity() {
-		this.RESULT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
+		this.OUTPUT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
 	}
 
 	@Override
@@ -66,8 +66,8 @@ public class CSVToQSARVectorActivity extends AbstractCDKActivity implements IFil
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 0);
-		addOutput(this.RESULT_PORTS[1], 0);
+		addOutput(this.OUTPUT_PORTS[0], 0);
+		addOutput(this.OUTPUT_PORTS[1], 0);
 	}
 
 	@Override
@@ -124,10 +124,10 @@ public class CSVToQSARVectorActivity extends AbstractCDKActivity implements IFil
 		try {
 			byte[] vectorData = CDKObjectHandler.getBytes(vectorMap);
 			T2Reference containerRef = referenceService.register(vectorData, 0, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 			byte[] nameData = CDKObjectHandler.getBytes(descriptorNames);
 			containerRef = referenceService.register(nameData, 0, true, context);
-			outputs.put(this.RESULT_PORTS[1], containerRef);
+			outputs.put(this.OUTPUT_PORTS[1], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);

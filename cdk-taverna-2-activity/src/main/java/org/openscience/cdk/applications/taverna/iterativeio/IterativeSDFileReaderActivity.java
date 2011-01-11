@@ -28,7 +28,7 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity implement
 	public static final String ITERATIVE_SD_FILE_READER_ACTIVITY = "Iterative SDfile Reader";
 
 	public IterativeSDFileReaderActivity() {
-		this.RESULT_PORTS = new String[] { "Structures" };
+		this.OUTPUT_PORTS = new String[] { "Structures" };
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity implement
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1, 0);
+		addOutput(this.OUTPUT_PORTS[0], 1, 0);
 	}
 
 	@Override
@@ -108,7 +108,7 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity implement
 				if (line == null || counter >= readSize) {
 					T2Reference containerRef = referenceService.register(dataList, 1, true, context);
 					outputList.add(index, containerRef);
-					outputs.put(this.RESULT_PORTS[0], containerRef);
+					outputs.put(this.OUTPUT_PORTS[0], containerRef);
 					callback.receiveResult(outputs, new int[] { index });
 					index++;
 					counter = 0;
@@ -117,7 +117,7 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity implement
 				line = lineReader.readLine();
 			} while (line != null);
 			T2Reference containerRef = referenceService.register(outputList, 1, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath(), this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath());

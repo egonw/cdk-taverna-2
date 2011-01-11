@@ -57,7 +57,7 @@ public class ART2aResultAsCSV extends AbstractCDKActivity {
 	 */
 	public ART2aResultAsCSV() {
 		this.INPUT_PORTS = new String[] { "ART-2a Files" };
-		this.RESULT_PORTS = new String[] { "ART-2a CSV" };
+		this.OUTPUT_PORTS = new String[] { "ART-2a CSV", "UUID Cluster CSV" };
 	}
 
 	@Override
@@ -67,7 +67,8 @@ public class ART2aResultAsCSV extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[1], 1);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -78,6 +79,7 @@ public class ART2aResultAsCSV extends AbstractCDKActivity {
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<String> result = new ArrayList<String>();
+		List<String> resultUUID = new ArrayList<String>();
 		List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
 				context);
 		if (files == null || files.size() == 0) {
@@ -125,6 +127,15 @@ public class ART2aResultAsCSV extends AbstractCDKActivity {
 				}
 				xmlReader.close();
 				xmlFileIO.closeXMLStreamReader();
+				// Create UUID cluster csv
+				resultUUID.add("UUID;Cluster_Number;\n");
+				int numberOfClasses = classificator.getNumberOfDetectedClasses();
+				for (int i = 0; i < numberOfClasses; i++) {
+					List<Object> items = classificator.getCorrespondingObjectsOfClass(i);
+					for (Object item : items) {
+						resultUUID.add((String) item + ";" + i + ";");
+					}
+				}
 			}
 			buffer = new StringBuffer();
 			buffer.append(result.get(0));
@@ -136,7 +147,9 @@ public class ART2aResultAsCSV extends AbstractCDKActivity {
 			result.set(0, buffer.toString());
 
 			T2Reference containerRef = referenceService.register(result, 1, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
+			containerRef = referenceService.register(resultUUID, 1, true, context);
+			outputs.put(this.OUTPUT_PORTS[1], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_ART2A_RESULT_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_ART2A_RESULT_ERROR);

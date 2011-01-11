@@ -34,7 +34,7 @@ import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
-import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
@@ -92,15 +92,10 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 		Instances dataset = null;
 		Clusterer clusterer = null;
 		ChartTool chartTool = new ChartTool();
-		chartTool.setBarChartHeight(450);
-		chartTool.setBarChartWidth(750);
-		chartTool.setPlotOrientation(PlotOrientation.VERTICAL);
-		chartTool.setDescriptionXAxis("(Class number/Number of Vectors)");
-		chartTool.setDescriptionYAxis("Number of vectors");
-		chartTool.setRenderXAxisDescriptionDiagonal(true);
-		ArrayList<File> tempFileList = new ArrayList<File>();
+		ArrayList<JFreeChart> charts = null;
 		WekaTools tools = new WekaTools();
 		for (int i = 2; i < files.size(); i++) { // The first two file are data files
+			charts = new ArrayList<JFreeChart>();
 			try {
 				// Load clusterer
 				clusterer = (Clusterer) SerializationHelper.read(files.get(i));
@@ -116,6 +111,9 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 			}
 			try {
 				String row = "Number of vectors in class";
+				String name = clusterer.getClass().getSimpleName();
+				String options = tools.getOptionsFromFile(new File(files.get(i)), name);
+				int jobID = tools.getIDFromOptions(options);
 				int[] numberOfVectorsInClass = new int[clusterer.numberOfClusters()];
 				for (int j = 0; j < dataset.numInstances(); j++) {
 					numberOfVectorsInClass[clusterer.clusterInstance(dataset.instance(j))]++;
@@ -125,7 +123,8 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 					String column = "(" + (j + 1) + "/" + numberOfVectorsInClass[j] + ")";
 					chartDataSet.addValue(numberOfVectorsInClass[j], row, column);
 				}
-				tempFileList.add(chartTool.exportToBarChart(chartDataSet, "Weka Clustering Result"));
+				charts.add(chartTool.createBarChart(name + " - JobID: " + jobID, "(Class number/Number of Vectors)",
+						"Number of vectors", chartDataSet));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -134,10 +133,8 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 				String name = clusterer.getClass().getSimpleName();
 				file = FileNameGenerator.getNewFile(file.getParent(), ".pdf", name
 						+ tools.getOptionsFromFile(new File(files.get(i)), name) + "-Result");
-				chartTool.setPdfPageInPortrait(false);
-
 				pdfTitle.add("Weka " + clusterer.getClass().getSimpleName() + " Clustering Result");
-				chartTool.exportToChartsToPDF(tempFileList, file, pdfTitle);
+				chartTool.writeChartAsPDF(file, charts);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

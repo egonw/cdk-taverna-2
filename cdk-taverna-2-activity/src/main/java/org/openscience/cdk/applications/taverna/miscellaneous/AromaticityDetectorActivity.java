@@ -55,7 +55,7 @@ public class AromaticityDetectorActivity extends AbstractCDKActivity {
 	 */
 	public AromaticityDetectorActivity() {
 		this.INPUT_PORTS = new String[] { "Structures", };
-		this.RESULT_PORTS = new String[] { "Aromatic Structures", "NON Aromatic Structures", "All Modified Structures" };
+		this.OUTPUT_PORTS = new String[] { "Aromatic Structures", "NON Aromatic Structures", "All Modified Structures" };
 	}
 
 	@Override
@@ -65,9 +65,9 @@ public class AromaticityDetectorActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1);
-		addOutput(this.RESULT_PORTS[1], 1);
-		addOutput(this.RESULT_PORTS[2], 1);
+		addOutput(this.OUTPUT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[1], 1);
+		addOutput(this.OUTPUT_PORTS[2], 1);
 	}
 
 	@Override
@@ -136,11 +136,11 @@ public class AromaticityDetectorActivity extends AbstractCDKActivity {
 		try {
 			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(aromaticMoleculesList), 1, true,
 					context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 			containerRef = referenceService.register(CDKObjectHandler.getBytesList(nonAromaticMoleculesList), 1, true, context);
-			outputs.put(this.RESULT_PORTS[1], containerRef);
+			outputs.put(this.OUTPUT_PORTS[1], containerRef);
 			containerRef = referenceService.register(CDKObjectHandler.getBytesList(allMoleculesList), 1, true, context);
-			outputs.put(this.RESULT_PORTS[2], containerRef);
+			outputs.put(this.OUTPUT_PORTS[2], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR,
 					this.getConfiguration().getActivityName(), e);

@@ -35,7 +35,7 @@ import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
-import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.openscience.cdk.applications.art2aclassification.Art2aClassificator;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
@@ -78,7 +78,6 @@ public class ART2aResultAsPDF extends AbstractCDKActivity {
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
 		List<String> resultFileNames = new ArrayList<String>();
-		List<String> pdfTitle = new ArrayList<String>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
@@ -92,22 +91,16 @@ public class ART2aResultAsPDF extends AbstractCDKActivity {
 			Art2aClassificator classificator;
 			XMLFileIO xmlFileIO = new XMLFileIO();
 			ChartTool chartTool = new ChartTool();
-			chartTool.setBarChartHeight(450);
-			chartTool.setBarChartWidth(750);
-			chartTool.setPlotOrientation(PlotOrientation.VERTICAL);
-			chartTool.setDescriptionXAxis("(Class number/Number of Vectors/Interangle)");
-			chartTool.setDescriptionYAxis("Number of vectors");
-			chartTool.setRenderXAxisDescriptionDiagonal(true);
 			int classNumberWithMaxOfVectors = 0;
 			int maxVectorsInClass = 0;
-			ArrayList<File> tempFileList = new ArrayList<File>();
+			ArrayList<JFreeChart> charts = new ArrayList<JFreeChart>();
 			TreeMap<Double, Integer> treeMap = new TreeMap<Double, Integer>();
 			Map.Entry<Double, Integer> entry;
 			DefaultCategoryDataset dataSet;
 			String numberOfVectorsInClass = "Number of vectors in class";
-			pdfTitle.add("This file contains charts from the ART2A Classification");
-			pdfTitle.add("The header of each chart contains the following informations; ");
-			pdfTitle.add("(Filename/Vigilance Parameter/Number of detected classes/Number of epochs)");
+			// pdfTitle.add("This file contains charts from the ART2A Classification");
+			// pdfTitle.add("The header of each chart contains the following informations; ");
+			// pdfTitle.add("(Filename/Vigilance Parameter/Number of detected classes/Number of epochs)");
 			for (String fileName : files) {
 				xmlReader = xmlFileIO.getXMLStreamReaderWithCompression(fileName);
 				xmlReader.next();
@@ -150,12 +143,12 @@ public class ART2aResultAsPDF extends AbstractCDKActivity {
 				buffer.append("/");
 				buffer.append(classificator.getNumberOfEpochs());
 				buffer.append(")");
-				tempFileList.add(chartTool.exportToBarChart(dataSet, buffer.toString()));
+				charts.add(chartTool.createBarChart(buffer.toString(), "(Class number/Number Of Vectors/Interangle)",
+						"Number Of Vectors", dataSet));
 			}
 			File file = new File(files.get(0));
 			file = FileNameGenerator.getNewFile(file.getParent(), ".pdf", "Art2aClassificationResult");
-			chartTool.setPdfPageInPortrait(false);
-			chartTool.exportToChartsToPDF(tempFileList, file, pdfTitle);
+			chartTool.writeChartAsPDF(file, charts);
 			resultFileNames.add(file.getAbsolutePath());
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_ART2A_RESULT_ERROR, this.getActivityName(), e);

@@ -55,7 +55,7 @@ public class MergeQSARVectorsActivity extends AbstractCDKActivity implements IPo
 	 */
 	public MergeQSARVectorsActivity() {
 		this.INPUT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names", "Name" };
-		this.RESULT_PORTS = new String[] { "Merged Descriptor Vector", "Merged Descriptor Names", "Relations Table" };
+		this.OUTPUT_PORTS = new String[] { "Merged Descriptor Vector", "Merged Descriptor Names", "Relations Table" };
 	}
 
 	@Override
@@ -70,9 +70,9 @@ public class MergeQSARVectorsActivity extends AbstractCDKActivity implements IPo
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 0);
-		addOutput(this.RESULT_PORTS[1], 0);
-		addOutput(this.RESULT_PORTS[2], 1);
+		addOutput(this.OUTPUT_PORTS[0], 0);
+		addOutput(this.OUTPUT_PORTS[1], 0);
+		addOutput(this.OUTPUT_PORTS[2], 1);
 	}
 
 	@Override
@@ -132,12 +132,12 @@ public class MergeQSARVectorsActivity extends AbstractCDKActivity implements IPo
 		try {
 			byte[] vectorData = CDKObjectHandler.getBytes(mergedVectorMap);
 			T2Reference containerRef = referenceService.register(vectorData, 0, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 			byte[] nameData = CDKObjectHandler.getBytes(mergedDescriptorNames);
 			containerRef = referenceService.register(nameData, 0, true, context);
-			outputs.put(this.RESULT_PORTS[1], containerRef);
+			outputs.put(this.OUTPUT_PORTS[1], containerRef);
 			containerRef = referenceService.register(idTable, 1, true, context);
-			outputs.put(this.RESULT_PORTS[2], containerRef);
+			outputs.put(this.OUTPUT_PORTS[2], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);

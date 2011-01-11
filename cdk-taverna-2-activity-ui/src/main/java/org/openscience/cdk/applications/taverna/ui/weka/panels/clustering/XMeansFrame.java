@@ -25,16 +25,19 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SpringLayout;
 import javax.swing.UIManager;
 
+import org.openscience.cdk.applications.taverna.ui.weka.WekaClusteringConfigurationPanelController;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractConfigurationFrame;
 
 import weka.clusterers.Clusterer;
 import weka.clusterers.XMeans;
+import javax.swing.SwingConstants;
 
 /**
  * XMeans clusterer configuration frame.
@@ -51,51 +54,55 @@ public class XMeansFrame extends AbstractConfigurationFrame {
 	private final JTextPane txtpnMaximumImprove = new JTextPane();
 	private final JTextPane txtpnMaximumNumberOf_1 = new JTextPane();
 	private final JTextField iterationsImproveStrucureTextField = new JTextField();
-	private final JLabel lblMinimumNumberOf = new JLabel("Minimum number of clusters:");
-	private final JTextField clustersMinimumTextField = new JTextField();
-	private final JLabel lblMaximumNumberOf = new JLabel("Maximum number of clusters:");
-	private final JTextField clustersMaximumTextField = new JTextField();
+	private final JLabel lblNumberOfClusters = new JLabel(" Number of Clusters:");
+	private final JTextField minNumberOfClustersTextField = new JTextField();
+	private final JTextField maxNumberOfClustersTextField = new JTextField();
+	private final JLabel label = new JLabel("-");
 
 	public XMeansFrame() {
-		clustersMaximumTextField.setText("4");
-		clustersMaximumTextField.setColumns(10);
-		clustersMinimumTextField.setText("2");
-		clustersMinimumTextField.setColumns(10);
+		maxNumberOfClustersTextField.setText("10");
+		maxNumberOfClustersTextField.setColumns(10);
+		minNumberOfClustersTextField.setText("2");
+		minNumberOfClustersTextField.setColumns(10);
 		iterationsImproveStrucureTextField.setText("1000");
 		iterationsImproveStrucureTextField.setColumns(10);
 		iterationsImproveParametersTextField.setText("1000");
 		iterationsImproveParametersTextField.setColumns(10);
-		setSize(new Dimension(350, 255));
+		setSize(new Dimension(350, 226));
 		iterationsOverallTextField.setText("1");
 		iterationsOverallTextField.setColumns(10);
 
 		JPanel configurationPanel = new JPanel();
 		getContentPane().add(configurationPanel, BorderLayout.CENTER);
 		SpringLayout sl_configurationPanel = new SpringLayout();
+		sl_configurationPanel.putConstraint(SpringLayout.NORTH, label, 9, SpringLayout.SOUTH, iterationsImproveStrucureTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.WEST, label, 0, SpringLayout.EAST, minNumberOfClustersTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.EAST, label, 0, SpringLayout.WEST, maxNumberOfClustersTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.NORTH, maxNumberOfClustersTextField, 6, SpringLayout.SOUTH,
+				iterationsImproveStrucureTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.WEST, maxNumberOfClustersTextField, 22, SpringLayout.EAST,
+				minNumberOfClustersTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.EAST, maxNumberOfClustersTextField, -10, SpringLayout.EAST,
+				configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.NORTH, lblNumberOfClusters, 3, SpringLayout.NORTH,
+				minNumberOfClustersTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.WEST, lblNumberOfClusters, 0, SpringLayout.WEST, txtpnMaximumNumberOf);
+		sl_configurationPanel.putConstraint(SpringLayout.NORTH, minNumberOfClustersTextField, 6, SpringLayout.SOUTH,
+				iterationsImproveStrucureTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.WEST, minNumberOfClustersTextField, -96, SpringLayout.EAST,
+				configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.EAST, minNumberOfClustersTextField, -64, SpringLayout.EAST,
+				configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.NORTH, iterationsImproveStrucureTextField, 34, SpringLayout.SOUTH,
+				iterationsImproveParametersTextField);
 		sl_configurationPanel.putConstraint(SpringLayout.NORTH, txtpnMaximumNumberOf_1, 6, SpringLayout.SOUTH,
 				txtpnMaximumImprove);
-		sl_configurationPanel.putConstraint(SpringLayout.NORTH, clustersMinimumTextField, 125, SpringLayout.NORTH,
-				configurationPanel);
-		sl_configurationPanel.putConstraint(SpringLayout.SOUTH, lblMinimumNumberOf, -12, SpringLayout.NORTH, lblMaximumNumberOf);
-		sl_configurationPanel.putConstraint(SpringLayout.SOUTH, iterationsImproveStrucureTextField, -6, SpringLayout.NORTH,
-				clustersMinimumTextField);
 		sl_configurationPanel
 				.putConstraint(SpringLayout.WEST, txtpnMaximumNumberOf_1, 0, SpringLayout.WEST, txtpnMaximumNumberOf);
 		sl_configurationPanel.putConstraint(SpringLayout.SOUTH, txtpnMaximumNumberOf_1, 0, SpringLayout.SOUTH,
 				iterationsImproveStrucureTextField);
 		sl_configurationPanel.putConstraint(SpringLayout.EAST, txtpnMaximumNumberOf_1, -6, SpringLayout.WEST,
 				iterationsImproveStrucureTextField);
-		sl_configurationPanel.putConstraint(SpringLayout.WEST, lblMaximumNumberOf, 2, SpringLayout.WEST, txtpnMaximumNumberOf);
-		sl_configurationPanel.putConstraint(SpringLayout.SOUTH, lblMaximumNumberOf, 0, SpringLayout.SOUTH,
-				clustersMaximumTextField);
-		sl_configurationPanel.putConstraint(SpringLayout.NORTH, clustersMaximumTextField, 6, SpringLayout.SOUTH,
-				clustersMinimumTextField);
-		sl_configurationPanel.putConstraint(SpringLayout.EAST, clustersMaximumTextField, 0, SpringLayout.EAST,
-				iterationsOverallTextField);
-		sl_configurationPanel.putConstraint(SpringLayout.WEST, lblMinimumNumberOf, 2, SpringLayout.WEST, txtpnMaximumNumberOf);
-		sl_configurationPanel.putConstraint(SpringLayout.EAST, lblMinimumNumberOf, 0, SpringLayout.EAST, txtpnMaximumNumberOf);
-		sl_configurationPanel.putConstraint(SpringLayout.WEST, clustersMinimumTextField, 0, SpringLayout.WEST,
-				iterationsOverallTextField);
 		sl_configurationPanel.putConstraint(SpringLayout.WEST, iterationsImproveStrucureTextField, 0, SpringLayout.WEST,
 				iterationsOverallTextField);
 		sl_configurationPanel.putConstraint(SpringLayout.WEST, txtpnMaximumImprove, 10, SpringLayout.WEST, configurationPanel);
@@ -145,18 +152,15 @@ public class XMeansFrame extends AbstractConfigurationFrame {
 		{
 			configurationPanel.add(iterationsImproveStrucureTextField);
 		}
-		{
-			configurationPanel.add(lblMinimumNumberOf);
-		}
-		{
-			configurationPanel.add(clustersMinimumTextField);
-		}
-		{
-			configurationPanel.add(lblMaximumNumberOf);
-		}
-		{
-			configurationPanel.add(clustersMaximumTextField);
-		}
+
+		configurationPanel.add(lblNumberOfClusters);
+
+		configurationPanel.add(minNumberOfClustersTextField);
+
+		configurationPanel.add(maxNumberOfClustersTextField);
+		label.setHorizontalAlignment(SwingConstants.CENTER);
+
+		configurationPanel.add(label);
 	}
 
 	@Override
@@ -165,18 +169,27 @@ public class XMeansFrame extends AbstractConfigurationFrame {
 	}
 
 	@Override
-	public String[] getOptions() {
-		String[] options = new String[10];
-		options[0] = "-I";
-		options[1] = this.iterationsOverallTextField.getText();
-		options[2] = "-M";
-		options[3] = this.iterationsImproveParametersTextField.getText();
-		options[4] = "-J";
-		options[5] = this.iterationsImproveStrucureTextField.getText();
-		options[6] = "-L";
-		options[7] = this.clustersMinimumTextField.getText();
-		options[8] = "-H";
-		options[9] = this.clustersMaximumTextField.getText();
+	public String[][] getOptions() {
+		int min = Integer.parseInt(this.minNumberOfClustersTextField.getText());
+		int max = Integer.parseInt(this.maxNumberOfClustersTextField.getText());
+		int numberOfJobs = max - min + 1;
+		int id = WekaClusteringConfigurationPanelController.getJobID();
+		String[][] options = new String[numberOfJobs][];
+		for (int i = 0; i < numberOfJobs; i++) {
+			options[i] = new String[12];
+			options[i][0] = "-I";
+			options[i][1] = this.iterationsOverallTextField.getText();
+			options[i][2] = "-M";
+			options[i][3] = this.iterationsImproveParametersTextField.getText();
+			options[i][4] = "-J";
+			options[i][5] = this.iterationsImproveStrucureTextField.getText();
+			options[i][6] = "-L";
+			options[i][7] = "" + (min + i);
+			options[i][8] = "-H";
+			options[i][9] = "" + (min + i);
+			options[i][10] = "-ID";
+			options[i][11] = "" + id;
+		}
 		return options;
 	}
 
@@ -187,19 +200,24 @@ public class XMeansFrame extends AbstractConfigurationFrame {
 
 	@Override
 	public boolean checkValues() {
-		if (this.checkTextFieldValueInt("Maximum number of overall iterations", this.iterationsOverallTextField, 1,
-				Integer.MAX_VALUE)
-				&& this.checkTextFieldValueInt("Maximum number of iterations in the kMeans loop in the Improve-Parameter part",
-						this.iterationsImproveParametersTextField, 1, Integer.MAX_VALUE)
-				&& this.checkTextFieldValueInt(
-						"Maximum number of iterations in the kMeans loop for the splitted centroids in the Improve-Structure part",
-						this.iterationsImproveParametersTextField, 1, Integer.MAX_VALUE)
-				&& this.checkTextFieldValueInt("Minimum number of clusters", this.iterationsImproveParametersTextField, 1,
+		if (!this.checkTextFieldValueInt("Min number of clusters", this.minNumberOfClustersTextField, 2, Integer.MAX_VALUE)
+				|| !this.checkTextFieldValueInt("Max number of clusters", this.maxNumberOfClustersTextField, 2, Integer.MAX_VALUE)
+				|| !this.checkTextFieldValueInt("Maximum number of overall iterations", this.iterationsOverallTextField, 1,
 						Integer.MAX_VALUE)
-				&& this.checkTextFieldValueInt("Maximum number of clusters", this.iterationsImproveParametersTextField, 1,
-						Integer.MAX_VALUE)) {
-			return true;
+				|| !this.checkTextFieldValueInt("Maximum number of iterations in the kMeans loop in the Improve-Parameter part",
+						this.iterationsImproveParametersTextField, 1, Integer.MAX_VALUE)
+				|| !this.checkTextFieldValueInt(
+						"Maximum number of iterations in the kMeans loop for the splitted centroids in the Improve-Structure part",
+						this.iterationsImproveParametersTextField, 1, Integer.MAX_VALUE)) {
+			return false;
 		}
-		return false;
+		int min = Integer.parseInt(this.minNumberOfClustersTextField.getText());
+		int max = Integer.parseInt(this.maxNumberOfClustersTextField.getText());
+		if (max < min) {
+			JOptionPane.showMessageDialog(this, "Max number of clusters has to be greater or equal than the min number!",
+					"Illegal Argument", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		return true;
 	}
 }

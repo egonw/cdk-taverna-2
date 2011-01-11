@@ -4,6 +4,7 @@
  * $Revision:  $
  * 
  * Copyright (C) 2008 by Thomas Kuhn <thomaskuhn@users.sourceforge.net>
+ * Copyright (C) 2010-11 by Andreas Truszkowski<atruszkowski@gmx.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -35,6 +36,7 @@ import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 import org.openscience.cdk.applications.art2aclassification.FingerprintItem;
+import org.openscience.cdk.applications.taverna.CDKTavernaException;
 
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
@@ -48,7 +50,7 @@ import weka.filters.unsupervised.attribute.Remove;
 /**
  * Class which provides general methods for using the WEKA library
  * 
- * @author Thomas Kuhn
+ * @author Thomas Kuhn, Andreas Truzskowski
  */
 public class WekaTools {
 
@@ -188,6 +190,16 @@ public class WekaTools {
 		return removeFilter;
 	}
 
+	/**
+	 * Generates a silhouette plot.
+	 * 
+	 * @param dataset
+	 *            The clustering data set
+	 * @param clusterer
+	 *            Weka clusterer model
+	 * @return
+	 * @throws Exception
+	 */
 	public double[][] generateSilhouettePlot(Instances dataset, Clusterer clusterer) throws Exception {
 		HashMap<Integer, List<Vector>> vectorMap = new HashMap<Integer, List<Vector>>();
 		HashMap<Vector, Instance> vectorToInstanceMap = new HashMap<Vector, Instance>();
@@ -235,14 +247,21 @@ public class WekaTools {
 			b[j] = new double[vectorOne.size()];
 			s[j] = new double[vectorOne.size()];
 			for (int k = 0; k < vectorOne.size(); k++) {
-				int nearestCluster = this.getNearestCluster(j, clusterer.distributionForInstance(vectorToInstanceMap
-						.get(vectorOne.get(k))));
-				List<Vector> vectorTwo = vectorMap.get(nearestCluster);
-				for (int l = 0; l < vectorTwo.size(); l++) {
-					Vector result = vectorOne.get(k).subtraction(vectorTwo.get(l));
-					b[j][k] += result.length();
+				double[][] tempResult = new double[clusterer.numberOfClusters()][];
+				for (int l = 0; l < clusterer.numberOfClusters(); l++) {
+					if (l == j) {
+						continue;
+					}
+					List<Vector> vectorTwo = vectorMap.get(l);
+					tempResult[l] = new double[vectorOne.size()];
+					for (int m = 0; m < vectorTwo.size(); m++) {
+						Vector result = vectorOne.get(k).subtraction(vectorTwo.get(m));
+						tempResult[l][k] += result.length();
+					}
+					tempResult[l][k] /= numberOfVectorsInClass[l];
 				}
-				b[j][k] /= numberOfVectorsInClass[nearestCluster];
+				int nearestCluster = this.getNearestCluster(j, tempResult);
+				b[j] = tempResult[nearestCluster];
 				// Calculate silhouette width
 				if (a[j][k] < b[j][k]) {
 					s[j][k] = 1 - a[j][k] / b[j][k];
@@ -256,24 +275,47 @@ public class WekaTools {
 	}
 
 	/**
+	 * Calculates the mean of given silhouette.
+	 * 
+	 * @param silhouette
+	 * @return The mean
+	 */
+	public double calculateSilhouetteMean(double[][] silhouette) {
+		int n = 0;
+		double value = 0;
+		for (int i = 0; i < silhouette.length; i++) {
+			for (int j = 0; j < silhouette[i].length; j++) {
+				value += silhouette[i][j];
+				n++;
+			}
+		}
+		return value / n;
+	}
+
+	/**
 	 * Determines the nearest cluster.
 	 * 
-	 * @param cluster
-	 *            Current cluster
-	 * @param distribution
-	 *            Likelihood distribution of the cluster membership.
 	 * @return Nearest cluster.
 	 */
-	private int getNearestCluster(int cluster, double[] distribution) {
-		int nearestCluster;
-		if (cluster == 0) {
-			nearestCluster = 1;
-		} else {
-			nearestCluster = 0;
-		}
-		for (int i = 0; i < distribution.length; i++) {
-			if (i != cluster) {
-				if (distribution[nearestCluster] < distribution[i]) {
+	private int getNearestCluster(int currentCluster, double[][] values) {
+		double min = 0;
+		int nearestCluster = 0;
+		boolean first = true;
+		for (int i = 0; i < values.length; i++) {
+			if (i == currentCluster) {
+				continue;
+			}
+			double temp = 0;
+			for (int j = 0; j < values[i].length; j++) {
+				temp += values[i][j];
+			}
+			if (first) {
+				min = temp;
+				nearestCluster = i;
+				first = false;
+			} else {
+				if (temp < min) {
+					min = temp;
 					nearestCluster = i;
 				}
 			}
@@ -281,6 +323,13 @@ public class WekaTools {
 		return nearestCluster;
 	}
 
+	/**
+	 * Extracts the options from given weka result file.
+	 * 
+	 * @param file
+	 * @param clustererName
+	 * @return Options string
+	 */
 	public String getOptionsFromFile(File file, String clustererName) {
 		String name = file.getName();
 		String[] parts = name.split("_");
@@ -290,6 +339,22 @@ public class WekaTools {
 			}
 		}
 		return "";
+	}
 
+	/**
+	 * Extracts the job ID from options String.
+	 * 
+	 * @param options
+	 * @return The ID
+	 * @throws CDKTavernaException
+	 */
+	public int getIDFromOptions(String options) throws CDKTavernaException {
+		String[] splitted = options.split("-");
+		for (String frag : splitted) {
+			if (frag.startsWith("ID")) {
+				return Integer.parseInt(frag.replace("ID", ""));
+			}
+		}
+		throw new CDKTavernaException("WekaTools", CDKTavernaException.CLUSTER_MODEL_HAS_NO_ID);
 	}
 }

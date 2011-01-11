@@ -46,12 +46,12 @@ public class ExtractClusteringStatisticsActivityTest extends CDKTavernaTestCases
 
 	private CDKActivityConfigurationBean configBean;
 
-	private AbstractCDKActivity wekaActivity = new ExtractClusteringStatisticsActivity();
+	private AbstractCDKActivity wekaActivity = new ExtractClusteringResultAsCSVActivity();
 	private ArrayList<String> files = new ArrayList<String>();
 	private File dir = null;
 
 	public ExtractClusteringStatisticsActivityTest() {
-		super(ExtractClusteringStatisticsActivity.EXTRACT_CLUSTERING_RESULT_AS_PDF_ACTIVITY);
+		super(ExtractClusteringResultAsCSVActivity.EXTRACT_CLUSTERING_RESULT_AS_CSV_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {

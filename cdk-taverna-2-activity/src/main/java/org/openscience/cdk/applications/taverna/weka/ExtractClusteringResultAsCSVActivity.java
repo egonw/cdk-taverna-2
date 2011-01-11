@@ -25,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,7 @@ import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
 import weka.clusterers.ClusterEvaluation;
 import weka.clusterers.Clusterer;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
 import weka.filters.Filter;
@@ -53,15 +55,16 @@ import weka.filters.Filter;
  * @author Andreas Truzskowski
  * 
  */
-public class ExtractClusteringStatisticsActivity extends AbstractCDKActivity {
+public class ExtractClusteringResultAsCSVActivity extends AbstractCDKActivity {
 
-	public static final String EXTRACT_CLUSTERING_RESULT_AS_PDF_ACTIVITY = "Extract Clustering Statistics";
+	public static final String EXTRACT_CLUSTERING_RESULT_AS_CSV_ACTIVITY = "Extract Clustering As CSV";
 
 	/**
 	 * Creates a new instance.
 	 */
-	public ExtractClusteringStatisticsActivity() {
+	public ExtractClusteringResultAsCSVActivity() {
 		this.INPUT_PORTS = new String[] { "Weka Clustering Files" };
+		this.OUTPUT_PORTS = new String[] { "Result Files" };
 	}
 
 	@Override
@@ -71,7 +74,7 @@ public class ExtractClusteringStatisticsActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		// empty
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -86,7 +89,9 @@ public class ExtractClusteringStatisticsActivity extends AbstractCDKActivity {
 		if (files == null || files.isEmpty()) {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_CLUSTERING_DATA_AVAILABLE);
 		}
+		ArrayList<String> resultFiles = new ArrayList<String>();
 		Instances dataset = null;
+		Instances uuids = null;
 		Clusterer clusterer = null;
 		WekaTools tools = new WekaTools();
 		for (int i = 2; i < files.size(); i++) { // The first two files are data files
@@ -97,6 +102,7 @@ public class ExtractClusteringStatisticsActivity extends AbstractCDKActivity {
 				BufferedReader buffReader = new BufferedReader(new FileReader(files.get(0)));
 				dataset = new Instances(buffReader);
 				buffReader.close();
+				uuids = Filter.useFilter(dataset, tools.getIDGetter(dataset));
 				dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			} catch (Exception e) {
 				ErrorLogger.getInstance()
@@ -104,15 +110,30 @@ public class ExtractClusteringStatisticsActivity extends AbstractCDKActivity {
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR);
 			}
 			try {
+				// Write statistics file.
 				ClusterEvaluation eval = new ClusterEvaluation();
 				eval.setClusterer(clusterer);
 				eval.evaluateClusterer(dataset);
 				String path = new File(files.get(0)).getParent();
 				String name = clusterer.getClass().getSimpleName();
-				File directory = FileNameGenerator.getNewFile(path, ".txt", name
+				File resultFile = FileNameGenerator.getNewFile(path, ".txt", name
 						+ tools.getOptionsFromFile(new File(files.get(i)), name) + "_ClusteringStats");
-				PrintWriter writer = new PrintWriter(directory);
+				PrintWriter writer = new PrintWriter(resultFile);
+				resultFiles.add(resultFile.getPath());
 				writer.write(eval.clusterResultsToString());
+				writer.close();
+				// Write UUID-Cluster CSV file
+				resultFile = FileNameGenerator.getNewFile(path, ".csv", name
+						+ tools.getOptionsFromFile(new File(files.get(i)), name) + "_UUIDCluster");
+				writer = new PrintWriter(resultFile);
+				resultFiles.add(resultFile.getPath());
+				writer.write("UUID;Cluster_Number;\n");
+				for (int j = 0; j < dataset.numInstances(); j++) {
+					Instance instance = dataset.instance(j);
+					int cluster = clusterer.clusterInstance(instance);
+					String uuid = uuids.instance(j).stringValue(0);
+					writer.write(uuid + ";" + cluster + ";\n");
+				}
 				writer.close();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -123,7 +144,7 @@ public class ExtractClusteringStatisticsActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getActivityName() {
-		return ExtractClusteringStatisticsActivity.EXTRACT_CLUSTERING_RESULT_AS_PDF_ACTIVITY;
+		return ExtractClusteringResultAsCSVActivity.EXTRACT_CLUSTERING_RESULT_AS_CSV_ACTIVITY;
 	}
 
 	@Override
@@ -134,7 +155,7 @@ public class ExtractClusteringStatisticsActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getDescription() {
-		return "Description: " + ExtractClusteringStatisticsActivity.EXTRACT_CLUSTERING_RESULT_AS_PDF_ACTIVITY;
+		return "Description: " + ExtractClusteringResultAsCSVActivity.EXTRACT_CLUSTERING_RESULT_AS_CSV_ACTIVITY;
 	}
 
 	@Override

@@ -62,7 +62,7 @@ public class RuleOfFiveFilter extends AbstractCDKActivity {
 
 	public RuleOfFiveFilter() {
 		this.INPUT_PORTS = new String[] { "Structures" };
-		this.RESULT_PORTS = new String[] { "matchingStructures", "otherStructures" };
+		this.OUTPUT_PORTS = new String[] { "matchingStructures", "otherStructures" };
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public class RuleOfFiveFilter extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		for (String name : this.RESULT_PORTS) {
+		for (String name : this.OUTPUT_PORTS) {
 			addOutput(name, 1);
 		}
 	}
@@ -144,10 +144,10 @@ public class RuleOfFiveFilter extends AbstractCDKActivity {
 		try {
 			dataArray = CDKObjectHandler.getBytesList(matchedList);
 			T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
-			outputs.put(this.RESULT_PORTS[0], containerRef);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 			dataArray = CDKObjectHandler.getBytesList(unmatchedList);
 			containerRef = referenceService.register(dataArray, 1, true, context);
-			outputs.put(this.RESULT_PORTS[1], containerRef);
+			outputs.put(this.OUTPUT_PORTS[1], containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");

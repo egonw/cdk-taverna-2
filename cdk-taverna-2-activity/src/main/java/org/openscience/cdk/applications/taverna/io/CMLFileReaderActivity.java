@@ -57,7 +57,7 @@ public class CMLFileReaderActivity extends AbstractCDKActivity implements IFileR
 	 * Creates a new instance.
 	 */
 	public CMLFileReaderActivity() {
-		this.RESULT_PORTS = new String[] { "Structures" };
+		this.OUTPUT_PORTS = new String[] { "Structures" };
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class CMLFileReaderActivity extends AbstractCDKActivity implements IFileR
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public class CMLFileReaderActivity extends AbstractCDKActivity implements IFileR
 			}
 		}
 		T2Reference containerRef = referenceService.register(dataList, 1, true, context);
-		outputs.put(this.RESULT_PORTS[0], containerRef);
+		outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		// Return results
 		return outputs;
 	}

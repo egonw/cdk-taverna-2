@@ -100,7 +100,7 @@ public class ART2aClassificationActivity extends AbstractCDKActivity {
 	 */
 	public ART2aClassificationActivity() {
 		this.INPUT_PORTS = new String[] { "Fingerprint Items" };
-		this.RESULT_PORTS = new String[] { "ART-2a Files" };
+		this.OUTPUT_PORTS = new String[] { "ART-2a Files" };
 	}
 
 	@Override
@@ -110,7 +110,7 @@ public class ART2aClassificationActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.RESULT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -198,7 +198,7 @@ public class ART2aClassificationActivity extends AbstractCDKActivity {
 			}
 		}
 		T2Reference containerRef = referenceService.register(resultFiles, 1, true, context);
-		outputs.put(this.RESULT_PORTS[0], containerRef);
+		outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		return outputs;
 	}
 

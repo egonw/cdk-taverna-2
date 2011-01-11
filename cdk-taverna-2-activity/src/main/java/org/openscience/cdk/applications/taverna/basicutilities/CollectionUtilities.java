@@ -13,7 +13,29 @@ import java.util.Map.Entry;
  * @author Andreas Truszkowski
  * 
  */
-public class MapUtilities {
+public class CollectionUtilities {
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public synchronized static void sortTwoLists(List<Integer> queryList, List secondList) {
+		if (queryList.size() != secondList.size()) {
+			throw new IllegalArgumentException("The lists have to be of equal size!");
+		}
+		int n = queryList.size();
+		for (int i = 0; i < n; i++) {
+			for (int j = n - 1; j > i; j--) {
+				int one = ((Number) queryList.get(j - 1)).intValue();
+				int two = ((Number) queryList.get(j)).intValue();
+				if (one > two) {
+					queryList.set(j - 1, two);
+					queryList.set(j, one);
+
+					Object temp = secondList.get(j - 1);
+					secondList.set(j - 1, secondList.get(j));
+					secondList.set(j, temp);
+				}
+			}
+		}
+	}
 
 	/**
 	 * Returns a sorted entry set of given map.

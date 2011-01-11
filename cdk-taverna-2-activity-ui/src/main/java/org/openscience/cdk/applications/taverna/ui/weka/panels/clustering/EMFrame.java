@@ -25,16 +25,19 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SpringLayout;
 import javax.swing.UIManager;
 
+import org.openscience.cdk.applications.taverna.ui.weka.WekaClusteringConfigurationPanelController;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractConfigurationFrame;
 
 import weka.clusterers.Clusterer;
 import weka.clusterers.EM;
+import javax.swing.SwingConstants;
 
 /**
  * EM clusterer configuration frame.
@@ -46,24 +49,49 @@ public class EMFrame extends AbstractConfigurationFrame {
 
 	private static final long serialVersionUID = 3225727167693843163L;
 	private final JLabel numberOfClustersLabel = new JLabel(" Number of clusters:");
-	private final JTextField numberOfClustersTextField = new JTextField();
+	private final JTextField minNumberOfClustersTextField = new JTextField();
 	private final JTextField numberOfIterationsTextField = new JTextField();
 	private final JLabel lblNumberOfIterations = new JLabel(" Number of iterations:");
 	private final JTextPane txtpnMinimumAllowableStandard = new JTextPane();
 	private final JTextField standardDeviationTextField = new JTextField();
+	private final JTextField maxNumberOfClustersTextField = new JTextField();
+	private final JLabel label = new JLabel("-");
 
 	public EMFrame() {
+		maxNumberOfClustersTextField.setText("10");
+		maxNumberOfClustersTextField.setColumns(10);
 		standardDeviationTextField.setText("0.00001");
 		standardDeviationTextField.setColumns(10);
 		numberOfIterationsTextField.setText("100");
 		numberOfIterationsTextField.setColumns(10);
 		setSize(new Dimension(350, 173));
-		numberOfClustersTextField.setText("5");
-		numberOfClustersTextField.setColumns(10);
+		minNumberOfClustersTextField.setText("2");
+		minNumberOfClustersTextField.setColumns(10);
 
 		JPanel configurationPanel = new JPanel();
 		getContentPane().add(configurationPanel, BorderLayout.CENTER);
 		SpringLayout sl_configurationPanel = new SpringLayout();
+		sl_configurationPanel.putConstraint(SpringLayout.NORTH, label, 8, SpringLayout.NORTH, configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.WEST, label, 0, SpringLayout.EAST, minNumberOfClustersTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.EAST, label, 0, SpringLayout.WEST, maxNumberOfClustersTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.WEST, maxNumberOfClustersTextField, 22, SpringLayout.EAST,
+				minNumberOfClustersTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.EAST, minNumberOfClustersTextField, -64, SpringLayout.EAST,
+				configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.NORTH, maxNumberOfClustersTextField, 0, SpringLayout.NORTH,
+				minNumberOfClustersTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.EAST, maxNumberOfClustersTextField, -10, SpringLayout.EAST,
+				configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.EAST, standardDeviationTextField, -10, SpringLayout.EAST,
+				configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.NORTH, numberOfIterationsTextField, 6, SpringLayout.SOUTH,
+				minNumberOfClustersTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.EAST, numberOfIterationsTextField, -10, SpringLayout.EAST,
+				configurationPanel);
+		sl_configurationPanel
+				.putConstraint(SpringLayout.NORTH, numberOfClustersLabel, 11, SpringLayout.NORTH, configurationPanel);
+		sl_configurationPanel.putConstraint(SpringLayout.WEST, minNumberOfClustersTextField, -96, SpringLayout.EAST,
+				configurationPanel);
 		sl_configurationPanel.putConstraint(SpringLayout.NORTH, standardDeviationTextField, 20, SpringLayout.SOUTH,
 				numberOfIterationsTextField);
 		sl_configurationPanel.putConstraint(SpringLayout.NORTH, txtpnMinimumAllowableStandard, 6, SpringLayout.SOUTH,
@@ -74,30 +102,20 @@ public class EMFrame extends AbstractConfigurationFrame {
 				lblNumberOfIterations);
 		sl_configurationPanel.putConstraint(SpringLayout.EAST, txtpnMinimumAllowableStandard, 220, SpringLayout.WEST,
 				configurationPanel);
-		sl_configurationPanel.putConstraint(SpringLayout.EAST, standardDeviationTextField, 0, SpringLayout.EAST,
-				numberOfClustersTextField);
 		sl_configurationPanel.putConstraint(SpringLayout.WEST, lblNumberOfIterations, 10, SpringLayout.WEST, configurationPanel);
 		sl_configurationPanel
 				.putConstraint(SpringLayout.WEST, numberOfClustersLabel, 0, SpringLayout.WEST, lblNumberOfIterations);
-		sl_configurationPanel.putConstraint(SpringLayout.SOUTH, numberOfClustersLabel, 0, SpringLayout.SOUTH,
-				numberOfClustersTextField);
 		sl_configurationPanel.putConstraint(SpringLayout.EAST, numberOfClustersLabel, 185, SpringLayout.WEST, configurationPanel);
 		sl_configurationPanel.putConstraint(SpringLayout.SOUTH, lblNumberOfIterations, 0, SpringLayout.SOUTH,
 				numberOfIterationsTextField);
-		sl_configurationPanel.putConstraint(SpringLayout.NORTH, numberOfIterationsTextField, 6, SpringLayout.SOUTH,
-				numberOfClustersTextField);
-		sl_configurationPanel.putConstraint(SpringLayout.EAST, numberOfIterationsTextField, 0, SpringLayout.EAST,
-				numberOfClustersTextField);
-		sl_configurationPanel.putConstraint(SpringLayout.NORTH, numberOfClustersTextField, 5, SpringLayout.NORTH,
-				configurationPanel);
-		sl_configurationPanel.putConstraint(SpringLayout.EAST, numberOfClustersTextField, -10, SpringLayout.EAST,
+		sl_configurationPanel.putConstraint(SpringLayout.NORTH, minNumberOfClustersTextField, 5, SpringLayout.NORTH,
 				configurationPanel);
 		configurationPanel.setLayout(sl_configurationPanel);
 		{
 			configurationPanel.add(numberOfClustersLabel);
 		}
 		{
-			configurationPanel.add(numberOfClustersTextField);
+			configurationPanel.add(minNumberOfClustersTextField);
 		}
 		{
 			configurationPanel.add(numberOfIterationsTextField);
@@ -114,6 +132,13 @@ public class EMFrame extends AbstractConfigurationFrame {
 		{
 			configurationPanel.add(standardDeviationTextField);
 		}
+		{
+			configurationPanel.add(maxNumberOfClustersTextField);
+		}
+		{
+			label.setHorizontalAlignment(SwingConstants.CENTER);
+			configurationPanel.add(label);
+		}
 	}
 
 	@Override
@@ -122,14 +147,23 @@ public class EMFrame extends AbstractConfigurationFrame {
 	}
 
 	@Override
-	public String[] getOptions() {
-		String[] options = new String[6];
-		options[0] = "-N";
-		options[1] = this.numberOfClustersTextField.getText();
-		options[2] = "-I";
-		options[3] = this.numberOfIterationsTextField.getText();
-		options[4] = "-M";
-		options[5] = this.standardDeviationTextField.getText();
+	public String[][] getOptions() {
+		int min = Integer.parseInt(this.minNumberOfClustersTextField.getText());
+		int max = Integer.parseInt(this.maxNumberOfClustersTextField.getText());
+		int numberOfJobs = max - min + 1;
+		int id = WekaClusteringConfigurationPanelController.getJobID();
+		String[][] options = new String[numberOfJobs][];
+		for (int i = 0; i < numberOfJobs; i++) {
+			options[i] = new String[8];
+			options[i][0] = "-N";
+			options[i][1] = "" + (min + i);
+			options[i][2] = "-I";
+			options[i][3] = this.numberOfIterationsTextField.getText();
+			options[i][4] = "-M";
+			options[i][5] = this.standardDeviationTextField.getText();
+			options[i][6] = "-ID";
+			options[i][7] = "" + id;
+		}
 		return options;
 	}
 
@@ -140,12 +174,20 @@ public class EMFrame extends AbstractConfigurationFrame {
 
 	@Override
 	public boolean checkValues() {
-		if (this.checkTextFieldValueInt("Number of clusters", this.numberOfClustersTextField, 1, Integer.MAX_VALUE)
-				&& this.checkTextFieldValueInt("Number of iterations", this.numberOfIterationsTextField, 1, Integer.MAX_VALUE)
-				&& this.checkTextFieldValueDouble("Minimum allowable standard deviation for normal density",
+		if (!this.checkTextFieldValueInt("Min number of clusters", this.minNumberOfClustersTextField, 2, Integer.MAX_VALUE)
+				|| !this.checkTextFieldValueInt("Max number of clusters", this.maxNumberOfClustersTextField, 2, Integer.MAX_VALUE)
+				|| !this.checkTextFieldValueInt("Number of iterations", this.numberOfIterationsTextField, 1, Integer.MAX_VALUE)
+				|| !this.checkTextFieldValueDouble("Minimum allowable standard deviation for normal density",
 						this.standardDeviationTextField, 0, Integer.MAX_VALUE)) {
-			return true;
+			return false;
 		}
-		return false;
+		int min = Integer.parseInt(this.minNumberOfClustersTextField.getText());
+		int max = Integer.parseInt(this.maxNumberOfClustersTextField.getText());
+		if (max < min) {
+			JOptionPane.showMessageDialog(this, "Max number of clusters has to be greater or equal than the min number!",
+					"Illegal Argument", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		return true;
 	}
 }
