@@ -67,8 +67,8 @@ public class GenerateSilhouettePlotFromClusteringResultAsPDFActivityTest extends
 		files.add(output.getPath());
 		files.add("");
 		input = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
-				+ File.separator + "weka" + File.separator + "clusterer.model");
-		output = new File(this.dir.getPath() + File.separator + "clusterer.model");
+				+ File.separator + "weka" + File.separator + "SimpleKMeans-ID1_test.model");
+		output = new File(this.dir.getPath() + File.separator + "SimpleKMeans-ID1_test.model");
 		FileNameGenerator.copyFile(input, output);
 		files.add(output.getPath());
 	}

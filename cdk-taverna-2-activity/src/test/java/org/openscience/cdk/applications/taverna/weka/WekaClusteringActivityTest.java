@@ -78,7 +78,7 @@ public class WekaClusteringActivityTest extends CDKTavernaTestCases {
 		configBean.setActivityName(CSVToQSARVectorActivity.CSV_TO_QSAR_VECTOR_ACTIVITY);
 		clusteringConfigBean = new CDKActivityConfigurationBean();
 		clusteringConfigBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.dir);
-		String jobData = "weka.clusterers.EM;-N;5;-I;100;-M;0.00001;weka.clusterers.FarthestFirst;-N;5;weka.clusterers.HierarchicalClusterer;-N;5;-L;SINGLE;weka.clusterers.SimpleKMeans;-N;5;-I;100;weka.clusterers.XMeans;-I;1;-M;1000;-J;1000;-L;2;-H;4;";
+		String jobData = "weka.clusterers.EM;-N;5;-I;100;-M;0.00001;-ID;1;weka.clusterers.FarthestFirst;-N;5;-ID;5;weka.clusterers.HierarchicalClusterer;-N;5;-L;SINGLE;-ID;2;weka.clusterers.SimpleKMeans;-N;5;-I;100;-ID;3;weka.clusterers.XMeans;-I;1;-M;1000;-J;1000;-L;2;-H;4;-ID;4";
 		clusteringConfigBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CLUSTERING_JOB_DATA, jobData);
 		clusteringConfigBean.setActivityName(WekaClusteringActivity.WEKA_CLUSTERING_ACTIVITY);
 	}

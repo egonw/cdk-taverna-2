@@ -80,7 +80,7 @@ public class ClusteringResultConsideringDifferentOriginsAsPDFActivityTest extend
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, csvFile);
 		clusteringConfigBean = new CDKActivityConfigurationBean();
 		clusteringConfigBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.dir);
-		String jobData = "weka.clusterers.EM;-N;5;-I;100;-M;0.00001;";
+		String jobData = "weka.clusterers.EM;-N;5;-I;100;-M;0.00001;-ID;1;";
 		clusteringConfigBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CLUSTERING_JOB_DATA, jobData);
 		clusteringConfigBean.setActivityName(WekaClusteringActivity.WEKA_CLUSTERING_ACTIVITY);
 	}
