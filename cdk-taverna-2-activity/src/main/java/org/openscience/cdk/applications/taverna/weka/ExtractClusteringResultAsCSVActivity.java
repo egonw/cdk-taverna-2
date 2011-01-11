@@ -136,7 +136,8 @@ public class ExtractClusteringResultAsCSVActivity extends AbstractCDKActivity {
 				}
 				writer.close();
 			} catch (Exception e) {
-				e.printStackTrace();
+				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(), e);
+				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
 			}
 		}
 		return outputs;

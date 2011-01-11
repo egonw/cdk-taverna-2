@@ -60,7 +60,7 @@ import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
  */
 public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 
-	public static final String QSAR_DESCRIPTOR_ACTIVITY = "QSAR Descriptor Threaded (Experimental)";
+	public static final String QSAR_DESCRIPTOR_ACTIVITY = "QSAR Descriptor Threaded";
 
 	private QSARDescriptorWorker[] workers = null;
 	private AsynchronousActivityCallback callback = null;

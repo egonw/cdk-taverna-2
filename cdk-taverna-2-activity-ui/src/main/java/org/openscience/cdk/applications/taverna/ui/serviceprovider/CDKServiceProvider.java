@@ -12,6 +12,8 @@ import net.sf.taverna.t2.servicedescriptions.ServiceDescriptionProvider;
 import net.sf.taverna.t2.spi.SPIRegistry;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
+import org.openscience.cdk.applications.taverna.CDKTavernaException;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 
 public class CDKServiceProvider implements ServiceDescriptionProvider {
@@ -46,11 +48,13 @@ public class CDKServiceProvider implements ServiceDescriptionProvider {
 			// No more results will be coming
 			callBack.finished();
 		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
+			ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_PROVIDING_SERVICES, this.getClass().getSimpleName(), e);
 		}
 	}
 
+	/**
+	 * Clears the cache directoy.
+	 */
 	private void cleanCache() {
 		String cacheDir = FileNameGenerator.getCacheDir();
 		File cache = new File(cacheDir);
@@ -69,7 +73,7 @@ public class CDKServiceProvider implements ServiceDescriptionProvider {
 	 * Name of service provider, appears in right click for 'Remove service provider'
 	 */
 	public String getName() {
-		return "CDK Taverna 2";
+		return "CDK Taverna 2.0";
 	}
 
 	@Override

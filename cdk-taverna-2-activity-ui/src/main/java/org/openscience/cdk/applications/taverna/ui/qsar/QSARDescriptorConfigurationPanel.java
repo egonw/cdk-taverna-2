@@ -28,6 +28,7 @@ import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityCon
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
+import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.qsar.QSARDescriptorThreadedActivity;
 
@@ -147,7 +148,10 @@ public class QSARDescriptorConfigurationPanel extends
 			}
 			this.repaint();
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error setting up configuration panel!", this.getClass().getSimpleName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_DURING_ACTIVITY_CONFIGURATION,
+					this.getClass().getSimpleName(), e);
+			JOptionPane.showMessageDialog(this, CDKTavernaException.ERROR_DURING_ACTIVITY_CONFIGURATION, "Error",
+					JOptionPane.ERROR_MESSAGE);
 		}
 
 	}

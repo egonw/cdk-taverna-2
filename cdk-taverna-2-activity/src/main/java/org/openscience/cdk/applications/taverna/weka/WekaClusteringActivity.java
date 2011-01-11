@@ -150,7 +150,8 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 				this.workers[i].start();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_INVOKING_WORKERS, this.getActivityName());
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.ERROR_INVOKING_WORKERS);
 		}
 		synchronized (this) {
 			this.wait();

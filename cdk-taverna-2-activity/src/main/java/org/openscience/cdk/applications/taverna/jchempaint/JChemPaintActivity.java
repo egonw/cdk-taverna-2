@@ -99,14 +99,11 @@ public class JChemPaintActivity extends AbstractCDKActivity {
 		List<byte[]> dataList = new ArrayList<byte[]>();
 		// Read ChemFile
 		try {
-			File file = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_CMLCHEMFILE);
-			if (file == null) {
-				throw new CDKTavernaException(JChemPaintActivity.JCHEMPAINT_ACTIVITY, CDKTavernaException.NO_FILE_CHOSEN);
+			byte[] data = (byte[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_CMLCHEMFILE_DATA);
+			if (data == null) {
+				throw new CDKTavernaException(JChemPaintActivity.JCHEMPAINT_ACTIVITY, CDKTavernaException.DATA_CONTAINS_NO_MOLECULE);
 			}
-			CMLChemFile cmlChemFile = new CMLChemFile();
-			CMLReader reader = new CMLReader(new FileInputStream(file));
-			cmlChemFile = (CMLChemFile) reader.read(cmlChemFile);
-			reader.close();
+			CMLChemFile cmlChemFile = (CMLChemFile) CDKObjectHandler.getObject(data);
 			cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(cmlChemFile);
 			if (cmlChemFileList.isEmpty()) {
 				throw new CDKTavernaException(JChemPaintActivity.JCHEMPAINT_ACTIVITY,

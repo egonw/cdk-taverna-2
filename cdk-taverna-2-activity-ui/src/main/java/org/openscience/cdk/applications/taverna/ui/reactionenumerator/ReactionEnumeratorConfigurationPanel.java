@@ -33,6 +33,8 @@ import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityCon
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
+import org.openscience.cdk.applications.taverna.CDKTavernaException;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.reactionenumerator.ReactionEnumeratorActivity;
 
 /**
@@ -72,7 +74,10 @@ public class ReactionEnumeratorConfigurationPanel extends
 			this.add(this.useMultiMatchCheckerCheckBox);
 			this.refreshConfiguration();
 		} catch (Exception e) {
-			e.printStackTrace();
+			ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_DURING_ACTIVITY_CONFIGURATION,
+					this.getClass().getSimpleName(), e);
+			JOptionPane.showMessageDialog(this, CDKTavernaException.ERROR_DURING_ACTIVITY_CONFIGURATION, "Error",
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}
 

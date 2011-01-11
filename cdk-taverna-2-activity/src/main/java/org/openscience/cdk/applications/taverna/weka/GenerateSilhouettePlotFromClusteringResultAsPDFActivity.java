@@ -167,7 +167,8 @@ public class GenerateSilhouettePlotFromClusteringResultAsPDFActivity extends Abs
 				meanValueList.add(mean);
 				meanClustersList.add(clusterer.numberOfClusters());
 			} catch (Exception e) {
-				e.printStackTrace();
+				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(), e);
+				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
 			}
 		}
 		try {
@@ -187,7 +188,8 @@ public class GenerateSilhouettePlotFromClusteringResultAsPDFActivity extends Abs
 			File file = FileNameGenerator.getNewFile(parent.getPath(), ".pdf", "Silhouette-Mean");
 			chartToolReloaded.writeChartAsPDF(file, charts);
 		} catch (Exception e) {
-			e.printStackTrace();
+			ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
 		}
 		return outputs;
 	}

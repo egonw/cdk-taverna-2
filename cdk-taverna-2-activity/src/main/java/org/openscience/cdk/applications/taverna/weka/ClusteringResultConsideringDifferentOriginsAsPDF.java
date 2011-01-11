@@ -80,12 +80,6 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 		// empty
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.openscience.cdk.applications.taverna.AbstractCDKActivity#work(java.util.Map,
-	 * net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback)
-	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)

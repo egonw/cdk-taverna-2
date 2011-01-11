@@ -126,7 +126,8 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 				charts.add(chartTool.createBarChart(name + " - JobID: " + jobID, "(Class number/Number of Vectors)",
 						"Number of vectors", chartDataSet));
 			} catch (Exception e) {
-				e.printStackTrace();
+				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(), e);
+				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
 			}
 			try {
 				File file = new File(files.get(0));
@@ -136,7 +137,8 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 				pdfTitle.add("Weka " + clusterer.getClass().getSimpleName() + " Clustering Result");
 				chartTool.writeChartAsPDF(file, charts);
 			} catch (Exception e) {
-				e.printStackTrace();
+				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(), e);
+				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
 			}
 		}
 		return outputs;

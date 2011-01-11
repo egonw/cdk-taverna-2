@@ -79,7 +79,10 @@ public class ART2aClassificationConfigurationPanel extends
 			this.view.getPathButton().setIcon(icon);
 			this.add(this.view);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error setting up configuration panel!", this.getClass().getSimpleName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_DURING_ACTIVITY_CONFIGURATION,
+					this.getClass().getSimpleName(), e);
+			JOptionPane.showMessageDialog(this, CDKTavernaException.ERROR_DURING_ACTIVITY_CONFIGURATION, "Error",
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
