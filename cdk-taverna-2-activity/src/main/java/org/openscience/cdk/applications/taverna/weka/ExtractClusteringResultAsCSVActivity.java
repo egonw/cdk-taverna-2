@@ -57,7 +57,7 @@ import weka.filters.Filter;
  */
 public class ExtractClusteringResultAsCSVActivity extends AbstractCDKActivity {
 
-	public static final String EXTRACT_CLUSTERING_RESULT_AS_CSV_ACTIVITY = "Extract Clustering As CSV";
+	public static final String EXTRACT_CLUSTERING_RESULT_AS_CSV_ACTIVITY = "Extract Clustering Result As CSV";
 
 	/**
 	 * Creates a new instance.
