@@ -131,6 +131,7 @@ public class SplitMoleculesIntoClustersActivity extends AbstractCDKActivity impl
 					if (cluster == null) {
 						ErrorLogger.getInstance().writeError(CDKTavernaException.NO_CLUSTER_INFORMATION_AVAILABLE,
 								this.getActivityName());
+						continue;
 					}
 					file = this.files.get(cluster);
 					if (file == null) {
@@ -170,6 +171,7 @@ public class SplitMoleculesIntoClustersActivity extends AbstractCDKActivity impl
 
 	@Override
 	public String getFolderName() {
-		return CDKTavernaConstants.IO_FOLDER_NAME;
+		return CDKTavernaConstants.WEKA_FOLDER_NAME
+		;
 	}
 }
