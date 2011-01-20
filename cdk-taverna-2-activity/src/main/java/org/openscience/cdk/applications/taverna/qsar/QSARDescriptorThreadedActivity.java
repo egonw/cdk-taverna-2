@@ -140,6 +140,10 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 			for (CMLChemFile chemFile : chemFiles) {
 				molecules.addAll(ChemFileManipulator.getAllAtomContainers(chemFile));
 			}
+			if(molecules.isEmpty()) {
+				ErrorLogger.getInstance().writeError(CDKTavernaException.DATA_CONTAINS_NO_MOLECULE, this.getActivityName());
+				return new HashMap<String, T2Reference>(); // FIXME Is it good to return only a empty list?
+			}
 			// Check for ID
 			for (IAtomContainer atomContainer : molecules) {
 				if (atomContainer.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
@@ -187,15 +191,6 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 			this.workers[i] = new QSARDescriptorWorker(this);
 			this.workers[i].start();
 		}
-		// // Setup timeout check
-		// Timer timer = new Timer();
-		// timer.schedule(new TimerTask() {
-		//
-		// @Override
-		// public void run() {
-		// QSARDescriptorThreadedActivity.this.checkForTimeout();
-		// }
-		// }, 1000, 1000); // Check for timeout every minute
 		// Wait for workers
 		synchronized (this) {
 			this.wait();
@@ -231,23 +226,6 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 		return outputs;
 	}
 
-	// private void checkForTimeout() {
-	// double timeout = 100.0;
-	// for (int i = 0; i < this.workers.length; i++) {
-	// long time = System.nanoTime() - this.workers[i].getStartTime();
-	// double millis = time / Math.pow(10, 6);
-	// if (millis > timeout) {
-	// try {
-	// this.workers[i].sleep(1000);
-	// } catch (InterruptedException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	// this.workers[i] = new QSARDescriptorWorker(this);
-	// this.workers[i].start();
-	// }
-	// }
-	// }
 
 	/**
 	 * Updates the duration of target descriptor.
