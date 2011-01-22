@@ -21,6 +21,8 @@
  */
 package org.openscience.cdk.applications.taverna.basicutilities;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -49,8 +51,10 @@ public class CDKObjectHandler {
 	 */
 	public static byte[] getBytes(Object obj) throws IOException {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(bos);
+		ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(bos));
 		oos.writeObject(obj);
+		oos.flush();
+		System.out.println("Object written");
 		byte[] data = bos.toByteArray();
 		oos.close();
 		return data;
@@ -94,7 +98,7 @@ public class CDKObjectHandler {
 	public static Object getObject(byte[] data) throws Exception {
 		Object object = null;
 		ByteArrayInputStream bis = new ByteArrayInputStream(data);
-		ObjectInputStream ois = new ObjectInputStream(bis);
+		ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(bis));
 		object = ois.readObject();
 		ois.close();
 		return object;

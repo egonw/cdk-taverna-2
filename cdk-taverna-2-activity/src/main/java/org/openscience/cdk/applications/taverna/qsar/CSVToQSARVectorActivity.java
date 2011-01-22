@@ -93,9 +93,11 @@ public class CSVToQSARVectorActivity extends AbstractCDKActivity implements IFil
 			throw new CDKTavernaException(this.getActivityName(), file.getPath() + "does not exist!");
 		}
 		String line = "";
+		int idx = 0;
 		try {
 			boolean readDescriptorNames = true;
 			while ((line = reader.readLine()) != null) {
+				idx++;
 				String[] items = this.getItems(line);
 				// First line contains the descriptor names
 				if (readDescriptorNames) {
@@ -115,6 +117,9 @@ public class CSVToQSARVectorActivity extends AbstractCDKActivity implements IFil
 					}
 					vectorMap.put(UUID.fromString(uuidString), descriptorResultMap);
 				}
+				if(idx % 1000 == 0) {
+					System.out.println(idx);
+				}
 			}
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!",
@@ -122,7 +127,9 @@ public class CSVToQSARVectorActivity extends AbstractCDKActivity implements IFil
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!");
 		}
 		try {
+			System.out.println("Size - " + vectorMap.size());
 			byte[] vectorData = CDKObjectHandler.getBytes(vectorMap);
+			System.out.println(vectorData.length);
 			T2Reference containerRef = referenceService.register(vectorData, 0, true, context);
 			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 			byte[] nameData = CDKObjectHandler.getBytes(descriptorNames);
