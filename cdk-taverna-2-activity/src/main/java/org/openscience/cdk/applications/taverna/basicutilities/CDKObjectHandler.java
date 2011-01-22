@@ -49,7 +49,7 @@ public class CDKObjectHandler {
 	/**
 	 * Serializes an object into a byte array.
 	 */
-	public static byte[] getBytes(Object obj) throws IOException {
+	public static byte[] getBytes(Object obj) throws Exception {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(bos));
 		oos.writeObject(obj);
@@ -63,7 +63,7 @@ public class CDKObjectHandler {
 	/**
 	 * Serializes an objects into a list of byte arrays.
 	 */
-	public static List<byte[]> getBytesList(List<?> objs) throws IOException {
+	public static List<byte[]> getBytesList(List<?> objs) throws Exception {
 		ArrayList<byte[]> list = new ArrayList<byte[]>();
 		for (Object obj : objs) {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -79,13 +79,14 @@ public class CDKObjectHandler {
 	/**
 	 * Serializes an objects into a list of byte arrays.
 	 */
-	public static List<byte[]> getBytesList(Object[] objs) throws IOException {
+	public static List<byte[]> getBytesList(Object[] objs) throws Exception {
 		ArrayList<byte[]> list = new ArrayList<byte[]>();
 		for (Object obj : objs) {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream(bos);
+			ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(bos));
 			oos.writeObject(obj);
 			byte[] data = bos.toByteArray();
+			oos.flush();
 			oos.close();
 			list.add(data);
 		}

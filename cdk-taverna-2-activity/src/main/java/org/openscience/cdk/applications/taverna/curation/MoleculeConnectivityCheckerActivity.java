@@ -118,18 +118,15 @@ public class MoleculeConnectivityCheckerActivity extends AbstractCDKActivity {
 			T2Reference containerRef = referenceService.register(acceptedList, 1, true, context);
 
 			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		} catch (IOException ex) {
-
+		} catch (Exception ex) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), ex);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
-
 		try {
-
 			List<byte[]> rejectedList = CDKObjectHandler.getBytesList(rejected);
 			T2Reference containerRef2 = referenceService.register(rejectedList, 1, true, context);
 			outputs.put(this.OUTPUT_PORTS[1], containerRef2);
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), ex);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}

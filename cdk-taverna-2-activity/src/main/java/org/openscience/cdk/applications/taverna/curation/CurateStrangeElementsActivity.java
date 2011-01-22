@@ -109,20 +109,16 @@ public class CurateStrangeElementsActivity extends AbstractCDKActivity {
 		try {
 			List<byte[]> curatedList = CDKObjectHandler.getBytesList(curated);
 			T2Reference containerRef = referenceService.register(curatedList, 1, true, context);
-
 			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		} catch (IOException ex) {
-
+		} catch (Exception ex) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), ex);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
-
 		try {
-
 			List<byte[]> discardedList = CDKObjectHandler.getBytesList(discarded);
 			T2Reference containerRef2 = referenceService.register(discardedList, 1, true, context);
 			outputs.put(this.OUTPUT_PORTS[1], containerRef2);
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), ex);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
 		}
