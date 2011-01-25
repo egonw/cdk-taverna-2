@@ -26,7 +26,6 @@ package org.openscience.cdk.applications.taverna.curation;
  * 
  * @author kalai
  */
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -116,7 +115,6 @@ public class MoleculeConnectivityCheckerActivity extends AbstractCDKActivity {
 		try {
 			List<byte[]> acceptedList = CDKObjectHandler.getBytesList(accepted);
 			T2Reference containerRef = referenceService.register(acceptedList, 1, true, context);
-
 			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		} catch (Exception ex) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), ex);

@@ -26,7 +26,6 @@ package org.openscience.cdk.applications.taverna.curation;
  * 
  * @author kalai
  */
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -92,9 +91,7 @@ public class CurateStrangeElementsActivity extends AbstractCDKActivity {
 		} catch (Exception e) {
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
-
 		for (CMLChemFile cml : chemFileList) {
-
 			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(cml);
 			for (IAtomContainer atomContainer : moleculeList) {
 
@@ -134,11 +131,8 @@ public class CurateStrangeElementsActivity extends AbstractCDKActivity {
 	private boolean shouldRemoveMolecule(IAtomContainer molecule) {
 		boolean removeMolecule = false;
 		String element;
-
 		for (IAtom atom : molecule.atoms()) {
-
 			element = atom.getSymbol();
-
 			if (!symbols2Check.contains(element)) {
 				removeMolecule = true;
 				break;

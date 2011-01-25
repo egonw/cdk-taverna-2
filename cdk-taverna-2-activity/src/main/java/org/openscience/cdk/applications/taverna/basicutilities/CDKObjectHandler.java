@@ -25,7 +25,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -54,7 +53,6 @@ public class CDKObjectHandler {
 		ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(bos));
 		oos.writeObject(obj);
 		oos.flush();
-		System.out.println("Object written");
 		byte[] data = bos.toByteArray();
 		oos.close();
 		return data;
@@ -67,8 +65,9 @@ public class CDKObjectHandler {
 		ArrayList<byte[]> list = new ArrayList<byte[]>();
 		for (Object obj : objs) {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream(bos);
+			ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(bos));
 			oos.writeObject(obj);
+			oos.flush();
 			byte[] data = bos.toByteArray();
 			oos.close();
 			list.add(data);
@@ -85,6 +84,7 @@ public class CDKObjectHandler {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(bos));
 			oos.writeObject(obj);
+			oos.flush();
 			byte[] data = bos.toByteArray();
 			oos.flush();
 			oos.close();

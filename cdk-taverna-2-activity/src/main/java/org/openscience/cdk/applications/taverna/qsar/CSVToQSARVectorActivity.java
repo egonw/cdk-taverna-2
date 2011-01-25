@@ -93,11 +93,9 @@ public class CSVToQSARVectorActivity extends AbstractCDKActivity implements IFil
 			throw new CDKTavernaException(this.getActivityName(), file.getPath() + "does not exist!");
 		}
 		String line = "";
-		int idx = 0;
 		try {
 			boolean readDescriptorNames = true;
 			while ((line = reader.readLine()) != null) {
-				idx++;
 				String[] items = this.getItems(line);
 				// First line contains the descriptor names
 				if (readDescriptorNames) {

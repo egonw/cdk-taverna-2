@@ -21,8 +21,6 @@
  */
 package org.openscience.cdk.applications.taverna.jchempaint;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +38,6 @@ import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.io.CMLReader;
 
 /**
  * Class which represents the JChemPaint activity.
