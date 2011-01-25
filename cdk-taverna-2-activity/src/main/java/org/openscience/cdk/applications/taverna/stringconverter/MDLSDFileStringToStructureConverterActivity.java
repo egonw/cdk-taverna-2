@@ -83,9 +83,9 @@ public class MDLSDFileStringToStructureConverterActivity extends AbstractCDKActi
 		LinkedList<String> notConverted = new LinkedList<String>();
 		List<String> sdfList = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
 				context);
-		for (String cml : sdfList) {
+		for (String sdf : sdfList) {
 			try {
-				MDLV2000Reader tmpMDLReader = new MDLV2000Reader(new ByteArrayInputStream(cml.getBytes()));
+				MDLV2000Reader tmpMDLReader = new MDLV2000Reader(new ByteArrayInputStream(sdf.getBytes()));
 				CMLChemFile chemFile = tmpMDLReader.read(new CMLChemFile());
 				tmpMDLReader.close();
 				List<CMLChemFile> cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(chemFile);
@@ -94,7 +94,7 @@ public class MDLSDFileStringToStructureConverterActivity extends AbstractCDKActi
 					dataList.add(CDKObjectHandler.getBytes(c));
 				}
 			} catch (Exception e) {
-				notConverted.add(cml);
+				notConverted.add(sdf);
 				ErrorLogger.getInstance().writeError(CDKTavernaException.CONVERTION_ERROR, this.getActivityName(), e);
 			}
 		}

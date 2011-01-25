@@ -1,7 +1,6 @@
 package org.openscience.cdk.applications.taverna.iterativeio;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
@@ -20,20 +19,21 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 
-public class IterativeSDFileReaderActivity extends AbstractCDKActivity implements IIterativeFileReader {
+public class IterativeSDFileReaderActivity extends AbstractCDKActivity {
 
 	public static final String ITERATIVE_SD_FILE_READER_ACTIVITY = "Iterative SDfile Reader";
 
 	public IterativeSDFileReaderActivity() {
+		this.INPUT_PORTS = new String[] { "File", "# Of Structures Per Iteration" };
 		this.OUTPUT_PORTS = new String[] { "Structures" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		// Nothing to add
+		addInput(this.INPUT_PORTS[0], 0, true, null, String.class);
+		addInput(this.INPUT_PORTS[1], 0, true, null, Integer.class);
 	}
 
 	@Override
@@ -49,9 +49,6 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity implement
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".sdf");
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL SDFile");
-		properties.put(CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE, 50);
 		return properties;
 	}
 
@@ -68,12 +65,17 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity implement
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
-		int readSize = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE);
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
-		// Read SDfile
-		File file = ((File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE))[0];
+		int readSize;
+		try {
+			readSize = (Integer) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[1]), Integer.class, context);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+		}
+		String file = (String) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class, context);
 		if (file == null) {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
@@ -119,8 +121,8 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity implement
 			T2Reference containerRef = referenceService.register(outputList, 1, true, context);
 			outputs.put(this.OUTPUT_PORTS[0], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath(), this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath());
+			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file);
 		}
 		// Return results
 		return outputs;

@@ -21,7 +21,6 @@
  */
 package org.openscience.cdk.applications.taverna.iterativeio;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.LineNumberReader;
@@ -41,7 +40,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 
 /**
@@ -50,7 +48,7 @@ import org.openscience.cdk.io.MDLV2000Reader;
  * @author Andreas Truszkowski
  * 
  */
-public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIterativeFileReader {
+public class LoopSDFileReaderActivity extends AbstractCDKActivity {
 
 	public static final String LOOP_SD_FILE_READER_ACTIVITY = "Loop SDfile Reader";
 	public static final String RUNNING = "RUNNING";
@@ -62,12 +60,14 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 	 * Creates a new instance.
 	 */
 	public LoopSDFileReaderActivity() {
+		this.INPUT_PORTS = new String[] { "File", "# Of Structures Per Iteration" };
 		this.OUTPUT_PORTS = new String[] { "Structures", "State" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		// Nothing to add
+		addInput(this.INPUT_PORTS[0], 0, true, null, String.class);
+		addInput(this.INPUT_PORTS[1], 0, true, null, Integer.class);
 	}
 
 	@Override
@@ -84,9 +84,6 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".sdf");
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL SDFile");
-		properties.put(CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE, 50);
 		return properties;
 	}
 
@@ -106,10 +103,16 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
-		int readSize = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE);
+		int readSize;
+		try {
+			readSize = (Integer) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[1]), Integer.class, context);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+		}
 		String state = RUNNING;
 		// Read SDfile
-		File file = ((File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE))[0];
+		String file = (String) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class, context);
 		if (file == null) {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
@@ -150,8 +153,8 @@ public class LoopSDFileReaderActivity extends AbstractCDKActivity implements IIt
 				}
 			} while (line != null && counter < readSize);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath(), this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath());
+			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file);
 		}
 		T2Reference reference = referenceService.register(dataList, 1, true, context);
 		outputs.put(this.OUTPUT_PORTS[0], reference);

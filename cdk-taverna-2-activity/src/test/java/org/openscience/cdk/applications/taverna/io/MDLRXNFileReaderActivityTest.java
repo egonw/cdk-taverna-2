@@ -22,6 +22,7 @@
 package org.openscience.cdk.applications.taverna.io;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,18 +57,17 @@ public class MDLRXNFileReaderActivityTest extends CDKTavernaTestCases {
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		// TODO read resource
-		File[] rxnTestFile = new File[] { new File("src" + File.separator + "test" + File.separator + "resources"
-				+ File.separator + "data" + File.separator + "mol" + File.separator + "reaction.rxn") };
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, rxnTestFile);
 		configBean.setActivityName(MDLRXNFileReaderActivity.RXN_FILE_READER_ACTIVITY);
 	}
 
 	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
-		// leave empty. No ports used
+		List<String> sdTestFile = new ArrayList<String>();
+		sdTestFile.add("src" + File.separator + "test" + File.separator + "resources"
+				+ File.separator + "data" + File.separator + "mol" + File.separator + "reaction.rxn");
 		Map<String, Object> inputs = new HashMap<String, Object>();
+		inputs.put(activity.getINPUT_PORTS()[0], sdTestFile);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);

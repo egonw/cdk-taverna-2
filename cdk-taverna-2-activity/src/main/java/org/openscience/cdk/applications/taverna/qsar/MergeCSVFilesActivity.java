@@ -167,6 +167,7 @@ public class MergeCSVFilesActivity extends AbstractCDKActivity implements IFileR
 					writer.write("\n");
 				}
 				reader.close();
+				writer.flush();
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!",
 						this.getActivityName(), e);

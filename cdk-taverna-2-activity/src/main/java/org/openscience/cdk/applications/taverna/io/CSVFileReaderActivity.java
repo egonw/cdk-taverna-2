@@ -21,7 +21,6 @@
  */
 package org.openscience.cdk.applications.taverna.io;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.LineNumberReader;
@@ -38,7 +37,6 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 
 /**
  * Class which represents the CSV file reader activity.
@@ -46,7 +44,7 @@ import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
  * @author Andreas Truzskowski
  * 
  */
-public class CSVFileReaderActivity extends AbstractCDKActivity implements IFileReader {
+public class CSVFileReaderActivity extends AbstractCDKActivity {
 
 	public static final String CSV_FILE_READER_ACTIVITY = "CSV File Reader";
 
@@ -54,12 +52,13 @@ public class CSVFileReaderActivity extends AbstractCDKActivity implements IFileR
 	 * Creates a new instance.
 	 */
 	public CSVFileReaderActivity() {
+		this.INPUT_PORTS = new String[] { "File" };
 		this.OUTPUT_PORTS = new String[] { "CSV String" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		// empty
+		addInput(this.INPUT_PORTS[0], 0, true, null, String.class);
 	}
 
 	@Override
@@ -73,19 +72,17 @@ public class CSVFileReaderActivity extends AbstractCDKActivity implements IFileR
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
-		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (files == null || files.length == 0) {
+		// No multi file selection supported
+		String file = (String) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class, context);
+		if (file == null) {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
-		// No multi file selection supported
-		File file = files[0];
-
 		LineNumberReader reader = null;
 		try {
 			reader = new LineNumberReader(new FileReader(file));
 		} catch (FileNotFoundException e) {
-			ErrorLogger.getInstance().writeError(file.getPath() + "does not exist!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), file.getPath() + "does not exist!");
+			ErrorLogger.getInstance().writeError(file + "does not exist!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), file + "does not exist!");
 		}
 		String line = "";
 		ArrayList<String> csv = new ArrayList<String>();
@@ -95,9 +92,8 @@ public class CSVFileReaderActivity extends AbstractCDKActivity implements IFileR
 			}
 			reader.close();
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!",
-					this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file + "!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file + "!");
 		}
 		try {
 			T2Reference containerRef = referenceService.register(csv, 1, true, context);
@@ -117,8 +113,6 @@ public class CSVFileReaderActivity extends AbstractCDKActivity implements IFileR
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".csv");
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "Any CSV File");
 		return properties;
 	}
 

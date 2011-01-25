@@ -22,7 +22,6 @@
 package org.openscience.cdk.applications.taverna.iterativeio;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
@@ -59,12 +58,14 @@ public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity imp
 	 * Creates a new instance.
 	 */
 	public IterativeMultiRXNFileReaderActivity() {
+		this.INPUT_PORTS = new String[] { "File", "# Of Structures Per Iteration" };
 		this.OUTPUT_PORTS = new String[] { "Reactions" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		// Nothing to add
+		addInput(this.INPUT_PORTS[0], 0, true, null, String.class);
+		addInput(this.INPUT_PORTS[1], 0, true, null, Integer.class);
 	}
 
 	@Override
@@ -80,9 +81,6 @@ public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity imp
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".rxn");
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL Multi RXN File");
-		properties.put(CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE, 50);
 		return properties;
 	}
 
@@ -99,13 +97,20 @@ public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity imp
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
-		int readSize = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE);
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<CMLChemFile> cmlChemFileList = null;
 		// Read SDfile
-		File file = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+		int readSize;
+		try {
+			readSize = (Integer) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[1]), Integer.class, context);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+		}
+		String file = (String) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class, context);
+
 		if (file == null) {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
@@ -144,9 +149,8 @@ public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity imp
 				}
 			} while (line != null);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!",
-					this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file + "!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file + "!");
 		}
 		T2Reference containerRef = referenceService.register(outputList, 1, true, context);
 		outputs.put(this.OUTPUT_PORTS[0], containerRef);

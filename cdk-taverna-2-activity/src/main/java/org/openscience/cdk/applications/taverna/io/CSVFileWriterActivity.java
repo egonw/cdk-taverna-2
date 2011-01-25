@@ -55,7 +55,7 @@ public class CSVFileWriterActivity extends AbstractCDKActivity implements IItera
 	 * Creates a new instance.
 	 */
 	public CSVFileWriterActivity() {
-		this.INPUT_PORTS = new String[] { "Strings" };
+		this.INPUT_PORTS = new String[] { "CSV Strings" };
 	}
 
 	@Override

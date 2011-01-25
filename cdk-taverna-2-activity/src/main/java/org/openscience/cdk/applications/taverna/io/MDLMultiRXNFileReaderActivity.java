@@ -22,7 +22,6 @@
 package org.openscience.cdk.applications.taverna.io;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileReader;
 import java.io.LineNumberReader;
 import java.util.HashMap;
@@ -40,7 +39,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLRXNReader;
 
 /**
@@ -50,7 +48,7 @@ import org.openscience.cdk.io.MDLRXNReader;
  * @author Andreas Truzskowski
  * 
  */
-public class MDLMultiRXNFileReaderActivity extends AbstractCDKActivity implements IFileReader {
+public class MDLMultiRXNFileReaderActivity extends AbstractCDKActivity {
 
 	public static final String MULTI_RXN_FILE_READER_ACTIVITY = "Mutli RXN File Reader";
 
@@ -58,12 +56,13 @@ public class MDLMultiRXNFileReaderActivity extends AbstractCDKActivity implement
 	 * Creates a new instance.
 	 */
 	public MDLMultiRXNFileReaderActivity() {
+		this.INPUT_PORTS = new String[] { "File" };
 		this.OUTPUT_PORTS = new String[] { "Reactions" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		// empty
+		addInput(this.INPUT_PORTS[0], 0, true, null, String.class);
 	}
 
 	@Override
@@ -79,7 +78,7 @@ public class MDLMultiRXNFileReaderActivity extends AbstractCDKActivity implement
 		ReferenceService referenceService = context.getReferenceService();
 		LinkedList<Reaction> reactionList = new LinkedList<Reaction>();
 		// Read RXN file
-		File file = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+		String file = (String) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class, context);
 		if (file == null) {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
@@ -105,8 +104,8 @@ public class MDLMultiRXNFileReaderActivity extends AbstractCDKActivity implement
 				}
 			}
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath(), this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath());
+			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file);
 		}
 		// Congfigure output
 		try {
@@ -128,8 +127,6 @@ public class MDLMultiRXNFileReaderActivity extends AbstractCDKActivity implement
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".rxn");
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL RXN file");
 		return properties;
 	}
 

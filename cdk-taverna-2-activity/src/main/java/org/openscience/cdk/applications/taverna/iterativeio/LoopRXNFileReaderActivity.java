@@ -21,7 +21,6 @@
  */
 package org.openscience.cdk.applications.taverna.iterativeio;
 
-import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +38,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileReader;
 import org.openscience.cdk.io.MDLRXNV2000Reader;
 
 /**
@@ -48,24 +46,26 @@ import org.openscience.cdk.io.MDLRXNV2000Reader;
  * @author Andreas Truszkowski
  * 
  */
-public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements IIterativeFileReader {
+public class LoopRXNFileReaderActivity extends AbstractCDKActivity {
 
 	public static final String LOOP_RXN_FILE_READER_ACTIVITY = "Loop RXN file Reader";
 	public static final String RUNNING = "RUNNING";
 	public static final String FINISHED = "FINISHED";
 
-	private ArrayList<File> fileList = null;
+	private ArrayList<String> fileList = null;
 
 	/**
 	 * Creates a new instance.
 	 */
 	public LoopRXNFileReaderActivity() {
+		this.INPUT_PORTS = new String[] { "Files", "# Of Structures Per Iteration" };
 		this.OUTPUT_PORTS = new String[] { "Reactions", "State" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		// Nothing to add
+		addInput(this.INPUT_PORTS[0], 1, true, null, String.class);
+		addInput(this.INPUT_PORTS[1], 0, true, null, Integer.class);
 	}
 
 	@Override
@@ -82,10 +82,6 @@ public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements II
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".rxn");
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL RXN file");
-		properties.put(CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE, 50);
-		properties.put(CDKTavernaConstants.PROPERTY_SUPPORT_MULTI_FILE, true);
 		return properties;
 	}
 
@@ -99,37 +95,45 @@ public class LoopRXNFileReaderActivity extends AbstractCDKActivity implements II
 		return CDKTavernaConstants.ITERATIVE_IO_FOLDER_NAME;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
-		int readSize = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE);
 		String state = RUNNING;
 		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		// Read RXNfile
+		int readSize;
+		try {
+			readSize = (Integer) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[1]), Integer.class, context);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+		}
 		if (this.fileList == null) {
-			File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-			if (files == null || files.length == 0) {
+
+			List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
+					context);
+			if (files == null || files.size() == 0) {
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 			}
-			this.fileList = new ArrayList<File>();
-			for (File f : files) {
+			this.fileList = new ArrayList<String>();
+			for (String f : files) {
 				this.fileList.add(f);
 			}
 		}
 		List<byte[]> dataList = new ArrayList<byte[]>();
 		for (int i = 0; i < readSize; i++) {
-			File file = fileList.remove(0);
+			String file = fileList.remove(0);
 			try {
 				MDLRXNV2000Reader reader = new MDLRXNV2000Reader(new FileReader(file));
 				Reaction reaction = (Reaction) reader.read(new Reaction());
 				reader.close();
 				dataList.add(CDKObjectHandler.getBytes(reaction));
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!",
-						this.getActivityName(), e);
-				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!");
+				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file + "!", this.getActivityName(), e);
+				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file + "!");
 			}
 			if (fileList.isEmpty()) {
 				state = FINISHED;

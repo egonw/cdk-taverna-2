@@ -21,7 +21,6 @@
  */
 package org.openscience.cdk.applications.taverna.io;
 
-import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +40,6 @@ import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.io.SMILESReader;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
@@ -52,7 +50,7 @@ import org.openscience.cdk.layout.StructureDiagramGenerator;
  * @author Andreas Truzskowski
  * 
  */
-public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFileReader {
+public class SMILESFileReaderActivity extends AbstractCDKActivity {
 
 	public static final String SMILES_FILE_READER_ACTIVITY = "SMILES File Reader";
 
@@ -60,12 +58,13 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 	 * Creates a new instance.
 	 */
 	public SMILESFileReaderActivity() {
+		this.INPUT_PORTS = new String[] { "Files" };
 		this.OUTPUT_PORTS = new String[] { "Structures" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		// empty
+		addInput(this.INPUT_PORTS[0], 1, true, null, String.class);
 	}
 
 	@Override
@@ -73,6 +72,7 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
@@ -82,19 +82,19 @@ public class SMILESFileReaderActivity extends AbstractCDKActivity implements IFi
 		CMLChemFile cmlChemFile = new CMLChemFile();
 		List<byte[]> dataArray = new ArrayList<byte[]>();
 		// Read SMILES file
-		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (files == null || files.length == 0) {
+		List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
+				context);
+		if (files == null || files.size() == 0) {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
-		for (File file : files) {
+		for (String file : files) {
 			IMoleculeSet som = null;
 			try {
 				SMILESReader reader = new SMILESReader(new FileReader(file));
 				som = (IMoleculeSet) reader.read(new MoleculeSet());
 				reader.close();
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!",
-						this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file + "!", this.getActivityName(), e);
 			}
 			IMoleculeSet som2D = new MoleculeSet();
 			StructureDiagramGenerator str = new StructureDiagramGenerator();

@@ -28,7 +28,6 @@ package org.openscience.cdk.applications.taverna.io;
  * 
  */
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
@@ -47,10 +46,9 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 
-public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFileReader {
+public class MDLSDFileReaderActivity extends AbstractCDKActivity {
 
 	public static final String SD_FILE_READER_ACTIVITY = "SDfile Reader";
 
@@ -58,12 +56,13 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 	 * Creates a new instance.
 	 */
 	public MDLSDFileReaderActivity() {
+		this.INPUT_PORTS = new String[] { "Files" };
 		this.OUTPUT_PORTS = new String[] { "Structures" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		// Nothing to add
+		addInput(this.INPUT_PORTS[0], 1, true, null, String.class);
 	}
 
 	@Override
@@ -71,6 +70,7 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
@@ -79,11 +79,12 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 		ReferenceService referenceService = context.getReferenceService();
 		List<byte[]> dataList = new ArrayList<byte[]>();
 		// Read SDfile
-		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (files == null || files.length == 0) {
+		List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
+				context);
+		if (files == null || files.size() == 0) {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
-		for (File file : files) {
+		for (String file : files) {
 			try {
 				LineNumberReader lineReader = new LineNumberReader(new FileReader(file));
 				String line;
@@ -98,7 +99,7 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 							tmpMDLReader.close();
 							dataList.add(CDKObjectHandler.getBytes(cmlChemFile));
 						} catch (Exception e) {
-							ErrorLogger.getInstance().writeError("Error in SD file: " + file.getPath() + "!\n" + SDFilePart,
+							ErrorLogger.getInstance().writeError("Error in SD file: " + file + "!\n" + SDFilePart,
 									this.getActivityName(), e);
 						} finally {
 							SDFilePart = "";
@@ -107,8 +108,7 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 				}
 				lineReader.close();
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!",
-						this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file + "!", this.getActivityName(), e);
 			}
 		}
 		// Congfigure output
@@ -131,9 +131,6 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity implements IFil
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".sdf");
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL SDFile");
-		properties.put(CDKTavernaConstants.PROPERTY_SUPPORT_MULTI_FILE, true);
 		return properties;
 	}
 

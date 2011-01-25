@@ -192,7 +192,7 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 				String options = tools.getOptionsFromFile(new File(files.get(i)), name);
 				int jobID = tools.getIDFromOptions(options);
 				String header = name + " - JobID: " + jobID;
-				charts.add(chartTool.createBarChart(header, "Ratio in percent", "(Class number/Number of Vectors)", dataSet));
+				charts.add(chartTool.createBarChart(header, "(Class number/Number of Vectors)", "Ratio in percent", dataSet));
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError("Error during evaluation of clustering results in file: " + files.get(i),
 						this.getActivityName(), e);

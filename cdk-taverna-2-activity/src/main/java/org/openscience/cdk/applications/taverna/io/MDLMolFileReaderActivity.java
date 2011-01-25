@@ -21,7 +21,6 @@
  */
 package org.openscience.cdk.applications.taverna.io;
 
-import java.io.File;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -40,7 +39,6 @@ import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.io.MDLReader;
 
 /**
@@ -49,7 +47,7 @@ import org.openscience.cdk.io.MDLReader;
  * @author Andreas Truzskowski
  * 
  */
-public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFileReader {
+public class MDLMolFileReaderActivity extends AbstractCDKActivity {
 
 	public static final String MOL_FILE_READER_ACTIVITY = "Mol file Reader";
 
@@ -57,12 +55,13 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFi
 	 * Creates a new instance.
 	 */
 	public MDLMolFileReaderActivity() {
-		this.OUTPUT_PORTS = new String[] { "Structure(s)" };
+		this.INPUT_PORTS = new String[] { "Files" };
+		this.OUTPUT_PORTS = new String[] { "Structures" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		// Nothing to add
+		addInput(this.INPUT_PORTS[0], 1, true, null, String.class);
 	}
 
 	@Override
@@ -70,6 +69,7 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFi
 		addOutput(this.OUTPUT_PORTS[0], 0);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, T2Reference> work(final Map<String, T2Reference> inputs, final AsynchronousActivityCallback callback)
 			throws CDKTavernaException {
@@ -78,17 +78,17 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFi
 		ReferenceService referenceService = context.getReferenceService();
 		List<CMLChemFile> cmlChemFiles = new LinkedList<CMLChemFile>();
 		// Read mol file
-		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (files == null || files.length == 0) {
+		List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
+				context);
+		if (files == null || files.size() == 0) {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
-		for (File file : files) {
+		for (String file : files) {
 			try {
 				MDLReader reader = new MDLReader(new FileReader(file));
 				cmlChemFiles.addAll(CMLChemFileWrapper.wrapInChemModelList((CMLChemFile) reader.read(new CMLChemFile())));
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath(),
-						this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file, this.getActivityName(), e);
 			}
 		}
 		// Congfigure output
@@ -112,9 +112,6 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity implements IFi
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".mol");
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "MDL Molfile");
-		properties.put(CDKTavernaConstants.PROPERTY_SUPPORT_MULTI_FILE, true);
 		return properties;
 	}
 

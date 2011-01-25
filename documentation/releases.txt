@@ -44,3 +44,9 @@
 - Added silhouette plot for weka clustering
 - Added split molecules in clusters activity
 - Reworked the chart tool
+
+0.3.3
+- Added the merge CSV files activity
+- Reworked object serialization (now supports huge objects)
+- Added remove sugar groups worker
+- Adapted file reader activities for the command line tools
