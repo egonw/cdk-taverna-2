@@ -24,6 +24,7 @@ package org.openscience.cdk.applications.taverna.io;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,7 @@ public class CSVFileWriterActivity extends AbstractCDKActivity implements IItera
 	 */
 	public CSVFileWriterActivity() {
 		this.INPUT_PORTS = new String[] { "CSV Strings" };
+		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
 	@Override
@@ -65,7 +67,7 @@ public class CSVFileWriterActivity extends AbstractCDKActivity implements IItera
 
 	@Override
 	protected void addOutputPorts() {
-		// Nothing to add
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -76,6 +78,8 @@ public class CSVFileWriterActivity extends AbstractCDKActivity implements IItera
 		ReferenceService referenceService = context.getReferenceService();
 		List<String> strings = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
 				context);
+		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
+		List<String> files = new ArrayList<String>();
 		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (directory == null) {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_OUTPUT_DIRECTORY_CHOSEN);
@@ -101,12 +105,20 @@ public class CSVFileWriterActivity extends AbstractCDKActivity implements IItera
 				writer.write(s + "\n");
 			}
 			writer.close();
+			files.add(this.file.getPath());
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + file.getPath() + "!",
 					this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRITE_FILE_ERROR + file.getPath() + "!");
 		}
-		return null;
+		try {
+			T2Reference containerRef = referenceService.register(files, 1, true, context);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
+		}
+		return outputs;
 	}
 
 	@Override

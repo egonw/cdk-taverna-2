@@ -28,7 +28,7 @@ public class CDKServiceProvider implements ServiceDescriptionProvider {
 		CDKServiceDescriptor service;
 		// First abuse this method to clean up the previous generated cache.
 		this.cleanCache();
-		// Use callback.status() for long-running searches
+			// Use callback.status() for long-running searches
 		// callBack.status("Resolving example services");
 		try {
 			List<ServiceDescription> results = new ArrayList<ServiceDescription>();

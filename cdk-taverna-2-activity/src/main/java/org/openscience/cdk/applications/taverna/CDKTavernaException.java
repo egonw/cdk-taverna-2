@@ -60,7 +60,7 @@ public class CDKTavernaException extends Exception {
 	public static final String ERROR_INVOKING_WORKERS = "Error while invoking workers!";
 	public static final String ERROR_DURING_SUBSTRUCTURE_SEARCH = "Error during substructure search!";
 	public static final String ERROR_WHILE_PARSING_SMILES = "Error while parsing SMILES!";
-	
+	public static final String CANT_INITIALIZE_TRAY = "Can't initialize tray!";
 	public CDKTavernaException(String activityName, String type) {
 		super(type + " Class: " + activityName + ".");
 	}

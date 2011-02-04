@@ -35,7 +35,6 @@ import org.junit.Assert;
 import org.openscience.cdk.ChemFile;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
-import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -59,13 +58,7 @@ public class LoopSDFileReaderActivityTest extends CDKTavernaTestCases {
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		// TODO read resource
-		File[] sdTestFile = new File[] { new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-				+ "data" + File.separator + "mol" + File.separator + "sdfile.sdf") };
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, sdTestFile);
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE, 1);
 		configBean.setActivityName(LoopSDFileReaderActivity.LOOP_SD_FILE_READER_ACTIVITY);
-
 	}
 
 	@SuppressWarnings("unchecked")
@@ -73,6 +66,10 @@ public class LoopSDFileReaderActivityTest extends CDKTavernaTestCases {
 		activity.configure(configBean);
 		// leave empty. No ports used
 		Map<String, Object> inputs = new HashMap<String, Object>();
+		String file = "src" + File.separator + "test" + File.separator + "resources" + File.separator
+				+ "data" + File.separator + "mol" + File.separator + "sdfile.sdf";
+		inputs.put(this.activity.getINPUT_PORTS()[0], file);
+		inputs.put(this.activity.getINPUT_PORTS()[1], 1);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
 		expectedOutputTypes.put(activity.getRESULT_PORTS()[1], String.class);

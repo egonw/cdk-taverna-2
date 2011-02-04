@@ -140,8 +140,11 @@ public class SugarGroupRemoverActivity extends AbstractCDKActivity {
 						}
 					}
 				}
+				// TODO Copy all properties?
+				Map<Object, Object> properties = molecule.getProperties();
 				IMoleculeSet molset = ConnectivityChecker.partitionIntoMolecules(molecule);
 				for (int i = 0; i < molset.getMoleculeCount(); i++) {
+					molset.getMolecule(i).setProperties(properties);
 					int size = molset.getMolecule(i).getBondCount();
 					if (size >= 5) {
 						if (hasSugarChains(molset.getMolecule(i), ringset.getAtomContainerCount()) == false) {

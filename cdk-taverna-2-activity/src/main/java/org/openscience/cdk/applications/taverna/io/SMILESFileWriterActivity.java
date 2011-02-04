@@ -59,6 +59,7 @@ public class SMILESFileWriterActivity extends AbstractCDKActivity implements IFi
 	 */
 	public SMILESFileWriterActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
+		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
 	@Override
@@ -68,7 +69,7 @@ public class SMILESFileWriterActivity extends AbstractCDKActivity implements IFi
 
 	@Override
 	protected void addOutputPorts() {
-		// empty
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -78,6 +79,8 @@ public class SMILESFileWriterActivity extends AbstractCDKActivity implements IFi
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
+		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
+		List<String> files = new ArrayList<String>();
 		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
 				context);
 		try {
@@ -98,11 +101,19 @@ public class SMILESFileWriterActivity extends AbstractCDKActivity implements IFi
 				writer.write(CMLChemFileWrapper.wrapChemModelInAtomContainer(cmlChemFile));
 			}
 			writer.close();
+			files.add(file.getPath());
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + file.getPath() + "!",
 					this.getActivityName(), e);
 		}
-		return null;
+		try {
+			T2Reference containerRef = referenceService.register(files, 1, true, context);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
+		}
+		return outputs;
 	}
 
 	@Override

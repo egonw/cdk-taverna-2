@@ -61,6 +61,7 @@ public class WriteMoleculeAsPNGActivity extends AbstractCDKActivity implements I
 	 */
 	public WriteMoleculeAsPNGActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
+		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
 	@Override
@@ -70,7 +71,7 @@ public class WriteMoleculeAsPNGActivity extends AbstractCDKActivity implements I
 
 	@Override
 	protected void addOutputPorts() {
-		// Nothing to add
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@Override
@@ -102,7 +103,8 @@ public class WriteMoleculeAsPNGActivity extends AbstractCDKActivity implements I
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
 		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
-
+		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
+		List<String> files = new ArrayList<String>();
 		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
 				context);
 		try {
@@ -119,13 +121,20 @@ public class WriteMoleculeAsPNGActivity extends AbstractCDKActivity implements I
 				IAtomContainer molecule = ChemFileManipulator.getAllAtomContainers(cmlChemFile).get(0);
 				BufferedImage image = Draw2DStructure.drawMolecule(molecule, 800, 600);
 				ImageIO.write(image, "png", file);
+				files.add(file.getPath());
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError("Error rendering image!", this.getActivityName(), e);
 				throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 			}
 		}
-		return null;
-
+		try {
+			T2Reference containerRef = referenceService.register(files, 1, true, context);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
+		}
+		return outputs;
 	}
 
 }
