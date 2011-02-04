@@ -56,6 +56,7 @@ public class CMLFileWriterActivity extends AbstractCDKActivity implements IFileW
 
 	public CMLFileWriterActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
+		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
 	@Override
@@ -65,7 +66,7 @@ public class CMLFileWriterActivity extends AbstractCDKActivity implements IFileW
 
 	@Override
 	protected void addOutputPorts() {
-		// empty
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -74,7 +75,9 @@ public class CMLFileWriterActivity extends AbstractCDKActivity implements IFileW
 			throws CDKTavernaException {
 		InvocationContext context = callback.getContext();
 		ReferenceService referenceService = context.getReferenceService();
+		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
+		List<String> files = new ArrayList<String>();
 		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
 				context);
 		try {
@@ -97,12 +100,20 @@ public class CMLFileWriterActivity extends AbstractCDKActivity implements IFileW
 			CMLWriter writer = new CMLWriter(new FileOutputStream(file));
 			writer.write(tmpChemFile);
 			writer.close();
+			files.add(file.getPath());
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + file.getPath() + "!",
 					this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRITE_FILE_ERROR + file.getPath() + "!");
 		}
-		return null;
+		try {
+			T2Reference containerRef = referenceService.register(files, 1, true, context);
+			outputs.put(this.OUTPUT_PORTS[0], containerRef);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
+		}
+		return outputs;
 	}
 
 	@Override

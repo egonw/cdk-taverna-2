@@ -1,5 +1,6 @@
 package org.openscience.cdk.applications.taverna.ui.serviceprovider;
 
+import java.awt.Color;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ import javax.swing.Icon;
 import net.sf.taverna.t2.servicedescriptions.ServiceDescription;
 import net.sf.taverna.t2.servicedescriptions.ServiceDescriptionProvider;
 import net.sf.taverna.t2.spi.SPIRegistry;
+import net.sf.taverna.t2.workbench.ui.impl.configuration.colour.ColourManager;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
@@ -40,6 +42,7 @@ public class CDKServiceProvider implements ServiceDescriptionProvider {
 				// TODO set description
 				service.setDescription(null);// TODO cdkActivity.getDescription());
 				service.setAdditionalProperties(cdkActivity.getAdditionalProperties());
+				this.setActivityColour(cdkActivity);
 				results.add(service);
 			}
 			// partialResults() can also be called several times from inside
@@ -52,6 +55,38 @@ public class CDKServiceProvider implements ServiceDescriptionProvider {
 		}
 	}
 
+	private void setActivityColour(AbstractCDKActivity cdkActivity) {
+		String name = cdkActivity.getClass().getName();
+		String colour;
+		if(name.startsWith("org.openscience.cdk.applications.taverna.classification.art2a")) {
+			colour = "#00EE76"; // Springgreen2
+		} else if(name.startsWith("org.openscience.cdk.applications.taverna.filter")) {
+			colour = "#EEAEEE"; // Plum2
+		} else if(name.startsWith("org.openscience.cdk.applications.taverna.io")) {
+			colour = "#D44942"; // Chili
+		} else if(name.startsWith("org.openscience.cdk.applications.taverna.isomorphism")) {
+			colour = "#D15FEE"; // Mediumorchid2
+		} else if(name.startsWith("org.openscience.cdk.applications.taverna.iterativeio")) {
+			colour = "#CD5555"; // Indianred3
+		} else if(name.startsWith("org.openscience.cdk.applications.taverna.jchempaint")) {
+			colour = "#CCFFCC"; // offwhitegreen
+		} else if(name.startsWith("org.openscience.cdk.applications.taverna.miscellaneous")) {
+			colour = "#CCCC00"; // ralphyellow
+		} else if(name.startsWith("org.openscience.cdk.applications.taverna.qsar")) {
+			colour = "#49E20E"; // Nerf green
+		} else if(name.startsWith("org.openscience.cdk.applications.taverna.reactionenumerator")) {
+			colour = "#40E0D0"; // Turquoise
+		} else if(name.startsWith("org.openscience.cdk.applications.taverna.renderer")) {
+			colour = "#F0E68C"; // Khaki
+		} else if(name.startsWith("org.openscience.cdk.applications.taverna.stringconverter")) {
+			colour = "#00FFFF"; // Cyan
+		} else if(name.startsWith("org.openscience.cdk.applications.taverna.weka")) {
+			colour = "#DB2929"; // Brownmadder
+		} else {
+			colour = "#FFFFFF"; //White
+		}
+		ColourManager.getInstance().setPreferredColour(cdkActivity.getClass().getName(), Color.decode(colour));
+	}
 	/**
 	 * Clears the cache directoy.
 	 */

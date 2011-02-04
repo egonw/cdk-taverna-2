@@ -50,3 +50,7 @@
 - Reworked object serialization (now supports huge objects)
 - Added remove sugar groups worker
 - Adapted file reader activities for the command line tools
+
+0.3.4
+- Filewriter now provide the filenames written over a output port
+- Enabled colouring of the actvities
