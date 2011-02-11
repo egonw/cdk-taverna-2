@@ -72,7 +72,7 @@ public class SetupController {
 		this.loaded = true;
 		String workingDirFilename = FileNameGenerator.getTempDir() + File.separator + "Test";
 		this.properties.setProperty(WORKING_DIRECTORY, workingDirFilename);
-		Boolean isDataCaching = true;
+		Boolean isDataCaching = false; // Most unit tests are not working with the caching
 		this.properties.setProperty(IS_DATA_CACHING, "" + isDataCaching);
 	}
 
