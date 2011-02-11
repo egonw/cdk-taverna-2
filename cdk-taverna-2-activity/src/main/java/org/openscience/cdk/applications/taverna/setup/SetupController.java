@@ -73,7 +73,7 @@ public class SetupController {
 		String workingDirFilename = FileNameGenerator.getTempDir() + File.separator + "Test";
 		this.properties.setProperty(WORKING_DIRECTORY, workingDirFilename);
 		Boolean isDataCaching = true;
-		this.properties.setProperty(WORKING_DIRECTORY, "" + isDataCaching);
+		this.properties.setProperty(IS_DATA_CACHING, "" + isDataCaching);
 	}
 
 	public synchronized void loadConfiguration() {
