@@ -23,26 +23,18 @@ package org.openscience.cdk.applications.taverna.miscellaneous;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
-
+import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
-import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
-import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IPortNumber;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IReaction;
 
 /**
- * Class which represents the reaction reactant splitter activity. It splits a given reaction into its reactants.
+ * Class which represents the reaction reactant splitter activity. It splits a
+ * given reaction into its reactants.
  * 
  * @author Andreas Truszkowski
  * 
@@ -63,7 +55,8 @@ public class ReactionReactantSplitterActivity extends AbstractCDKActivity implem
 
 	@Override
 	protected void addOutputPorts() {
-		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
+		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
 		this.OUTPUT_PORTS = new String[numberOfPorts];
 		for (int i = 0; i < numberOfPorts; i++) {
 			this.OUTPUT_PORTS[i] = "Reactant " + (i + 1);
@@ -93,41 +86,25 @@ public class ReactionReactantSplitterActivity extends AbstractCDKActivity implem
 		return CDKTavernaConstants.MISCELLANEOUS_FOLDER_NAME;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback) throws Exception {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		List<IReaction> reactionList;
-		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
+	public void work() throws Exception {
+		// Get input
+		List<Reaction> reactionList = this.getInputAsList(this.INPUT_PORTS[0], Reaction.class);
+		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
+		// Do work
 		CMLChemFile[] resultList = new CMLChemFile[numberOfPorts];
 		for (int i = 0; i < resultList.length; i++) {
 			resultList[i] = new CMLChemFile();
 		}
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
-				context);
-		// try {
-		reactionList = CDKObjectHandler.getReactionList(dataArray);
-		// } catch (Exception e) {
-		// throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		// }
 		for (int i = 0; i < numberOfPorts; i++) {
 			IAtomContainer container = reactionList.get(0).getReactants().getAtomContainer(i);
 			CMLChemFile chemFile = CMLChemFileWrapper.wrapAtomContainerInChemModel(container);
 			resultList[i] = chemFile;
 		}
-		// Congfigure output
-		try {
-			for (int i = 0; i < resultList.length; i++) {
-				byte[] dataObject = CDKObjectHandler.getBytes(resultList[i]);
-				T2Reference containerRef = referenceService.register(dataObject, 0, true, context);
-				outputs.put(this.OUTPUT_PORTS[i], containerRef);
-			}
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
+		// Set output
+		for (int i = 0; i < resultList.length; i++) {
+			this.setOutputAsObject(resultList[i], this.OUTPUT_PORTS[i]);
 		}
-		return outputs;
 	}
 }

@@ -45,7 +45,8 @@ public class WekaClusteringWorker extends Thread {
 			// Do clustering
 			clusterer.buildClusterer(dataset);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.CLUSTERING_ERROR, this.getClass().getSimpleName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.CLUSTERING_ERROR, this.getClass().getSimpleName(),
+					e);
 		} finally {
 			done = true;
 			this.owner.workerDone(clusterer, optionString);

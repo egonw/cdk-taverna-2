@@ -25,28 +25,22 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.stream.XMLStreamWriter;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.art2aclassification.Art2aClassificator;
 import org.openscience.cdk.applications.art2aclassification.FingerprintItem;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.io.XMLFileIO;
 
 /**
- * Class which implements a local worker for the cdk-taverna project. This worker uses an implementation of the ART2A
- * Classificator to classify a given set of fingerprint items.
+ * Class which implements a local worker for the cdk-taverna project. This
+ * worker uses an implementation of the ART2A Classificator to classify a given
+ * set of fingerprint items.
  * 
  * @author Thomas Kuhn
  * @author Andreas Truzskowski
@@ -77,21 +71,24 @@ public class ART2aClassificationActivity extends AbstractCDKActivity {
 	 */
 	private int maximumClassificationTime = 15;
 	/**
-	 * The flag is used to switch between deterministic random and random random. If mDeterministicRandom = true a seed of 1 is
-	 * used. If mDeterministicRandom = false no seed is set explicitly
+	 * The flag is used to switch between deterministic random and random
+	 * random. If mDeterministicRandom = true a seed of 1 is used. If
+	 * mDeterministicRandom = false no seed is set explicitly
 	 */
 	private boolean deterministicRandom = true;
 
 	/**
-	 * This flag enables the switch between the two convergence criteria. convergenceFlag = true means the clustering is
-	 * convergent if the angels between two cluster has the required similarity between two epochs. convergenceFlag = false means
-	 * the clustering is convergent if the number of cluster have the same composition as in the previous epoch.
+	 * This flag enables the switch between the two convergence criteria.
+	 * convergenceFlag = true means the clustering is convergent if the angels
+	 * between two cluster has the required similarity between two epochs.
+	 * convergenceFlag = false means the clustering is convergent if the number
+	 * of cluster have the same composition as in the previous epoch.
 	 */
 	private boolean convergenceFlag = true;
 
 	/**
-	 * The required similarity for the use of the convergence flag. This is the required similarity used if the convergence flag
-	 * is set to true.
+	 * The required similarity for the use of the convergence flag. This is the
+	 * required similarity used if the convergence flag is set to true.
 	 */
 	private double requiredSimilarity = 0.99;
 
@@ -113,30 +110,19 @@ public class ART2aClassificationActivity extends AbstractCDKActivity {
 		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		List<FingerprintItem> fingerprintItemList = new ArrayList<FingerprintItem>();
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
-				context);
-		try {
-			fingerprintItemList = CDKObjectHandler.getFingerprintList(dataArray);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
+	public void work() throws Exception {
+		// Get input
+		List<FingerprintItem> fingerprintItemList = this.getInputAsList(this.INPUT_PORTS[0], FingerprintItem.class);
 		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (directory == null) {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_OUTPUT_DIRECTORY_CHOSEN);
 		}
-		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
+		String extension = (String) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
+		// Do work
 		FingerprintItem[] fingerprintItemArray = new FingerprintItem[fingerprintItemList.size()];
 		fingerprintItemList.toArray(fingerprintItemArray);
-
 		this.scaleFingerprintItemToInternalZeroOne = (Boolean) this.getConfiguration().getAdditionalProperty(
 				CDKTavernaConstants.PROPERTY_SCALE_FINGERPRINT_ITEMS);
 		this.numberOfClassifications = (Integer) this.getConfiguration().getAdditionalProperty(
@@ -150,7 +136,8 @@ public class ART2aClassificationActivity extends AbstractCDKActivity {
 
 		if (this.numberOfClassifications < 1)
 			throw new IllegalArgumentException("The number of clusters must be greater 0.");
-		if (this.upperVigilanceLimit < 0 || this.upperVigilanceLimit > 1 || this.upperVigilanceLimit <= this.lowerVigilanceLimit)
+		if (this.upperVigilanceLimit < 0 || this.upperVigilanceLimit > 1
+				|| this.upperVigilanceLimit <= this.lowerVigilanceLimit)
 			throw new IllegalArgumentException("The upper limit of the vigilance parameter is out of boundaries.");
 		if (this.lowerVigilanceLimit < 0 || this.lowerVigilanceLimit > 1)
 			throw new IllegalArgumentException("The lower limit of the vigilance parameter is out of boundaries.");
@@ -182,7 +169,8 @@ public class ART2aClassificationActivity extends AbstractCDKActivity {
 				myART.setDeterministicRandom(this.deterministicRandom);
 				myART.classify();
 				// Store the results
-				String name = "ART2a_Result" + String.valueOf(i + 1) + "of" + String.valueOf(this.numberOfClassifications) + "_";
+				String name = "ART2a_Result" + String.valueOf(i + 1) + "of"
+						+ String.valueOf(this.numberOfClassifications) + "_";
 				File file = FileNameGenerator.getNewFile(directory.getPath(), extension, name);
 				writer = xmlFileIO.getXMLStreamWriterWithCompression(file);
 				writer.writeStartDocument();
@@ -197,9 +185,8 @@ public class ART2aClassificationActivity extends AbstractCDKActivity {
 								+ String.valueOf(this.numberOfClassifications) + "!", this.getActivityName(), e);
 			}
 		}
-		T2Reference containerRef = referenceService.register(resultFiles, 1, true, context);
-		outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		return outputs;
+		// Set output
+		this.setOutputAsStringList(resultFiles, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override
@@ -215,7 +202,8 @@ public class ART2aClassificationActivity extends AbstractCDKActivity {
 		properties.put(CDKTavernaConstants.PROPERTY_UPPER_VIGILANCE_LIMIT, this.upperVigilanceLimit);
 		properties.put(CDKTavernaConstants.PROPERTY_LOWER_VIGILANCE_LIMIT, this.lowerVigilanceLimit);
 		properties.put(CDKTavernaConstants.PROPERTY_MAXIMUM_CLASSIFICATION_TIME, this.maximumClassificationTime);
-		properties.put(CDKTavernaConstants.PROPERTY_SCALE_FINGERPRINT_ITEMS, this.scaleFingerprintItemToInternalZeroOne);
+		properties
+				.put(CDKTavernaConstants.PROPERTY_SCALE_FINGERPRINT_ITEMS, this.scaleFingerprintItemToInternalZeroOne);
 		return properties;
 	}
 

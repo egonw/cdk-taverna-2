@@ -28,18 +28,11 @@ package org.openscience.cdk.applications.taverna.filter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.qsar.DescriptorValue;
@@ -62,7 +55,7 @@ public class RuleOfFiveFilter extends AbstractCDKActivity {
 
 	public RuleOfFiveFilter() {
 		this.INPUT_PORTS = new String[] { "Structures" };
-		this.OUTPUT_PORTS = new String[] { "matchingStructures", "otherStructures" };
+		this.OUTPUT_PORTS = new String[] { "matchingStructures", "discardedStructures" };
 	}
 
 	@Override
@@ -97,23 +90,12 @@ public class RuleOfFiveFilter extends AbstractCDKActivity {
 		return CDKTavernaConstants.FILTER_FOLDER_NAME;
 	}
 
-	@SuppressWarnings("unchecked")
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		List<CMLChemFile> inputList = new ArrayList<CMLChemFile>();
+	public void work() throws Exception {
+		// Get input
+		List<CMLChemFile> inputList = this.getInputAsList(this.INPUT_PORTS[0], CMLChemFile.class);
+		// Do work
 		List<CMLChemFile> matchedList = new ArrayList<CMLChemFile>();
 		List<CMLChemFile> unmatchedList = new ArrayList<CMLChemFile>();
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
-				context);
-		try {
-			inputList = CDKObjectHandler.getChemFileList(dataArray);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
 		if (descriptor == null) {
 			descriptor = new RuleOfFiveDescriptor();
 		}
@@ -124,7 +106,8 @@ public class RuleOfFiveFilter extends AbstractCDKActivity {
 					try {
 						DescriptorValue value = descriptor.calculate(molecule);
 						molecule.setProperty(value.getSpecification(), value);
-						if (value.getValue() instanceof IntegerResult && ((IntegerResult) value.getValue()).intValue() == 0) {
+						if (value.getValue() instanceof IntegerResult
+								&& ((IntegerResult) value.getValue()).intValue() == 0) {
 							matchedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(molecule));
 						} else {
 							unmatchedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(molecule));
@@ -140,19 +123,9 @@ public class RuleOfFiveFilter extends AbstractCDKActivity {
 		} catch (Exception exception) {
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), exception.getMessage());
 		}
-		// Congfigure output
-		try {
-			dataArray = CDKObjectHandler.getBytesList(matchedList);
-			T2Reference containerRef = referenceService.register(dataArray, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-			dataArray = CDKObjectHandler.getBytesList(unmatchedList);
-			containerRef = referenceService.register(dataArray, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[1], containerRef);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error while configurating output port!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error while configurating output port!");
-		}
-		return outputs;
+		// Set output
+		this.setOutputAsObjectList(matchedList, this.OUTPUT_PORTS[0]);
+		this.setOutputAsObjectList(unmatchedList, this.OUTPUT_PORTS[1]);
 	}
 
 }

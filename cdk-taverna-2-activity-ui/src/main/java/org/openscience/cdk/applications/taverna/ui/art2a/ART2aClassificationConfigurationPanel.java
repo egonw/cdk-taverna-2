@@ -15,8 +15,8 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.Preferences;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.applications.taverna.iterativeio.DataStreamController;
 
 public class ART2aClassificationConfigurationPanel extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
@@ -32,10 +32,10 @@ public class ART2aClassificationConfigurationPanel extends
 		private static final long serialVersionUID = 2594222854083984583L;
 
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser openDialog = new JFileChooser(new File(Preferences.getInstance().getCurrentDirectory()));
+			JFileChooser openDialog = new JFileChooser(new File(DataStreamController.getInstance().getCurrentDirectory()));
 			openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			if (openDialog.showOpenDialog(ART2aClassificationConfigurationPanel.this) == JFileChooser.APPROVE_OPTION) {
-				Preferences.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
+				DataStreamController.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
 				ART2aClassificationConfigurationPanel.this.file = openDialog.getSelectedFile();
 				ART2aClassificationConfigurationPanel.this.showValue();
 			}

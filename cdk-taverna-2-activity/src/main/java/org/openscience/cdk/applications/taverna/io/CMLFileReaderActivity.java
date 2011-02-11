@@ -27,22 +27,20 @@ package org.openscience.cdk.applications.taverna.io;
  * @author Andreas Truzskowski
  * 
  */
+import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.io.CMLReader;
@@ -61,7 +59,10 @@ public class CMLFileReaderActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addInputPorts() {
-		addInput(this.INPUT_PORTS[0], 1, true, null, String.class);
+		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+		expectedReferences.add(FileReference.class);
+		expectedReferences.add(InlineStringReference.class);
+		addInput(this.INPUT_PORTS[0], 1, false, expectedReferences, null);
 	}
 
 	@Override
@@ -69,40 +70,30 @@ public class CMLFileReaderActivity extends AbstractCDKActivity {
 		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		CMLChemFile cmlChemFile = new CMLChemFile();
-		List<CMLChemFile> cmlChemFileList = null;
-		List<byte[]> dataList = new ArrayList<byte[]>();
-		// Read SDfile
-		List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
-				context);
-		if (files == null || files.size() == 0) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
-		}
-		for (String file : files) {
+	public void work() throws Exception {
+		// Get input
+		List<File> files = this.getInputAsFileList(this.INPUT_PORTS[0]);
+		// Do work
+		CMLChemFile cmlChemFile;
+		List<CMLChemFile> cmlChemFileList;
+		List<CMLChemFile> dataList = new ArrayList<CMLChemFile>();
+		for (File file : files) {
 			try {
 				CMLReader reader = new CMLReader(new FileInputStream(file));
-				cmlChemFile = (CMLChemFile) reader.read(cmlChemFile);
+				cmlChemFile = (CMLChemFile) reader.read(new CMLChemFile());
 				reader.close();
 				cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(cmlChemFile);
-				// Congfigure output
 				for (CMLChemFile c : cmlChemFileList) {
-					dataList.add(CDKObjectHandler.getBytes(c));
+					dataList.add(c);
 				}
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file, this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath(),
+						this.getActivityName(), e);
 			}
 		}
-		T2Reference containerRef = referenceService.register(dataList, 1, true, context);
-		outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		// Return results
-		return outputs;
+		// Set output
+		this.setOutputAsObjectList(dataList, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override

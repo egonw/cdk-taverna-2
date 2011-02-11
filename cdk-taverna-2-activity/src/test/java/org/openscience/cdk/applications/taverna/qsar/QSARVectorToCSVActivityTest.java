@@ -55,10 +55,6 @@ public class QSARVectorToCSVActivityTest extends CDKTavernaTestCases {
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		// TODO read resource
-		File[] csvFile = new File[] { new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-				+ "data" + File.separator + "qsar" + File.separator + "qsar.csv") };
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, csvFile);
 		configBean.setActivityName(CSVToQSARVectorActivity.CSV_TO_QSAR_VECTOR_ACTIVITY);
 	}
 
@@ -68,17 +64,20 @@ public class QSARVectorToCSVActivityTest extends CDKTavernaTestCases {
 		loadActivity.configure(configBean);
 		// leave empty. No ports used
 		Map<String, Object> inputs = new HashMap<String, Object>();
+		File csvFile = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
+				+ "data" + File.separator + "qsar" + File.separator + "qsar.csv");
+		inputs.put(loadActivity.INPUT_PORTS[0], csvFile);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[1], byte[].class);
+		expectedOutputTypes.put(loadActivity.OUTPUT_PORTS[0], byte[].class);
+		expectedOutputTypes.put(loadActivity.OUTPUT_PORTS[1], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(loadActivity, inputs, expectedOutputTypes);
 		// leave empty. No ports used
 		inputs = outputs;
 		expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(csvActivity.getRESULT_PORTS()[0], String.class);
+		expectedOutputTypes.put(csvActivity.OUTPUT_PORTS[0], String.class);
 		outputs = ActivityInvoker.invokeAsyncActivity(csvActivity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
-		List<String> csvs = (List<String>) outputs.get(csvActivity.getRESULT_PORTS()[0]);
+		List<String> csvs = (List<String>) outputs.get(csvActivity.OUTPUT_PORTS[0]);
 		Assert.assertEquals(10, csvs.size());
 	}
 

@@ -74,9 +74,10 @@ public class ChartTool {
 	 * @param dataset
 	 * @return JfreeChart instance.
 	 */
-	public JFreeChart createAreaChart(String title, String categoryAxisLabel, String valueAxisLabel, CategoryDataset dataset) {
-		JFreeChart chart = ChartFactory.createAreaChart(title, categoryAxisLabel, valueAxisLabel, dataset, this.orientation,
-				this.drawLegend, false, false);
+	public JFreeChart createAreaChart(String title, String categoryAxisLabel, String valueAxisLabel,
+			CategoryDataset dataset) {
+		JFreeChart chart = ChartFactory.createAreaChart(title, categoryAxisLabel, valueAxisLabel, dataset,
+				this.orientation, this.drawLegend, false, false);
 		// set the background color for the chart...
 		chart.setBackgroundPaint(Color.white);
 		chart.setAntiAlias(true);
@@ -105,9 +106,10 @@ public class ChartTool {
 	 * @param dataset
 	 * @return JfreeChart instance.
 	 */
-	public JFreeChart createBarChart(String title, String categoryAxisLabel, String valueAxisLabel, CategoryDataset dataset) {
-		JFreeChart chart = ChartFactory.createBarChart(title, categoryAxisLabel, valueAxisLabel, dataset, this.orientation,
-				this.drawLegend, false, false);
+	public JFreeChart createBarChart(String title, String categoryAxisLabel, String valueAxisLabel,
+			CategoryDataset dataset) {
+		JFreeChart chart = ChartFactory.createBarChart(title, categoryAxisLabel, valueAxisLabel, dataset,
+				this.orientation, this.drawLegend, false, false);
 		// set the background color for the chart...
 		chart.setBackgroundPaint(Color.white);
 		chart.setAntiAlias(true);
@@ -136,9 +138,10 @@ public class ChartTool {
 	 * @param dataset
 	 * @return JfreeChart instance.
 	 */
-	public JFreeChart createLineChart(String title, String categoryAxisLabel, String valueAxisLabel, CategoryDataset dataset) {
-		JFreeChart chart = ChartFactory.createLineChart(title, categoryAxisLabel, valueAxisLabel, dataset, this.orientation,
-				this.drawLegend, false, false);
+	public JFreeChart createLineChart(String title, String categoryAxisLabel, String valueAxisLabel,
+			CategoryDataset dataset) {
+		JFreeChart chart = ChartFactory.createLineChart(title, categoryAxisLabel, valueAxisLabel, dataset,
+				this.orientation, this.drawLegend, false, false);
 		// set the background color for the chart...
 		chart.setBackgroundPaint(Color.white);
 		chart.setAntiAlias(true);

@@ -72,8 +72,8 @@ public class ReactionEnumeratorActivityTest extends CDKTavernaTestCases {
 		chemFiles = CDKTavernaTestData.getReactionEvaluationEductTwo();
 		data = CDKObjectHandler.getBytesList(chemFiles);
 		inputs.put(ReactionEnumeratorActivity.REACTANT_PORT + " " + "2", data);
-		List<byte[]> reactionData = CDKObjectHandler.getBytesList(new Reaction[] { CDKTavernaTestData
-				.getReactionEvaluationReaction() });
+		byte[] reactionData = CDKObjectHandler.getBytes(CDKTavernaTestData
+				.getReactionEvaluationReaction());
 		inputs.put(ReactionEnumeratorActivity.REACTION_PORT, reactionData);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(ReactionEnumeratorActivity.RESULT_PORT, byte[].class);

@@ -27,13 +27,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -53,7 +47,8 @@ import weka.core.SerializationHelper;
 import weka.filters.Filter;
 
 /**
- * Class which represents the the clustering result considering different origins to PDF activity.
+ * Class which represents the the clustering result considering different
+ * origins to PDF activity.
  * 
  * @author Andreas Truzskowski
  * 
@@ -67,6 +62,7 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 	 */
 	public ClusteringResultConsideringDifferentOriginsAsPDF() {
 		this.INPUT_PORTS = new String[] { "Weka Clustering Files", "Relations Table" };
+		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
 	@Override
@@ -80,21 +76,14 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 		// empty
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
+	public void work() throws Exception {
+		// Get input
+		List<String> files = this.getInputAsList(this.INPUT_PORTS[0], String.class);
+		List<String> relationTable = this.getInputAsList(this.INPUT_PORTS[1], String.class);
+		// Do work
 		List<String> resultFileNames = new ArrayList<String>();
 		List<String> pdfTitle = new ArrayList<String>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
-				context);
-		if (files == null || files.size() == 0) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_CLUSTERING_DATA_AVAILABLE);
-		}
-		ArrayList<String> relationTable = (ArrayList<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[1]),
-				String.class, context);
 		// Prepare relation table data
 		ArrayList<String> subjectNames = new ArrayList<String>();
 		HashMap<String, Integer> numberOfSubjectsInTable = new HashMap<String, Integer>();
@@ -139,8 +128,8 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 				uuids = Filter.useFilter(dataset, tools.getIDGetter(dataset));
 				dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			} catch (Exception e) {
-				ErrorLogger.getInstance()
-						.writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR, this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR,
+						this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR);
 			}
 			try {
@@ -192,9 +181,11 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 				String options = tools.getOptionsFromFile(new File(files.get(i)), name);
 				int jobID = tools.getIDFromOptions(options);
 				String header = name + " - JobID: " + jobID;
-				charts.add(chartTool.createBarChart(header, "(Class number/Number of Vectors)", "Ratio in percent", dataSet));
+				charts.add(chartTool.createBarChart(header, "(Class number/Number of Vectors)", "Ratio in percent",
+						dataSet));
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error during evaluation of clustering results in file: " + files.get(i),
+				ErrorLogger.getInstance().writeError(
+						"Error during evaluation of clustering results in file: " + files.get(i),
 						this.getActivityName(), e);
 			}
 			try {
@@ -204,18 +195,19 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 					optionString += o;
 				}
 				String name = clusterer.getClass().getSimpleName();
-				file = FileNameGenerator.getNewFile(file.getParent(), ".pdf", name
-						+ tools.getOptionsFromFile(new File(files.get(i)), name) + "-ClassificationResult");
+				file = FileNameGenerator.getNewFile(file.getParent(), ".pdf",
+						name + tools.getOptionsFromFile(new File(files.get(i)), name) + "-ClassificationResult");
 				pdfTitle.add("(Clusterer name/Number of detected classes)");
 				chartTool.writeChartAsPDF(file, charts);
 				resultFileNames.add(file.getAbsolutePath());
 
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR,
+						this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
 			}
 		}
-		return null;
+		this.setOutputAsStringList(resultFileNames, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override

@@ -43,7 +43,8 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 /**
- * Class which stores xml files to disk. The original content compressed to reduce the data size.
+ * Class which stores xml files to disk. The original content compressed to
+ * reduce the data size.
  * 
  * @author Thomas Kuhn
  * 
@@ -56,7 +57,8 @@ public class XMLFileIO {
 	private BufferedOutputStream bufferedOutputStream = null;
 
 	/**
-	 * Get the xml stream writer which uses a gzip stream to compress the output file
+	 * Get the xml stream writer which uses a gzip stream to compress the output
+	 * file
 	 * 
 	 * @param file
 	 *            File which gets created with the compressed gzip stream

@@ -56,10 +56,6 @@ public class CSVToQSARVectorActivityTest extends CDKTavernaTestCases {
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		// TODO read resource
-		File[] csvFile = new File[] { new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-				+ "data" + File.separator + "qsar" + File.separator + "qsar.csv") };
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, csvFile);
 		configBean.setActivityName(CSVToQSARVectorActivity.CSV_TO_QSAR_VECTOR_ACTIVITY);
 	}
 
@@ -68,15 +64,18 @@ public class CSVToQSARVectorActivityTest extends CDKTavernaTestCases {
 		activity.configure(configBean);
 		// leave empty. No ports used
 		Map<String, Object> inputs = new HashMap<String, Object>();
+		File csvFile = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
+				+ "data" + File.separator + "qsar" + File.separator + "qsar.csv");
+		inputs.put(activity.INPUT_PORTS[0], csvFile);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[1], byte[].class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[0], byte[].class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[1], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
-		byte[] objectData = (byte[]) outputs.get(activity.getRESULT_PORTS()[0]);
+		byte[] objectData = (byte[]) outputs.get(activity.OUTPUT_PORTS[0]);
 		Map<UUID, Map<String, Object>> vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(objectData);
 		Assert.assertEquals(9, vectorMap.size());
-		objectData = (byte[]) outputs.get(activity.getRESULT_PORTS()[1]);
+		objectData = (byte[]) outputs.get(activity.OUTPUT_PORTS[1]);
 		ArrayList<String> descriptorNames = (ArrayList<String>) CDKObjectHandler.getObject(objectData);
 		Assert.assertEquals(277, descriptorNames.size());
 	}

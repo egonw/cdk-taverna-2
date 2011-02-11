@@ -201,4 +201,28 @@ public class CDKObjectHandler {
 		return instances;
 	}
 
+	/**
+	 * Deserializes a list of byte arrays into a T type list.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> getGenericList(List<byte[]> dataArray, Class<T> type) throws Exception {
+		ArrayList<T> genericList = new ArrayList<T>();
+		for (byte[] data : dataArray) {
+			T obj = null;
+			try {
+				obj = (T) CDKObjectHandler.getObject(data);
+			} catch (Exception e) {
+				ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, "CDKObjectHandler", e);
+				throw new CDKTavernaException("CDKObjectHandler", CDKTavernaException.WRONG_INPUT_PORT_TYPE
+						+ " Expected type: " + type.getSimpleName());
+			}
+			if (obj.getClass() != type) {
+				throw new CDKTavernaException("CDKObjectHandler", CDKTavernaException.WRONG_INPUT_PORT_TYPE
+						+ " Expected type: " + type.getSimpleName());
+			}
+			genericList.add(obj);
+		}
+		return genericList;
+	}
+
 }

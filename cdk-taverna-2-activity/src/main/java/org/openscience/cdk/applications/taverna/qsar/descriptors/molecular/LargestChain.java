@@ -30,7 +30,8 @@ import org.openscience.cdk.qsar.IMolecularDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.LargestChainDescriptor;
 
 /**
- * Class which provides the implementation for a cdk-taverna molecular qsar descriptor.
+ * Class which provides the implementation for a cdk-taverna molecular qsar
+ * descriptor.
  * 
  * @author Thomas Kuhn
  * 
@@ -40,7 +41,8 @@ public class LargestChain extends AbstractMolecularDescriptor {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.openscience.cdk.applications.taverna.qsar.descriptors.bond.AbstractBondDescriptor#getDescriptor()
+	 * @see org.openscience.cdk.applications.taverna.qsar.descriptors.bond.
+	 * AbstractBondDescriptor#getDescriptor()
 	 */
 	public IMolecularDescriptor getDescriptor() {
 		return new LargestChainDescriptor();

@@ -39,7 +39,8 @@ import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 /**
- * Class which provides method to wrap in CMLChemfiles or from CMLChemfiles to other data types like atomcontianer
+ * Class which provides method to wrap in CMLChemfiles or from CMLChemfiles to
+ * other data types like atomcontianer
  * 
  * @author Thomas Kuhn & Andreas Truszkowski
  */
@@ -66,7 +67,8 @@ public class CMLChemFileWrapper {
 	}
 
 	/**
-	 * Method which converts an CMLChemfile array to a CMLChemFile array with only one molecule per CMLChemFile.
+	 * Method which converts an CMLChemfile array to a CMLChemFile array with
+	 * only one molecule per CMLChemFile.
 	 * 
 	 * @param atomContainer
 	 * @return CMLChemFile which contains the information of the atomContainer
@@ -169,7 +171,8 @@ public class CMLChemFileWrapper {
 	 *            Gets the atomContainers
 	 * @return modified CMLChemFile
 	 */
-	public static CMLChemFile wrapChemModelAtomContainerInChemModel(CMLChemFile chemFileSource, CMLChemFile chemFileTarget) {
+	public static CMLChemFile wrapChemModelAtomContainerInChemModel(CMLChemFile chemFileSource,
+			CMLChemFile chemFileTarget) {
 		if (chemFileTarget.getChemSequence(0) == null) {
 			chemFileTarget.addChemSequence(new ChemSequence());
 			chemFileTarget.getChemSequence(0).addChemModel(new ChemModel());
@@ -192,10 +195,12 @@ public class CMLChemFileWrapper {
 	 * 
 	 * @param cmlChemFileList
 	 *            List of CMLChemfiles
-	 * @return AtomContainer array which contains the molecules of the CMLChemFileList
+	 * @return AtomContainer array which contains the molecules of the
+	 *         CMLChemFileList
 	 * @throws Exception
 	 */
-	public static IAtomContainer[] convertCMLChemFileListToAtomContainerArray(List<CMLChemFile> cmlChemFileList) throws Exception {
+	public static IAtomContainer[] convertCMLChemFileListToAtomContainerArray(List<CMLChemFile> cmlChemFileList)
+			throws Exception {
 		IAtomContainer[] atomContainerArray;
 		List<IAtomContainer> listOfAtomContainerTemp = new ArrayList<IAtomContainer>();
 		for (int i = 0; i < cmlChemFileList.size(); i++) {
@@ -228,8 +233,8 @@ public class CMLChemFileWrapper {
 	}
 
 	/**
-	 * Method which converts a cmlChemFile which contains multiple molecules to an array of cmlChemFiles which contains only one
-	 * molecle
+	 * Method which converts a cmlChemFile which contains multiple molecules to
+	 * an array of cmlChemFiles which contains only one molecle
 	 * 
 	 * @param cmlChemFile
 	 *            which can contain multiple molecules
@@ -259,8 +264,8 @@ public class CMLChemFileWrapper {
 	}
 
 	/**
-	 * Method which converts a cmlChemFile which contains multiple molecules to a list of cmlChemFiles which contains only one
-	 * molecule
+	 * Method which converts a cmlChemFile which contains multiple molecules to
+	 * a list of cmlChemFiles which contains only one molecule
 	 * 
 	 * @param cmlChemFile
 	 *            which can contain multiple molecules
@@ -288,8 +293,8 @@ public class CMLChemFileWrapper {
 	}
 
 	/**
-	 * Method which converts a cmlChemFile which contains multiple molecules to an List of CML Strings which each represent only
-	 * one molecule
+	 * Method which converts a cmlChemFile which contains multiple molecules to
+	 * an List of CML Strings which each represent only one molecule
 	 * 
 	 * @param cmlChemFile
 	 *            which can contain multiple molecules
@@ -314,7 +319,8 @@ public class CMLChemFileWrapper {
 	}
 
 	/**
-	 * Method which converts a CML String list to a cmlChemFile which contains multiple molecules.
+	 * Method which converts a CML String list to a cmlChemFile which contains
+	 * multiple molecules.
 	 * 
 	 * @param stringList
 	 *            CML String list

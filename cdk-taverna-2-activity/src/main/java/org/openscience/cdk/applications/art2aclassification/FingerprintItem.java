@@ -31,8 +31,10 @@ import java.io.Serializable;
  * Fingerprint Item<br>
  * This class is a ported C# struct.
  * 
- * @author original C# code: Stefan Neumann, Gesellschaft fuer naturwissenschaftliche Informatik, stefan.neumann@gnwi.de<br>
- *         porting to Java: Christian Geiger, University of Applied Sciences Gelsenkirchen, 2007
+ * @author original C# code: Stefan Neumann, Gesellschaft fuer
+ *         naturwissenschaftliche Informatik, stefan.neumann@gnwi.de<br>
+ *         porting to Java: Christian Geiger, University of Applied Sciences
+ *         Gelsenkirchen, 2007
  * @author Thomas Kuhn
  */
 public class FingerprintItem implements Serializable {

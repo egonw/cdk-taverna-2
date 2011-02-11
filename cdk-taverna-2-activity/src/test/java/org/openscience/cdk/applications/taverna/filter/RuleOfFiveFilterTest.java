@@ -80,13 +80,13 @@ public class RuleOfFiveFilterTest extends CDKTavernaTestCases {
 			dataList.add(CDKObjectHandler.getBytes(c));
 		}
 		inputMap = new HashMap<String, Object>();
-		inputMap.put(activity.getINPUT_PORTS()[0], dataList);
+		inputMap.put(activity.INPUT_PORTS[0], dataList);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[1], byte[].class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[0], byte[].class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[1], byte[].class);
 		resultMap = ActivityInvoker.invokeAsyncActivity(activity, inputMap, expectedOutputTypes);
-		List<byte[]> matchedStructures = (List<byte[]>) resultMap.get(activity.getRESULT_PORTS()[0]);
-		List<byte[]> unmatchedStructures = (List<byte[]>) resultMap.get(activity.getRESULT_PORTS()[1]);
+		List<byte[]> matchedStructures = (List<byte[]>) resultMap.get(activity.OUTPUT_PORTS[0]);
+		List<byte[]> unmatchedStructures = (List<byte[]>) resultMap.get(activity.OUTPUT_PORTS[1]);
 		Assert.assertEquals(9, matchedStructures.size());
 		Assert.assertEquals(1, unmatchedStructures.size());
 	}

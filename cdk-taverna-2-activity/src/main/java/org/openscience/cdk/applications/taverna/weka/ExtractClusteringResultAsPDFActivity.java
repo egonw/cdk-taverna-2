@@ -27,12 +27,6 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -64,6 +58,7 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 	 */
 	public ExtractClusteringResultAsPDFActivity() {
 		this.INPUT_PORTS = new String[] { "Weka Clustering Files" };
+		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
 	@Override
@@ -73,22 +68,16 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		// empty
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
+	public void work() throws Exception {
+		// Get input
+		List<String> files = this.getInputAsList(this.INPUT_PORTS[0], String.class);
+		// Do work
+		List<String> resultFiles = new ArrayList<String>();
 		List<String> pdfTitle = new ArrayList<String>();
-		List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
-				context);
-		if (files == null || files.isEmpty()) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_CLUSTERING_DATA_AVAILABLE);
-		}
 		Instances dataset = null;
 		Clusterer clusterer = null;
 		ChartTool chartTool = new ChartTool();
@@ -105,8 +94,8 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 				buffReader.close();
 				dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			} catch (Exception e) {
-				ErrorLogger.getInstance()
-						.writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR, this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR,
+						this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR);
 			}
 			try {
@@ -126,22 +115,26 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 				charts.add(chartTool.createBarChart(name + " - JobID: " + jobID, "(Class number/Number of Vectors)",
 						"Number of vectors", chartDataSet));
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR,
+						this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
 			}
 			try {
 				File file = new File(files.get(0));
 				String name = clusterer.getClass().getSimpleName();
-				file = FileNameGenerator.getNewFile(file.getParent(), ".pdf", name
-						+ tools.getOptionsFromFile(new File(files.get(i)), name) + "-Result");
+				file = FileNameGenerator.getNewFile(file.getParent(), ".pdf",
+						name + tools.getOptionsFromFile(new File(files.get(i)), name) + "-Result");
 				pdfTitle.add("Weka " + clusterer.getClass().getSimpleName() + " Clustering Result");
 				chartTool.writeChartAsPDF(file, charts);
+				resultFiles.add(file.getPath());
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR,
+						this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
 			}
 		}
-		return outputs;
+		// Set output
+		this.setOutputAsStringList(resultFiles, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override

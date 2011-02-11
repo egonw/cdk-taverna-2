@@ -25,17 +25,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
@@ -50,7 +45,8 @@ import weka.core.SerializationHelper;
 import weka.filters.Filter;
 
 /**
- * Class which implements the generate silhouette plot from clustering result as csv activity.
+ * Class which implements the generate silhouette plot from clustering result as
+ * csv activity.
  * 
  * @author Andreas Truzskowski
  * 
@@ -64,6 +60,7 @@ public class GenerateSilhouettePlotFromClusteringResultAsCSVActivity extends Abs
 	 */
 	public GenerateSilhouettePlotFromClusteringResultAsCSVActivity() {
 		this.INPUT_PORTS = new String[] { "Weka Clustering Files" };
+		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
 	@Override
@@ -73,21 +70,15 @@ public class GenerateSilhouettePlotFromClusteringResultAsCSVActivity extends Abs
 
 	@Override
 	protected void addOutputPorts() {
-		// empty
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
-				context);
-		if (files == null || files.isEmpty()) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_CLUSTERING_DATA_AVAILABLE);
-		}
+	public void work() throws Exception {
+		// Get input
+		List<String> files = this.getInputAsList(this.INPUT_PORTS[0], String.class);
+		// Do work
+		ArrayList<String> resultFiles = new ArrayList<String>();
 		Instances dataset = null;
 		Clusterer clusterer = null;
 		WekaTools tools = new WekaTools();
@@ -102,8 +93,8 @@ public class GenerateSilhouettePlotFromClusteringResultAsCSVActivity extends Abs
 				buffReader.close();
 				dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			} catch (Exception e) {
-				ErrorLogger.getInstance()
-						.writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR, this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR,
+						this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR);
 			}
 			try {
@@ -126,6 +117,7 @@ public class GenerateSilhouettePlotFromClusteringResultAsCSVActivity extends Abs
 					}
 				}
 				writer.close();
+				resultFiles.add(file.getPath());
 				// Save mean value
 				LinkedList<String> meanList = meanTable.get(jobID);
 				double mean = tools.calculateSilhouetteMean(s);
@@ -149,13 +141,15 @@ public class GenerateSilhouettePlotFromClusteringResultAsCSVActivity extends Abs
 						}
 					}
 					writer.close();
+					resultFiles.add(file.getPath());
 				}
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR,
+						this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
 			}
 		}
-		return outputs;
+		this.setOutputAsStringList(resultFiles, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override

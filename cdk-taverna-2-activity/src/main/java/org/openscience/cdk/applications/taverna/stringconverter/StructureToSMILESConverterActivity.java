@@ -32,18 +32,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.io.SMILESWriter;
@@ -73,44 +66,28 @@ public class StructureToSMILESConverterActivity extends AbstractCDKActivity {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
+	public void work() throws Exception {
+		// Get input
+		List<CMLChemFile> chemFileList = this.getInputAsList(this.INPUT_PORTS[0], CMLChemFile.class);
+		// Do work
 		LinkedList<CMLChemFile> notConverted = new LinkedList<CMLChemFile>();
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
-				context);
-		List<CMLChemFile> chemFileList = null;
-		try {
-			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
-		List<String> molStringList = new ArrayList<String>();
+		List<String> smilesStringList = new ArrayList<String>();
 		for (CMLChemFile cml : chemFileList) {
 			try {
 				StringWriter stringWriter = new StringWriter();
 				SMILESWriter writer = new SMILESWriter(stringWriter);
 				writer.write(CMLChemFileWrapper.wrapChemModelInAtomContainer(cml));
 				writer.close();
-				molStringList.add(stringWriter.toString());
+				smilesStringList.add(stringWriter.toString());
 			} catch (Exception e) {
 				notConverted.add(cml);
 				ErrorLogger.getInstance().writeError(CDKTavernaException.CONVERTION_ERROR, this.getActivityName(), e);
 			}
 		}
-		if (molStringList.isEmpty()) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.CONVERTION_ERROR);
-		}
-		T2Reference containerRef = referenceService.register(molStringList, 1, true, context);
-		outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		containerRef = referenceService.register(notConverted, 1, true, context);
-		outputs.put(this.OUTPUT_PORTS[1], containerRef);
-		// Return results
-		return outputs;
+		// Set input
+		this.setOutputAsStringList(smilesStringList, this.OUTPUT_PORTS[0]);
+		this.setOutputAsObjectList(notConverted, this.OUTPUT_PORTS[1]);
+
 	}
 
 	@Override

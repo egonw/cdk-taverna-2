@@ -22,19 +22,13 @@
 package org.openscience.cdk.applications.taverna.iterativeio;
 
 import java.util.HashMap;
-import java.util.Map;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
-import org.openscience.cdk.applications.taverna.CDKTavernaException;
 
 /**
- * Class which represents the consume state activity. Used with iterative loop reader.
+ * Class which represents the consume state activity. Used with iterative loop
+ * reader.
  * 
  * @author Andreas Truzskowski
  * 
@@ -61,12 +55,9 @@ public class ConsumeStateActivity extends AbstractCDKActivity {
 	}
 
 	@Override
-	public Map<String, T2Reference> work(final Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class, context);
-		return null;
+	public void work() throws Exception {
+		// Just consume the data from port
+		this.getInputAsFileList(this.INPUT_PORTS[0]);
 	}
 
 	@Override

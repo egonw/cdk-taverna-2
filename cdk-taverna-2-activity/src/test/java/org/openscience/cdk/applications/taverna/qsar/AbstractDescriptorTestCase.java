@@ -92,8 +92,8 @@ public abstract class AbstractDescriptorTestCase extends CDKTavernaTestCases {
 			e.printStackTrace();
 			assertEquals(false, true);
 		}
-		this.activityInputNames = this.activity.getINPUT_PORTS();
-		this.activityOutputNames = this.activity.getRESULT_PORTS();
+		this.activityInputNames = this.activity.INPUT_PORTS;
+		this.activityOutputNames = this.activity.OUTPUT_PORTS;
 		this.activityName = this.activity.getActivityName();
 	}
 

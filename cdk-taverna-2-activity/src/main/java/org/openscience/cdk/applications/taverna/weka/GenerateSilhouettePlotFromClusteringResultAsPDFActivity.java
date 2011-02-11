@@ -24,17 +24,12 @@ package org.openscience.cdk.applications.taverna.weka;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -67,6 +62,7 @@ public class GenerateSilhouettePlotFromClusteringResultAsPDFActivity extends Abs
 	 */
 	public GenerateSilhouettePlotFromClusteringResultAsPDFActivity() {
 		this.INPUT_PORTS = new String[] { "Weka Clustering Files" };
+		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
 	@Override
@@ -76,33 +72,15 @@ public class GenerateSilhouettePlotFromClusteringResultAsPDFActivity extends Abs
 
 	@Override
 	protected void addOutputPorts() {
-		// empty
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.openscience.cdk.applications.taverna.AbstractCDKActivity#work(java.util.Map,
-	 * net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback)
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.openscience.cdk.applications.taverna.AbstractCDKActivity#work(java.util.Map,
-	 * net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback)
-	 */
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
-				context);
-		if (files == null || files.isEmpty()) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_CLUSTERING_DATA_AVAILABLE);
-		}
+	public void work() throws Exception {
+		// Get input
+		List<String> files = this.getInputAsList(this.INPUT_PORTS[0], String.class);
+		// Do work
+		ArrayList<String> resultFiles = new ArrayList<String>();
 		Instances dataset = null;
 		Clusterer clusterer = null;
 		ChartTool chartToolReloaded = new ChartTool();
@@ -123,8 +101,8 @@ public class GenerateSilhouettePlotFromClusteringResultAsPDFActivity extends Abs
 				buffReader.close();
 				dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			} catch (Exception e) {
-				ErrorLogger.getInstance()
-						.writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR, this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR,
+						this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR);
 			}
 			try {
@@ -145,14 +123,15 @@ public class GenerateSilhouettePlotFromClusteringResultAsPDFActivity extends Abs
 							dataSet.addValue(s[j][k], "Silhouette width", "" + (k + 1));
 						}
 					}
-					charts.add(chartToolReloaded.createBarChart(clusterer.getClass().getSimpleName() + " - JobID " + jobID
-							+ " - Cluster " + (j + 1), "Cluster Item", "Silhouette Width", dataSet));
+					charts.add(chartToolReloaded.createBarChart(clusterer.getClass().getSimpleName() + " - JobID "
+							+ jobID + " - Cluster " + (j + 1), "Cluster Item", "Silhouette Width", dataSet));
 				}
 				File file = new File(files.get(0));
 				parent = file.getParentFile();
 				idNameMap.put(jobID, name);
 				file = FileNameGenerator.getNewFile(file.getParent(), ".pdf", name + options + "-Silhouette");
 				chartToolReloaded.writeChartAsPDF(file, charts);
+				resultFiles.add(file.getPath());
 				// resultFileNames.add(file.getAbsolutePath());
 				// Save mean value
 				LinkedList<Double> meanValueList = meanValueMap.get(jobID);
@@ -167,7 +146,8 @@ public class GenerateSilhouettePlotFromClusteringResultAsPDFActivity extends Abs
 				meanValueList.add(mean);
 				meanClustersList.add(clusterer.numberOfClusters());
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR,
+						this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
 			}
 		}
@@ -182,16 +162,19 @@ public class GenerateSilhouettePlotFromClusteringResultAsPDFActivity extends Abs
 				for (int i = 0; i < meanValueList.size(); i++) {
 					dataSet.addValue(meanValueList.get(i), "Silhouette width", meanClustersList.get(i));
 				}
-				charts.add(chartToolReloaded.createLineChart(idNameMap.get(jobID) + " - JobID: " + jobID, "Number of Clusters",
-						"Mean Silhouette Width", dataSet));
+				charts.add(chartToolReloaded.createLineChart(idNameMap.get(jobID) + " - JobID: " + jobID,
+						"Number of Clusters", "Mean Silhouette Width", dataSet));
 			}
 			File file = FileNameGenerator.getNewFile(parent.getPath(), ".pdf", "Silhouette-Mean");
 			chartToolReloaded.writeChartAsPDF(file, charts);
+			resultFiles.add(file.getPath());
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(),
+					e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
 		}
-		return outputs;
+		// Set output
+		this.setOutputAsStringList(resultFiles, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override

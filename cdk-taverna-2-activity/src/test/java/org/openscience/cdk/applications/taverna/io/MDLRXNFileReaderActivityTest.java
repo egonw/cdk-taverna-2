@@ -66,12 +66,12 @@ public class MDLRXNFileReaderActivityTest extends CDKTavernaTestCases {
 		sdTestFile.add("src" + File.separator + "test" + File.separator + "resources"
 				+ File.separator + "data" + File.separator + "mol" + File.separator + "reaction.rxn");
 		Map<String, Object> inputs = new HashMap<String, Object>();
-		inputs.put(activity.getINPUT_PORTS()[0], sdTestFile);
+		inputs.put(activity.INPUT_PORTS[0], sdTestFile);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[0], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
-		List<byte[]> objectData = (List<byte[]>) outputs.get(activity.getRESULT_PORTS()[0]);
+		List<byte[]> objectData = (List<byte[]>) outputs.get(activity.OUTPUT_PORTS[0]);
 		Reaction reaction = (Reaction) CDKObjectHandler.getObject(objectData.get(0));
 		Assert.assertEquals(2, reaction.getReactantCount());
 		Assert.assertEquals(1, reaction.getProductCount());

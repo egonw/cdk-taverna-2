@@ -48,6 +48,7 @@ import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.classification.art2a.ART2aClassificationActivity;
 import org.openscience.cdk.applications.taverna.io.XMLFileIO;
+import org.openscience.cdk.applications.taverna.setup.SetupController;
 
 /**
  * Test class for the ART2aClassification activity.
@@ -88,15 +89,15 @@ public class ART2aClassificationActivityTest extends CDKTavernaTestCases {
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
 		configBean.setActivityName(ART2aClassificationActivity.ART2A_CLASSIFICATOR_ACTIVITY);
-		this.dir = new File("." + File.separator + "Test" + File.separator);
-		this.dir.mkdir();
+		this.dir = new File(SetupController.getInstance().getWorkingDir());
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.dir);
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".art2a");
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_CLASSIFICATIONS, this.numberOfClassifications);
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_CLASSIFICATIONS,
+				this.numberOfClassifications);
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_UPPER_VIGILANCE_LIMIT, this.upperVigilanceLimit);
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_LOWER_VIGILANCE_LIMIT, this.lowerVigilanceLimit);
-		configBean
-				.addAdditionalProperty(CDKTavernaConstants.PROPERTY_MAXIMUM_CLASSIFICATION_TIME, this.maximumClassificationTime);
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_MAXIMUM_CLASSIFICATION_TIME,
+				this.maximumClassificationTime);
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_SCALE_FINGERPRINT_ITEMS,
 				this.scaleFingerprintItemToInternalZeroOne);
 	}
@@ -135,11 +136,11 @@ public class ART2aClassificationActivityTest extends CDKTavernaTestCases {
 		// Run test
 		Map<String, Object> inputs = new HashMap<String, Object>();
 		List<byte[]> dataList = CDKObjectHandler.getBytesList(fingerprintList);
-		inputs.put(activity.getINPUT_PORTS()[0], dataList);
+		inputs.put(activity.INPUT_PORTS[0], dataList);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], String.class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[0], String.class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
-		ArrayList<String> files = (ArrayList<String>) outputs.get(activity.getRESULT_PORTS()[0]);
+		ArrayList<String> files = (ArrayList<String>) outputs.get(activity.OUTPUT_PORTS[0]);
 		XMLFileIO xmlFileIO = new XMLFileIO();
 		for (int i = 0; i < files.size(); i++) {
 			String fileName = files.get(i);
@@ -164,7 +165,8 @@ public class ART2aClassificationActivityTest extends CDKTavernaTestCases {
 	}
 
 	/**
-	 * I/O-method. Reads the data from the iris flower files to an integer array.
+	 * I/O-method. Reads the data from the iris flower files to an integer
+	 * array.
 	 * 
 	 * @param filename
 	 *            The location of the file.

@@ -22,15 +22,10 @@
 package org.openscience.cdk.applications.taverna.reactionenumerator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.Reaction;
@@ -63,7 +58,8 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addInputPorts() {
-		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
+		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
 		for (int i = 0; i < numberOfPorts; i++) {
 			addInput(ReactionEnumeratorActivity.REACTANT_PORT + " " + (i + 1), 1, true, null, byte[].class);
 		}
@@ -75,36 +71,16 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 		addOutput(ReactionEnumeratorActivity.RESULT_PORT, 1);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		LinkedList<IAtomContainer[]> reactants = new LinkedList<IAtomContainer[]>();
-		IReaction reaction = null;
-		List<byte[]> dataList;
-		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
-		ReactionEnumerator enumerator = new ReactionEnumerator();
-		// TODO remove
-		enumerator.setCreate2DCoordinates(true);
-		// ErrorLogger.getInstance().setLogMolecules(false);
-		enumerator.setUseMultiMatchChecker(this.getConfiguration().getAdditionalProperty(
-				ReactionEnumeratorActivity.USE_MULTI_MATCH_CHECKER) != null);
-		enumerator.setUseVariableRegionChecker(this.getConfiguration().getAdditionalProperty(
-				ReactionEnumeratorActivity.USE_VARIABLE_REGION_CHECKER) != null);
+	public void work() throws Exception {
+		// Get input
+		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
 		// get reactants
+		LinkedList<IAtomContainer[]> reactants = new LinkedList<IAtomContainer[]>();
 		for (int i = 0; i < numberOfPorts; i++) {
-			dataList = (List<byte[]>) referenceService.renderIdentifier(inputs.get(ReactionEnumeratorActivity.REACTANT_PORT + " "
-					+ (i + 1)), byte[].class, context);
-			List<CMLChemFile> list = null;
-			try {
-				list = CDKObjectHandler.getChemFileList(dataList);
-			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
-				throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-			}
+			List<CMLChemFile> list = this.getInputAsList(ReactionEnumeratorActivity.REACTANT_PORT + " "
+					+ (i + 1), CMLChemFile.class);
 			IAtomContainer[] containerArray = new AtomContainer[list.size()];
 			for (int j = 0; j < list.size(); j++) {
 				try {
@@ -118,17 +94,22 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 			reactants.add(containerArray);
 		}
 		// get reaction
-		List<byte[]> data = (List<byte[]>) referenceService.renderIdentifier(
-				inputs.get(ReactionEnumeratorActivity.REACTION_PORT), byte[].class, context);
-		try {
-			reaction = CDKObjectHandler.getReactionList(data).get(0);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
+		Reaction reaction = this.getInputAsObject(ReactionEnumeratorActivity.REACTION_PORT, Reaction.class);
+		// Do work
+		List<byte[]> dataList;
+		ReactionEnumerator enumerator = new ReactionEnumerator();
+		// TODO remove
+		enumerator.setCreate2DCoordinates(true);
+		// ErrorLogger.getInstance().setLogMolecules(false);
+		enumerator.setUseMultiMatchChecker(this.getConfiguration().getAdditionalProperty(
+				ReactionEnumeratorActivity.USE_MULTI_MATCH_CHECKER) != null);
+		enumerator.setUseVariableRegionChecker(this.getConfiguration().getAdditionalProperty(
+				ReactionEnumeratorActivity.USE_VARIABLE_REGION_CHECKER) != null);
+
+		IReaction[] results = null;
 		try {
 			// enumerate results
-			Reaction[] results = enumerator.enumerateReactions(reaction, reactants);
+			results = enumerator.enumerateReactions(reaction, reactants);
 			// prepare output data
 			dataList = new ArrayList<byte[]>();
 			if (results != null && results.length != 0) {
@@ -140,9 +121,8 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 			ErrorLogger.getInstance().writeError("Error during reaction enumeration!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
-		T2Reference containerRef = referenceService.register(dataList, 1, true, context);
-		outputs.put(RESULT_PORT, containerRef);
-		return outputs;
+		// Set output
+		this.setOutputAsObjectList(Arrays.asList(results), RESULT_PORT);
 	}
 
 	@Override

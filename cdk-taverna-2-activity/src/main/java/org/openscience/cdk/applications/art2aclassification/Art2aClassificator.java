@@ -34,14 +34,18 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 /**
- * Implements an ART-2A-Algorithm of rapid, stable and unsupervised clustering for open categorical problems.<br>
+ * Implements an ART-2A-Algorithm of rapid, stable and unsupervised clustering
+ * for open categorical problems.<br>
  * LITERATURE SOURCE:<br>
  * Original : G.A. Carpenter etal., Neural Networks 4 (1991) 493-504<br>
- * Secondary : Wienke etal., Chemometrics and Intelligent Laboratory Systems 24 (1994), 367-387<br>
+ * Secondary : Wienke etal., Chemometrics and Intelligent Laboratory Systems 24
+ * (1994), 367-387<br>
  * This class was ported from C# code.
  * 
- * @author original C# code: Stefan Neumann, Gesellschaft fuer naturwissenschaftliche Informatik, stefan.neumann@gnwi.de<br>
- *         porting to Java: Christian Geiger, University of Applied Sciences Gelsenkirchen, 2007
+ * @author original C# code: Stefan Neumann, Gesellschaft fuer
+ *         naturwissenschaftliche Informatik, stefan.neumann@gnwi.de<br>
+ *         porting to Java: Christian Geiger, University of Applied Sciences
+ *         Gelsenkirchen, 2007
  * @author Thomas Kuhn
  */
 public class Art2aClassificator {
@@ -83,7 +87,8 @@ public class Art2aClassificator {
 	FingerprintItem[][] mObjectsOfSelectedClasses;
 
 	/**
-	 * The objects in all classes: mObjectsInClasses[i][] corresponds to mNumberOfObjectsInClasses[i]
+	 * The objects in all classes: mObjectsInClasses[i][] corresponds to
+	 * mNumberOfObjectsInClasses[i]
 	 */
 	Object[][] mObjectsOfAllClasses;
 
@@ -94,46 +99,54 @@ public class Art2aClassificator {
 	boolean mNullclassSelectFlag;
 
 	/**
-	 * True: The classification was successful and the results have been successfully calculated.<br>
-	 * False: The classification ended abnormaly and some or all results have not been calculated.
+	 * True: The classification was successful and the results have been
+	 * successfully calculated.<br>
+	 * False: The classification ended abnormaly and some or all results have
+	 * not been calculated.
 	 */
 	boolean mClassificationCompleteFlag;
 
 	/**
-	 * Parameter to influence the number of classes. 0 less than or equal to vigilanceParameter less than or equal to 1.
+	 * Parameter to influence the number of classes. 0 less than or equal to
+	 * vigilanceParameter less than or equal to 1.
 	 */
 	double mVigilanceParameter;
 
 	/**
-	 * Parameter to define the final similarity between the class vectors of the current and the previous epoche. 0 less than or
-	 * equal to RequiredSimilarity less than or equal to 1 Default: 0.99
+	 * Parameter to define the final similarity between the class vectors of the
+	 * current and the previous epoche. 0 less than or equal to
+	 * RequiredSimilarity less than or equal to 1 Default: 0.99
 	 */
 	double mRequiredSimilarity;
 
 	/**
-	 * Parameter to define the intensity of keeping the old class vector in mind before the system adapts it to the new sample
-	 * vector.
+	 * Parameter to define the intensity of keeping the old class vector in mind
+	 * before the system adapts it to the new sample vector.
 	 */
 	double mLearningParameter;
 
 	/**
-	 * All matrixvalues less than this threshold are set to zero. An increase of the threshold leads to greater
-	 * contrastenhancement and to a faster stability of the classvectors. 0 less than or equal to ThresholdForContrastEnhancement
-	 * less than or equal to 1 / Sqr(NumberOfComponents);<br>
+	 * All matrixvalues less than this threshold are set to zero. An increase of
+	 * the threshold leads to greater contrastenhancement and to a faster
+	 * stability of the classvectors. 0 less than or equal to
+	 * ThresholdForContrastEnhancement less than or equal to 1 /
+	 * Sqr(NumberOfComponents);<br>
 	 * Default: 1 / Sqr(NumberOfComponents - 1)
 	 */
 	double mThresholdForContrastEnhancement;
 
 	/**
-	 * The value influences the number of detected classes. A high value increase the number of classes. 0 less than or equal to
+	 * The value influences the number of detected classes. A high value
+	 * increase the number of classes. 0 less than or equal to
 	 * InputScalingFactor less than or equal to 1 / Sqr(NumberOfComponents);<br>
 	 * Default: 1 / Sqr(NumberOfComponents - 1)
 	 */
 	double mInputScalingFactor;
 
 	/**
-	 * The dataMatrix contains the fingerprintVectors of all object which should be classified. Each row codes one
-	 * fingerprintVector and each column codes an objectproperty.
+	 * The dataMatrix contains the fingerprintVectors of all object which should
+	 * be classified. Each row codes one fingerprintVector and each column codes
+	 * an objectproperty.
 	 */
 	double[][] mDataMatrix;
 
@@ -143,7 +156,8 @@ public class Art2aClassificator {
 	double[][] mClassMatrix;
 
 	/**
-	 * Classmatrix of the previous epoch. Is needed to check the convergence of the system.
+	 * Classmatrix of the previous epoch. Is needed to check the convergence of
+	 * the system.
 	 */
 	double[][] mClassMatrixOld;
 
@@ -163,7 +177,8 @@ public class Art2aClassificator {
 	double[] mSampleVector;
 
 	/**
-	 * Represents the class information of each vector. mClassView[3]=5 means vector no. 4 is in class no.6.
+	 * Represents the class information of each vector. mClassView[3]=5 means
+	 * vector no. 4 is in class no.6.
 	 */
 	int[] mClassView;
 
@@ -173,7 +188,8 @@ public class Art2aClassificator {
 	int[] mVectorsInNullClass;
 
 	/**
-	 * ClassView of the previous epoch. Is needed to check the convergence of the system.
+	 * ClassView of the previous epoch. Is needed to check the convergence of
+	 * the system.
 	 */
 	int[] mClassViewOld;
 
@@ -183,12 +199,14 @@ public class Art2aClassificator {
 	int[] mSampleVectorsInRandomOrder;
 
 	/**
-	 * mNumberOfVectorsInClass[i] : get the number of datavectors in the class of index i
+	 * mNumberOfVectorsInClass[i] : get the number of datavectors in the class
+	 * of index i
 	 */
 	int[] mNumberOfVectorsInClass;
 
 	/**
-	 * Index for descending sort of detected classes according to the number of vectors in class
+	 * Index for descending sort of detected classes according to the number of
+	 * vectors in class
 	 */
 	int[] mClassDescentSortIndex;
 
@@ -209,9 +227,10 @@ public class Art2aClassificator {
 	boolean[] mSelectClassFlag;
 
 	/**
-	 * true: System will converge if the scalar product of the classes of the current and the previous epoch is less than
-	 * RequiredSimilarity.<br>
-	 * false: System will be converge if the classification does not change after one epoch.
+	 * true: System will converge if the scalar product of the classes of the
+	 * current and the previous epoch is less than RequiredSimilarity.<br>
+	 * false: System will be converge if the classification does not change
+	 * after one epoch.
 	 */
 	boolean mConvergenceFlag;
 
@@ -226,7 +245,8 @@ public class Art2aClassificator {
 	int mNumberOfVectors;
 
 	/**
-	 * The number of epochs. One epoch is finished when all sample vectors have been looped through the algortihm.
+	 * The number of epochs. One epoch is finished when all sample vectors have
+	 * been looped through the algortihm.
 	 */
 	int mNumberOfEpochs;
 
@@ -291,13 +311,15 @@ public class Art2aClassificator {
 	double mDefaultThresholdForContrastEnhancement;
 
 	/**
-	 * The flag is used to switch between deterministic random and random random. If mDeterministicRandom = true a seed of 1 is
-	 * used. If mDeterministicRandom = false no seed is set explicitly
+	 * The flag is used to switch between deterministic random and random
+	 * random. If mDeterministicRandom = true a seed of 1 is used. If
+	 * mDeterministicRandom = false no seed is set explicitly
 	 */
 	boolean mDeterministicRandom = true;
 
 	/**
-	 * The mCorrespondingObjectArray contain the corresponding objects from input fingerprint item array.
+	 * The mCorrespondingObjectArray contain the corresponding objects from
+	 * input fingerprint item array.
 	 */
 	Object[] mCorrespondingObjectArray;
 
@@ -308,18 +330,23 @@ public class Art2aClassificator {
 	// region CONSTRUCTORS
 
 	/**
-	 * Implements an ART-2A-Algorithm which classifies a set of fingerprintVectors coded in a datamatrix without defining the
-	 * number of classes. <br>
-	 * Remark: A vigilanceParameter near 1 forces a fine classification and the number of detected classes will increase.On the
-	 * other hand a value near 0 forces a coarse classification and decreases the number of detected classes.<br>
+	 * Implements an ART-2A-Algorithm which classifies a set of
+	 * fingerprintVectors coded in a datamatrix without defining the number of
+	 * classes. <br>
+	 * Remark: A vigilanceParameter near 1 forces a fine classification and the
+	 * number of detected classes will increase.On the other hand a value near 0
+	 * forces a coarse classification and decreases the number of detected
+	 * classes.<br>
 	 * 
 	 * @param dataMatrix
-	 *            The dataMatrix contains the fingerprintVectors of all objects which should be classified. Each row codes one
+	 *            The dataMatrix contains the fingerprintVectors of all objects
+	 *            which should be classified. Each row codes one
 	 *            fingerprintVector and each column codes an object property.<br>
-	 *            IMPORTANT: ALL values of the matrix must be scaled to the interval [0,1].
+	 *            IMPORTANT: ALL values of the matrix must be scaled to the
+	 *            interval [0,1].
 	 * @param vigilanceParameter
-	 *            Parameter to influence the number of classes. 0 less than or equal to vigilanceParameter less than or equal to
-	 *            1.
+	 *            Parameter to influence the number of classes. 0 less than or
+	 *            equal to vigilanceParameter less than or equal to 1.
 	 */
 	public Art2aClassificator(double[][] dataMatrix, double vigilanceParameter) {
 		if (dataMatrix == null) {
@@ -338,19 +365,25 @@ public class Art2aClassificator {
 	}
 
 	/**
-	 * Implements an ART-2A-Algorithm which classifies a set of fingerprintVectors coded in a datamatrix without defining the
-	 * number of classes. <br>
-	 * A vigilanceParameter near 1 forces a fine classification and the number of detected classes will increase. On the other
-	 * hand a value near 0 forces a coarse classification and decreases the number of detected classes.<br>
-	 * HINT: Use the method "scaleFingerprintVectorComponentsToIntervalZeroOne" to scale the fingerprintVectors of the objects.
+	 * Implements an ART-2A-Algorithm which classifies a set of
+	 * fingerprintVectors coded in a datamatrix without defining the number of
+	 * classes. <br>
+	 * A vigilanceParameter near 1 forces a fine classification and the number
+	 * of detected classes will increase. On the other hand a value near 0
+	 * forces a coarse classification and decreases the number of detected
+	 * classes.<br>
+	 * HINT: Use the method "scaleFingerprintVectorComponentsToIntervalZeroOne"
+	 * to scale the fingerprintVectors of the objects.
 	 * 
 	 * @param objects
-	 *            Array of objects to be classified. All objects must implement the FingerprintItem interface. Each component of
-	 *            the vector codes one "property" of the object.<br>
-	 *            IMPORTANT: All components must be scaled to the interval [0, 1].
+	 *            Array of objects to be classified. All objects must implement
+	 *            the FingerprintItem interface. Each component of the vector
+	 *            codes one "property" of the object.<br>
+	 *            IMPORTANT: All components must be scaled to the interval [0,
+	 *            1].
 	 * @param vigilanceParameter
-	 *            Parameter to influence the number of classes. 0 less than or equal to vigilanceParameter less than or equal to
-	 *            1.
+	 *            Parameter to influence the number of classes. 0 less than or
+	 *            equal to vigilanceParameter less than or equal to 1.
 	 */
 	public Art2aClassificator(FingerprintItem[] objects, double vigilanceParameter) {
 		if (objects == null) {
@@ -370,7 +403,8 @@ public class Art2aClassificator {
 	}
 
 	/**
-	 * Gets an ART2aClassificator from a XmlReader which contains a xml stream created by "saveStatusToXmlWriter".
+	 * Gets an ART2aClassificator from a XmlReader which contains a xml stream
+	 * created by "saveStatusToXmlWriter".
 	 * 
 	 * @param xmlReader
 	 *            The XmlStreamReader which contains the xml file.
@@ -380,12 +414,14 @@ public class Art2aClassificator {
 	}
 
 	/**
-	 * Gets an ART2aClassificator from a XmlReader which contains a xml stream created by "saveStatusToXmlWriter".
+	 * Gets an ART2aClassificator from a XmlReader which contains a xml stream
+	 * created by "saveStatusToXmlWriter".
 	 * 
 	 * @param xmlReader
 	 *            The XmlStreamReader which contains the xml file.
 	 * @param loadResultOnly
-	 *            If true: load only the result xml stream. This one do NOT contain the original data matrix.
+	 *            If true: load only the result xml stream. This one do NOT
+	 *            contain the original data matrix.
 	 */
 	public Art2aClassificator(XMLStreamReader xmlReader, boolean loadResultOnly) {
 		if (loadResultOnly) {
@@ -401,9 +437,11 @@ public class Art2aClassificator {
 
 	/**
 	 * Starts the clustering ART-2A-Algorithm.<br>
-	 * Classifies the "mNumberOfVectors" sample vectors (with "mNumberOfComponents" features in each case)of data matrix
-	 * "mDataMatrix" by grouping into classes according to the vigilance parameter "mVigilanceParameter". If all features of a
-	 * data vector are "0", the vector is put into the null-class.
+	 * Classifies the "mNumberOfVectors" sample vectors (with
+	 * "mNumberOfComponents" features in each case)of data matrix "mDataMatrix"
+	 * by grouping into classes according to the vigilance parameter
+	 * "mVigilanceParameter". If all features of a data vector are "0", the
+	 * vector is put into the null-class.
 	 * 
 	 * @throws RuntimeException
 	 *             when the classification failed.
@@ -553,7 +591,8 @@ public class Art2aClassificator {
 								double factor2 = 1 - mLearningParameter;
 
 								for (int j = 0; j < mNumberOfComponents; j++) {
-									mSampleVector[j] = mSampleVector[j] * factor1 + factor2 * mClassMatrix[indexOfWinnerClass][j];
+									mSampleVector[j] = mSampleVector[j] * factor1 + factor2
+											* mClassMatrix[indexOfWinnerClass][j];
 								}
 
 								normOfSampleVector = 1 / getLengthOfVector(mSampleVector);
@@ -611,10 +650,13 @@ public class Art2aClassificator {
 	 * Saves all information of the ART2aClassificator to a XmlWriter.
 	 * 
 	 * @param writer
-	 *            The XmlWriter to write the data in. All XML knods containing data are enclosed by the "ClassificatorData" knod.
-	 *            At the end of the method the end element of the "ClassificatorData" knod will be written.
+	 *            The XmlWriter to write the data in. All XML knods containing
+	 *            data are enclosed by the "ClassificatorData" knod. At the end
+	 *            of the method the end element of the "ClassificatorData" knod
+	 *            will be written.
 	 * @throws RuntimeException
-	 *             when the information of the classificator cannot be saved to the xml-writer.
+	 *             when the information of the classificator cannot be saved to
+	 *             the xml-writer.
 	 */
 	public void saveStatusToXmlWriter(XMLStreamWriter writer) throws RuntimeException {
 		try {
@@ -809,10 +851,13 @@ public class Art2aClassificator {
 	 * Saves all information of the ART2aClassificator to a XmlWriter.
 	 * 
 	 * @param writer
-	 *            The XmlWriter to write the data in. All XML knods containing data are enclosed by the "ClassificatorData" knod.
-	 *            At the end of the method the end element of the "ClassificatorData" knod will be written.
+	 *            The XmlWriter to write the data in. All XML knods containing
+	 *            data are enclosed by the "ClassificatorData" knod. At the end
+	 *            of the method the end element of the "ClassificatorData" knod
+	 *            will be written.
 	 * @throws RuntimeException
-	 *             when the information of the classificator cannot be saved to the xml-writer.
+	 *             when the information of the classificator cannot be saved to
+	 *             the xml-writer.
 	 */
 	public void saveResultToXmlWriter(XMLStreamWriter writer) throws RuntimeException {
 		try {
@@ -1014,12 +1059,15 @@ public class Art2aClassificator {
 	 * Gets all information of a classification from a XmlReader
 	 * 
 	 * @param reader
-	 *            which contains the information of the classificator. The current position of the reader hast to be the start
-	 *            element of the XML knod "ClassificatorData". This knod encloses the XML knods containing the data of the
-	 *            classificator. At the end of the method the position of the reader is the end element of the "ClassificatorData"
-	 *            knod
+	 *            which contains the information of the classificator. The
+	 *            current position of the reader hast to be the start element of
+	 *            the XML knod "ClassificatorData". This knod encloses the XML
+	 *            knods containing the data of the classificator. At the end of
+	 *            the method the position of the reader is the end element of
+	 *            the "ClassificatorData" knod
 	 * @throws RuntimeException
-	 *             when the information of the classificator cannot be loaded from the xml-reader.
+	 *             when the information of the classificator cannot be loaded
+	 *             from the xml-reader.
 	 * 
 	 */
 	public void loadStatusFromXmlReader(XMLStreamReader reader) throws RuntimeException {
@@ -1285,12 +1333,15 @@ public class Art2aClassificator {
 	 * Gets all information of a classification from a XmlReader
 	 * 
 	 * @param reader
-	 *            which contains the information of the classificator. The current position of the reader hast to be the start
-	 *            element of the XML knod "ClassificatorData". This knod encloses the XML knods containing the data of the
-	 *            classificator. At the end of the method the position of the reader is the end element of the "ClassificatorData"
-	 *            knod
+	 *            which contains the information of the classificator. The
+	 *            current position of the reader hast to be the start element of
+	 *            the XML knod "ClassificatorData". This knod encloses the XML
+	 *            knods containing the data of the classificator. At the end of
+	 *            the method the position of the reader is the end element of
+	 *            the "ClassificatorData" knod
 	 * @throws RuntimeException
-	 *             when the information of the classificator cannot be loaded from the xml-reader.
+	 *             when the information of the classificator cannot be loaded
+	 *             from the xml-reader.
 	 * 
 	 */
 	public void loadResultFromXmlReader(XMLStreamReader reader) throws RuntimeException {
@@ -1659,11 +1710,13 @@ public class Art2aClassificator {
 	}
 
 	/**
-	 * Contains the information whether a class is selected or not. No information about the null class is returned.
+	 * Contains the information whether a class is selected or not. No
+	 * information about the null class is returned.
 	 * 
 	 * @return The selectionflag array.
 	 * @throws RuntimeException
-	 *             when an error occured while getting the class selection flags.
+	 *             when an error occured while getting the class selection
+	 *             flags.
 	 */
 	public boolean[] getClassSelectionFlags() {
 		try {
@@ -1715,14 +1768,16 @@ public class Art2aClassificator {
 	// region Get methods
 
 	/**
-	 * Gets the angle between classI and classJ in degree. 0 less than or equal to angle less than or equal to 90
+	 * Gets the angle between classI and classJ in degree. 0 less than or equal
+	 * to angle less than or equal to 90
 	 * 
 	 * @param classI
 	 *            Index of first class (less than mNumberOfDetectedClasses)
 	 * @param classJ
 	 *            Index of second class (less than mNumberOfDetectedClasses)
-	 * @return The angle in degree. "getIndexOfMaximumDataVectors" = 0 : The vectors are identicaly;
-	 *         "getIndexOfMaximumDataVectors" = 90 : The vectors are perpendicular to each other.
+	 * @return The angle in degree. "getIndexOfMaximumDataVectors" = 0 : The
+	 *         vectors are identicaly; "getIndexOfMaximumDataVectors" = 90 : The
+	 *         vectors are perpendicular to each other.
 	 * @throws IllegalArgumentException
 	 *             when one of the delivered indices is illegal.
 	 */
@@ -1759,11 +1814,13 @@ public class Art2aClassificator {
 	}
 
 	/**
-	 * The objects in all classes: mObjectsInClasses[i][] corresponds to mNumberOfObjectsInClasses[i]
+	 * The objects in all classes: mObjectsInClasses[i][] corresponds to
+	 * mNumberOfObjectsInClasses[i]
 	 * 
 	 * @return An jagged array with all objects.
 	 * @throws IllegalArgumentException
-	 *             when an error occures while getting the objects from allclasses.
+	 *             when an error occures while getting the objects from
+	 *             allclasses.
 	 */
 	public Object[][] getClassificationObjectsFromAllClasses() {
 		try {
@@ -1792,7 +1849,8 @@ public class Art2aClassificator {
 	 * 
 	 * @return The objects in the nullclass.
 	 * @throws RuntimeException
-	 *             when an error occures while getting the objects from the null class.
+	 *             when an error occures while getting the objects from the null
+	 *             class.
 	 */
 	public Object[] getClassificationObjectsFromNullClass() {
 		try {
@@ -1813,7 +1871,8 @@ public class Art2aClassificator {
 	 * 
 	 * @return The classified objects in the selected classes.
 	 * @throws RuntimeException
-	 *             when the an error occures while getting the objects from the selected classes.
+	 *             when the an error occures while getting the objects from the
+	 *             selected classes.
 	 */
 	public FingerprintItem[] getObjectsFromSelectedClasses() {
 		int numberOfSelectedObjectsInClass = mNumberOfSelectedVectors;
@@ -1880,7 +1939,8 @@ public class Art2aClassificator {
 	 *            Contains the datavectors
 	 * @return The datamatrix.
 	 * @throws RuntimeException
-	 *             when an error occured while getting the DataMatrix from the fingerprint array.
+	 *             when an error occured while getting the DataMatrix from the
+	 *             fingerprint array.
 	 */
 	public double[][] getDataMatrixFromClassificationObject(FingerprintItem[] objects) {
 		try {
@@ -1928,14 +1988,17 @@ public class Art2aClassificator {
 			}
 			return matrix;
 		} catch (Exception exception) {
-			throw new RuntimeException("An error occured while calculating the datamatrix from the objectarray", exception);
+			throw new RuntimeException("An error occured while calculating the datamatrix from the objectarray",
+					exception);
 		}
 	}
 
 	/**
-	 * Gets the class information of each vector. mClassView[3]=5 means vector no. 4 is in class no.6.
+	 * Gets the class information of each vector. mClassView[3]=5 means vector
+	 * no. 4 is in class no.6.
 	 * 
-	 * @return A copy of the mClassView array, containing the class information of each vector.
+	 * @return A copy of the mClassView array, containing the class information
+	 *         of each vector.
 	 */
 	public int[] getClassView() {
 		int[] copyOfClassView = new int[mClassView.length];
@@ -1960,13 +2023,14 @@ public class Art2aClassificator {
 	// region Scale methods
 
 	/**
-	 * Scales the components of the fingerprintVector of the classification objects in the object array to the interval [0, 1]
-	 * within a column.
+	 * Scales the components of the fingerprintVector of the classification
+	 * objects in the object array to the interval [0, 1] within a column.
 	 * 
 	 * @param objects
 	 *            Contains the classification objects.
 	 * @throws RuntimeException
-	 *             when the fingerprint vector components cannot be scaled to the intervall [0,1].
+	 *             when the fingerprint vector components cannot be scaled to
+	 *             the intervall [0,1].
 	 */
 	public static void scaleFingerprintVectorComponentsToIntervalZeroOne(FingerprintItem[] objects) {
 		try {
@@ -1996,8 +2060,8 @@ public class Art2aClassificator {
 				}
 			}
 		} catch (Exception exception) {
-			throw new RuntimeException("An error occured while scaling the fingerprintVectors of the IClassification objects",
-					exception);
+			throw new RuntimeException(
+					"An error occured while scaling the fingerprintVectors of the IClassification objects", exception);
 		}
 	}
 
@@ -2010,7 +2074,8 @@ public class Art2aClassificator {
 	/**
 	 * Get-Property
 	 * 
-	 * @return Parameter to influence the number of classes. 0 less than or equal to vigilanceParameter less than or equal to 1.
+	 * @return Parameter to influence the number of classes. 0 less than or
+	 *         equal to vigilanceParameter less than or equal to 1.
 	 */
 	public double getVigilanceParameter() {
 		return mVigilanceParameter;
@@ -2020,8 +2085,8 @@ public class Art2aClassificator {
 	 * Set-Property
 	 * 
 	 * @param vigilanceParameter
-	 *            Parameter to influence the number of classes. 0 less than or equal to vigilanceParameter less than or equal to
-	 *            1.
+	 *            Parameter to influence the number of classes. 0 less than or
+	 *            equal to vigilanceParameter less than or equal to 1.
 	 * @throws IllegalArgumentException
 	 *             when trying to set an illegal value.
 	 */
@@ -2036,8 +2101,8 @@ public class Art2aClassificator {
 	/**
 	 * Get-Property
 	 * 
-	 * @return Parameter to define the intensity of keeping the old class vector in mindbefore the system adapts it to the new
-	 *         sample vector.
+	 * @return Parameter to define the intensity of keeping the old class vector
+	 *         in mindbefore the system adapts it to the new sample vector.
 	 */
 	public double getLearningParameter() {
 		return mLearningParameter;
@@ -2047,8 +2112,9 @@ public class Art2aClassificator {
 	 * Set-Property
 	 * 
 	 * @param learningParameter
-	 *            Parameter to define the intensity of keeping the old class vector in mindbefore the system adapts it to the new
-	 *            sample vector.
+	 *            Parameter to define the intensity of keeping the old class
+	 *            vector in mindbefore the system adapts it to the new sample
+	 *            vector.
 	 * @throws IllegalArgumentException
 	 *             when trying to set an illegal value.
 	 */
@@ -2063,10 +2129,12 @@ public class Art2aClassificator {
 	/**
 	 * GetProperty
 	 * 
-	 * @return Parameter to define the final similarity between the classvectors of the current and the previous epoche. 0 less
-	 *         than or equal to RequiredSimilarity less than or equal to 1 Default: 0.99<br>
-	 *         Remark: E.g. a value of 0.99 means that the classification will end if the classvectors of the current and the
-	 *         previous epoche have a similarity of 99 percent.
+	 * @return Parameter to define the final similarity between the classvectors
+	 *         of the current and the previous epoche. 0 less than or equal to
+	 *         RequiredSimilarity less than or equal to 1 Default: 0.99<br>
+	 *         Remark: E.g. a value of 0.99 means that the classification will
+	 *         end if the classvectors of the current and the previous epoche
+	 *         have a similarity of 99 percent.
 	 */
 	public double getRequiredSimilarity() {
 		return mRequiredSimilarity;
@@ -2076,10 +2144,13 @@ public class Art2aClassificator {
 	 * Set-Property
 	 * 
 	 * @param requiredSimilarity
-	 *            Parameter to define the final similarity between the classvectors of the current and the previous epoche. 0 less
-	 *            than or equal to RequiredSimilarity less than or equal to 1 Default: 0.99<br>
-	 *            Remark: E.g. a value of 0.99 means that the classification will end if the classvectors of the current and the
-	 *            previous epoche have a similarity of 99 percent.
+	 *            Parameter to define the final similarity between the
+	 *            classvectors of the current and the previous epoche. 0 less
+	 *            than or equal to RequiredSimilarity less than or equal to 1
+	 *            Default: 0.99<br>
+	 *            Remark: E.g. a value of 0.99 means that the classification
+	 *            will end if the classvectors of the current and the previous
+	 *            epoche have a similarity of 99 percent.
 	 * @throws IllegalArgumentException
 	 *             when trying to set an illegal value.
 	 */
@@ -2094,9 +2165,11 @@ public class Art2aClassificator {
 	/**
 	 * Get--Property
 	 * 
-	 * @return true: System will converge if the scalar product of the classes of the current and the previous epoch is less than
+	 * @return true: System will converge if the scalar product of the classes
+	 *         of the current and the previous epoch is less than
 	 *         RequiredSimilarity.<br>
-	 *         false: System will converge if the classification does not change after one epoch.
+	 *         false: System will converge if the classification does not change
+	 *         after one epoch.
 	 */
 	public boolean getConvergenceFlag() {
 		return mConvergenceFlag;
@@ -2106,9 +2179,11 @@ public class Art2aClassificator {
 	 * Set-Property
 	 * 
 	 * @param convergenceFlag
-	 *            true: System will converge if the scalar product of the classes of the current and the previous epoch is less
-	 *            than RequiredSimilarity.<br>
-	 *            false: System will converge if the classification does not change after one epoch.
+	 *            true: System will converge if the scalar product of the
+	 *            classes of the current and the previous epoch is less than
+	 *            RequiredSimilarity.<br>
+	 *            false: System will converge if the classification does not
+	 *            change after one epoch.
 	 */
 	public void setConvergenceFlag(boolean convergenceFlag) {
 		mConvergenceFlag = convergenceFlag;
@@ -2117,8 +2192,10 @@ public class Art2aClassificator {
 	/**
 	 * Get-Property
 	 * 
-	 * @return True: The classification was successful and the results have been successfully calculated.<br>
-	 *         False: The classification ended abnormaly and some or all results have not been calculated.
+	 * @return True: The classification was successful and the results have been
+	 *         successfully calculated.<br>
+	 *         False: The classification ended abnormaly and some or all results
+	 *         have not been calculated.
 	 */
 	public boolean getClassificationCompleteFlag() {
 		return mClassificationCompleteFlag;
@@ -2127,7 +2204,8 @@ public class Art2aClassificator {
 	/**
 	 * Get--Property
 	 * 
-	 * @return Limit of the number of epochs. MaximumNumberOfEpochs greater than 1
+	 * @return Limit of the number of epochs. MaximumNumberOfEpochs greater than
+	 *         1
 	 */
 	public int getMaximumNumberOfEpochs() {
 		return mMaximumNumberOfEpochs;
@@ -2137,7 +2215,8 @@ public class Art2aClassificator {
 	 * Set-Property
 	 * 
 	 * @param maximumNumberOfEpochs
-	 *            Limit of the number of epochs. MaximumNumberOfEpochs greater than 1
+	 *            Limit of the number of epochs. MaximumNumberOfEpochs greater
+	 *            than 1
 	 * @throws IllegalArgumentException
 	 *             when trying to set an illegal value.
 	 */
@@ -2211,7 +2290,8 @@ public class Art2aClassificator {
 	/**
 	 * Get-Property
 	 * 
-	 * @return The maximum number of data vectors in one of the detected classes.
+	 * @return The maximum number of data vectors in one of the detected
+	 *         classes.
 	 */
 	public int getMaximumNumberOfVectorsInDetectedClasses() {
 		return mMaximumNumberOfVectorsInDetectedClasses;
@@ -2229,11 +2309,13 @@ public class Art2aClassificator {
 	/**
 	 * Get-Property
 	 * 
-	 * @return All matrix values less than this threshold are set to zero. 0 less than or equal to ThresholdForContrastEnhancement
-	 *         less than or equal to 1 / Sqr(NumberOfComponents);<br>
+	 * @return All matrix values less than this threshold are set to zero. 0
+	 *         less than or equal to ThresholdForContrastEnhancement less than
+	 *         or equal to 1 / Sqr(NumberOfComponents);<br>
 	 *         Default: 1 / Sqr(NumberOfComponents - 1)<br>
-	 *         Remark: An increase of the threshold leads to greater contrastenhancement and to a faster stability of the
-	 *         classvectors but forces a wrong classification.
+	 *         Remark: An increase of the threshold leads to greater
+	 *         contrastenhancement and to a faster stability of the classvectors
+	 *         but forces a wrong classification.
 	 */
 	public double getThresholdForContrastEnhancement() {
 		return mThresholdForContrastEnhancement;
@@ -2243,16 +2325,19 @@ public class Art2aClassificator {
 	 * Set-Property
 	 * 
 	 * @param thresholdForContrastEnhancement
-	 *            All matrix values less than this threshold are set to zero. 0 less than or equal to
-	 *            ThresholdForContrastEnhancement less than or equal to 1 / Sqr(NumberOfComponents);<br>
+	 *            All matrix values less than this threshold are set to zero. 0
+	 *            less than or equal to ThresholdForContrastEnhancement less
+	 *            than or equal to 1 / Sqr(NumberOfComponents);<br>
 	 *            Default: 1 / Sqr(NumberOfComponents - 1)<br>
-	 *            Remark: An increase of the threshold leads to greater contrastenhancement and to a faster stability of the
+	 *            Remark: An increase of the threshold leads to greater
+	 *            contrastenhancement and to a faster stability of the
 	 *            classvectors but forces a wrong classification.
 	 * @throws IllegalArgumentException
 	 *             when trying to set an illegal value.
 	 */
 	public void setThresholdForContrastEnhancement(double thresholdForContrastEnhancement) {
-		if (thresholdForContrastEnhancement >= 0 && thresholdForContrastEnhancement <= 1 / Math.sqrt(mNumberOfComponents))
+		if (thresholdForContrastEnhancement >= 0
+				&& thresholdForContrastEnhancement <= 1 / Math.sqrt(mNumberOfComponents))
 			mThresholdForContrastEnhancement = thresholdForContrastEnhancement;
 		else
 			throw new IllegalArgumentException("This is not a valid value for the parameter");
@@ -2261,9 +2346,10 @@ public class Art2aClassificator {
 	/**
 	 * Get-property
 	 * 
-	 * @return The value influences the number of detected classes. A high value increases the number of classes. 0 less than or
-	 *         equal to InputScalingFactor less than or equal to 1 / Sqr(NumberOfComponents); Default: 1 / Sqr(NumberOfComponents
-	 *         - 1)
+	 * @return The value influences the number of detected classes. A high value
+	 *         increases the number of classes. 0 less than or equal to
+	 *         InputScalingFactor less than or equal to 1 /
+	 *         Sqr(NumberOfComponents); Default: 1 / Sqr(NumberOfComponents - 1)
 	 */
 	public double getInputScalingFactor() {
 		return mInputScalingFactor;
@@ -2273,9 +2359,11 @@ public class Art2aClassificator {
 	 * Set-property
 	 * 
 	 * @param inputScalingFactor
-	 *            The value influences the number of detected classes. A high value increases the number of classes. 0 less than
-	 *            or equal to InputScalingFactor less than or equal to 1 / Sqr(NumberOfComponents); Default: 1 /
-	 *            Sqr(NumberOfComponents - 1)
+	 *            The value influences the number of detected classes. A high
+	 *            value increases the number of classes. 0 less than or equal to
+	 *            InputScalingFactor less than or equal to 1 /
+	 *            Sqr(NumberOfComponents); Default: 1 / Sqr(NumberOfComponents -
+	 *            1)
 	 * @throws IllegalArgumentException
 	 *             when trying to set an illegal value.
 	 */
@@ -2304,7 +2392,8 @@ public class Art2aClassificator {
 	/**
 	 * Get-Property
 	 * 
-	 * @return The objects of the selected classes. The first index defines the class and the second one the object in the class.
+	 * @return The objects of the selected classes. The first index defines the
+	 *         class and the second one the object in the class.
 	 */
 	public FingerprintItem[][] getObjectsFromSelectedClass() {
 		return mObjectsOfSelectedClasses;
@@ -2331,7 +2420,8 @@ public class Art2aClassificator {
 	/**
 	 * Get-Property
 	 * 
-	 * @return True / false, depending on whether the random should be deterministic or not.
+	 * @return True / false, depending on whether the random should be
+	 *         deterministic or not.
 	 */
 	public boolean getDeterministicRandom() {
 		return mDeterministicRandom;
@@ -2355,7 +2445,8 @@ public class Art2aClassificator {
 	 * Puts the selected objects from the object array into a jagged array.
 	 * 
 	 * @throws RuntimeException
-	 *             when an error occurs while creating the array containing the selected objects.
+	 *             when an error occurs while creating the array containing the
+	 *             selected objects.
 	 */
 	private void createArrayOfSelectedObjects() {
 		try {
@@ -2396,7 +2487,8 @@ public class Art2aClassificator {
 	}
 
 	/**
-	 * Evaluates the results of the classification. Is invoked if the classification suceeded.
+	 * Evaluates the results of the classification. Is invoked if the
+	 * classification suceeded.
 	 * 
 	 * @throws RuntimeException
 	 *             when the calculation of the classifcation results fails.
@@ -2493,13 +2585,15 @@ public class Art2aClassificator {
 	}
 
 	/**
-	 * Checks the convergence of the classification at the end of each epoch. The type of convergence-check depends on the
-	 * convergence-flag.
+	 * Checks the convergence of the classification at the end of each epoch.
+	 * The type of convergence-check depends on the convergence-flag.
 	 * 
 	 * @return true: Classvectors converged. Classification ends.<br>
-	 *         /* false: Classvectors are still not convergent. Classification continues.
+	 *         /* false: Classvectors are still not convergent. Classification
+	 *         continues.
 	 * @throws RuntimeException
-	 *             when an error occurs while checking the convergence of the current classification.
+	 *             when an error occurs while checking the convergence of the
+	 *             current classification.
 	 */
 	private boolean isNetworkConvergent() {
 		try {
@@ -2602,7 +2696,8 @@ public class Art2aClassificator {
 			return convergenceFlag;
 		} catch (Exception exception) {
 			throw new RuntimeException(
-					"The classification failed! Unable to check the convergence of the current classification.", exception);
+					"The classification failed! Unable to check the convergence of the current classification.",
+					exception);
 		}
 	}
 
@@ -2651,11 +2746,14 @@ public class Art2aClassificator {
 	}
 
 	/**
-	 * Fills the "mSampleVectorsInRandomOrder" array with vectorindices in a random order. <br>
-	 * Restriction: Every vector index is allowed to occur just one time in the array.
+	 * Fills the "mSampleVectorsInRandomOrder" array with vectorindices in a
+	 * random order. <br>
+	 * Restriction: Every vector index is allowed to occur just one time in the
+	 * array.
 	 * 
 	 * @throws RuntimeException
-	 *             when an error occurs while randomizing the vector indices of the array "mSampleVectorsInRandomOrder".
+	 *             when an error occurs while randomizing the vector indices of
+	 *             the array "mSampleVectorsInRandomOrder".
 	 */
 	private void randomizeVectorIndices() {
 		try {
@@ -2757,12 +2855,14 @@ public class Art2aClassificator {
 	}
 
 	/**
-	 * Gets index of data vector in class "classIndex" at position "vectorInClassIndex".
+	 * Gets index of data vector in class "classIndex" at position
+	 * "vectorInClassIndex".
 	 * 
 	 * @param classIndex
 	 *            Class index (less than mNumberOfDetectedClasses)
 	 * @param vectorInClassIndex
-	 *            The vector index to define the vector in the class (less than mNumberOfVectorsInClass).
+	 *            The vector index to define the vector in the class (less than
+	 *            mNumberOfVectorsInClass).
 	 * @return The index of the classvector in the classmatrix.
 	 * @throws IllegalArgumentException
 	 *             when one of the delivered indices is illegal.
@@ -2787,10 +2887,12 @@ public class Art2aClassificator {
 	}
 
 	/**
-	 * Gets the index of the data vector in the null class at position "vectorInNullClassIndex" in the datamatrix.
+	 * Gets the index of the data vector in the null class at position
+	 * "vectorInNullClassIndex" in the datamatrix.
 	 * 
 	 * @param vectorInNullClassIndex
-	 *            / The vectorindex to define the vector in the nullclass (less than the number of vectors in nullclass)
+	 *            / The vectorindex to define the vector in the nullclass (less
+	 *            than the number of vectors in nullclass)
 	 * @return The index in the datamatrix.
 	 * @throws IllegalArgumentException
 	 *             when the delivered index is invalid.

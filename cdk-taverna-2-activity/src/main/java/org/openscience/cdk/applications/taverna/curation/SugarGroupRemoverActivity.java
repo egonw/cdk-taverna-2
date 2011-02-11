@@ -26,17 +26,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
-
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.exception.CDKException;
@@ -85,38 +79,22 @@ public class SugarGroupRemoverActivity extends AbstractCDKActivity {
 
 	List<IAtomContainer> sugarChains = new ArrayList<IAtomContainer>();
 
-	@SuppressWarnings("unchecked")
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
-				context);
-		List<CMLChemFile> chemFileList = null;
+	public void work() throws Exception {
+		// Get input
+		String[] smilesList = { "C(C(C(C(C(C=O)O)O)O)O)O", "C(C(CC(C(CO)O)O)O)(O)=O", "C(C(C(CC(=O)O)O)O)O",
+				"C(C(C(C(C(CO)O)O)O)=O)O", "C(C(C(C(C(CO)O)O)O)O)O", "C(C(C(C(CC=O)O)O)O)O" };
+		List<CMLChemFile> chemFileList = this.getInputAsList(this.INPUT_PORTS[0], CMLChemFile.class);
+		// Do work
 		ArrayList<CMLChemFile> curated = new ArrayList<CMLChemFile>();
 		ArrayList<CMLChemFile> discarded = new ArrayList<CMLChemFile>();
-		try {
-			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
-		} catch (Exception e) {
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
-		String smiles = "C(C(C(C(C(C=O)O)O)O)O)O";
-		String smiles2 = "C(C(CC(C(CO)O)O)O)(O)=O";
-		String smiles3 = "C(C(C(CC(=O)O)O)O)O";
-		String smiles4 = "C(C(C(C(C(CO)O)O)O)=O)O";
-		String smiles5 = "C(C(C(C(C(CO)O)O)O)O)O";
-		String smiles6 = "C(C(C(C(CC=O)O)O)O)O";
 		SmilesParser sp = new SmilesParser(DefaultChemObjectBuilder.getInstance());
 		try {
-			sugarChains.add(sp.parseSmiles(smiles));
-			sugarChains.add(sp.parseSmiles(smiles2));
-			sugarChains.add(sp.parseSmiles(smiles3));
-			sugarChains.add(sp.parseSmiles(smiles4));
-			sugarChains.add(sp.parseSmiles(smiles5));
-			sugarChains.add(sp.parseSmiles(smiles6));
+			for (String smiles : smilesList) {
+				sugarChains.add(sp.parseSmiles(smiles));
+			}
 		} catch (InvalidSmilesException ex) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_WHILE_PARSING_SMILES, this.getActivityName(), ex);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_WHILE_PARSING_SMILES,
+					this.getActivityName(), ex);
 		}
 		for (CMLChemFile cml : chemFileList) {
 			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(cml);
@@ -157,23 +135,9 @@ public class SugarGroupRemoverActivity extends AbstractCDKActivity {
 				}
 			}
 		}
-		try {
-			List<byte[]> curatedList = CDKObjectHandler.getBytesList(curated);
-			T2Reference containerRef = referenceService.register(curatedList, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		} catch (Exception ex) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), ex);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
-		}
-		try {
-			List<byte[]> discardedList = CDKObjectHandler.getBytesList(discarded);
-			T2Reference containerRef2 = referenceService.register(discardedList, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[1], containerRef2);
-		} catch (Exception ex) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), ex);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
-		}
-		return outputs;
+		// Set output
+		this.setOutputAsObjectList(curated, this.OUTPUT_PORTS[0]);
+		this.setOutputAsObjectList(discarded, this.OUTPUT_PORTS[1]);
 	}
 
 	private boolean shouldRemoveRing(IAtomContainer ring, IAtomContainer molecule, IRingSet ringset) {
@@ -186,7 +150,8 @@ public class SugarGroupRemoverActivity extends AbstractCDKActivity {
 		for (IAtom atom : sugarRing.atoms()) {
 			bonds = molecule.getConnectedBondsList(atom);
 		}
-		if (IBond.Order.SINGLE.equals(BondManipulator.getMaximumBondOrder(bonds)) && connectedRings.getAtomContainerCount() == 0) {
+		if (IBond.Order.SINGLE.equals(BondManipulator.getMaximumBondOrder(bonds))
+				&& connectedRings.getAtomContainerCount() == 0) {
 			return shouldRemoveRing;
 		} else {
 			return shouldRemoveRing = false;

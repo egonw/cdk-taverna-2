@@ -27,18 +27,17 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
+import org.openscience.cdk.applications.taverna.basicutilities.Tools;
 import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileWriter;
 
 /**
@@ -56,13 +55,17 @@ public class CSVFileWriterActivity extends AbstractCDKActivity implements IItera
 	 * Creates a new instance.
 	 */
 	public CSVFileWriterActivity() {
-		this.INPUT_PORTS = new String[] { "CSV Strings" };
+		this.INPUT_PORTS = new String[] { "CSV Strings", "File" };
 		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
 	@Override
 	protected void addInputPorts() {
 		addInput(this.INPUT_PORTS[0], 1, true, null, String.class);
+		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+		expectedReferences.add(FileReference.class);
+		expectedReferences.add(InlineStringReference.class);
+		addInput(this.INPUT_PORTS[1], 0, false, expectedReferences, null);
 	}
 
 	@Override
@@ -70,55 +73,46 @@ public class CSVFileWriterActivity extends AbstractCDKActivity implements IItera
 		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(final Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		List<String> strings = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
-				context);
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		List<String> files = new ArrayList<String>();
-		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (directory == null) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_OUTPUT_DIRECTORY_CHOSEN);
-		}
-		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
+	public void work() throws Exception {
+		// Get input
+		List<String> strings = this.getInputAsList(this.INPUT_PORTS[0], String.class);
+		File targetFile = this.getInputAsFile(this.INPUT_PORTS[1]);
+		String directory = Tools.getDirectory(targetFile);
+		String name = Tools.getFileName(targetFile);
+		String extension = (String) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 		Boolean oneFilePerIteration = (Boolean) this.getConfiguration().getAdditionalProperty(
 				CDKTavernaConstants.PROPERTY_ONE_FILE_PER_ITERATION);
 		if (oneFilePerIteration) {
-			this.file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
+			this.file = FileNameGenerator.getNewFile(directory, extension, name, this.iteration);
 		} else {
 			if (this.file == null) {
-				this.file = FileNameGenerator.getNewFile(directory.getPath(), extension);
+				this.file = FileNameGenerator.getNewFile(directory, extension, name);
 			}
 		}
+		// Do work
+		List<String> resultFiles = new ArrayList<String>();
 		try {
 			PrintWriter writer = new PrintWriter(new FileWriter(file, !oneFilePerIteration));
 			for (int i = 0; i < strings.size(); i++) {
 				String s = strings.get(i);
-				if (this.iteration > 1 && (s.startsWith("\"ID\"") || s.startsWith("Descriptor Name")) && !oneFilePerIteration
-						&& i == 0) {
+				if (this.iteration > 1 && (s.startsWith("\"ID\"") || s.startsWith("Descriptor Name"))
+						&& !oneFilePerIteration && i == 0) {
 					continue;
 				}
 				writer.write(s + "\n");
 			}
 			writer.close();
-			files.add(this.file.getPath());
+			resultFiles.add(this.file.getPath());
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + file.getPath() + "!",
 					this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRITE_FILE_ERROR + file.getPath() + "!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRITE_FILE_ERROR + file.getPath()
+					+ "!");
 		}
-		try {
-			T2Reference containerRef = referenceService.register(files, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
-		}
-		return outputs;
+		// Set output
+		this.setOutputAsStringList(resultFiles, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override

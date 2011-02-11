@@ -64,16 +64,16 @@ public class AtomTypeFilterActivityTest extends CDKTavernaTestCases {
 		Map<String, Object> inputs = new HashMap<String, Object>();
 		CMLChemFile[] chemFiles = CDKTavernaTestData.getCMLChemFile();
 		List<byte[]> data = CDKObjectHandler.getBytesList(chemFiles);
-		inputs.put(activity.getINPUT_PORTS()[0], data);
+		inputs.put(activity.INPUT_PORTS[0], data);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[1], byte[].class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[0], byte[].class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[1], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
-		List<byte[]> objectData = (List<byte[]>) outputs.get(activity.getRESULT_PORTS()[0]);
+		List<byte[]> objectData = (List<byte[]>) outputs.get(activity.OUTPUT_PORTS[0]);
 		List<CMLChemFile> typedStructures = (List<CMLChemFile>) CDKObjectHandler.getChemFileList(objectData);
 		Assert.assertEquals(10, typedStructures.size());
-		objectData = (List<byte[]>) outputs.get(activity.getRESULT_PORTS()[1]);
+		objectData = (List<byte[]>) outputs.get(activity.OUTPUT_PORTS[1]);
 		Assert.assertEquals(true, objectData.isEmpty());
 	}
 

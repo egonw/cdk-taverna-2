@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 
+import org.openscience.cdk.Reaction;
 import org.openscience.cdk.geometry.GeometryTools;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IReaction;
@@ -78,7 +79,7 @@ public class DrawPDF {
 		pdf.close();
 	}
 
-	public static void drawReactionAsPDF(List<IReaction> reactions, File file) throws Exception {
+	public static void drawReactionAsPDF(List<Reaction> reactions, File file) throws Exception {
 		Document pdf = new Document();
 		PdfWriter writer = PdfWriter.getInstance(pdf, new FileOutputStream(file));
 		pdf.open();

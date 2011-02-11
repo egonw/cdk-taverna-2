@@ -23,18 +23,11 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
@@ -44,8 +37,9 @@ import org.openscience.cdk.interfaces.IAtomType;
 import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 
 /**
- * Class which represents the atom type filter activity. It tries to type each atom of the given structures and separates the
- * structures in typeable and not typeable ones.
+ * Class which represents the atom type filter activity. It tries to type each
+ * atom of the given structures and separates the structures in typeable and not
+ * typeable ones.
  * 
  * @author Andreas Truszkowski
  * 
@@ -94,25 +88,13 @@ public class AtomTypeFilterActivity extends AbstractCDKActivity {
 		return CDKTavernaConstants.FILTER_FOLDER_NAME;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
+	public void work() throws Exception {
+		// Get input
+		List<CMLChemFile> chemFileList = this.getInputAsList(this.INPUT_PORTS[0], CMLChemFile.class);
+		// Do work	
 		List<CMLChemFile> typedList = new ArrayList<CMLChemFile>();
 		List<CMLChemFile> notTypedList = new ArrayList<CMLChemFile>();
-		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
-				context);
-		try {
-			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR,
-					this.getConfiguration().getActivityName(), e);
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
 		IAtomContainer[] containers;
 		try {
 			containers = CMLChemFileWrapper.convertCMLChemFileListToAtomContainerArray(chemFileList);
@@ -133,23 +115,15 @@ public class AtomTypeFilterActivity extends AbstractCDKActivity {
 					}
 				}
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeMessage("Atom with element " + tmpAtom.getSymbol() + " could not be typed!");
+				ErrorLogger.getInstance().writeMessage(
+						"Atom with element " + tmpAtom.getSymbol() + " could not be typed!");
 				notTypedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(cont));
 				continue;
 			}
 			typedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(cont));
 		}
-		// Congfigure output
-		try {
-			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(typedList), 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-			containerRef = referenceService.register(CDKObjectHandler.getBytesList(notTypedList), 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[1], containerRef);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR,
-					this.getConfiguration().getActivityName(), e);
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
-		return outputs;
+		// Set output
+		this.setOutputAsObjectList(typedList, this.OUTPUT_PORTS[0]);
+		this.setOutputAsObjectList(notTypedList, this.OUTPUT_PORTS[1]);
 	}
 }

@@ -43,9 +43,9 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.Preferences;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKFileFilter;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.applications.taverna.iterativeio.DataStreamController;
 
 /**
  * Configuration panel for iterative file reading activities.
@@ -70,7 +70,7 @@ public class IterativeFileReaderConfigurationPanel extends
 		private static final long serialVersionUID = 5977560838089160808L;
 
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser openDialog = new JFileChooser(new File(Preferences.getInstance().getCurrentDirectory()));
+			JFileChooser openDialog = new JFileChooser(new File(DataStreamController.getInstance().getCurrentDirectory()));
 			if (IterativeFileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
 					CDKTavernaConstants.PROPERTY_SUPPORT_MULTI_FILE) != null) {
 				openDialog.setMultiSelectionEnabled(true);
@@ -81,7 +81,7 @@ public class IterativeFileReaderConfigurationPanel extends
 					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION);
 			openDialog.addChoosableFileFilter(new CDKFileFilter(description, extension));
 			if (openDialog.showOpenDialog(IterativeFileReaderConfigurationPanel.this) == JFileChooser.APPROVE_OPTION) {
-				Preferences.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
+				DataStreamController.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
 				if (IterativeFileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
 						CDKTavernaConstants.PROPERTY_SUPPORT_MULTI_FILE) != null) {
 					IterativeFileReaderConfigurationPanel.this.files = openDialog.getSelectedFiles();

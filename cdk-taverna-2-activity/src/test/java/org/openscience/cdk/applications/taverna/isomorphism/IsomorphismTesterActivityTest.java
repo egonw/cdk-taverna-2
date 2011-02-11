@@ -68,17 +68,17 @@ public class IsomorphismTesterActivityTest extends CDKTavernaTestCases {
 		for (CMLChemFile chemFile : chemFiles) {
 			structures.add(CDKObjectHandler.getBytes(chemFile));
 		}
-		inputs.put(activity.getINPUT_PORTS()[0], structures);
-		inputs.put(activity.getINPUT_PORTS()[1], structures.get(5));
+		inputs.put(activity.INPUT_PORTS[0], structures);
+		inputs.put(activity.INPUT_PORTS[1], structures.get(5));
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[1], byte[].class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[0], byte[].class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[1], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
 		List<CMLChemFile> calcStructures = CDKObjectHandler.getChemFileList((List<byte[]>) outputs
-				.get(activity.getRESULT_PORTS()[0]));
+				.get(activity.OUTPUT_PORTS[0]));
 		List<CMLChemFile> notCalcStructures = CDKObjectHandler.getChemFileList((List<byte[]>) outputs.get(activity
-				.getRESULT_PORTS()[1]));
+				.OUTPUT_PORTS[1]));
 		Assert.assertEquals(1, calcStructures.size());
 		Assert.assertEquals(9, notCalcStructures.size());
 	}

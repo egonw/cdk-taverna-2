@@ -45,8 +45,8 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.Preferences;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.applications.taverna.iterativeio.DataStreamController;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractConfigurationFrame;
 
 /**
@@ -92,10 +92,10 @@ public class WekaClusteringConfigurationPanelController extends
 	private ActionListener chooseFileAction = new ActionListener() {
 		
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser openDialog = new JFileChooser(new File(Preferences.getInstance().getCurrentDirectory()));
+			JFileChooser openDialog = new JFileChooser(new File(DataStreamController.getInstance().getCurrentDirectory()));
 			openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			if (openDialog.showOpenDialog(view) == JFileChooser.APPROVE_OPTION) {
-				Preferences.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
+				DataStreamController.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
 				file = openDialog.getSelectedFile();
 				view.getChoosenFileTextField().setText(file.getPath());
 				isChanged = true;

@@ -88,21 +88,21 @@ public class QSARVectorGeneratorActivityTest extends CDKTavernaTestCases {
 			container.setProperty(CDKTavernaConstants.MOLECULEID, uuid);
 		}
 		List<byte[]> data = CDKObjectHandler.getBytesList(chemFiles);
-		inputs.put(descriptorActivity.getINPUT_PORTS()[0], data);
+		inputs.put(descriptorActivity.INPUT_PORTS[0], data);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(descriptorActivity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(descriptorActivity.getRESULT_PORTS()[1], String.class);
+		expectedOutputTypes.put(descriptorActivity.OUTPUT_PORTS[0], byte[].class);
+		expectedOutputTypes.put(descriptorActivity.OUTPUT_PORTS[1], String.class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(descriptorActivity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
-		inputs.put(generatorActivity.getINPUT_PORTS()[0], outputs.get(descriptorActivity.getRESULT_PORTS()[0]));
+		inputs.put(generatorActivity.INPUT_PORTS[0], outputs.get(descriptorActivity.OUTPUT_PORTS[0]));
 		expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(generatorActivity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(generatorActivity.getRESULT_PORTS()[1], byte[].class);
+		expectedOutputTypes.put(generatorActivity.OUTPUT_PORTS[0], byte[].class);
+		expectedOutputTypes.put(generatorActivity.OUTPUT_PORTS[1], byte[].class);
 		outputs = ActivityInvoker.invokeAsyncActivity(generatorActivity, inputs, expectedOutputTypes);
-		byte[] vectorData = (byte[]) outputs.get(generatorActivity.getRESULT_PORTS()[0]);
+		byte[] vectorData = (byte[]) outputs.get(generatorActivity.OUTPUT_PORTS[0]);
 		Map<UUID, Map<String, Object>> resultVector = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(vectorData);
 		Assert.assertEquals(10, resultVector.size());
-		byte[] nameData = (byte[]) outputs.get(generatorActivity.getRESULT_PORTS()[1]);
+		byte[] nameData = (byte[]) outputs.get(generatorActivity.OUTPUT_PORTS[1]);
 		ArrayList<String> resultNames = (ArrayList<String>) CDKObjectHandler.getObject(nameData);
 		Assert.assertEquals(177, resultNames.size());
 	}

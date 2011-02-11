@@ -71,12 +71,12 @@ public class TagMoleculesWithUUIDActivityTest extends CDKTavernaTestCases {
 		for (CMLChemFile chemFile : chemFiles) {
 			data.add(CDKObjectHandler.getBytes(chemFile));
 		}
-		inputs.put(activity.getINPUT_PORTS()[0], data);
+		inputs.put(activity.INPUT_PORTS[0], data);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[0], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
-		List<byte[]> objectData = (List<byte[]>) outputs.get(activity.getRESULT_PORTS()[0]);
+		List<byte[]> objectData = (List<byte[]>) outputs.get(activity.OUTPUT_PORTS[0]);
 		List<CMLChemFile> resultChemFiles = CDKObjectHandler.getChemFileList(objectData);
 		for (int i = 0; i < resultChemFiles.size(); i++) {
 			IAtomContainer resultContainer = ChemFileManipulator.getAllAtomContainers(resultChemFiles.get(i)).get(0);

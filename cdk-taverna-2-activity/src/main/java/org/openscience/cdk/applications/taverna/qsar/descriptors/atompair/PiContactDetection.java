@@ -30,7 +30,8 @@ import org.openscience.cdk.qsar.IAtomPairDescriptor;
 import org.openscience.cdk.qsar.descriptors.atompair.PiContactDetectionDescriptor;
 
 /**
- * Class which provides the implementation for a cdk-taverna atomic qsar descriptor.
+ * Class which provides the implementation for a cdk-taverna atomic qsar
+ * descriptor.
  * 
  * @author Thomas Kuhn
  * 
@@ -40,7 +41,8 @@ public class PiContactDetection extends AbstractAtompairDescriptor {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.openscience.cdk.applications.taverna.qsar.descriptors.atomic.AbstractAtomicDescriptor#getDescriptor()
+	 * @see org.openscience.cdk.applications.taverna.qsar.descriptors.atomic.
+	 * AbstractAtomicDescriptor#getDescriptor()
 	 */
 	public IAtomPairDescriptor getDescriptor() {
 		return new PiContactDetectionDescriptor();

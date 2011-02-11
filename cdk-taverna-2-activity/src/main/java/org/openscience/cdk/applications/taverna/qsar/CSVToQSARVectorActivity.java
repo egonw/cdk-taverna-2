@@ -27,20 +27,18 @@ import java.io.FileReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 
 /**
  * Class which represents the CSV to QSAR vector activity.
@@ -48,7 +46,7 @@ import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
  * @author Andreas Truzskowski
  * 
  */
-public class CSVToQSARVectorActivity extends AbstractCDKActivity implements IFileReader {
+public class CSVToQSARVectorActivity extends AbstractCDKActivity {
 
 	public static final String CSV_TO_QSAR_VECTOR_ACTIVITY = "CSV To QSAR Vector";
 
@@ -56,12 +54,16 @@ public class CSVToQSARVectorActivity extends AbstractCDKActivity implements IFil
 	 * Creates a new instance.
 	 */
 	public CSVToQSARVectorActivity() {
+		this.INPUT_PORTS = new String[] { "File" };
 		this.OUTPUT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		// empty
+		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+		expectedReferences.add(FileReference.class);
+		expectedReferences.add(InlineStringReference.class);
+		addInput(this.INPUT_PORTS[0], 0, false, expectedReferences, null);
 	}
 
 	@Override
@@ -71,17 +73,10 @@ public class CSVToQSARVectorActivity extends AbstractCDKActivity implements IFil
 	}
 
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (files == null || files.length == 0) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
-		}
-		// No multi file selection supported
-		File file = files[0];
+	public void work() throws Exception {
+		// Get input
+		File file = this.getInputAsFile(this.INPUT_PORTS[0]);
+		// Do work
 		Map<UUID, Map<String, Object>> vectorMap = new HashMap<UUID, Map<String, Object>>();
 		Map<String, Object> descriptorResultMap;
 		ArrayList<String> descriptorNames = new ArrayList<String>();
@@ -119,20 +114,12 @@ public class CSVToQSARVectorActivity extends AbstractCDKActivity implements IFil
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!",
 					this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath()
+					+ "!");
 		}
-		try {
-			byte[] vectorData = CDKObjectHandler.getBytes(vectorMap);
-			T2Reference containerRef = referenceService.register(vectorData, 0, true, context);
-			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-			byte[] nameData = CDKObjectHandler.getBytes(descriptorNames);
-			containerRef = referenceService.register(nameData, 0, true, context);
-			outputs.put(this.OUTPUT_PORTS[1], containerRef);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
-		}
-		return outputs;
+		// Set output
+		this.setOutputAsObject(vectorMap, this.OUTPUT_PORTS[0]);
+		this.setOutputAsObject(descriptorNames, this.OUTPUT_PORTS[1]);
 	}
 
 	/**
@@ -158,7 +145,6 @@ public class CSVToQSARVectorActivity extends AbstractCDKActivity implements IFil
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
 		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".csv");
-		properties.put(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION, "Any CSV File");
 		return properties;
 	}
 

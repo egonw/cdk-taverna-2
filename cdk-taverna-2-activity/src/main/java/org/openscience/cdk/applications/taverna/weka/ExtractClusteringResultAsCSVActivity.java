@@ -28,12 +28,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
@@ -77,18 +71,11 @@ public class ExtractClusteringResultAsCSVActivity extends AbstractCDKActivity {
 		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
-				context);
-		if (files == null || files.isEmpty()) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_CLUSTERING_DATA_AVAILABLE);
-		}
+	public void work() throws Exception {
+		// Get input
+		List<String> files = this.getInputAsList(this.INPUT_PORTS[0], String.class);
+		// Do work
 		ArrayList<String> resultFiles = new ArrayList<String>();
 		Instances dataset = null;
 		Instances uuids = null;
@@ -105,8 +92,8 @@ public class ExtractClusteringResultAsCSVActivity extends AbstractCDKActivity {
 				uuids = Filter.useFilter(dataset, tools.getIDGetter(dataset));
 				dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			} catch (Exception e) {
-				ErrorLogger.getInstance()
-						.writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR, this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR,
+						this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR);
 			}
 			try {
@@ -116,15 +103,15 @@ public class ExtractClusteringResultAsCSVActivity extends AbstractCDKActivity {
 				eval.evaluateClusterer(dataset);
 				String path = new File(files.get(0)).getParent();
 				String name = clusterer.getClass().getSimpleName();
-				File resultFile = FileNameGenerator.getNewFile(path, ".txt", name
-						+ tools.getOptionsFromFile(new File(files.get(i)), name) + "_ClusteringStats");
+				File resultFile = FileNameGenerator.getNewFile(path, ".txt",
+						name + tools.getOptionsFromFile(new File(files.get(i)), name) + "_ClusteringStats");
 				PrintWriter writer = new PrintWriter(resultFile);
 				resultFiles.add(resultFile.getPath());
 				writer.write(eval.clusterResultsToString());
 				writer.close();
 				// Write UUID-Cluster CSV file
-				resultFile = FileNameGenerator.getNewFile(path, ".csv", name
-						+ tools.getOptionsFromFile(new File(files.get(i)), name) + "_UUIDCluster");
+				resultFile = FileNameGenerator.getNewFile(path, ".csv",
+						name + tools.getOptionsFromFile(new File(files.get(i)), name) + "_UUIDCluster");
 				writer = new PrintWriter(resultFile);
 				resultFiles.add(resultFile.getPath());
 				writer.write("UUID;Cluster_Number;\n");
@@ -136,11 +123,13 @@ public class ExtractClusteringResultAsCSVActivity extends AbstractCDKActivity {
 				}
 				writer.close();
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR,
+						this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
 			}
 		}
-		return outputs;
+		// Set output
+		this.setOutputAsStringList(resultFiles, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override

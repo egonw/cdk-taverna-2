@@ -30,7 +30,8 @@ import org.openscience.cdk.applications.taverna.qsar.AbstractMolecularDescriptor
 import org.openscience.cdk.qsar.IMolecularDescriptor;
 
 /**
- * Class which provides the implementation for a cdk-taverna molecular qsar descriptor.
+ * Class which provides the implementation for a cdk-taverna molecular qsar
+ * descriptor.
  * 
  * @author Thomas Kuhn
  * 
@@ -40,7 +41,8 @@ public class TaeAminoAcid extends AbstractMolecularDescriptor {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.openscience.cdk.applications.taverna.qsar.descriptors.bond.AbstractBondDescriptor#getDescriptor()
+	 * @see org.openscience.cdk.applications.taverna.qsar.descriptors.bond.
+	 * AbstractBondDescriptor#getDescriptor()
 	 */
 	public IMolecularDescriptor getDescriptor() {
 		return new org.openscience.cdk.qsar.descriptors.protein.TaeAminoAcidDescriptor();

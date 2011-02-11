@@ -31,20 +31,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
-import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
-import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
@@ -74,23 +65,12 @@ public class CurateStrangeElementsActivity extends AbstractCDKActivity {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
-				context);
-		List<CMLChemFile> chemFileList = null;
+	public void work() throws Exception {
+		// Get input
+		List<CMLChemFile> chemFileList = this.getInputAsList(this.INPUT_PORTS[0], CMLChemFile.class);
+		// Do work
 		ArrayList<CMLChemFile> curated = new ArrayList<CMLChemFile>();
 		ArrayList<CMLChemFile> discarded = new ArrayList<CMLChemFile>();
-		try {
-			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
-		} catch (Exception e) {
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
 		for (CMLChemFile cml : chemFileList) {
 			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(cml);
 			for (IAtomContainer atomContainer : moleculeList) {
@@ -103,27 +83,14 @@ public class CurateStrangeElementsActivity extends AbstractCDKActivity {
 				}
 			}
 		}
-		try {
-			List<byte[]> curatedList = CDKObjectHandler.getBytesList(curated);
-			T2Reference containerRef = referenceService.register(curatedList, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		} catch (Exception ex) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), ex);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
-		}
-		try {
-			List<byte[]> discardedList = CDKObjectHandler.getBytesList(discarded);
-			T2Reference containerRef2 = referenceService.register(discardedList, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[1], containerRef2);
-		} catch (Exception ex) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), ex);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
-		}
-		return outputs;
+		// Set output
+		this.setOutputAsObjectList(curated, this.OUTPUT_PORTS[0]);
+		this.setOutputAsObjectList(discarded, this.OUTPUT_PORTS[1]);
 	}
 
 	/**
-	 * Checks whether the molecule contains a strange element and should be removed.
+	 * Checks whether the molecule contains a strange element and should be
+	 * removed.
 	 * 
 	 * @param molecule
 	 * @return

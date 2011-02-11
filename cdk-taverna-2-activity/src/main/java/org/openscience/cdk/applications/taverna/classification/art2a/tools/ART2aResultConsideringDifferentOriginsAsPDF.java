@@ -25,15 +25,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.xml.stream.XMLStreamReader;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -47,7 +41,8 @@ import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator
 import org.openscience.cdk.applications.taverna.io.XMLFileIO;
 
 /**
- * Class which represents the the ART-2a result considering different origins to PDF activity.
+ * Class which represents the the ART-2a result considering different origins to
+ * PDF activity.
  * 
  * @author Andreas Truzskowski
  * 
@@ -61,6 +56,7 @@ public class ART2aResultConsideringDifferentOriginsAsPDF extends AbstractCDKActi
 	 */
 	public ART2aResultConsideringDifferentOriginsAsPDF() {
 		this.INPUT_PORTS = new String[] { "ART-2a Files", "Relations Table" };
+		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
 	@Override
@@ -71,23 +67,15 @@ public class ART2aResultConsideringDifferentOriginsAsPDF extends AbstractCDKActi
 
 	@Override
 	protected void addOutputPorts() {
-		// empty
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		List<String> resultFileNames = new ArrayList<String>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
-				context);
-		if (files == null || files.size() == 0) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_CLUSTERING_DATA_AVAILABLE);
-		}
-		ArrayList<String> relationTable = (ArrayList<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[1]),
-				String.class, context);
+	public void work() throws Exception {
+		// Get input
+		List<String> files = this.getInputAsList(this.INPUT_PORTS[0], String.class);
+		List<String> relationTable = this.getInputAsList(this.INPUT_PORTS[1], String.class);
+		// Do work
 		// Prepare relation table data
 		ArrayList<String> subjectNames = new ArrayList<String>();
 		HashMap<String, Integer> foundSubjectsTable;
@@ -113,6 +101,7 @@ public class ART2aResultConsideringDifferentOriginsAsPDF extends AbstractCDKActi
 				numberOfSubjectsInTable.put(currentName, value);
 			}
 		}
+		List<String> resultFiles = new ArrayList<String>();
 		try {
 			XMLStreamReader xmlReader;
 			Art2aClassificator classificator;
@@ -161,23 +150,27 @@ public class ART2aResultConsideringDifferentOriginsAsPDF extends AbstractCDKActi
 
 					}
 					String header = "(" + fileName + "/" + classificator.getVigilanceParameter() + "/"
-							+ classificator.getNumberOfDetectedClasses() + "/" + classificator.getNumberOfEpochs() + ")";
+							+ classificator.getNumberOfDetectedClasses() + "/" + classificator.getNumberOfEpochs()
+							+ ")";
 					charts.add(chartTool.createBarChart(header, "(Class number/Number Of Vectors/Interangle)",
 							"Number Of Vectors", dataSet));
 				} catch (Exception e) {
 					ErrorLogger.getInstance().writeError(
-							"Error during evaluation of classification results in file: " + fileName, this.getActivityName(), e);
+							"Error during evaluation of classification results in file: " + fileName,
+							this.getActivityName(), e);
 				}
 			}
 			File file = new File(files.get(0));
 			file = FileNameGenerator.getNewFile(file.getParent(), ".pdf", "Art2aMergedClassificationResult");
 			chartTool.writeChartAsPDF(file, charts);
-			resultFileNames.add(file.getAbsolutePath());
+			resultFiles.add(file.getAbsolutePath());
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_ART2A_RESULT_ERROR, this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_ART2A_RESULT_ERROR,
+					this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_ART2A_RESULT_ERROR);
 		}
-		return null;
+		// Set output
+		this.setOutputAsStringList(resultFiles, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override

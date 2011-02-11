@@ -35,6 +35,11 @@
 			<version>${t2.core.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>net.sf.taverna.t2.core</groupId>
+			<artifactId>reference-core-extensions</artifactId>
+			<version>${t2.core.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>net.sf.taverna.t2.activities</groupId>
 			<artifactId>activity-test-utils</artifactId>
 			<version>${t2.activities.version}</version>

@@ -44,7 +44,8 @@ import org.openscience.cdk.math.RandomNumbersTool;
  */
 public class CDKIOFileWriter {
 	/**
-	 * Method to write a CMLChemfile-Array to a file after it is converted to a cml-string Mainly for debugging purpose
+	 * Method to write a CMLChemfile-Array to a file after it is converted to a
+	 * cml-string Mainly for debugging purpose
 	 * 
 	 * @param cmlChemFile
 	 * @param fileName
@@ -64,7 +65,8 @@ public class CDKIOFileWriter {
 	}
 
 	/**
-	 * Method to write a List of CMLChemfiles to a file after it is converted to a cml-string Mainly for debugging purpose
+	 * Method to write a List of CMLChemfiles to a file after it is converted to
+	 * a cml-string Mainly for debugging purpose
 	 * 
 	 * @param List
 	 *            of CMLChemFiles
@@ -72,7 +74,8 @@ public class CDKIOFileWriter {
 	 *            The name of the file in which the
 	 * @throws Exception
 	 */
-	public static void writeListOfCMLChemFilesToFile(List<CMLChemFile> list, String fileName, String path) throws Exception {
+	public static void writeListOfCMLChemFilesToFile(List<CMLChemFile> list, String fileName, String path)
+			throws Exception {
 		if (fileName == null || fileName.length() == 0) {
 			fileName = "NoFileNameAvailable";
 		}
@@ -123,7 +126,8 @@ public class CDKIOFileWriter {
 				pw.print(content[i]);
 			}
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + file.getPath(), "CDKIOFileWriter", e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + file.getPath(),
+					"CDKIOFileWriter", e);
 			throw new CDKTavernaException("CDKIOFileWriter", CDKTavernaException.WRITE_FILE_ERROR + file.getPath());
 		} finally {
 			if (pw != null) {
@@ -155,8 +159,8 @@ public class CDKIOFileWriter {
 	}
 
 	/**
-	 * Method which checks if the path exists and if not if it is possible to build. If it is possible to build the path it will
-	 * be done.
+	 * Method which checks if the path exists and if not if it is possible to
+	 * build. If it is possible to build the path it will be done.
 	 * 
 	 * @param path
 	 *            Path which will be check
@@ -166,14 +170,16 @@ public class CDKIOFileWriter {
 		File file = new File(path);
 		if (!file.exists()) {
 			if (!file.mkdirs()) {
-				throw new CDKTavernaException("CDKIOFileWriter", CDKTavernaException.CREATE_DIRECTORY_ERROR + file.getPath());
+				throw new CDKTavernaException("CDKIOFileWriter", CDKTavernaException.CREATE_DIRECTORY_ERROR
+						+ file.getPath());
 			}
 		}
 	}
 
 	/**
-	 * Method which returns the absolute path. This method checks also whether the given path is correct or not. If the path don't
-	 * exist will it be created.
+	 * Method which returns the absolute path. This method checks also whether
+	 * the given path is correct or not. If the path don't exist will it be
+	 * created.
 	 * 
 	 * @param path
 	 *            The relative path

@@ -21,17 +21,18 @@
  */
 package org.openscience.cdk.applications.taverna.iterativeio;
 
+import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 
 import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
@@ -61,7 +62,10 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addInputPorts() {
-		addInput(this.INPUT_PORTS[0], 1, true, null, String.class);
+		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+		expectedReferences.add(FileReference.class);
+		expectedReferences.add(InlineStringReference.class);
+		addInput(this.INPUT_PORTS[0], 1, false, expectedReferences, null);
 		addInput(this.INPUT_PORTS[1], 0, true, null, Integer.class);
 	}
 
@@ -91,26 +95,13 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity {
 		return CDKTavernaConstants.ITERATIVE_IO_FOLDER_NAME;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		// Read RXNfile
-		int readSize;
-		try {
-			readSize = (Integer) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[1]), Integer.class, context);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRONG_INPUT_PORT_TYPE);
-		}
-		List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
-				context);
-		if (files == null || files.size() == 0) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
-		}
+	public void work() throws Exception {
+		// Get input
+		ReferenceService referenceService = this.callback.getContext().getReferenceService();
+		List<File> files = this.getInputAsFileList(this.INPUT_PORTS[0]);
+		int readSize = this.getInputAsObject(this.INPUT_PORTS[1], Integer.class);
+		// Do work
 		List<T2Reference> outputList = new ArrayList<T2Reference>();
 		try {
 			List<Reaction> reactions = new LinkedList<Reaction>();
@@ -128,7 +119,7 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity {
 				if (i == files.size() - 1 || counter >= readSize) {
 					List<byte[]> dataList = new ArrayList<byte[]>();
 					dataList = CDKObjectHandler.getBytesList(reactions);
-					T2Reference containerRef = referenceService.register(dataList, 1, true, context);
+					T2Reference containerRef = referenceService.register(dataList, 1, true, this.callback.getContext());
 					outputList.add(i, containerRef);
 					outputs.put(this.OUTPUT_PORTS[0], containerRef);
 					callback.receiveResult(outputs, new int[] { i });
@@ -140,10 +131,9 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity {
 			ErrorLogger.getInstance().writeError("Error reading RXN files!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), "Error reading RXN files!");
 		}
-		T2Reference containerRef = referenceService.register(outputList, 1, true, context);
-		outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		// Return results
-		return outputs;
+		// Set output
+		T2Reference containerRef = referenceService.register(outputList, 1, true, this.callback.getContext());
+		this.outputs.put(this.OUTPUT_PORTS[0], containerRef);
 	}
 
 }

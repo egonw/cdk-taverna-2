@@ -23,25 +23,19 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.isomorphism.UniversalIsomorphismTester;
 
 /**
- * Class which represents the doublets filter activity. It filter doublets in given structures list.
+ * Class which represents the doublets filter activity. It filter doublets in
+ * given structures list.
  * 
  * @author Andreas Truszkowski
  * 
@@ -88,24 +82,12 @@ public class DoubletsFilterActivity extends AbstractCDKActivity {
 		return CDKTavernaConstants.FILTER_FOLDER_NAME;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
+	public void work() throws Exception {
+		// Get input
+		List<CMLChemFile> chemFileList = this.getInputAsList(this.INPUT_PORTS[0], CMLChemFile.class);
+		// Do work
 		List<CMLChemFile> filteredList = new ArrayList<CMLChemFile>();
-		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
-				context);
-		try {
-			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR,
-					this.getConfiguration().getActivityName(), e);
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
 		IAtomContainer[] containers;
 		try {
 			containers = CMLChemFileWrapper.convertCMLChemFileListToAtomContainerArray(chemFileList);
@@ -134,19 +116,10 @@ public class DoubletsFilterActivity extends AbstractCDKActivity {
 				tempList.add(queryContainer);
 			}
 		}
-
 		for (IAtomContainer c : tempList) {
 			filteredList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(c));
 		}
-		// Congfigure output
-		try {
-			T2Reference containerRef = referenceService.register(CDKObjectHandler.getBytesList(filteredList), 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR,
-					this.getConfiguration().getActivityName(), e);
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
-		return outputs;
+		// Set output
+		this.setOutputAsObjectList(filteredList, this.OUTPUT_PORTS[0]);
 	}
 }

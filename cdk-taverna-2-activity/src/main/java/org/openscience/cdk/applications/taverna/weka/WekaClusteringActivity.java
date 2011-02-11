@@ -25,19 +25,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
+import org.openscience.cdk.applications.taverna.basicutilities.Tools;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaClusteringWorker;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
@@ -48,7 +46,8 @@ import weka.core.converters.ConverterUtils.DataSink;
 import weka.filters.Filter;
 
 /**
- * Class which implements the EM (Expectation Maximisation) clustering algorithm.
+ * Class which implements the EM (Expectation Maximisation) clustering
+ * algorithm.
  * 
  * @author Andreas Truzskowski
  * 
@@ -57,20 +56,24 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 
 	public static final String WEKA_CLUSTERING_ACTIVITY = "Weka Clustering";
 	private WekaClusteringWorker[] workers = null;
-	private File directory = null;
 	private List<String> resultFiles = null;
+	private String directory;
 
 	/**
 	 * Creates a new instance.
 	 */
 	public WekaClusteringActivity() {
-		this.INPUT_PORTS = new String[] { "Weka Dataset" };
+		this.INPUT_PORTS = new String[] { "Weka Dataset", "File" };
 		this.OUTPUT_PORTS = new String[] { "Weka Clustering Files" };
 	}
 
 	@Override
 	protected void addInputPorts() {
 		addInput(this.INPUT_PORTS[0], 0, true, null, byte[].class);
+		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+		expectedReferences.add(FileReference.class);
+		expectedReferences.add(InlineStringReference.class);
+		addInput(this.INPUT_PORTS[1], 0, false, expectedReferences, null);
 	}
 
 	@Override
@@ -79,27 +82,19 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 	}
 
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback) throws Exception {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		Instances dataset;
-		this.resultFiles = new ArrayList<String>();
-		byte[] dataArray = (byte[]) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class, context);
-		try {
-			dataset = CDKObjectHandler.getInstancesObject(dataArray);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
-		this.directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (this.directory == null) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_OUTPUT_DIRECTORY_CHOSEN);
-		}
-		String jobData = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_CLUSTERING_JOB_DATA);
+	public void work() throws Exception {
+		// Get input
+		Instances dataset = this.getInputAsObject(this.INPUT_PORTS[0], Instances.class);
+		File targetFile = this.getInputAsFile(this.INPUT_PORTS[1]);
+		this.directory = Tools.getDirectory(targetFile);
+		String name = Tools.getFileName(targetFile);
+		String jobData = (String) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_CLUSTERING_JOB_DATA);
 		if (jobData == null) {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_CLUSTERING_DATA_AVAILABLE);
 		}
+		// Do work
+		this.resultFiles = new ArrayList<String>();
 		// Extract job data
 		List<String> jobClustererNames = new ArrayList<String>();
 		List<String[]> jobOptions = new ArrayList<String[]>();
@@ -111,7 +106,8 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 			} else {
 				tempOption.add(splittedData[i]);
 			}
-			if (!tempOption.isEmpty() && (splittedData[i].startsWith("weka.clusterers") || i == splittedData.length - 1)) {
+			if (!tempOption.isEmpty()
+					&& (splittedData[i].startsWith("weka.clusterers") || i == splittedData.length - 1)) {
 				String[] option = new String[tempOption.size()];
 				option = tempOption.toArray(option);
 				jobOptions.add(option);
@@ -121,7 +117,7 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 		// Save data as arff
 		File arffFile = null;
 		try {
-			arffFile = FileNameGenerator.getNewFile(directory.getPath(), ".arff", "ClusteringData");
+			arffFile = FileNameGenerator.getNewFile(this.directory, ".arff", name + "_ClusteringData");
 			DataSink.write(arffFile.getPath(), dataset);
 			this.resultFiles.add(arffFile.getPath());
 		} catch (Exception e) {
@@ -131,7 +127,7 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 		// save as CSV
 		File csvFile = null;
 		try {
-			csvFile = FileNameGenerator.getNewFile(directory.getPath(), ".csv", "ClusteringData");
+			csvFile = FileNameGenerator.getNewFile(this.directory, ".csv", name + "_ClusteringData");
 			DataSink.write(csvFile.getPath(), dataset);
 			this.resultFiles.add(csvFile.getPath());
 		} catch (Exception e) {
@@ -156,16 +152,15 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 		synchronized (this) {
 			this.wait();
 		}
-		T2Reference containerRef = referenceService.register(this.resultFiles, 1, true, context);
-		outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		return outputs;
+		// Set output
+		this.setOutputAsStringList(this.resultFiles, this.OUTPUT_PORTS[0]);
 	}
 
 	public synchronized void workerDone(Clusterer clusterer, String options) {
 		File emModelFile = null;
 		try {
-			emModelFile = FileNameGenerator.getNewFile(directory.getPath(), ".model", clusterer.getClass().getSimpleName()
-					+ options);
+			emModelFile = FileNameGenerator.getNewFile(directory, ".model", clusterer.getClass()
+					.getSimpleName() + options);
 			SerializationHelper.write(emModelFile.getPath(), clusterer);
 			resultFiles.add(emModelFile.getPath());
 

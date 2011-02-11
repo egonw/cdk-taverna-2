@@ -79,14 +79,16 @@ public class CDKActivityConfigurationBean implements Serializable {
 	}
 
 	/**
-	 * @return hashmap containing additionally properties needed for the configuration of the activity.
+	 * @return hashmap containing additionally properties needed for the
+	 *         configuration of the activity.
 	 */
 	public HashMap<String, Object> getAdditionalProperties() {
 		return additionalProperties;
 	}
 
 	/**
-	 * Gets an additionally property needed for the configuration of the activity.
+	 * Gets an additionally property needed for the configuration of the
+	 * activity.
 	 * 
 	 * @param key
 	 * @return property
@@ -96,7 +98,8 @@ public class CDKActivityConfigurationBean implements Serializable {
 	}
 
 	/**
-	 * Sets the additionally properties needed for the configuration of the activity.
+	 * Sets the additionally properties needed for the configuration of the
+	 * activity.
 	 * 
 	 * @param additionalProperties
 	 */
@@ -105,7 +108,8 @@ public class CDKActivityConfigurationBean implements Serializable {
 	}
 
 	/**
-	 * Adds an additionally property needed for the configuration of the activity.
+	 * Adds an additionally property needed for the configuration of the
+	 * activity.
 	 * 
 	 * @param key
 	 * @param object

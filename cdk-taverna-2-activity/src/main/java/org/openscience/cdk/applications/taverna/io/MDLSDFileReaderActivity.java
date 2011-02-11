@@ -28,23 +28,21 @@ package org.openscience.cdk.applications.taverna.io;
  * 
  */
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.io.MDLV2000Reader;
 
@@ -62,7 +60,10 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addInputPorts() {
-		addInput(this.INPUT_PORTS[0], 1, true, null, String.class);
+		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+		expectedReferences.add(FileReference.class);
+		expectedReferences.add(InlineStringReference.class);
+		addInput(this.INPUT_PORTS[0], 1, false, expectedReferences, null);
 	}
 
 	@Override
@@ -70,21 +71,13 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity {
 		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		List<byte[]> dataList = new ArrayList<byte[]>();
-		// Read SDfile
-		List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
-				context);
-		if (files == null || files.size() == 0) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
-		}
-		for (String file : files) {
+	public void work() throws Exception {
+		// Get input
+		List<File> files = this.getInputAsFileList(this.INPUT_PORTS[0]);
+		// Do work
+		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
+		for (File file : files) {
 			try {
 				LineNumberReader lineReader = new LineNumberReader(new FileReader(file));
 				String line;
@@ -94,10 +87,11 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity {
 					if (line.contains("$$$$")) {
 						try {
 							CMLChemFile cmlChemFile = new CMLChemFile();
-							MDLV2000Reader tmpMDLReader = new MDLV2000Reader(new ByteArrayInputStream(SDFilePart.getBytes()));
+							MDLV2000Reader tmpMDLReader = new MDLV2000Reader(new ByteArrayInputStream(
+									SDFilePart.getBytes()));
 							tmpMDLReader.read(cmlChemFile);
 							tmpMDLReader.close();
-							dataList.add(CDKObjectHandler.getBytes(cmlChemFile));
+							chemFileList.add(cmlChemFile);
 						} catch (Exception e) {
 							ErrorLogger.getInstance().writeError("Error in SD file: " + file + "!\n" + SDFilePart,
 									this.getActivityName(), e);
@@ -108,19 +102,12 @@ public class MDLSDFileReaderActivity extends AbstractCDKActivity {
 				}
 				lineReader.close();
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file + "!", this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file + "!",
+						this.getActivityName(), e);
 			}
 		}
-		// Congfigure output
-		try {
-			T2Reference containerRef = referenceService.register(dataList, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
-		}
-		// Return results
-		return outputs;
+		// Set output
+		this.setOutputAsObjectList(chemFileList, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override

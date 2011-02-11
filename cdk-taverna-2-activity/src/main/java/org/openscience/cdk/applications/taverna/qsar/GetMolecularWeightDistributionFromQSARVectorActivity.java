@@ -28,20 +28,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
-
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.qsar.utilities.QSARVectorUtility;
 
 /**
- * Class which represents the Get Molecular Weight Distribution From QSAR Vector activity.
+ * Class which represents the Get Molecular Weight Distribution From QSAR Vector
+ * activity.
  * 
  * @author Andreas Truzskowski
  * 
@@ -54,14 +49,13 @@ public class GetMolecularWeightDistributionFromQSARVectorActivity extends Abstra
 	 * Creates a new instance.
 	 */
 	public GetMolecularWeightDistributionFromQSARVectorActivity() {
-		this.INPUT_PORTS = new String[] { "Descriptor Vector", "Descriptor Names" };
+		this.INPUT_PORTS = new String[] { "Descriptor Vector" };
 		this.OUTPUT_PORTS = new String[] { "MW Distribution CSV", "MW Molecule IDS CSV" };
 	}
 
 	@Override
 	protected void addInputPorts() {
 		addInput(this.INPUT_PORTS[0], 0, true, null, byte[].class);
-		addInput(this.INPUT_PORTS[1], 0, true, null, byte[].class);
 	}
 
 	@Override
@@ -72,30 +66,16 @@ public class GetMolecularWeightDistributionFromQSARVectorActivity extends Abstra
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
+	public void work() throws Exception {
+		// Get input
 		Map<UUID, Map<String, Object>> vectorMap;
-		byte[] vectorData = (byte[]) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class, context);
 		try {
-			vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(vectorData);
+			vectorMap = (Map<UUID, Map<String, Object>>) this.getInputAsObject(this.INPUT_PORTS[0]);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
-		ArrayList<String> descriptorNames;
-		byte[] nameData = (byte[]) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[1]), byte[].class, context);
-		try {
-			descriptorNames = (ArrayList<String>) CDKObjectHandler.getObject(nameData);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
-		if (!descriptorNames.contains("weight")) {
-			throw new CDKTavernaException(this.getActivityName(), "QSAR Vector contains no molecular weight data!");
-		}
+		// Do work
 		ArrayList<String> molIdSWeightCSV = new ArrayList<String>();
 		ArrayList<String> weightDistributionCSV = new ArrayList<String>();
 		try {
@@ -131,16 +111,9 @@ public class GetMolecularWeightDistributionFromQSARVectorActivity extends Abstra
 					this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
-		try {
-			T2Reference containerRef = referenceService.register(weightDistributionCSV, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-			containerRef = referenceService.register(molIdSWeightCSV, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[1], containerRef);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
-		}
-		return outputs;
+		// Set output
+		this.setOutputAsStringList(weightDistributionCSV, this.OUTPUT_PORTS[0]);
+		this.setOutputAsStringList(molIdSWeightCSV, this.OUTPUT_PORTS[1]);
 	}
 
 	@Override

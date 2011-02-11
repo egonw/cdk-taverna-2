@@ -31,22 +31,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
-
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
-import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.graph.ConnectivityChecker;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.interfaces.IMoleculeSet;
-import org.openscience.cdk.reaction.enumerator.tools.ErrorLogger;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 public class MoleculeConnectivityCheckerActivity extends AbstractCDKActivity {
@@ -72,26 +64,16 @@ public class MoleculeConnectivityCheckerActivity extends AbstractCDKActivity {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
+	public void work() throws Exception {
+		// Get input
+		List<CMLChemFile> chemFileList = this.getInputAsList(this.INPUT_PORTS[0], CMLChemFile.class);
+		Integer cutoffvalue = (Integer) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_ATOM_COUNT_CUTOFF);
+		// Do work
 		ArrayList<CMLChemFile> accepted = new ArrayList<CMLChemFile>();
 		ArrayList<CMLChemFile> rejected = new ArrayList<CMLChemFile>();
 		IMolecule nonPartitionedMolecule = null;
 		IMoleculeSet molSet = null;
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
-				context);
-		List<CMLChemFile> chemFileList = null;
-		try {
-			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
-		} catch (Exception e) {
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
-		Integer cutoffvalue = (Integer) this.getConfiguration().getAdditionalProperty(
-				CDKTavernaConstants.PROPERTY_ATOM_COUNT_CUTOFF);
 		for (CMLChemFile cml : chemFileList) {
 			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(cml);
 			for (IAtomContainer atomContainer : moleculeList) {
@@ -112,24 +94,9 @@ public class MoleculeConnectivityCheckerActivity extends AbstractCDKActivity {
 
 			}
 		}
-		try {
-			List<byte[]> acceptedList = CDKObjectHandler.getBytesList(accepted);
-			T2Reference containerRef = referenceService.register(acceptedList, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		} catch (Exception ex) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), ex);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
-		}
-		try {
-			List<byte[]> rejectedList = CDKObjectHandler.getBytesList(rejected);
-			T2Reference containerRef2 = referenceService.register(rejectedList, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[1], containerRef2);
-		} catch (Exception ex) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), ex);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
-		}
-		// Return results
-		return outputs;
+		// Set output
+		this.setOutputAsObjectList(accepted, this.OUTPUT_PORTS[0]);
+		this.setOutputAsObjectList(rejected, this.OUTPUT_PORTS[1]);
 	}
 
 	@Override

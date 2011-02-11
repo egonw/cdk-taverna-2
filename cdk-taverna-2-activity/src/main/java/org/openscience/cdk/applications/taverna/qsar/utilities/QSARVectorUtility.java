@@ -70,7 +70,8 @@ public class QSARVectorUtility {
 	}
 
 	/**
-	 * Calculates statistic parameters like the standard deviation of the errors or the number of errors in each row.
+	 * Calculates statistic parameters like the standard deviation of the errors
+	 * or the number of errors in each row.
 	 * 
 	 * @param vectorMap
 	 *            QSAR vector map
@@ -79,7 +80,8 @@ public class QSARVectorUtility {
 	 * @param uuids
 	 *            UUIDs of all molecules.
 	 */
-	private void evaluateStatistics(Map<UUID, Map<String, Object>> vectorMap, ArrayList<String> descriptorNames, List<UUID> uuids) {
+	private void evaluateStatistics(Map<UUID, Map<String, Object>> vectorMap, ArrayList<String> descriptorNames,
+			List<UUID> uuids) {
 		this.numberOfErrorsInRowMap.clear();
 		this.numberOfErrorsPerDescriptor.clear();
 		int entriesTotal = 0;
@@ -166,7 +168,8 @@ public class QSARVectorUtility {
 				}
 				// Decrease accuracy by standard deviation
 				// TODO perhaps 1, 2 or 3 times standard deviation?
-				double rowErrorRatio = (rowErrors - (2 * this.errorStandardDeviation)) / (double) (descriptorNames.size() - 1);
+				double rowErrorRatio = (rowErrors - (2 * this.errorStandardDeviation))
+						/ (double) (descriptorNames.size() - 1);
 				if (type == QSARVectorUtility.DYNAMIC_CURATION && rowErrorRatio > this.averageErrorRatio) {
 					rowsToDelete.add(uuid);
 				} else {
@@ -226,7 +229,8 @@ public class QSARVectorUtility {
 				this.curatedVectorMap.put(uuid, curatedDescriptorResultMap);
 			}
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during curation of QSAR vector!", this.getClass().getSimpleName(), e);
+			ErrorLogger.getInstance().writeError("Error during curation of QSAR vector!",
+					this.getClass().getSimpleName(), e);
 			throw new CDKTavernaException(this.getClass().getSimpleName(), "Error during curation of QSAR vector!");
 		}
 	}
@@ -266,7 +270,8 @@ public class QSARVectorUtility {
 	}
 
 	/**
-	 * Creates a minimum set of descriptor names from given descriptor name list.
+	 * Creates a minimum set of descriptor names from given descriptor name
+	 * list.
 	 * 
 	 * @param descriptorNameList
 	 *            List of all descriptor names.
@@ -328,7 +333,8 @@ public class QSARVectorUtility {
 	}
 
 	/**
-	 * Identifies the indices of corrupted columns. (Double.NAN, Double.Infinit, Null)
+	 * Identifies the indices of corrupted columns. (Double.NAN, Double.Infinit,
+	 * Null)
 	 * 
 	 * @param vectorMap
 	 *            QSAR vector map
@@ -338,8 +344,8 @@ public class QSARVectorUtility {
 	 *            UUIDs of all molecules.
 	 * @return Indices of corrupted columns.
 	 */
-	private HashSet<Integer> getCorruptedColumns(Map<UUID, Map<String, Object>> vectorMap, ArrayList<String> descriptorNames,
-			UUID uuid) {
+	private HashSet<Integer> getCorruptedColumns(Map<UUID, Map<String, Object>> vectorMap,
+			ArrayList<String> descriptorNames, UUID uuid) {
 		HashSet<Integer> columnsToDelete = new HashSet<Integer>();
 		Map<String, Object> descriptorResultMap = vectorMap.get(uuid);
 		for (int i = 0; i < descriptorNames.size(); i++) {
@@ -371,7 +377,8 @@ public class QSARVectorUtility {
 	 *            List of all calculated descriptor names
 	 * @return
 	 */
-	private HashSet<Integer> getMinMaxNotDifferColumns(Map<UUID, Map<String, Object>> vectorMap, ArrayList<String> descriptorNames) {
+	private HashSet<Integer> getMinMaxNotDifferColumns(Map<UUID, Map<String, Object>> vectorMap,
+			ArrayList<String> descriptorNames) {
 		HashSet<Integer> columnsToDelete = new HashSet<Integer>();
 		List<UUID> uuids = getUUIDs(vectorMap);
 		for (int i = 0; i < descriptorNames.size(); i++) {
@@ -419,7 +426,8 @@ public class QSARVectorUtility {
 	 *            List of all calculated descriptor names
 	 * @return
 	 */
-	public List<String> calculateQSARVectorStatistics(Map<UUID, Map<String, Object>> vectorMap, ArrayList<String> descriptorNames) {
+	public List<String> calculateQSARVectorStatistics(Map<UUID, Map<String, Object>> vectorMap,
+			ArrayList<String> descriptorNames) {
 		ArrayList<String> stats = new ArrayList<String>();
 		List<UUID> uuids = getUUIDs(vectorMap);
 		this.evaluateStatistics(vectorMap, descriptorNames, uuids);
@@ -450,7 +458,8 @@ public class QSARVectorUtility {
 		stats.add(stat);
 		int remainingDescriptors = (descriptorNames.size() - columnsToDeleteError.size()) * uuids.size();
 		ratio = remainingDescriptors / (double) totalDescriptorValues * 100;
-		stat = "Number of remaining descriptor values: " + remainingDescriptors + " --> " + String.format("%.2f", ratio) + "%";
+		stat = "Number of remaining descriptor values: " + remainingDescriptors + " --> "
+				+ String.format("%.2f", ratio) + "%";
 		stats.add(stat);
 		HashSet<Integer> columnsToDeleteMinMax = this.getMinMaxNotDifferColumns(vectorMap, descriptorNames);
 		stat = "Number of descriptors where min max not differ: " + columnsToDeleteMinMax.size();
@@ -468,7 +477,8 @@ public class QSARVectorUtility {
 		stats.add(stat);
 		remainingDescriptors = (descriptorNames.size() - columnsToDeleteError.size()) * uuids.size();
 		ratio = remainingDescriptors / (double) totalDescriptorValues * 100;
-		stat = "Number of remaining descriptor values: " + remainingDescriptors + " --> " + String.format("%.2f", ratio) + "%";
+		stat = "Number of remaining descriptor values: " + remainingDescriptors + " --> "
+				+ String.format("%.2f", ratio) + "%";
 		stats.add(stat);
 		// Row errors
 		HashSet<UUID> rowsToDelete = new HashSet<UUID>();
@@ -484,7 +494,8 @@ public class QSARVectorUtility {
 		stats.add(stat);
 		remainingDescriptors = (uuids.size() - rowsToDelete.size()) * descriptorNames.size();
 		ratio = remainingDescriptors / (double) totalDescriptorValues * 100;
-		stat = "Number of remaining descriptor values: " + remainingDescriptors + " --> " + String.format("%.2f", ratio) + "%";
+		stat = "Number of remaining descriptor values: " + remainingDescriptors + " --> "
+				+ String.format("%.2f", ratio) + "%";
 		stats.add(stat);
 		// Dynamic curation
 		HashSet<Integer> columnsToDelete = null;
@@ -497,7 +508,8 @@ public class QSARVectorUtility {
 			}
 			// Decrease accuracy by standard deviation
 			// TODO perhaps 1, 2 or 3 times standard deviation?
-			double rowErrorRatio = (rowErrors - (2 * this.errorStandardDeviation)) / (double) (descriptorNames.size() - 1);
+			double rowErrorRatio = (rowErrors - (2 * this.errorStandardDeviation))
+					/ (double) (descriptorNames.size() - 1);
 			if (rowErrorRatio > this.averageErrorRatio) {
 				rowsToDelete.add(uuid);
 			} else {
@@ -518,8 +530,8 @@ public class QSARVectorUtility {
 		}
 		double ratioMolecules = rowsToDelete.size() / (double) (uuids.size()) * 100;
 		double ratioDescriptors = columnsToDelete.size() / (double) (descriptorNames.size() - 1) * 100;
-		stat = "Dynamic Curation: Rejected molecules: " + rowsToDelete.size() + " --> " + String.format("%.2f", ratioMolecules)
-				+ "%";
+		stat = "Dynamic Curation: Rejected molecules: " + rowsToDelete.size() + " --> "
+				+ String.format("%.2f", ratioMolecules) + "%";
 		stats.add(stat);
 		stat = "Dynamic Curation: Rejected descriptor values: " + columnsToDelete.size() + " --> "
 				+ String.format("%.2f", ratioDescriptors) + "%";
@@ -527,7 +539,8 @@ public class QSARVectorUtility {
 		remainingDescriptors = totalDescriptorValues - (rowsToDelete.size() * descriptorNames.size())
 				- (columnsToDelete.size() * (uuids.size() - rowsToDelete.size()));
 		ratio = remainingDescriptors / (double) totalDescriptorValues * 100;
-		stat = "Number of remaining descriptor values: " + remainingDescriptors + " --> " + String.format("%.2f", ratio) + "%";
+		stat = "Number of remaining descriptor values: " + remainingDescriptors + " --> "
+				+ String.format("%.2f", ratio) + "%";
 		stats.add(stat);
 		columnsToDeleteMinMax = this.getMinMaxNotDifferColumns(vectorMap, descriptorNames);
 		stat = "Number of descriptors where min max not differ: " + columnsToDeleteMinMax.size();
@@ -542,8 +555,8 @@ public class QSARVectorUtility {
 		remainingDescriptors = totalDescriptorValues - (rowsToDelete.size() * descriptorNames.size())
 				- (columnsToDelete.size() * (uuids.size() - rowsToDelete.size()));
 		ratio = remainingDescriptors / (double) totalDescriptorValues * 100;
-		stat = "Total number of remaining descriptor values: " + remainingDescriptors + " --> " + String.format("%.2f", ratio)
-				+ "%";
+		stat = "Total number of remaining descriptor values: " + remainingDescriptors + " --> "
+				+ String.format("%.2f", ratio) + "%";
 		stats.add(stat);
 		stats.add("Descriptor statistics:");
 		List<Map.Entry<String, Integer>> sorted = CollectionUtilities.sortByValue(this.numberOfErrorsPerDescriptor);

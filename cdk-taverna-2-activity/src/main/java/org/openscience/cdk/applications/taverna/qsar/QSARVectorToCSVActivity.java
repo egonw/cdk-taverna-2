@@ -27,21 +27,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
-
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.qsar.utilities.QSARVectorUtility;
 
 /**
- * Class which implements a local worker for the cdk-taverna-2 project which provides the possibility to generate a CSV from
- * descriptor values which are calculated and stored within each molecule
+ * Class which implements a local worker for the cdk-taverna-2 project which
+ * provides the possibility to generate a CSV from descriptor values which are
+ * calculated and stored within each molecule
  * 
  * @author Thomas Kuhn, Andreas Truszkowski
  * 
@@ -71,27 +66,23 @@ public class QSARVectorToCSVActivity extends AbstractCDKActivity {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
+	public void work() throws Exception {
+		// Get input
 		Map<UUID, Map<String, Object>> vectorMap;
-		byte[] vectorData = (byte[]) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class, context);
 		try {
-			vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(vectorData);
+			vectorMap = (Map<UUID, Map<String, Object>>) this.getInputAsObject(this.INPUT_PORTS[0]);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		ArrayList<String> descriptorNames;
-		byte[] nameData = (byte[]) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[1]), byte[].class, context);
 		try {
-			descriptorNames = (ArrayList<String>) CDKObjectHandler.getObject(nameData);
+			descriptorNames = (ArrayList<String>) this.getInputAsObject(this.INPUT_PORTS[1]);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
+		// Do work
 		List<String> csv = null;
 		try {
 			QSARVectorUtility vectorUtility = new QSARVectorUtility();
@@ -101,11 +92,8 @@ public class QSARVectorToCSVActivity extends AbstractCDKActivity {
 			ErrorLogger.getInstance().writeError("Error during CSV creation!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
-		T2Reference containerRef = referenceService.register(csv, 1, true, context);
-		outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		// Return results
-		return outputs;
-
+		// Set output
+		this.setOutputAsStringList(csv, this.OUTPUT_PORTS[0]);
 	}
 
 	/**
@@ -115,7 +103,8 @@ public class QSARVectorToCSVActivity extends AbstractCDKActivity {
 	 *            Vector of qsar descriptor results
 	 * @return List of strings which contains the descriptor values as CSV
 	 */
-	private List<String> createCSV(Map<UUID, Map<String, Object>> results, ArrayList<String> descriptorNames, List<UUID> uuids) {
+	private List<String> createCSV(Map<UUID, Map<String, Object>> results, ArrayList<String> descriptorNames,
+			List<UUID> uuids) {
 		List<String> csv = new ArrayList<String>();
 		StringBuffer buffer;
 		String separator = ";";

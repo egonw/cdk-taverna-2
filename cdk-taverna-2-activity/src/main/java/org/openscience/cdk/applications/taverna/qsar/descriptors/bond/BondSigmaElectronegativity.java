@@ -30,7 +30,8 @@ import org.openscience.cdk.qsar.IBondDescriptor;
 import org.openscience.cdk.qsar.descriptors.bond.BondSigmaElectronegativityDescriptor;
 
 /**
- * Class which provides the implementation for a cdk-taverna atomic qsar descriptor.
+ * Class which provides the implementation for a cdk-taverna atomic qsar
+ * descriptor.
  * 
  * @author Thomas Kuhn
  * 
@@ -40,7 +41,8 @@ public class BondSigmaElectronegativity extends AbstractBondDescriptor {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.openscience.cdk.applications.taverna.qsar.descriptors.bond.AbstractBondDescriptor#getDescriptor()
+	 * @see org.openscience.cdk.applications.taverna.qsar.descriptors.bond.
+	 * AbstractBondDescriptor#getDescriptor()
 	 */
 	public IBondDescriptor getDescriptor() {
 		return new BondSigmaElectronegativityDescriptor();

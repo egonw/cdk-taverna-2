@@ -21,17 +21,17 @@
  */
 package org.openscience.cdk.applications.taverna.io;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
@@ -58,7 +58,10 @@ public class CSVFileReaderActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addInputPorts() {
-		addInput(this.INPUT_PORTS[0], 0, true, null, String.class);
+		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+		expectedReferences.add(FileReference.class);
+		expectedReferences.add(InlineStringReference.class);
+		addInput(this.INPUT_PORTS[0], 0, false, expectedReferences, null);
 	}
 
 	@Override
@@ -67,22 +70,16 @@ public class CSVFileReaderActivity extends AbstractCDKActivity {
 	}
 
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		// No multi file selection supported
-		String file = (String) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class, context);
-		if (file == null) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
-		}
+	public void work() throws Exception {
+		// Get input
+		File file = this.getInputAsFile(this.INPUT_PORTS[0]);
+		// Do work
 		LineNumberReader reader = null;
 		try {
 			reader = new LineNumberReader(new FileReader(file));
 		} catch (FileNotFoundException e) {
-			ErrorLogger.getInstance().writeError(file + "does not exist!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), file + "does not exist!");
+			ErrorLogger.getInstance().writeError(file.getPath() + "does not exist!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), file.getPath() + "does not exist!");
 		}
 		String line = "";
 		ArrayList<String> csv = new ArrayList<String>();
@@ -92,17 +89,13 @@ public class CSVFileReaderActivity extends AbstractCDKActivity {
 			}
 			reader.close();
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file + "!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file + "!");
+			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!",
+					this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath()
+					+ "!");
 		}
-		try {
-			T2Reference containerRef = referenceService.register(csv, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
-		}
-		return outputs;
+		// Set output
+		this.setOutputAsStringList(csv, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override

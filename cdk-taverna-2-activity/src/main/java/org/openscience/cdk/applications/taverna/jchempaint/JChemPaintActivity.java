@@ -21,15 +21,8 @@
  */
 package org.openscience.cdk.applications.taverna.jchempaint;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
@@ -37,7 +30,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
-import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 
 /**
  * Class which represents the JChemPaint activity.
@@ -87,38 +79,23 @@ public class JChemPaintActivity extends AbstractCDKActivity {
 	}
 
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
+	public void work() throws Exception {
+		// Get input
 		List<CMLChemFile> cmlChemFileList = null;
-		List<byte[]> dataList = new ArrayList<byte[]>();
-		// Read ChemFile
-		try {
-			byte[] data = (byte[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_CMLCHEMFILE_DATA);
-			if (data == null) {
-				throw new CDKTavernaException(JChemPaintActivity.JCHEMPAINT_ACTIVITY, CDKTavernaException.DATA_CONTAINS_NO_MOLECULE);
-			}
-			CMLChemFile cmlChemFile = (CMLChemFile) CDKObjectHandler.getObject(data);
-			cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(cmlChemFile);
-			if (cmlChemFileList.isEmpty()) {
-				throw new CDKTavernaException(JChemPaintActivity.JCHEMPAINT_ACTIVITY,
-						CDKTavernaException.DATA_CONTAINS_NO_MOLECULE);
-			}
-			// Congfigure output
-			for (CMLChemFile c : cmlChemFileList) {
-				dataList.add(CDKObjectHandler.getBytes(c));
-			}
-			T2Reference containerRef = referenceService.register(dataList, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error in JChemPaint activity!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), "Error in JChemPaint activity!");
+		byte[] data = (byte[]) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_CMLCHEMFILE_DATA);
+		if (data == null) {
+			throw new CDKTavernaException(JChemPaintActivity.JCHEMPAINT_ACTIVITY,
+					CDKTavernaException.DATA_CONTAINS_NO_MOLECULE);
 		}
-		// Return results
-		return outputs;
-
+		CMLChemFile cmlChemFile = (CMLChemFile) CDKObjectHandler.getObject(data);
+		cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(cmlChemFile);
+		if (cmlChemFileList.isEmpty()) {
+			throw new CDKTavernaException(JChemPaintActivity.JCHEMPAINT_ACTIVITY,
+					CDKTavernaException.DATA_CONTAINS_NO_MOLECULE);
+		}
+		// Set output
+		this.setOutputAsObjectList(cmlChemFileList, this.OUTPUT_PORTS[0]);
 	}
 
 }

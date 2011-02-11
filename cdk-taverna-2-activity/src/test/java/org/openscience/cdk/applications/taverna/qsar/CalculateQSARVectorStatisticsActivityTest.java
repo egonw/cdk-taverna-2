@@ -53,10 +53,6 @@ public class CalculateQSARVectorStatisticsActivityTest extends CDKTavernaTestCas
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		// TODO read resource
-		File[] csvFile = new File[] { new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-				+ "data" + File.separator + "qsar" + File.separator + "notcuratedqsar.csv") };
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, csvFile);
 		configBean.setActivityName(CSVToQSARVectorActivity.CSV_TO_QSAR_VECTOR_ACTIVITY);
 	}
 
@@ -65,13 +61,16 @@ public class CalculateQSARVectorStatisticsActivityTest extends CDKTavernaTestCas
 		loadActivity.configure(configBean);
 		// leave empty. No ports used
 		Map<String, Object> inputs = new HashMap<String, Object>();
+		File csvFile =  new File("src" + File.separator + "test" + File.separator + "resources"
+				+ File.separator + "data" + File.separator + "qsar" + File.separator + "notcuratedqsar.csv");
+		inputs.put(loadActivity.INPUT_PORTS[0], csvFile);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[1], byte[].class);
+		expectedOutputTypes.put(loadActivity.OUTPUT_PORTS[0], byte[].class);
+		expectedOutputTypes.put(loadActivity.OUTPUT_PORTS[1], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(loadActivity, inputs, expectedOutputTypes);
 		inputs = outputs;
 		expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(statActivity.getRESULT_PORTS()[0], byte[].class);
+		expectedOutputTypes.put(statActivity.OUTPUT_PORTS[0], byte[].class);
 		outputs = ActivityInvoker.invokeAsyncActivity(statActivity, inputs, expectedOutputTypes);
 	}
 

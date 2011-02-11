@@ -21,9 +21,6 @@
  */
 package org.openscience.cdk.applications.taverna.basicutilities;
 
-import java.awt.Component;
-import java.awt.Point;
-import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -34,9 +31,11 @@ import java.util.Hashtable;
 import java.util.UUID;
 
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
+import org.openscience.cdk.applications.taverna.setup.SetupController;
 
 /**
- * Class which provides methods for a centralized file name handling within the cdk-taverna project
+ * Class which provides methods for a centralized file name handling within the
+ * cdk-taverna project
  * 
  * @author Andreas Truszkowski
  * 
@@ -168,10 +167,18 @@ public class FileNameGenerator {
 	}
 
 	/**
-	 * @return path to the cache directory. It's located in the OS temporary directory.
+	 * @return path to the application directory
+	 */
+	public static String getApplicationDir() {
+		return new java.io.File("").getAbsolutePath() + File.separator;
+	}
+	
+	/**
+	 * @return path to the cache directory. It's located in the OS temporary
+	 *         directory.
 	 */
 	public synchronized static String getCacheDir() {
-		String cacheDir = getTempDir();
+		String cacheDir = SetupController.getInstance().getWorkingDir();
 		cacheDir += "cache" + File.separator;
 		File file = new File(cacheDir);
 		if (!file.exists()) {
@@ -181,10 +188,11 @@ public class FileNameGenerator {
 	}
 
 	/**
-	 * @return path to the log directory. It's located in the OS temporary directory.
+	 * @return path to the log directory. It's located in the OS temporary
+	 *         directory.
 	 */
 	public synchronized static String getLogDir() {
-		String logDir = getTempDir();
+		String logDir = SetupController.getInstance().getWorkingDir();
 		logDir += "log" + File.separator;
 		File file = new File(logDir);
 		if (!file.exists()) {
@@ -194,8 +202,9 @@ public class FileNameGenerator {
 	}
 
 	/**
-	 * Deletes all files and subdirectories under dir. Returns true if all deletions were successful. If a deletion fails, the
-	 * method stops attempting to delete and returns false.
+	 * Deletes all files and subdirectories under dir. Returns true if all
+	 * deletions were successful. If a deletion fails, the method stops
+	 * attempting to delete and returns false.
 	 * 
 	 * @param dir
 	 *            Directory to delete
@@ -232,9 +241,4 @@ public class FileNameGenerator {
 		out.close();
 	}
 
-	public static void centerWindowOnScreen(Component window) {
-		Point center = new Point((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2, (int) Toolkit
-				.getDefaultToolkit().getScreenSize().getHeight() / 2);
-		window.setLocation((center.x - window.getWidth() / 2), (center.y - window.getHeight() / 2));
-	}
 }

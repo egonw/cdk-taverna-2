@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna;
+package org.openscience.cdk.applications.taverna.iterativeio;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -32,14 +32,15 @@ import java.util.UUID;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 
 /**
- * Singleton class holding configuration properties.
+ * Singleton class holding file stream data for the datacollector/emitter
+ * activities.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class Preferences {
+public class DataStreamController {
 
-	private static Preferences instance = null;
+	private static DataStreamController instance = null;
 
 	private String currentDirectory = ".";
 	private HashMap<UUID, DataOutputStream> dataCollectorIdxStreamMap = new HashMap<UUID, DataOutputStream>();
@@ -48,15 +49,15 @@ public class Preferences {
 	/**
 	 * Creates a new instance.
 	 */
-	private Preferences() {
+	private DataStreamController() {
 	}
 
 	/**
 	 * @return instance of the preferences class.
 	 */
-	public synchronized static Preferences getInstance() {
+	public synchronized static DataStreamController getInstance() {
 		if (instance == null) {
-			instance = new Preferences();
+			instance = new DataStreamController();
 		}
 		return instance;
 	}
@@ -78,7 +79,8 @@ public class Preferences {
 	}
 
 	/**
-	 * Creates a filename from given id and extension for the data collector activity.
+	 * Creates a filename from given id and extension for the data collector
+	 * activity.
 	 * 
 	 * @param id
 	 *            of the stream
@@ -93,7 +95,8 @@ public class Preferences {
 	}
 
 	/**
-	 * Creates a new data output stream for the data collector activity from the given id.
+	 * Creates a new data output stream for the data collector activity from the
+	 * given id.
 	 * 
 	 * @param id
 	 *            of the stream
@@ -139,7 +142,8 @@ public class Preferences {
 	}
 
 	/**
-	 * Creates a new index output stream for the data collector activity from given id.
+	 * Creates a new index output stream for the data collector activity from
+	 * given id.
 	 * 
 	 * @param id
 	 * @return

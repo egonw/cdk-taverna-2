@@ -103,8 +103,8 @@ public class CDKIOReader {
 	}
 
 	/**
-	 * Method which converts a cmlChemFile which contains multiple molecules to an array of cmlChemFiles which contains only one
-	 * molecle
+	 * Method which converts a cmlChemFile which contains multiple molecules to
+	 * an array of cmlChemFiles which contains only one molecle
 	 * 
 	 * @param cmlChemFile
 	 *            which can contain multiple molecules
@@ -179,8 +179,8 @@ public class CDKIOReader {
 	 * @taverna.consume
 	 */
 	public static Reaction readRXNV2000File(String fileName) throws Exception {
-		org.openscience.cdk.io.MDLRXNV2000Reader reader = new org.openscience.cdk.io.MDLRXNV2000Reader(new FileReader(new File(
-				fileName)));
+		org.openscience.cdk.io.MDLRXNV2000Reader reader = new org.openscience.cdk.io.MDLRXNV2000Reader(new FileReader(
+				new File(fileName)));
 		Reaction reaction = new Reaction();
 		reaction = (Reaction) reader.read(reaction);
 		reader.close();

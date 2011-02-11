@@ -34,18 +34,11 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.Preferences;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 
 public class DataCollectorEmitterActivity extends AbstractCDKActivity {
@@ -71,24 +64,21 @@ public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 	}
 
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		List<byte[]> dataList = new ArrayList<byte[]>();
-		UUID id = UUID.fromString((String) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
-				context));
+	public void work() throws Exception {
+		// Get input
+		UUID id = UUID.fromString(this.getInputAsObject(this.INPUT_PORTS[0], String.class));
 		if (id == null) {
-			throw new CDKTavernaException(DATA_COLLECTOR_EMITTER_ACTIVITY, CDKTavernaException.MOLECULE_NOT_TAGGED_WITH_UUID);
+			throw new CDKTavernaException(DATA_COLLECTOR_EMITTER_ACTIVITY, CDKTavernaException.WRONG_INPUT_PORT_TYPE);
 		}
+		// Do work
+		List<byte[]> dataList = new ArrayList<byte[]>();
 		try {
 			// close old writer
-			Preferences.getInstance().closeDataCollectorDataStream(id);
-			Preferences.getInstance().closeDataCollectorDataStream(id);
+			DataStreamController.getInstance().closeDataCollectorDataStream(id);
+			DataStreamController.getInstance().closeDataCollectorDataStream(id);
 			// Read cached data
-			File idxFile = new File(Preferences.getInstance().createDataCollectorFilename(id, "idx"));
-			File datFile = new File(Preferences.getInstance().createDataCollectorFilename(id, "dat"));
+			File idxFile = new File(DataStreamController.getInstance().createDataCollectorFilename(id, "idx"));
+			File datFile = new File(DataStreamController.getInstance().createDataCollectorFilename(id, "dat"));
 			DataInputStream idxStream = new DataInputStream(new FileInputStream(idxFile));
 			DataInputStream datStream = new DataInputStream(new FileInputStream(datFile));
 			do {
@@ -110,11 +100,8 @@ public class DataCollectorEmitterActivity extends AbstractCDKActivity {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_CACHE_DATA_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_CACHE_DATA_ERROR);
 		}
-		// Congfigure output
-		T2Reference containerRef = referenceService.register(dataList, 1, true, context);
-		outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		// Return results
-		return outputs;
+		// Set output
+		this.setOutputAsByteList(dataList, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override

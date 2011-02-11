@@ -21,22 +21,21 @@
  */
 package org.openscience.cdk.applications.taverna.io;
 
+import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.io.MDLReader;
@@ -61,7 +60,10 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addInputPorts() {
-		addInput(this.INPUT_PORTS[0], 1, true, null, String.class);
+		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+		expectedReferences.add(FileReference.class);
+		expectedReferences.add(InlineStringReference.class);
+		addInput(this.INPUT_PORTS[0], 1, false, expectedReferences, null);
 	}
 
 	@Override
@@ -69,39 +71,24 @@ public class MDLMolFileReaderActivity extends AbstractCDKActivity {
 		addOutput(this.OUTPUT_PORTS[0], 0);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(final Map<String, T2Reference> inputs, final AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
+	public void work() throws Exception {
+		// Get input
+		List<File> files = this.getInputAsFileList(this.INPUT_PORTS[0]);
+		// Do work
 		List<CMLChemFile> cmlChemFiles = new LinkedList<CMLChemFile>();
-		// Read mol file
-		List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
-				context);
-		if (files == null || files.size() == 0) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
-		}
-		for (String file : files) {
+		for (File file : files) {
 			try {
 				MDLReader reader = new MDLReader(new FileReader(file));
-				cmlChemFiles.addAll(CMLChemFileWrapper.wrapInChemModelList((CMLChemFile) reader.read(new CMLChemFile())));
+				cmlChemFiles
+						.addAll(CMLChemFileWrapper.wrapInChemModelList((CMLChemFile) reader.read(new CMLChemFile())));
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file, this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file,
+						this.getActivityName(), e);
 			}
 		}
-		// Congfigure output
-		T2Reference containerRef;
-		try {
-			containerRef = referenceService.register(CDKObjectHandler.getBytesList(cmlChemFiles), 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
-		}
-		// Return results
-		return outputs;
+		// Set output
+		this.setOutputAsObjectList(cmlChemFiles, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override

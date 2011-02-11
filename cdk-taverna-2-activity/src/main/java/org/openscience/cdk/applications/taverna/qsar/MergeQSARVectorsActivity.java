@@ -27,15 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
-
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IPortNumber;
 import org.openscience.cdk.applications.taverna.qsar.utilities.QSARVectorUtility;
@@ -60,7 +54,8 @@ public class MergeQSARVectorsActivity extends AbstractCDKActivity implements IPo
 
 	@Override
 	protected void addInputPorts() {
-		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
+		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
 		for (int i = 1; i <= numberOfPorts; i++) {
 			addInput(this.INPUT_PORTS[0] + "_" + i, 0, true, null, byte[].class);
 			addInput(this.INPUT_PORTS[1] + "_" + i, 0, true, null, byte[].class);
@@ -75,47 +70,45 @@ public class MergeQSARVectorsActivity extends AbstractCDKActivity implements IPo
 		addOutput(this.OUTPUT_PORTS[2], 1);
 	}
 
-	@Override
 	@SuppressWarnings("unchecked")
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
+	@Override
+	public void work() throws Exception {
+		// Get input
+		int numberOfPorts = (Integer) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
 		List<Map<UUID, Map<String, Object>>> vectorMapList = new ArrayList<Map<UUID, Map<String, Object>>>();
 		List<List<String>> descriptorNameList = new ArrayList<List<String>>();
 		String names[] = new String[numberOfPorts];
 		for (int i = 1; i <= numberOfPorts; i++) {
 			Map<UUID, Map<String, Object>> vectorMap;
-			byte[] vectorData = (byte[]) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0] + "_" + i),
-					byte[].class, context);
 			try {
-				vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(vectorData);
-				vectorMapList.add(vectorMap);
+				vectorMap = (Map<UUID, Map<String, Object>>) this.getInputAsObject(this.INPUT_PORTS[0] + "_" + i);
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, this.getActivityName(),
+						e);
 				throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 			}
+			vectorMapList.add(vectorMap);
 			ArrayList<String> descriptorNames;
-			byte[] nameData = (byte[]) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[1] + "_" + i), byte[].class,
-					context);
 			try {
-				descriptorNames = (ArrayList<String>) CDKObjectHandler.getObject(nameData);
-				descriptorNameList.add(descriptorNames);
+				descriptorNames = (ArrayList<String>) this.getInputAsObject(this.INPUT_PORTS[1] + "_" + i);
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, this.getActivityName(),
+						e);
 				throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 			}
-			String name = (String) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[2] + "_" + i), String.class,
-					context);
+			descriptorNameList.add(descriptorNames);
+			String name = this.getInputAsObject(this.INPUT_PORTS[2] + "_" + i, String.class);
 			names[i - 1] = name;
 		}
+		// Do work
 		QSARVectorUtility qsarVectorUtility = new QSARVectorUtility();
 		// Create minimum set of the descriptor names
-		ArrayList<String> mergedDescriptorNames = qsarVectorUtility.createMinimumDescriptorNamesList(descriptorNameList);
+		ArrayList<String> mergedDescriptorNames = qsarVectorUtility
+				.createMinimumDescriptorNamesList(descriptorNameList);
 		// Create merged QSAR vector
-		Map<UUID, Map<String, Object>> mergedVectorMap = qsarVectorUtility.mergeQSARVectors(vectorMapList, mergedDescriptorNames);
+		Map<UUID, Map<String, Object>> mergedVectorMap = qsarVectorUtility.mergeQSARVectors(vectorMapList,
+				mergedDescriptorNames);
 		// Create id relation table
 		ArrayList<String> idTable = new ArrayList<String>();
 		for (int i = 0; i < numberOfPorts; i++) {
@@ -129,20 +122,10 @@ public class MergeQSARVectorsActivity extends AbstractCDKActivity implements IPo
 				idTable.add(line);
 			}
 		}
-		try {
-			byte[] vectorData = CDKObjectHandler.getBytes(mergedVectorMap);
-			T2Reference containerRef = referenceService.register(vectorData, 0, true, context);
-			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-			byte[] nameData = CDKObjectHandler.getBytes(mergedDescriptorNames);
-			containerRef = referenceService.register(nameData, 0, true, context);
-			outputs.put(this.OUTPUT_PORTS[1], containerRef);
-			containerRef = referenceService.register(idTable, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[2], containerRef);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
-		}
-		return outputs;
+		// Set output
+		this.setOutputAsObject(mergedVectorMap, this.OUTPUT_PORTS[0]);
+		this.setOutputAsObject(mergedDescriptorNames, this.OUTPUT_PORTS[1]);
+		this.setOutputAsStringList(idTable, this.OUTPUT_PORTS[2]);
 	}
 
 	@Override

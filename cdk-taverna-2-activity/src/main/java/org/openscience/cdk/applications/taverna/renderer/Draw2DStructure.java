@@ -78,7 +78,8 @@ public class Draw2DStructure {
 		return drawMolecule(molecule, width, height, 1.0);
 	}
 
-	public static BufferedImage drawMolecule(IAtomContainer molecule, int width, int height, double scale) throws Exception {
+	public static BufferedImage drawMolecule(IAtomContainer molecule, int width, int height, double scale)
+			throws Exception {
 		// Init image
 		GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
 				.getDefaultConfiguration();
@@ -99,7 +100,8 @@ public class Draw2DStructure {
 			int scaledHeight = (int) (height * scale);
 			molecule = Draw2DStructure.fitMoleculeGeometry(molecule, new Dimension(scaledWith, scaledHeight));
 			try {
-				renderer.paintMolecule(molecule, new AWTDrawVisitor(g2), new Rectangle(x, y, scaledWith, scaledHeight), true);
+				renderer.paintMolecule(molecule, new AWTDrawVisitor(g2), new Rectangle(x, y, scaledWith, scaledHeight),
+						true);
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError("Error rendering molecule!", "Draw2DStructure", e);
 			}

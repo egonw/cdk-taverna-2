@@ -57,10 +57,6 @@ public class CurateQSARVectorActivityTest extends CDKTavernaTestCases {
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		// TODO read resource
-		File[] csvFile = new File[] { new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-				+ "data" + File.separator + "qsar" + File.separator + "qsar.csv") };
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, csvFile);
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_QSAR_VECTOR_MIN_MAX_CURATION, true);
 		configBean.setActivityName(CSVToQSARVectorActivity.CSV_TO_QSAR_VECTOR_ACTIVITY);
 	}
@@ -71,9 +67,12 @@ public class CurateQSARVectorActivityTest extends CDKTavernaTestCases {
 		loadActivity.configure(configBean);
 		// leave empty. No ports used
 		Map<String, Object> inputs = new HashMap<String, Object>();
+		File csvFile =  new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
+				+ "data" + File.separator + "qsar" + File.separator + "qsar.csv");
+		inputs.put(loadActivity.INPUT_PORTS[0], csvFile);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[1], byte[].class);
+		expectedOutputTypes.put(loadActivity.OUTPUT_PORTS[0], byte[].class);
+		expectedOutputTypes.put(loadActivity.OUTPUT_PORTS[1], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(loadActivity, inputs, expectedOutputTypes);
 		// leave empty. No ports used
 		inputs = outputs;
@@ -82,14 +81,14 @@ public class CurateQSARVectorActivityTest extends CDKTavernaTestCases {
 		for (int i = 0; i < 3; i++) {
 			configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_QSAR_VECTOR_CURATION_TYPE, i);
 			expectedOutputTypes = new HashMap<String, Class<?>>();
-			expectedOutputTypes.put(curateActivity.getRESULT_PORTS()[0], byte[].class);
-			expectedOutputTypes.put(curateActivity.getRESULT_PORTS()[1], byte[].class);
+			expectedOutputTypes.put(curateActivity.OUTPUT_PORTS[0], byte[].class);
+			expectedOutputTypes.put(curateActivity.OUTPUT_PORTS[1], byte[].class);
 			outputs = ActivityInvoker.invokeAsyncActivity(curateActivity, inputs, expectedOutputTypes);
 			Assert.assertEquals("Unexpected outputs", 2, outputs.size());
-			byte[] objectData = (byte[]) outputs.get(curateActivity.getRESULT_PORTS()[0]);
+			byte[] objectData = (byte[]) outputs.get(curateActivity.OUTPUT_PORTS[0]);
 			Map<UUID, Map<String, Object>> vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(objectData);
 			Assert.assertEquals(vectorMapAsserts[i], vectorMap.size());
-			objectData = (byte[]) outputs.get(curateActivity.getRESULT_PORTS()[1]);
+			objectData = (byte[]) outputs.get(curateActivity.OUTPUT_PORTS[1]);
 			ArrayList<String> descriptorNames = (ArrayList<String>) CDKObjectHandler.getObject(objectData);
 			Assert.assertEquals(descriptorNamesAssert[i], descriptorNames.size());
 		}

@@ -60,10 +60,10 @@ public class UUIDGeneratorActivityTest extends CDKTavernaTestCases {
 		// leave empty. No ports used
 		Map<String, Object> inputs = new HashMap<String, Object>();
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], String.class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[0], String.class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
-		String uuidString = (String) outputs.get(activity.getRESULT_PORTS()[0]);
+		String uuidString = (String) outputs.get(activity.OUTPUT_PORTS[0]);
 		UUID.fromString(uuidString);
 	}
 

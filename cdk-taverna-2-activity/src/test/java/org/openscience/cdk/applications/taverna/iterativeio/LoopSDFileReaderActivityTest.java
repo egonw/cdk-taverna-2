@@ -68,24 +68,24 @@ public class LoopSDFileReaderActivityTest extends CDKTavernaTestCases {
 		Map<String, Object> inputs = new HashMap<String, Object>();
 		String file = "src" + File.separator + "test" + File.separator + "resources" + File.separator
 				+ "data" + File.separator + "mol" + File.separator + "sdfile.sdf";
-		inputs.put(this.activity.getINPUT_PORTS()[0], file);
-		inputs.put(this.activity.getINPUT_PORTS()[1], 1);
+		inputs.put(this.activity.INPUT_PORTS[0], file);
+		inputs.put(this.activity.INPUT_PORTS[1], 1);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[1], String.class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[0], byte[].class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[1], String.class);
 		ArrayList<IAtomContainer> container = new ArrayList<IAtomContainer>();
 		String state = "";
 		int loops = 0;
 		do {
 			Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 			Assert.assertEquals("Unexpected outputs", 2, outputs.size());
-			List<byte[]> objectData = (List<byte[]>) outputs.get(activity.getRESULT_PORTS()[0]);
+			List<byte[]> objectData = (List<byte[]>) outputs.get(activity.OUTPUT_PORTS[0]);
 			for (byte[] data : objectData) {
 				ChemFile chemFile = (ChemFile) CDKObjectHandler.getObject(data);
 				IAtomContainer cont = ChemFileManipulator.getAllAtomContainers(chemFile).get(0);
 				container.add(cont);
 			}
-			state = (String) outputs.get(activity.getRESULT_PORTS()[1]);
+			state = (String) outputs.get(activity.OUTPUT_PORTS[1]);
 			loops++;
 		} while (!state.equals(LoopSDFileReaderActivity.FINISHED));
 		Assert.assertEquals(3, container.size());

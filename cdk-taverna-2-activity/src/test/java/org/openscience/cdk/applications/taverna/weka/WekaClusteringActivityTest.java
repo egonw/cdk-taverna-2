@@ -41,7 +41,9 @@ import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.qsar.CSVToQSARVectorActivity;
+import org.openscience.cdk.applications.taverna.setup.SetupController;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
 import weka.clusterers.Clusterer;
@@ -70,14 +72,9 @@ public class WekaClusteringActivityTest extends CDKTavernaTestCases {
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		this.dir = new File("." + File.separator + "Test" + File.separator);
-		this.dir.mkdir();
-		File[] csvFile = new File[] { new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-				+ "data" + File.separator + "qsar" + File.separator + "curatedQSARbig.csv") };
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, csvFile);
+		this.dir = new File(SetupController.getInstance().getWorkingDir());
 		configBean.setActivityName(CSVToQSARVectorActivity.CSV_TO_QSAR_VECTOR_ACTIVITY);
 		clusteringConfigBean = new CDKActivityConfigurationBean();
-		clusteringConfigBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.dir);
 		String jobData = "weka.clusterers.EM;-N;5;-I;100;-M;0.00001;-ID;1;weka.clusterers.FarthestFirst;-N;5;-ID;5;weka.clusterers.HierarchicalClusterer;-N;5;-L;SINGLE;-ID;2;weka.clusterers.SimpleKMeans;-N;5;-I;100;-ID;3;weka.clusterers.XMeans;-I;1;-M;1000;-J;1000;-L;2;-H;4;-ID;4";
 		clusteringConfigBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CLUSTERING_JOB_DATA, jobData);
 		clusteringConfigBean.setActivityName(WekaClusteringActivity.WEKA_CLUSTERING_ACTIVITY);
@@ -93,22 +90,26 @@ public class WekaClusteringActivityTest extends CDKTavernaTestCases {
 		wekaClusteringActivity.configure(clusteringConfigBean);
 		// load QSAR vectors
 		Map<String, Object> inputs = new HashMap<String, Object>();
+		File csvFile =  new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
+				+ "data" + File.separator + "qsar" + File.separator + "curatedQSARbig.csv");
+		inputs.put(loadActivity.INPUT_PORTS[0], csvFile);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[1], byte[].class);
+		expectedOutputTypes.put(loadActivity.OUTPUT_PORTS[0], byte[].class);
+		expectedOutputTypes.put(loadActivity.OUTPUT_PORTS[1], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(loadActivity, inputs, expectedOutputTypes);
 		inputs = outputs;
 		expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(wekaDatasetActivity.getRESULT_PORTS()[0], byte[].class);
+		expectedOutputTypes.put(wekaDatasetActivity.OUTPUT_PORTS[0], byte[].class);
 		outputs = ActivityInvoker.invokeAsyncActivity(wekaDatasetActivity, inputs, expectedOutputTypes);
-		byte[] datasetData = (byte[]) outputs.get(wekaDatasetActivity.getRESULT_PORTS()[0]);
+		byte[] datasetData = (byte[]) outputs.get(wekaDatasetActivity.OUTPUT_PORTS[0]);
 		Instances dataset = CDKObjectHandler.getInstancesObject(datasetData);
 		inputs = outputs;
 		// Cluster
+		inputs.put(wekaClusteringActivity.INPUT_PORTS[1], this.dir);
 		expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(wekaClusteringActivity.getRESULT_PORTS()[0], String.class);
+		expectedOutputTypes.put(wekaClusteringActivity.OUTPUT_PORTS[0], String.class);
 		outputs = ActivityInvoker.invokeAsyncActivity(wekaClusteringActivity, inputs, expectedOutputTypes);
-		List<String> files = (List<String>) outputs.get(wekaClusteringActivity.getRESULT_PORTS()[0]);
+		List<String> files = (List<String>) outputs.get(wekaClusteringActivity.OUTPUT_PORTS[0]);
 		// Test results
 		HashMap<String, Integer[]> resultMap = new HashMap<String, Integer[]>();
 		resultMap.put("XMeans", new Integer[] { 47, 178, 175, 300 });
@@ -156,10 +157,7 @@ public class WekaClusteringActivityTest extends CDKTavernaTestCases {
 	}
 
 	public void cleanUp() {
-		for (File file : this.dir.listFiles()) {
-			file.delete();
-		}
-		this.dir.delete();
+		FileNameGenerator.deleteDir(this.dir);
 	}
 
 	/**

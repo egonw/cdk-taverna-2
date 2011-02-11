@@ -58,9 +58,6 @@ public class CreateFingerprintItemListFromQSARVectorActivityTest extends CDKTave
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
 		// TODO read resource
-		File[] csvFile = new File[] { new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-				+ "data" + File.separator + "qsar" + File.separator + "qsar.csv") };
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, csvFile);
 		configBean.setActivityName(CSVToQSARVectorActivity.CSV_TO_QSAR_VECTOR_ACTIVITY);
 	}
 
@@ -70,17 +67,20 @@ public class CreateFingerprintItemListFromQSARVectorActivityTest extends CDKTave
 		loadActivity.configure(configBean);
 		// leave empty. No ports used
 		Map<String, Object> inputs = new HashMap<String, Object>();
+		File csvFile = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
+				+ "data" + File.separator + "qsar" + File.separator + "qsar.csv");
+		inputs.put(loadActivity.INPUT_PORTS[0], csvFile);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[1], byte[].class);
+		expectedOutputTypes.put(loadActivity.OUTPUT_PORTS[0], byte[].class);
+		expectedOutputTypes.put(loadActivity.OUTPUT_PORTS[1], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(loadActivity, inputs, expectedOutputTypes);
 		// leave empty. No ports used
 		inputs = outputs;
 		expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(fingerprintActivity.getRESULT_PORTS()[0], byte[].class);
+		expectedOutputTypes.put(fingerprintActivity.OUTPUT_PORTS[0], byte[].class);
 		outputs = ActivityInvoker.invokeAsyncActivity(fingerprintActivity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
-		List<byte[]> objectData = (List<byte[]>) outputs.get(fingerprintActivity.getRESULT_PORTS()[0]);
+		List<byte[]> objectData = (List<byte[]>) outputs.get(fingerprintActivity.OUTPUT_PORTS[0]);
 		List<FingerprintItem> vectorMap = (List<FingerprintItem>) CDKObjectHandler.getFingerprintList(objectData);
 		Assert.assertEquals(9, vectorMap.size());
 	}

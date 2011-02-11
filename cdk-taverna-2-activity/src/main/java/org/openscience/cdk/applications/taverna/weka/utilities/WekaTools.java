@@ -26,20 +26,15 @@
  */
 package org.openscience.cdk.applications.taverna.weka.utilities;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
 
 import org.openscience.cdk.applications.art2aclassification.FingerprintItem;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 import weka.clusterers.Clusterer;
 import weka.core.Attribute;
 import weka.core.FastVector;
@@ -55,14 +50,16 @@ import weka.filters.unsupervised.attribute.Remove;
 public class WekaTools {
 
 	/**
-	 * Creates a Weka Instances dataset from given fingerprint item list and descriptor names. The first entry is the molecule ID.
-	 * The following entries are the descriptor values.
+	 * Creates a Weka Instances dataset from given fingerprint item list and
+	 * descriptor names. The first entry is the molecule ID. The following
+	 * entries are the descriptor values.
 	 * 
 	 * @param fingerprintItems
 	 * @param descriptorNames
 	 * @return The Weka Instances dataset
 	 */
-	public Instances createInstancesFromFingerprintArray(FingerprintItem[] fingerprintItems, List<String> descriptorNames) {
+	public Instances createInstancesFromFingerprintArray(FingerprintItem[] fingerprintItems,
+			List<String> descriptorNames) {
 		FastVector attributes = new FastVector(descriptorNames.size() + 1);
 		Attribute idAttr = new Attribute("ID", (FastVector) null);
 		attributes.addElement(idAttr);
@@ -86,78 +83,14 @@ public class WekaTools {
 	}
 
 	/**
-	 * Comresses string into Base64 string that encodes the underlying compressed UTF-8 byte array. Can be decompressed with
-	 * method Utility.decompressBase64String().
-	 * 
-	 * @param aString
-	 *            String to be compressed
-	 * @return Compressed Base64 string or null if string could not be compressed
-	 */
-	public String compressIntoBase64String(String aString) {
-
-		// Region: Checks
-
-		if (aString == null || aString.isEmpty()) {
-			return null;
-		}
-
-		// End of region
-
-		try {
-			byte[] tmpOriginalByteArray = aString.getBytes("UTF-8");
-			Deflater tmpCompresser = new Deflater();
-			tmpCompresser.setInput(tmpOriginalByteArray);
-			tmpCompresser.finish();
-			ByteArrayOutputStream tmpByteArrayOutputStream = new ByteArrayOutputStream(tmpOriginalByteArray.length);
-			byte[] tmpBuffer = new byte[1024];
-			while (!tmpCompresser.finished()) {
-				int tmpCount = tmpCompresser.deflate(tmpBuffer);
-				tmpByteArrayOutputStream.write(tmpBuffer, 0, tmpCount);
-			}
-			tmpByteArrayOutputStream.close();
-			byte[] tmpCompressedByteArray = tmpByteArrayOutputStream.toByteArray();
-			return new BASE64Encoder().encode(tmpCompressedByteArray);
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	/**
-	 * Decompresses Base64 string that was compressed with method Utility.compressIntoBase64String()
-	 * 
-	 * @param aBase64String
-	 *            Base64 string (result string of method Utility.compressIntoBase64String())
-	 * @return Decompressed string or null if string could not be decompressed
-	 */
-	public String decompressBase64String(String aBase64String) {
-		if (aBase64String == null || aBase64String.isEmpty()) {
-			return null;
-		}
-		try {
-			byte[] tmpCompressedByteArray = new BASE64Decoder().decodeBuffer(aBase64String);
-			Inflater tmpDecompresser = new Inflater();
-			tmpDecompresser.setInput(tmpCompressedByteArray);
-			ByteArrayOutputStream tmpByteArrayOutputStream = new ByteArrayOutputStream(tmpCompressedByteArray.length);
-			byte[] tmpBuffer = new byte[1024];
-			while (!tmpDecompresser.finished()) {
-				int tmpCount = tmpDecompresser.inflate(tmpBuffer);
-				tmpByteArrayOutputStream.write(tmpBuffer, 0, tmpCount);
-			}
-			tmpByteArrayOutputStream.close();
-			byte[] tmpDecodedByteArray = tmpByteArrayOutputStream.toByteArray();
-			return new String(tmpDecodedByteArray, 0, tmpDecodedByteArray.length, "UTF-8");
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	/**
-	 * Method which returns a filter to remove the identifier from a given instance IMPORTANT: The identifier is the first
-	 * attribute within the instances
+	 * Method which returns a filter to remove the identifier from a given
+	 * instance IMPORTANT: The identifier is the first attribute within the
+	 * instances
 	 * 
 	 * @param instances
 	 *            Instances which contains the format of the input instances
-	 * @return Weka remover filter which is configured to remove the identifier from the instance
+	 * @return Weka remover filter which is configured to remove the identifier
+	 *         from the instance
 	 * @throws Exception
 	 */
 	public Remove getIDRemover(Instances instances) throws Exception {
@@ -171,12 +104,13 @@ public class WekaTools {
 	}
 
 	/**
-	 * Method which returns a filter to get the identifier from a given instance IMPORTANT: The identifier is the first attribute
-	 * within the instances
+	 * Method which returns a filter to get the identifier from a given instance
+	 * IMPORTANT: The identifier is the first attribute within the instances
 	 * 
 	 * @param instances
 	 *            Instances which contains the format of the input instances
-	 * @return Weka remover filter which is configured to get the identifier from the instance
+	 * @return Weka remover filter which is configured to get the identifier
+	 *         from the instance
 	 * @throws Exception
 	 */
 	public Remove getIDGetter(Instances instances) throws Exception {

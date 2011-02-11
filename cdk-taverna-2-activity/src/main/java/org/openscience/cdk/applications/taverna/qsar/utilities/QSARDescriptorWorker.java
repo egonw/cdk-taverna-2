@@ -89,7 +89,8 @@ public class QSARDescriptorWorker extends Thread {
 									descriptor.toString(), e);
 						}
 					} else if (descriptorActivity instanceof AbstractAtomicProtonDescriptor) {
-						IAtomicDescriptor descriptor = ((AbstractAtomicProtonDescriptor) descriptorActivity).getDescriptor();
+						IAtomicDescriptor descriptor = ((AbstractAtomicProtonDescriptor) descriptorActivity)
+								.getDescriptor();
 						try {
 							for (int j = 0; j < molecule.getAtomCount(); j++) {
 								// Calculates only the value if the atom has the symbol H
@@ -104,12 +105,13 @@ public class QSARDescriptorWorker extends Thread {
 									descriptor.toString(), e);
 						}
 					} else if (descriptorActivity instanceof AbstractAtompairDescriptor) {
-						IAtomPairDescriptor descriptor = ((AbstractAtompairDescriptor) descriptorActivity).getDescriptor();
+						IAtomPairDescriptor descriptor = ((AbstractAtompairDescriptor) descriptorActivity)
+								.getDescriptor();
 						try {
 							for (int j = 0; j < molecule.getAtomCount(); j++) {
 								for (int i = 0; i < molecule.getAtomCount(); i++) {
-									DescriptorValue value = descriptor.calculate(molecule.getAtom(j), molecule.getAtom(i),
-											molecule);
+									DescriptorValue value = descriptor.calculate(molecule.getAtom(j),
+											molecule.getAtom(i), molecule);
 									molecule.setProperty(value.getSpecification(), value);
 								}
 							}
@@ -131,7 +133,8 @@ public class QSARDescriptorWorker extends Thread {
 									descriptor.toString(), e);
 						}
 					} else if (descriptorActivity instanceof AbstractMolecularDescriptor) {
-						IMolecularDescriptor descriptor = ((AbstractMolecularDescriptor) descriptorActivity).getDescriptor();
+						IMolecularDescriptor descriptor = ((AbstractMolecularDescriptor) descriptorActivity)
+								.getDescriptor();
 						try {
 							DescriptorValue value = descriptor.calculate(molecule);
 							molecule.setProperty(value.getSpecification(), value);
@@ -156,7 +159,8 @@ public class QSARDescriptorWorker extends Thread {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			ErrorLogger.getInstance().writeError("Serious QSAR descriptor calculation error!", this.getClass().getSimpleName());
+			ErrorLogger.getInstance().writeError("Serious QSAR descriptor calculation error!",
+					this.getClass().getSimpleName());
 		} finally {
 			this.currentSate = QSARDescriptorWorker.FINISHED;
 			this.owner.showProgress();

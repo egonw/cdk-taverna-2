@@ -28,17 +28,10 @@ package org.openscience.cdk.applications.taverna.miscellaneous;
  * 
  */
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
-import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 
 public class UUIDGeneratorActivity extends AbstractCDKActivity implements IFileReader {
@@ -64,16 +57,10 @@ public class UUIDGeneratorActivity extends AbstractCDKActivity implements IFileR
 	}
 
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
+	public void work() throws Exception {
 		this.id = UUID.randomUUID();
-		T2Reference containerRef = referenceService.register(this.id.toString(), 0, true, context);
-		outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		// Return results
-		return outputs;
+		// Set output
+		this.setOutputAsString(this.id.toString(), this.OUTPUT_PORTS[0]);
 	}
 
 	@Override

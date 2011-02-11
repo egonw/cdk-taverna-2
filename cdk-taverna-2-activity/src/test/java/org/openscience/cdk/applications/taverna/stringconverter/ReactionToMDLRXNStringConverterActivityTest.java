@@ -66,12 +66,12 @@ public class ReactionToMDLRXNStringConverterActivityTest extends CDKTavernaTestC
 		Reaction rxnFile = CDKTavernaTestData.getReactionEvaluationReaction();
 		List<byte[]> dataList = new ArrayList<byte[]>();
 		dataList.add(CDKObjectHandler.getBytes(rxnFile));
-		inputs.put(activity.getINPUT_PORTS()[0], dataList);
+		inputs.put(activity.INPUT_PORTS[0], dataList);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], String.class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[0], String.class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
-		List<String> reactionData = (List<String>) outputs.get(activity.getRESULT_PORTS()[0]);
+		List<String> reactionData = (List<String>) outputs.get(activity.OUTPUT_PORTS[0]);
 		Assert.assertEquals(1, reactionData.size());
 	}
 

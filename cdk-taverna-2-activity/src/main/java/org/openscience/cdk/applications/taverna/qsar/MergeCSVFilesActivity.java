@@ -29,17 +29,17 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 
 /**
  * Class which represents the merge CSV To QSAR vector activity.
@@ -47,7 +47,7 @@ import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
  * @author Andreas Truzskowski
  * 
  */
-public class MergeCSVFilesActivity extends AbstractCDKActivity implements IFileReader {
+public class MergeCSVFilesActivity extends AbstractCDKActivity {
 
 	public static final String MERGE_CSV_TO_QSAR_VECTOR_ACTIVITY = "Merge CSV Files";
 
@@ -55,29 +55,31 @@ public class MergeCSVFilesActivity extends AbstractCDKActivity implements IFileR
 	 * Creates a new instance.
 	 */
 	public MergeCSVFilesActivity() {
-		// Empty
+		this.INPUT_PORTS = new String[] { "Files" };
+		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		// Empty
+		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+		expectedReferences.add(FileReference.class);
+		expectedReferences.add(InlineStringReference.class);
+		addInput(this.INPUT_PORTS[0], 1, false, expectedReferences, null);
 	}
 
 	@Override
 	protected void addOutputPorts() {
-		// Empty
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (files == null || files.length == 0) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
-		}
+	public void work() throws Exception {
+		// Get input 
+		List<File> files = this.getInputAsFileList(this.INPUT_PORTS[0]);
+		// Do work
 		HashSet<String> descriptorNamesSet = new HashSet<String>();
 		ArrayList<String> descriptorNamesList = new ArrayList<String>();
+		ArrayList<String> resultFiles = new ArrayList<String>();
 		// Read available descriptor names
 		for (File file : files) {
 			try {
@@ -104,10 +106,11 @@ public class MergeCSVFilesActivity extends AbstractCDKActivity implements IFileR
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!",
 						this.getActivityName(), e);
-				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!");
+				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR
+						+ file.getPath() + "!");
 			}
 		}
-		File outputFile = FileNameGenerator.getNewFile(files[0].getParent(), ".csv", "MergedFile");
+		File outputFile = FileNameGenerator.getNewFile(files.get(0).getParent(), ".csv", "MergedFile");
 		PrintWriter writer = null;
 		try {
 			// write csv file
@@ -170,11 +173,14 @@ public class MergeCSVFilesActivity extends AbstractCDKActivity implements IFileR
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!",
 						this.getActivityName(), e);
-				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath() + "!");
+				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR
+						+ file.getPath() + "!");
 			}
 		}
 		writer.close();
-		return outputs;
+		resultFiles.add(outputFile.getPath());
+		// Set output
+		this.setOutputAsStringList(resultFiles, this.OUTPUT_PORTS[0]);
 	}
 
 	/**

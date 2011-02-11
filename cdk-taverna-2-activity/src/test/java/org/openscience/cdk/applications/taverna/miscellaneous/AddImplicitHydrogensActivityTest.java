@@ -67,9 +67,9 @@ public class AddImplicitHydrogensActivityTest extends CDKTavernaTestCases {
 		for (CMLChemFile chemFile : chemFiles) {
 			data.add(CDKObjectHandler.getBytes(chemFile));
 		}
-		inputs.put(activity.getINPUT_PORTS()[0], data);
+		inputs.put(activity.INPUT_PORTS[0], data);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[0], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
 		// Only check for exceptions

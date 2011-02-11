@@ -38,7 +38,9 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
+import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.qsar.CSVToQSARVectorActivity;
+import org.openscience.cdk.applications.taverna.setup.SetupController;
 
 /**
  * Test class for the create extract clustering result as PDF activity.
@@ -65,8 +67,7 @@ public class ClusteringResultConsideringDifferentOriginsAsPDFActivityTest extend
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
 		this.configBean.setActivityName(this.wekaActivity.getActivityName());
-		this.dir = new File("." + File.separator + "Test" + File.separator);
-		this.dir.mkdir();
+		this.dir = new File(SetupController.getInstance().getWorkingDir());
 		File relationFile = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
 				+ File.separator + "weka" + File.separator + "relationtable.txt");
 		LineNumberReader reader = new LineNumberReader(new FileReader(relationFile));
@@ -75,9 +76,6 @@ public class ClusteringResultConsideringDifferentOriginsAsPDFActivityTest extend
 			relationTable.add(line);
 		}
 		reader.close();
-		File[] csvFile = new File[] { new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-				+ "data" + File.separator + "weka" + File.separator + "qsardata.csv") };
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, csvFile);
 		clusteringConfigBean = new CDKActivityConfigurationBean();
 		clusteringConfigBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.dir);
 		String jobData = "weka.clusterers.EM;-N;5;-I;100;-M;0.00001;-ID;1;";
@@ -94,22 +92,26 @@ public class ClusteringResultConsideringDifferentOriginsAsPDFActivityTest extend
 		// load QSAR vectors
 		Map<String, Object> inputs = new HashMap<String, Object>();
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(loadActivity.getRESULT_PORTS()[1], byte[].class);
+		expectedOutputTypes.put(loadActivity.OUTPUT_PORTS[0], byte[].class);
+		expectedOutputTypes.put(loadActivity.OUTPUT_PORTS[1], byte[].class);
+		File csvFile = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
+				+ "data" + File.separator + "weka" + File.separator + "qsardata.csv");
+		inputs.put(loadActivity.INPUT_PORTS[0], csvFile);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(loadActivity, inputs, expectedOutputTypes);
 		inputs = outputs;
 		expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(wekaDatasetActivity.getRESULT_PORTS()[0], byte[].class);
+		expectedOutputTypes.put(wekaDatasetActivity.OUTPUT_PORTS[0], byte[].class);
 		outputs = ActivityInvoker.invokeAsyncActivity(wekaDatasetActivity, inputs, expectedOutputTypes);
 		inputs = outputs;
 		// Cluster
 		expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(wekaClusteringActivity.getRESULT_PORTS()[0], String.class);
+		expectedOutputTypes.put(wekaClusteringActivity.OUTPUT_PORTS[0], String.class);
+		inputs.put(wekaClusteringActivity.INPUT_PORTS[1], this.dir);
 		outputs = ActivityInvoker.invokeAsyncActivity(wekaClusteringActivity, inputs, expectedOutputTypes);
-		List<String> files = (List<String>) outputs.get(wekaClusteringActivity.getRESULT_PORTS()[0]);
+		List<String> files = (List<String>) outputs.get(wekaClusteringActivity.OUTPUT_PORTS[0]);
 		inputs = new HashMap<String, Object>();
-		inputs.put(wekaActivity.getINPUT_PORTS()[0], files);
-		inputs.put(wekaActivity.getINPUT_PORTS()[1], relationTable);
+		inputs.put(wekaActivity.INPUT_PORTS[0], files);
+		inputs.put(wekaActivity.INPUT_PORTS[1], relationTable);
 		expectedOutputTypes = new HashMap<String, Class<?>>();
 		outputs = ActivityInvoker.invokeAsyncActivity(wekaActivity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 0, outputs.size());
@@ -130,10 +132,7 @@ public class ClusteringResultConsideringDifferentOriginsAsPDFActivityTest extend
 	}
 
 	public void cleanUp() {
-		for (File file : this.dir.listFiles()) {
-			file.delete();
-		}
-		this.dir.delete();
+		FileNameGenerator.deleteDir(this.dir);
 	}
 
 	/**

@@ -38,6 +38,8 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
+import org.openscience.cdk.applications.taverna.setup.SetupController;
 
 /**
  * Test class for the MDL RXN file writer activity.
@@ -60,9 +62,7 @@ public class MDLRXNFileWriterActivityTest extends CDKTavernaTestCases {
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
 		// TODO read resource
-		this.dir = new File("." + File.separator + "Test" + File.separator);
-		this.dir.mkdir();
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.dir);
+		this.dir = new File(SetupController.getInstance().getWorkingDir());
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".rxn");
 		configBean.setActivityName(MDLRXNFileWriterActivity.RXN_FILE_WRITER_ACTIVITY);
 	}
@@ -72,17 +72,15 @@ public class MDLRXNFileWriterActivityTest extends CDKTavernaTestCases {
 		Map<String, Object> inputs = new HashMap<String, Object>();
 		List<byte[]> data = new ArrayList<byte[]>();
 		data.add(CDKObjectHandler.getBytes(CDKTavernaTestData.getReactionEvaluationReaction()));
-		inputs.put(activity.getINPUT_PORTS()[0], data);
+		inputs.put(activity.INPUT_PORTS[0], data);
+		inputs.put(activity.INPUT_PORTS[1], this.dir);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 0, outputs.size());
 	}
 
 	public void cleanUp() {
-		for (File file : this.dir.listFiles()) {
-			file.delete();
-		}
-		this.dir.delete();
+		FileNameGenerator.deleteDir(this.dir);
 	}
 
 	public void executeTest() {

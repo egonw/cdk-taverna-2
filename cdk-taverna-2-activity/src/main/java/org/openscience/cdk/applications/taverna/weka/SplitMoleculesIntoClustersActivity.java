@@ -23,24 +23,22 @@ package org.openscience.cdk.applications.taverna.weka;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
-import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
+import org.openscience.cdk.applications.taverna.basicutilities.Tools;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.SDFWriter;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
@@ -51,7 +49,7 @@ import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
  * @author Andreas Truzskowski
  * 
  */
-public class SplitMoleculesIntoClustersActivity extends AbstractCDKActivity implements IFileWriter {
+public class SplitMoleculesIntoClustersActivity extends AbstractCDKActivity {
 
 	public static final String SPLIT_MOLECULES_INTO_CLUSTERS = "Split Molecules Into Clusters";
 	private HashMap<Integer, File> files = null;
@@ -61,52 +59,40 @@ public class SplitMoleculesIntoClustersActivity extends AbstractCDKActivity impl
 	 * Creates a new instance.
 	 */
 	public SplitMoleculesIntoClustersActivity() {
-		this.INPUT_PORTS = new String[] { "Structures", "UUID Cluster CSV" };
+		this.INPUT_PORTS = new String[] { "Structures", "UUID Cluster CSV", "File" };
+		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
 	@Override
 	protected void addInputPorts() {
 		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
 		addInput(this.INPUT_PORTS[1], 1, true, null, String.class);
+		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+		expectedReferences.add(FileReference.class);
+		expectedReferences.add(InlineStringReference.class);
+		addInput(this.INPUT_PORTS[2], 1, false, expectedReferences, null);
 	}
 
 	@Override
 	protected void addOutputPorts() {
-		// Nothing to add
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(final Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		List<CMLChemFile> chemFiles = null;
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
-				context);
-		try {
-			chemFiles = CDKObjectHandler.getChemFileList(dataArray);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
-		if (chemFiles.isEmpty()) {
-			return null;
-		}
-		List<String> csv = null;
-		try {
-			csv = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[1]), String.class, context);
-		} catch (Exception e) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRONG_INPUT_PORT_TYPE);
-		}
-		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (directory == null || !directory.exists()) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_OUTPUT_DIRECTORY_CHOSEN);
-		}
-		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
+	public void work() throws Exception {
+		// Get input
+		List<CMLChemFile> chemFiles = this.getInputAsList(this.INPUT_PORTS[0], CMLChemFile.class);
+		List<String> csv = this.getInputAsList(this.INPUT_PORTS[1], String.class);
+		File targetFile = this.getInputAsFile(this.INPUT_PORTS[2]);
+		String directory = Tools.getDirectory(targetFile);
+		String name = Tools.getFileName(targetFile);
+		String extension = (String) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
+		// Do work
 		if (this.files == null) {
 			this.files = new HashMap<Integer, File>();
 		}
+		List<String> resultFiles = new ArrayList<String>();
 		// Create cluster uuid map
 		if (this.uuidClusterMap == null) {
 			this.uuidClusterMap = new HashMap<UUID, Integer>();
@@ -135,8 +121,9 @@ public class SplitMoleculesIntoClustersActivity extends AbstractCDKActivity impl
 					}
 					file = this.files.get(cluster);
 					if (file == null) {
-						file = FileNameGenerator.getNewFile(directory.getPath(), extension, "Cluster_" + cluster);
+						file = FileNameGenerator.getNewFile(directory, extension, name + "_Cluster_" + cluster);
 						this.files.put(cluster, file);
+						resultFiles.add(file.getPath());
 					}
 					SDFWriter writer = new SDFWriter(new FileWriter(file, true));
 					writer.write(container);
@@ -144,12 +131,12 @@ public class SplitMoleculesIntoClustersActivity extends AbstractCDKActivity impl
 				} catch (Exception e) {
 					ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + file.getPath() + "!",
 							this.getActivityName(), e);
-					throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRITE_FILE_ERROR + file.getPath()
-							+ "!");
+					throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRITE_FILE_ERROR
+							+ file.getPath() + "!");
 				}
 			}
 		}
-		return null;
+		this.setOutputAsStringList(resultFiles, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override
@@ -171,7 +158,6 @@ public class SplitMoleculesIntoClustersActivity extends AbstractCDKActivity impl
 
 	@Override
 	public String getFolderName() {
-		return CDKTavernaConstants.WEKA_FOLDER_NAME
-		;
+		return CDKTavernaConstants.WEKA_FOLDER_NAME;
 	}
 }

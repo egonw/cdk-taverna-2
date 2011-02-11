@@ -32,8 +32,8 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * This class contains utility methods for the handling of the fingerprint item, lists of fingerprint items and list of double
- * arrays
+ * This class contains utility methods for the handling of the fingerprint item,
+ * lists of fingerprint items and list of double arrays
  * 
  * @author Thomas Kuhn
  * 
@@ -44,13 +44,15 @@ public class FingerprintUtility {
 	 */
 	private double maxPercentageOfNotUsableValues = 1.0;
 	/**
-	 * Removes all double[] which contains nullable values or Double.NaN values. This check is done AFTER the removing of the
-	 * values and components over the maxPerentageOfNotUsableValues TRUE == remove all vectors which contains null or Double.NaN
-	 * values
+	 * Removes all double[] which contains nullable values or Double.NaN values.
+	 * This check is done AFTER the removing of the values and components over
+	 * the maxPerentageOfNotUsableValues TRUE == remove all vectors which
+	 * contains null or Double.NaN values
 	 */
 	private boolean removeAllVectorsUnderTheCutoff = false;
 	/**
-	 * Removes all components of the list of Double[] which min and max value do not differ.
+	 * Removes all components of the list of Double[] which min and max value do
+	 * not differ.
 	 */
 	private boolean removeAllComponentsWhichMinAndMaxValueDoNotDiffer = false;
 
@@ -65,7 +67,8 @@ public class FingerprintUtility {
 	 * @param removeAllComponentsWhichMinAndMaxValueDoNotDiffer
 	 *            the removeAllComponentsWhichMinAndMaxValueDoNotDiffer to set
 	 */
-	public void setRemoveAllComponentsWhichMinAndMaxValueDoNotDiffer(boolean removeAllComponentsWhichMinAndMaxValueDoNotDiffer) {
+	public void setRemoveAllComponentsWhichMinAndMaxValueDoNotDiffer(
+			boolean removeAllComponentsWhichMinAndMaxValueDoNotDiffer) {
 		this.removeAllComponentsWhichMinAndMaxValueDoNotDiffer = removeAllComponentsWhichMinAndMaxValueDoNotDiffer;
 	}
 
@@ -121,12 +124,17 @@ public class FingerprintUtility {
 	}
 
 	/**
-	 * This method creates a list of fingerprint vectors From a given prepared statement It removes all columns and vectors which
-	 * contains more non desired Double values which are null and Double.NaN than the maxPercentageOfNotUsableValues The order of
-	 * checks within this method: 1. Check for columns with more than the maxPercentageOfNotUsableValues of undesired double
-	 * values 2. Check for vectors with more than the maxPercentageOfNotUsableValues of undesired double values 3. Remove all
-	 * vectors under the cutoff which still contains undesired double values 4. Replace undesired double values with 0.0 5.
-	 * Replace all columns which min and max values are identical (This columns contains the same value on in every vector)
+	 * This method creates a list of fingerprint vectors From a given prepared
+	 * statement It removes all columns and vectors which contains more non
+	 * desired Double values which are null and Double.NaN than the
+	 * maxPercentageOfNotUsableValues The order of checks within this method: 1.
+	 * Check for columns with more than the maxPercentageOfNotUsableValues of
+	 * undesired double values 2. Check for vectors with more than the
+	 * maxPercentageOfNotUsableValues of undesired double values 3. Remove all
+	 * vectors under the cutoff which still contains undesired double values 4.
+	 * Replace undesired double values with 0.0 5. Replace all columns which min
+	 * and max values are identical (This columns contains the same value on in
+	 * every vector)
 	 * 
 	 * @param statement
 	 * @param identifierColumnName
@@ -134,8 +142,8 @@ public class FingerprintUtility {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<FingerprintItem> createCleanFingerprintItemList(PreparedStatement statement, String identifierColumnName,
-			HashSet<Integer> useOnlyTheseVectors) throws Exception {
+	public List<FingerprintItem> createCleanFingerprintItemList(PreparedStatement statement,
+			String identifierColumnName, HashSet<Integer> useOnlyTheseVectors) throws Exception {
 		boolean getAllMolecules = true;
 		int valueCounter = 0;
 		ResultSet resultSet;
@@ -210,7 +218,8 @@ public class FingerprintUtility {
 			errorsInVectors.add(errorsInVectorCounter);
 		}
 		// Calculating the Threshold
-		maxNumberOfNotUsableValues = (int) Math.round((maxPercentageOfNotUsableValues * this.usableColumnNames.size()) / 100.0);
+		maxNumberOfNotUsableValues = (int) Math
+				.round((maxPercentageOfNotUsableValues * this.usableColumnNames.size()) / 100.0);
 		// Extract the identifier of each vectors and add them to a list
 		for (int i = 0; i < errorsInVectors.size(); i++) {
 			if (errorsInVectors.get(i) > maxNumberOfNotUsableValues) {
@@ -271,7 +280,8 @@ public class FingerprintUtility {
 			}
 			List<String> columnNamesToRemove = new ArrayList<String>(this.usableColumnNames.size());
 			for (int i = 0; i < max.length; i++) {
-				if (Double.isNaN(max[i]) || Double.isNaN(min[i]) || Double.isInfinite(max[i]) || Double.isInfinite(min[i])) {
+				if (Double.isNaN(max[i]) || Double.isNaN(min[i]) || Double.isInfinite(max[i])
+						|| Double.isInfinite(min[i])) {
 					columnNamesToRemove.add(this.usableColumnNames.get(i));
 				}
 				if (max[i].doubleValue() == min[i].doubleValue()) {
@@ -323,8 +333,8 @@ public class FingerprintUtility {
 	}
 
 	/**
-	 * Remove Components form the vector list. This will reduce the size of each vector in the list according to the list of
-	 * removable columns
+	 * Remove Components form the vector list. This will reduce the size of each
+	 * vector in the list according to the list of removable columns
 	 * 
 	 * @param listOfValues
 	 *            The list of double[] which will be processed

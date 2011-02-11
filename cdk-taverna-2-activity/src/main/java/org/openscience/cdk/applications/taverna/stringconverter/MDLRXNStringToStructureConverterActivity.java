@@ -32,19 +32,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.io.MDLRXNV2000Reader;
 
 public class MDLRXNStringToStructureConverterActivity extends AbstractCDKActivity {
@@ -72,36 +66,26 @@ public class MDLRXNStringToStructureConverterActivity extends AbstractCDKActivit
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		List<byte[]> dataList = new ArrayList<byte[]>();
+	public void work() throws Exception {
+		// Get input
+		List<String> stringList = this.getInputAsList(this.INPUT_PORTS[0], String.class);
+		// Do work
+		List<IReaction> reactionList = new ArrayList<IReaction>();
 		LinkedList<String> notConverted = new LinkedList<String>();
-		List<String> stringList = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
-				context);
 		for (String string : stringList) {
 			try {
 				MDLRXNV2000Reader reader = new MDLRXNV2000Reader(new ByteArrayInputStream(string.getBytes()));
 				Reaction reaction = (Reaction) reader.read(new Reaction());
 				reader.close();
-				dataList.add(CDKObjectHandler.getBytes(reaction));
+				reactionList.add(reaction);
 			} catch (Exception e) {
 				notConverted.add(string);
 				ErrorLogger.getInstance().writeError(CDKTavernaException.CONVERTION_ERROR, this.getActivityName(), e);
 			}
 		}
-		if (dataList.isEmpty()) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.CONVERTION_ERROR);
-		}
-		T2Reference containerRef = referenceService.register(dataList, 1, true, context);
-		outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		containerRef = referenceService.register(notConverted, 1, true, context);
-		outputs.put(this.OUTPUT_PORTS[1], containerRef);
-		// Return results
-		return outputs;
+		// Set output
+		this.setOutputAsObjectList(reactionList, this.OUTPUT_PORTS[0]);
+		this.setOutputAsStringList(notConverted, this.OUTPUT_PORTS[1]);
 	}
 
 	@Override

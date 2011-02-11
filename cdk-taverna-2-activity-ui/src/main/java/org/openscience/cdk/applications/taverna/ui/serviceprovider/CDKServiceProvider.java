@@ -17,6 +17,7 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
+import org.openscience.cdk.applications.taverna.setup.SetupController;
 
 public class CDKServiceProvider implements ServiceDescriptionProvider {
 
@@ -28,9 +29,11 @@ public class CDKServiceProvider implements ServiceDescriptionProvider {
 	@SuppressWarnings("rawtypes")
 	public void findServiceDescriptionsAsync(FindServiceDescriptionsCallBack callBack) {
 		CDKServiceDescriptor service;
+		// Setup CDK-Taverna 2
+		SetupController.getInstance().loadConfiguration();
 		// First abuse this method to clean up the previous generated cache.
 		this.cleanCache();
-			// Use callback.status() for long-running searches
+		// Use callback.status() for long-running searches
 		// callBack.status("Resolving example services");
 		try {
 			List<ServiceDescription> results = new ArrayList<ServiceDescription>();
@@ -69,9 +72,11 @@ public class CDKServiceProvider implements ServiceDescriptionProvider {
 		} else if(name.startsWith("org.openscience.cdk.applications.taverna.iterativeio")) {
 			colour = "#CD5555"; // Indianred3
 		} else if(name.startsWith("org.openscience.cdk.applications.taverna.jchempaint")) {
-			colour = "#CCFFCC"; // offwhitegreen
+			colour = "#CCFFCC"; // Offwhitegreen
 		} else if(name.startsWith("org.openscience.cdk.applications.taverna.miscellaneous")) {
-			colour = "#CCCC00"; // ralphyellow
+			colour = "#CCCC00"; // Ralphyellow
+		} else if(name.startsWith("org.openscience.cdk.applications.taverna.curation")) {
+			colour = "#3CB371"; // Mediumseagreen
 		} else if(name.startsWith("org.openscience.cdk.applications.taverna.qsar")) {
 			colour = "#49E20E"; // Nerf green
 		} else if(name.startsWith("org.openscience.cdk.applications.taverna.reactionenumerator")) {

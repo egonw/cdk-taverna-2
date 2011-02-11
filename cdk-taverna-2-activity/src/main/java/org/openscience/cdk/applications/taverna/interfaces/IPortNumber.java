@@ -21,10 +21,9 @@
  */
 package org.openscience.cdk.applications.taverna.interfaces;
 
-import java.util.List;
-
 /**
- * Interface for tagging activities to use the port number adjust configuration panel.
+ * Interface for tagging activities to use the port number adjust configuration
+ * panel.
  * 
  * @author Andreas Truszkowski
  * 

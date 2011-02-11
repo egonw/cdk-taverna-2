@@ -33,7 +33,8 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.SDFWriter;
 
 /**
- * Writes the submitted error to the error log file. This class is singleton. Get an instance over the getInstance() method.
+ * Writes the submitted error to the error log file. This class is singleton.
+ * Get an instance over the getInstance() method.
  * 
  * @author Andreas Truszkowski
  * 
@@ -45,7 +46,7 @@ public class ErrorLogger {
 	/**
 	 * Holds the instance of the errorLogger.
 	 */
-	private static final ErrorLogger instance = new ErrorLogger();
+	private static ErrorLogger instance = null;
 	/**
 	 * Filename of the log file.
 	 */
@@ -236,8 +237,9 @@ public class ErrorLogger {
 	}
 
 	/**
-	 * Writes the given Molecule to hard disk. The name of the file is the current time. If the file exists an index will be added
-	 * to the name so that no files will be overridden.
+	 * Writes the given Molecule to hard disk. The name of the file is the
+	 * current time. If the file exists an index will be added to the name so
+	 * that no files will be overridden.
 	 * 
 	 * @param aMolecule
 	 *            Molcelue to write to hard disk
@@ -247,8 +249,8 @@ public class ErrorLogger {
 	}
 
 	/**
-	 * Writes the given Molecule to hard disk. If the file exists an index will be added to the name so that no files will be
-	 * overridden.
+	 * Writes the given Molecule to hard disk. If the file exists an index will
+	 * be added to the name so that no files will be overridden.
 	 * 
 	 * @param aMolecule
 	 *            Molecule to write to hard disk
@@ -260,8 +262,8 @@ public class ErrorLogger {
 	}
 
 	/**
-	 * Writes the given Molecule to hard disk. If the file exists an index will be added to the name so that no files will be
-	 * overridden.
+	 * Writes the given Molecule to hard disk. If the file exists an index will
+	 * be added to the name so that no files will be overridden.
 	 * 
 	 * @param aMolecule
 	 *            Molecule to write to hard disk
@@ -326,7 +328,10 @@ public class ErrorLogger {
 	/**
 	 * @return An instance of the ErrorLogger
 	 */
-	public static ErrorLogger getInstance() {
+	public synchronized static ErrorLogger getInstance() {
+		if(instance == null) {
+			instance = new ErrorLogger();
+		}
 		return instance;
 	}
 
@@ -348,7 +353,8 @@ public class ErrorLogger {
 	}
 
 	/**
-	 * @return True if an error was logged until first invocation of this class or until last reset with setErrorOccured().
+	 * @return True if an error was logged until first invocation of this class
+	 *         or until last reset with setErrorOccured().
 	 */
 	public boolean isErrorOccured() {
 		return errorOccured;

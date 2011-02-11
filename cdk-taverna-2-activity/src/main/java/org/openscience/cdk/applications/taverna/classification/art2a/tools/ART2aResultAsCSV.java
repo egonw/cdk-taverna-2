@@ -25,14 +25,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.art2aclassification.Art2aClassificator;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
@@ -42,8 +36,9 @@ import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.io.XMLFileIO;
 
 /**
- * Class which represents the ART-2a result to CSV activity. This worker extracts content from a given set of ART2A classification
- * results and creates a String list in the comma separated value format.
+ * Class which represents the ART-2a result to CSV activity. This worker
+ * extracts content from a given set of ART2A classification results and creates
+ * a String list in the comma separated value format.
  * 
  * @author Andreas Truzskowski
  * 
@@ -73,18 +68,12 @@ public class ART2aResultAsCSV extends AbstractCDKActivity {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
+	public void work() throws Exception {
+		// Get input
+		List<String> files = this.getInputAsList(this.INPUT_PORTS[0], String.class);
+		// Do work
 		List<String> result = new ArrayList<String>();
 		List<String> resultUUID = new ArrayList<String>();
-		List<String> files = (List<String>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), String.class,
-				context);
-		if (files == null || files.size() == 0) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
-		}
 		try {
 			XMLStreamReader xmlReader;
 			StringBuffer buffer;
@@ -145,16 +134,14 @@ public class ART2aResultAsCSV extends AbstractCDKActivity {
 				buffer.append(i);
 			}
 			result.set(0, buffer.toString());
-
-			T2Reference containerRef = referenceService.register(result, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-			containerRef = referenceService.register(resultUUID, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[1], containerRef);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_ART2A_RESULT_ERROR, this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_ART2A_RESULT_ERROR,
+					this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_ART2A_RESULT_ERROR);
 		}
-		return outputs;
+		// Set output
+		this.setOutputAsStringList(result, this.OUTPUT_PORTS[0]);
+		this.setOutputAsStringList(resultUUID, this.OUTPUT_PORTS[1]);
 	}
 
 	@Override

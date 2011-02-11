@@ -87,9 +87,9 @@ public class QSARDescriptorThreadedActivityTest extends CDKTavernaTestCases {
 			container.setProperty(CDKTavernaConstants.MOLECULEID, uuid);
 		}
 		List<byte[]> data = CDKObjectHandler.getBytesList(chemFiles);
-		inputs.put(activity.getINPUT_PORTS()[0], data);
+		inputs.put(activity.INPUT_PORTS[0], data);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[0], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
 	}

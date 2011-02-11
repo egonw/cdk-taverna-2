@@ -21,15 +21,27 @@
  */
 package org.openscience.cdk.applications.taverna;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.Identified;
+import net.sf.taverna.t2.reference.IdentifiedList;
+import net.sf.taverna.t2.reference.ReferenceService;
+import net.sf.taverna.t2.reference.ReferenceSet;
 import net.sf.taverna.t2.reference.T2Reference;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
+import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 
 /**
@@ -48,16 +60,21 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 	/**
 	 * Input port names.
 	 */
-	protected String[] INPUT_PORTS;
+	public String[] INPUT_PORTS;
 	/**
 	 * Output port names.
 	 */
-	protected String[] OUTPUT_PORTS;
+	public String[] OUTPUT_PORTS;
 
 	/**
 	 * Configuration bean.
 	 */
 	private CDKActivityConfigurationBean configBean;
+
+	private Map<String, T2Reference> inputs;
+	protected Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
+
+	protected AsynchronousActivityCallback callback;
 
 	public AbstractCDKActivity() {
 		// empty
@@ -77,7 +94,7 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 	/**
 	 * Do port configuration.
 	 */
-	protected void configurePorts() {
+	private void configurePorts() {
 		// In case we are being reconfigured - remove existing ports first
 		// to avoid duplicates
 		removeInputs();
@@ -98,27 +115,26 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 
 	@Override
 	public void executeAsynch(final Map<String, T2Reference> inputs, final AsynchronousActivityCallback callback) {
+		this.inputs = inputs;
+		this.callback = callback;
 		// Don't execute service directly now, request to be run ask to be run
 		// from thread pool and return asynchronously
 		callback.requestRun(new Runnable() {
 
 			public void run() {
 				// Do work
-				Map<String, T2Reference> outputs = null;
 				try {
 					AbstractCDKActivity.this.iteration++;
-					outputs = AbstractCDKActivity.this.work(inputs, callback);
+					AbstractCDKActivity.this.work();
 				} catch (Exception e) {
-					ErrorLogger.getInstance().writeError(CDKTavernaException.NOT_CATCHED_EXCEPTION, "AbstractCDKActivity", e);
+					ErrorLogger.getInstance().writeError(CDKTavernaException.NOT_CATCHED_EXCEPTION,
+							"AbstractCDKActivity", e);
 					callback.fail(e.getMessage());
-				}
-				if (outputs == null) {
-					outputs = new HashMap<String, T2Reference>();
 				}
 				// return map of output data, with empty index array as this is
 				// the only and final result (this index parameter is used if
 				// pipelining output)
-				callback.receiveResult(outputs, new int[0]);
+				callback.receiveResult(AbstractCDKActivity.this.outputs, new int[0]);
 			}
 		});
 	}
@@ -126,8 +142,7 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 	/**
 	 * Abstract method which does the work.
 	 */
-	public abstract Map<String, T2Reference> work(final Map<String, T2Reference> inputs,
-			final AsynchronousActivityCallback callback) throws Exception;
+	public abstract void work() throws Exception;
 
 	@Override
 	public CDKActivityConfigurationBean getConfiguration() {
@@ -154,18 +169,224 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 	 */
 	public abstract HashMap<String, Object> getAdditionalProperties();
 
+	// ---- Input handling -------------------------------------------------------------------
+
 	/**
-	 * @return Input port names/identifiers.
+	 * Extracts file information from an input port.
+	 * 
+	 * @param port
+	 *            The name of target port.
+	 * @return The file
+	 * @throws Exception
 	 */
-	public String[] getINPUT_PORTS() {
-		return INPUT_PORTS;
+	protected File getInputAsFile(String port) throws Exception {
+		ReferenceService referenceService = this.callback.getContext().getReferenceService();
+		String file = null;
+		T2Reference inputRef = this.inputs.get(port);
+		Identified identified = referenceService.resolveIdentifier(inputRef, null, this.callback.getContext());
+		if (identified instanceof IdentifiedList<?>) {
+			identified = (ReferenceSet) ((IdentifiedList<?>) identified).get(0);
+		}
+		if (identified instanceof ReferenceSet) {
+			ReferenceSet referenceSet = (ReferenceSet) identified;
+			Set<ExternalReferenceSPI> externalReferences = referenceSet.getExternalReferences();
+			for (ExternalReferenceSPI externalReference : externalReferences) {
+				if (externalReference instanceof FileReference) {
+					FileReference fileReference = (FileReference) externalReference;
+					file = fileReference.getFilePath();
+				} else if (externalReference instanceof InlineStringReference) {
+					InlineStringReference fileReference = (InlineStringReference) externalReference;
+					file = fileReference.getContents();
+				}
+			}
+		}
+		if (file == null) {
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+		}
+		return new File(file);
 	}
 
 	/**
-	 * @return Result port names/identifiers.
+	 * Extracts file informations from an input port.
+	 * 
+	 * @param port
+	 *            The name of target port.
+	 * @return List of Files
+	 * @throws Exception
 	 */
-	public String[] getRESULT_PORTS() {
-		return OUTPUT_PORTS;
+	protected List<File> getInputAsFileList(String port) throws Exception {
+		ReferenceService referenceService = this.callback.getContext().getReferenceService();
+		ArrayList<File> files = new ArrayList<File>();
+		T2Reference inputRef = this.inputs.get(port);
+		Identified identified = referenceService.resolveIdentifier(inputRef, null, this.callback.getContext());
+		if (identified instanceof IdentifiedList<?>) {
+			for (int i = 0; i < ((IdentifiedList<?>) identified).size(); i++) {
+				if (((IdentifiedList<?>) identified).get(i) instanceof ReferenceSet) {
+					ReferenceSet referenceSet = (ReferenceSet) ((IdentifiedList<?>) identified).get(i);
+					Set<ExternalReferenceSPI> externalReferences = referenceSet.getExternalReferences();
+					for (ExternalReferenceSPI externalReference : externalReferences) {
+						try {
+							if (externalReference instanceof FileReference) {
+								FileReference fileReference = (FileReference) externalReference;
+								String file = fileReference.getFilePath();
+								files.add(new File(file));
+							} else if (externalReference instanceof InlineStringReference) {
+								InlineStringReference fileReference = (InlineStringReference) externalReference;
+								String file = fileReference.getContents();
+								files.add(new File(file));
+							}
+						} catch (Exception e) {
+							ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_RESOLVING_FILE_INPUT,
+									this.getActivityName(), e);
+						}
+					}
+				}
+			}
+		}
+		if (files.isEmpty()) {
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+		}
+		return files;
 	}
 
+	protected Object getInputAsObject(String port) throws Exception {
+		ReferenceService referenceService = this.callback.getContext().getReferenceService();
+		Object obj = null;
+		try {
+			byte[] data = (byte[]) referenceService.renderIdentifier(inputs.get(port), byte[].class,
+					this.callback.getContext());
+			obj = CDKObjectHandler.getObject(data);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR,
+					this.getActivityName(), e);
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
+		}
+		return obj;
+	}
+
+	@SuppressWarnings("unchecked")
+	protected <T> T getInputAsObject(String port, Class<T> type) throws Exception {
+		ReferenceService referenceService = this.callback.getContext().getReferenceService();
+		T obj = null;
+		try {
+			if (type == String.class || type == Integer.class) {
+				obj = (T) referenceService
+						.renderIdentifier(inputs.get(port), type, this.callback.getContext());
+			} else {
+				byte[] data = (byte[]) referenceService.renderIdentifier(inputs.get(port), byte[].class,
+						this.callback.getContext());
+				obj = (T) CDKObjectHandler.getObject(data);
+			}
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(
+					CDKTavernaException.WRONG_INPUT_PORT_TYPE + " Expected type:" + type.getSimpleName(),
+					this.getActivityName(), e);
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
+		}
+		if (obj.getClass() != type) {
+			throw new CDKTavernaException("CDKObjectHandler", CDKTavernaException.WRONG_INPUT_PORT_TYPE
+					+ " Expected type: " + type.getSimpleName());
+		}
+		return obj;
+	}
+
+	@SuppressWarnings("unchecked")
+	protected <T> List<T> getInputAsList(String port, Class<T> type) throws Exception {
+		ReferenceService referenceService = this.callback.getContext().getReferenceService();
+		if (type == String.class) {
+			List<T> strings = (List<T>) referenceService.renderIdentifier(inputs.get(port), String.class,
+					this.callback.getContext());
+			if (strings == null || strings.isEmpty()) {
+				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+			}
+			return strings;
+		}
+		if (type == byte[].class) {
+			List<T> data;
+			try {
+				data = (List<T>) referenceService.renderIdentifier(inputs.get(port), byte[].class,
+						this.callback.getContext());
+			} catch (Exception e) {
+				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+			}
+			return data;
+		} else {
+			List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(port), byte[].class,
+					this.callback.getContext());
+			List<T> dataList = null;
+			try {
+				dataList = CDKObjectHandler.getGenericList(dataArray, type);
+			} catch (Exception e) {
+				ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR,
+						this.getActivityName(), e);
+				throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
+			}
+			return dataList;
+		}
+
+	}
+
+	// ---- Output handling -----------------------------------------------------------------------------
+
+	protected void setOutputAsObjectList(List<?> objectList, String port) throws Exception {
+		try {
+			ReferenceService referenceService = this.callback.getContext().getReferenceService();
+			List<byte[]> dataList = CDKObjectHandler.getBytesList(objectList);
+			T2Reference containerRef = referenceService.register(dataList, 1, true, this.callback.getContext());
+			this.outputs.put(port, containerRef);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR,
+					this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
+		}
+	}
+
+	protected void setOutputAsObject(Object object, String port) throws Exception {
+		try {
+			ReferenceService referenceService = this.callback.getContext().getReferenceService();
+			byte[] data = CDKObjectHandler.getBytes(object);
+			T2Reference containerRef = referenceService.register(data, 0, true, this.callback.getContext());
+			this.outputs.put(port, containerRef);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR,
+					this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
+		}
+	}
+
+	protected void setOutputAsStringList(List<String> stringList, String port) throws Exception {
+		try {
+			ReferenceService referenceService = this.callback.getContext().getReferenceService();
+			T2Reference containerRef = referenceService.register(stringList, 1, true, this.callback.getContext());
+			this.outputs.put(port, containerRef);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR,
+					this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
+		}
+	}
+
+	protected void setOutputAsString(String s, String port) throws Exception {
+		try {
+			ReferenceService referenceService = this.callback.getContext().getReferenceService();
+			T2Reference containerRef = referenceService.register(s, 0, true, this.callback.getContext());
+			this.outputs.put(port, containerRef);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR,
+					this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
+		}
+	}
+
+	protected void setOutputAsByteList(List<byte[]> byteList, String port) throws Exception {
+		try {
+			ReferenceService referenceService = this.callback.getContext().getReferenceService();
+			T2Reference containerRef = referenceService.register(byteList, 1, true, this.callback.getContext());
+			this.outputs.put(port, containerRef);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR,
+					this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
+		}
+	}
 }

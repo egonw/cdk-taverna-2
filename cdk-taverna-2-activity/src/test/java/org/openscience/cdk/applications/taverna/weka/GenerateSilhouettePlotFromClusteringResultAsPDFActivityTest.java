@@ -35,6 +35,7 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
+import org.openscience.cdk.applications.taverna.setup.SetupController;
 
 /**
  * Test class for the generate silhouette plot from clustering result as CSV activity.
@@ -58,8 +59,7 @@ public class GenerateSilhouettePlotFromClusteringResultAsPDFActivityTest extends
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
 		this.configBean.setActivityName(this.wekaActivity.getActivityName());
-		this.dir = new File("." + File.separator + "Test" + File.separator);
-		this.dir.mkdir();
+		this.dir = new File(SetupController.getInstance().getWorkingDir());
 		File input = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
 				+ File.separator + "weka" + File.separator + "data.arff");
 		File output = new File(this.dir.getPath() + File.separator + "data.arff");
@@ -76,7 +76,7 @@ public class GenerateSilhouettePlotFromClusteringResultAsPDFActivityTest extends
 	public void executeAsynch() throws Exception {
 		wekaActivity.configure(configBean);
 		Map<String, Object> inputs = new HashMap<String, Object>();
-		inputs.put(wekaActivity.getINPUT_PORTS()[0], files);
+		inputs.put(wekaActivity.INPUT_PORTS[0], files);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(wekaActivity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 0, outputs.size());
@@ -97,10 +97,7 @@ public class GenerateSilhouettePlotFromClusteringResultAsPDFActivityTest extends
 	}
 
 	public void cleanUp() {
-		for (File file : this.dir.listFiles()) {
-			file.delete();
-		}
-		this.dir.delete();
+		FileNameGenerator.deleteDir(this.dir);
 	}
 
 	/**

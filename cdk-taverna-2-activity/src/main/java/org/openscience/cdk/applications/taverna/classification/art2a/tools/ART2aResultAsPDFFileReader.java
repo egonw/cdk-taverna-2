@@ -30,9 +30,6 @@ import java.util.TreeMap;
 
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
-
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.openscience.cdk.applications.art2aclassification.Art2aClassificator;
@@ -46,7 +43,8 @@ import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.applications.taverna.io.XMLFileIO;
 
 /**
- * Class which represents the ART-2a result to PDF activity. Reads ART-2a result files from hard disk.
+ * Class which represents the ART-2a result to PDF activity. Reads ART-2a result
+ * files from hard disk.
  * 
  * @author Andreas Truzskowski
  * 
@@ -73,14 +71,15 @@ public class ART2aResultAsPDFFileReader extends AbstractCDKActivity implements I
 	}
 
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		List<String> resultFileNames = new ArrayList<String>();
-		List<String> pdfTitle = new ArrayList<String>();
+	public void work() throws CDKTavernaException {
+		// Get input
 		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
 		if (files == null || files.length == 0) {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
+		// Do work
+		List<String> resultFileNames = new ArrayList<String>();
+		List<String> pdfTitle = new ArrayList<String>();
 		try {
 			XMLStreamReader xmlReader;
 			StringBuffer buffer;
@@ -127,8 +126,8 @@ public class ART2aResultAsPDFFileReader extends AbstractCDKActivity implements I
 					buffer.append("/");
 					buffer.append(entry.getKey().intValue());
 					buffer.append(")");
-					dataSet.addValue(classificator.getNumberOfVectorsInClass(entry.getValue()), numberOfVectorsInClass, buffer
-							.toString());
+					dataSet.addValue(classificator.getNumberOfVectorsInClass(entry.getValue()), numberOfVectorsInClass,
+							buffer.toString());
 				}
 				buffer = new StringBuffer();
 				buffer.append("(");
@@ -147,10 +146,10 @@ public class ART2aResultAsPDFFileReader extends AbstractCDKActivity implements I
 			chartTool.writeChartAsPDF(file, charts);
 			resultFileNames.add(file.getAbsolutePath());
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_ART2A_RESULT_ERROR, this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_ART2A_RESULT_ERROR,
+					this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_ART2A_RESULT_ERROR);
 		}
-		return null;
 	}
 
 	@Override

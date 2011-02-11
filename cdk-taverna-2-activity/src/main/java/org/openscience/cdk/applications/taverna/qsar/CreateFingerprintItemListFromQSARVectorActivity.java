@@ -27,21 +27,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
-
 import org.openscience.cdk.applications.art2aclassification.FingerprintItem;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.qsar.utilities.QSARVectorUtility;
 
 /**
- * Class which represents the create fingerprint item list from QSAR vector activity.
+ * Class which represents the create fingerprint item list from QSAR vector
+ * activity.
  * 
  * @author Andreas Truzskowski
  * 
@@ -71,44 +66,34 @@ public class CreateFingerprintItemListFromQSARVectorActivity extends AbstractCDK
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
+	public void work() throws Exception {
+		// Get input
 		Map<UUID, Map<String, Object>> vectorMap;
-		byte[] vectorData = (byte[]) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class, context);
 		try {
-			vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(vectorData);
+			vectorMap = (Map<UUID, Map<String, Object>>) this.getInputAsObject(this.INPUT_PORTS[0]);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		ArrayList<String> descriptorNames;
-		byte[] nameData = (byte[]) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[1]), byte[].class, context);
 		try {
-			descriptorNames = (ArrayList<String>) CDKObjectHandler.getObject(nameData);
+			descriptorNames = (ArrayList<String>) this.getInputAsObject(this.INPUT_PORTS[1]);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
+		// Do work
 		List<FingerprintItem> fingerprintList = null;
 		try {
 			QSARVectorUtility vectorUtility = new QSARVectorUtility();
 			fingerprintList = vectorUtility.createFingerprintItemListFromQSARVector(vectorMap, descriptorNames);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during fingerprint items creation !", this.getActivityName(), e);
+			ErrorLogger.getInstance()
+					.writeError("Error during fingerprint items creation !", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
-		try {
-			List<byte[]> fingerprintData = CDKObjectHandler.getBytesList(fingerprintList);
-			T2Reference containerRef = referenceService.register(fingerprintData, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
-		}
-		return outputs;
+		// Set output
+		this.setOutputAsObjectList(fingerprintList, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override

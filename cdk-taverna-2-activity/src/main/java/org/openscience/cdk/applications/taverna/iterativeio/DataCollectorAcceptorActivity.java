@@ -30,18 +30,11 @@ package org.openscience.cdk.applications.taverna.iterativeio;
 import java.io.DataOutputStream;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.Preferences;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 
 public class DataCollectorAcceptorActivity extends AbstractCDKActivity {
@@ -67,26 +60,22 @@ public class DataCollectorAcceptorActivity extends AbstractCDKActivity {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
-				context);
-		UUID id = UUID.fromString((String) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[1]), String.class,
-				context));
+	public void work() throws Exception {
+		//Get input
+		List<byte[]> dataArray = this.getInputAsList(this.INPUT_PORTS[0], byte[].class);
+		UUID id = UUID.fromString(this.getInputAsObject(this.INPUT_PORTS[1], String.class));
 		if (id == null) {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.MOLECULE_NOT_TAGGED_WITH_UUID);
 		}
+		// Do work
 		DataOutputStream dataStream;
 		DataOutputStream idxStream;
 		try {
-			dataStream = Preferences.getInstance().getDataCollectorDataStream(id);
-			idxStream = Preferences.getInstance().createDataCollectorIdxStream(id);
+			dataStream = DataStreamController.getInstance().getDataCollectorDataStream(id);
+			idxStream = DataStreamController.getInstance().createDataCollectorIdxStream(id);
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.STREAM_INITIALIZATION_ERROR, this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.STREAM_INITIALIZATION_ERROR,
+					this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.STREAM_INITIALIZATION_ERROR);
 		}
 		try {
@@ -100,8 +89,6 @@ public class DataCollectorAcceptorActivity extends AbstractCDKActivity {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_CACHE_DATA_ERROR, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRITE_CACHE_DATA_ERROR);
 		}
-		// Return results
-		return outputs;
 	}
 
 	@Override

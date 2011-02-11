@@ -26,28 +26,27 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
+import org.openscience.cdk.applications.taverna.basicutilities.Tools;
 import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 /**
- * Class which represents the write molecule as png activitiy. Saves molecule images as png files.
+ * Class which represents the write molecule as png activitiy. Saves molecule
+ * images as png files.
  * 
  * @author Andreas Truszkowski
  * 
@@ -60,13 +59,17 @@ public class WriteMoleculeAsPNGActivity extends AbstractCDKActivity implements I
 	 * Creates a new instance.
 	 */
 	public WriteMoleculeAsPNGActivity() {
-		this.INPUT_PORTS = new String[] { "Structures" };
+		this.INPUT_PORTS = new String[] { "Structures", "File" };
 		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
 	@Override
 	protected void addInputPorts() {
 		this.addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
+		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+		expectedReferences.add(FileReference.class);
+		expectedReferences.add(InlineStringReference.class);
+		addInput(this.INPUT_PORTS[1], 0, false, expectedReferences, null);
 	}
 
 	@Override
@@ -96,45 +99,31 @@ public class WriteMoleculeAsPNGActivity extends AbstractCDKActivity implements I
 		return CDKTavernaConstants.RENDERER_FOLDER_NAME;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, T2Reference> work(Map<String, T2Reference> inputs, AsynchronousActivityCallback callback)
-			throws CDKTavernaException {
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context.getReferenceService();
-		List<CMLChemFile> chemFileList = new ArrayList<CMLChemFile>();
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		List<String> files = new ArrayList<String>();
-		List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(this.INPUT_PORTS[0]), byte[].class,
-				context);
-		try {
-			chemFileList = CDKObjectHandler.getChemFileList(dataArray);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
-		}
-		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		String extension = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
+	public void work() throws Exception {
+		// Get input
+		List<CMLChemFile> chemFileList = this.getInputAsList(this.INPUT_PORTS[0], CMLChemFile.class);
+		File targetFile = this.getInputAsFile(this.INPUT_PORTS[1]);
+		String directory = Tools.getDirectory(targetFile);
+		String name = Tools.getFileName(targetFile);
+		String extension = (String) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
+		// Do work
+		ArrayList<String> resultFiles = new ArrayList<String>();
 		for (CMLChemFile cmlChemFile : chemFileList) {
 			try {
-				File file = FileNameGenerator.getNewFile(directory.getPath(), extension, this.iteration);
+				File file = FileNameGenerator.getNewFile(directory, extension, name, this.iteration);
 				IAtomContainer molecule = ChemFileManipulator.getAllAtomContainers(cmlChemFile).get(0);
 				BufferedImage image = Draw2DStructure.drawMolecule(molecule, 800, 600);
 				ImageIO.write(image, "png", file);
-				files.add(file.getPath());
+				resultFiles.add(file.getPath());
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError("Error rendering image!", this.getActivityName(), e);
 				throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 			}
 		}
-		try {
-			T2Reference containerRef = referenceService.register(files, 1, true, context);
-			outputs.put(this.OUTPUT_PORTS[0], containerRef);
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR, this.getActivityName(), e);
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
-		}
-		return outputs;
+		// Set output
+		this.setOutputAsStringList(resultFiles, this.OUTPUT_PORTS[0]);
 	}
 
 }

@@ -21,6 +21,7 @@
  */
 package org.openscience.cdk.applications.taverna.iterativeio;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,8 @@ import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
+import org.openscience.cdk.applications.taverna.setup.SetupController;
 
 /**
  * Test class for the data collector acceptor/emitter activities.
@@ -79,24 +82,26 @@ public class DataCollectorAEActivityTest extends CDKTavernaTestCases {
 			Map<String, Object> inputs = new HashMap<String, Object>();
 			List<byte[]> dataList = new ArrayList<byte[]>();
 			dataList.add(data);
-			inputs.put(this.acceptor.getINPUT_PORTS()[0], dataList);
-			inputs.put(this.acceptor.getINPUT_PORTS()[1], uuid.toString());
+			inputs.put(this.acceptor.INPUT_PORTS[0], dataList);
+			inputs.put(this.acceptor.INPUT_PORTS[1], uuid.toString());
 			Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-			Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(this.acceptor, inputs, expectedOutputTypes);
+			Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(this.acceptor, inputs,
+					expectedOutputTypes);
 			Assert.assertEquals("Unexpected outputs", 0, outputs.size());
 		}
 		// Execute emitter
 		Map<String, Object> inputs = new HashMap<String, Object>();
-		inputs.put(this.emitter.getINPUT_PORTS()[0], uuid.toString());
+		inputs.put(this.emitter.INPUT_PORTS[0], uuid.toString());
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(this.emitter.getRESULT_PORTS()[0], byte[].class);
+		expectedOutputTypes.put(this.emitter.OUTPUT_PORTS[0], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(this.emitter, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
-		List<byte[]> objectData = (List<byte[]>) outputs.get(this.emitter.getRESULT_PORTS()[0]);
+		List<byte[]> objectData = (List<byte[]>) outputs.get(this.emitter.OUTPUT_PORTS[0]);
 		Assert.assertEquals(10, objectData.size());
 	}
 
 	public void cleanUp() {
+		FileNameGenerator.deleteDir(new File(SetupController.getInstance().getWorkingDir()));
 	}
 
 	public void executeTest() {

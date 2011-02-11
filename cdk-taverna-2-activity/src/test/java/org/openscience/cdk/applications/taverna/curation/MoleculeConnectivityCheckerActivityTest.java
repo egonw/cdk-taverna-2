@@ -48,17 +48,17 @@ public class MoleculeConnectivityCheckerActivityTest extends CDKTavernaTestCases
 
 		List<byte[]> dataList = CDKObjectHandler.getBytesList(cmlFiles);
 
-		inputs.put(activity.getINPUT_PORTS()[0], dataList);
+		inputs.put(activity.INPUT_PORTS[0], dataList);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[0], byte[].class);
-		expectedOutputTypes.put(activity.getRESULT_PORTS()[1], byte[].class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[0], byte[].class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[1], byte[].class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
 
-		List<byte[]> objectDataList = (List<byte[]>) outputs.get(activity.getRESULT_PORTS()[1]);
+		List<byte[]> objectDataList = (List<byte[]>) outputs.get(activity.OUTPUT_PORTS[1]);
 		List<CMLChemFile> chemFile = CDKObjectHandler.getChemFileList(objectDataList);
 		Assert.assertEquals(2, chemFile.size());
-		objectDataList = (List<byte[]>) outputs.get(activity.getRESULT_PORTS()[0]);
+		objectDataList = (List<byte[]>) outputs.get(activity.OUTPUT_PORTS[0]);
 		chemFile = CDKObjectHandler.getChemFileList(objectDataList);
 		Assert.assertEquals(1, chemFile.size());
 

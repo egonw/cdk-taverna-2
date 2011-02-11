@@ -39,6 +39,8 @@ import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
+import org.openscience.cdk.applications.taverna.setup.SetupController;
 
 /**
  * Test class for the MDL Mol file writer activity.
@@ -61,9 +63,7 @@ public class MDLMolFileWriterActivityTest extends CDKTavernaTestCases {
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
 		// TODO read resource
-		this.dir = new File("." + File.separator + "Test" + File.separator);
-		this.dir.mkdir();
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.dir);
+		this.dir = new File(SetupController.getInstance().getWorkingDir());
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".mol");
 		configBean.setActivityName(MDLMolFileReaderActivity.MOL_FILE_READER_ACTIVITY);
 	}
@@ -76,17 +76,15 @@ public class MDLMolFileWriterActivityTest extends CDKTavernaTestCases {
 		for (CMLChemFile chemFile : chemFiles) {
 			data.add(CDKObjectHandler.getBytes(chemFile));
 		}
-		inputs.put(activity.getINPUT_PORTS()[0], data);
+		inputs.put(activity.INPUT_PORTS[0], data);
+		inputs.put(activity.INPUT_PORTS[1], this.dir);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 0, outputs.size());
 	}
 
 	public void cleanUp() {
-		for (File file : this.dir.listFiles()) {
-			file.delete();
-		}
-		this.dir.delete();
+		FileNameGenerator.deleteDir(this.dir);
 	}
 
 	public void executeTest() {
