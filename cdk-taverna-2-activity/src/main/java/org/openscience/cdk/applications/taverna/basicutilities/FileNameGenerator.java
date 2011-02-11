@@ -22,6 +22,8 @@
 package org.openscience.cdk.applications.taverna.basicutilities;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -239,6 +241,30 @@ public class FileNameGenerator {
 			out.write(c);
 		in.close();
 		out.close();
+	}
+	
+	public static synchronized UUID cacheByteStream(byte[] data) throws Exception {
+		String filename = getCacheDir();
+		UUID uuid = UUID.randomUUID();
+		filename += File.separator + uuid.toString();
+		filename += ".cache";
+		FileOutputStream fos = new FileOutputStream(filename);
+		fos.write(data);
+		fos.flush();
+		fos.close();
+		return uuid;
+	}
+	
+	public static synchronized byte[] uncacheByteStream(UUID uuid) throws Exception {
+		String filename = getCacheDir();
+		filename += File.separator + uuid.toString();
+		filename += ".cache";
+		File file = new File(filename);
+		byte[] data = new byte[(int)file.length()];
+		FileInputStream fis = new FileInputStream(file);
+		fis.read(data);
+		fis.close();
+		return data;
 	}
 
 }

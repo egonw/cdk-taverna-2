@@ -26,7 +26,7 @@ public class Tools {
 		if (file.isDirectory()) {
 			return "";
 		}
-		result = result.replace(file.getParent(), "");
+		result = file.getName();
 		int idx = result.lastIndexOf(".");
 		if (idx > 0) {
 			return result.substring(0, idx - 1);

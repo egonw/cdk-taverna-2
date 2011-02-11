@@ -27,7 +27,7 @@ public class CDKTavernaException extends Exception {
 
 	public static final String WRONG_INPUT_PORT_TYPE = "Incorrect input port type!";
 	public static final String NOT_CATCHED_EXCEPTION = "Not catched exception!";
-	public static final String FILE_CREATION_ERROR = "Error during fille creation!";
+	public static final String FILE_CREATION_ERROR = "Error during file creation!";
 	public static final String OBJECT_DESERIALIZATION_ERROR = "Error during object deseralization!";
 	public static final String NO_OUTPUT_DIRECTORY_CHOSEN = "Error, no output directory chosen!";
 	public static final String NO_FILE_CHOSEN = "Error, no file chosen!";

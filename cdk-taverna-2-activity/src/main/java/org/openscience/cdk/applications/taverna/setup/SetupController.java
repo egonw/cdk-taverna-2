@@ -9,21 +9,36 @@ import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.basicutilities.Tools;
+import org.openscience.cdk.applications.taverna.iterativeio.DataStreamController;
 
 public class SetupController {
 
 	private static final String WORKING_DIRECTORY = "Working Directory";
+	private static final String IS_DATA_CACHING = "Is Data Caching";
 
 	private SetupDialog view = null;
 	private static SetupController instance = null;
 	private Properties properties = new Properties();
 	private boolean loaded = false;
-	
+
+	private ActionListener chooseFileListener = new ActionListener() {
+
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser openDialog = new JFileChooser(new File(DataStreamController.getInstance()
+					.getCurrentDirectory()));
+			openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			if (openDialog.showOpenDialog(view) == JFileChooser.APPROVE_OPTION) {
+				view.getWorkingDirectoryTextField().setText(openDialog.getSelectedFile().getPath());
+			}
+		}
+	};
+
 	private ActionListener okButtonListener = new ActionListener() {
 
 		public void actionPerformed(ActionEvent e) {
@@ -49,21 +64,20 @@ public class SetupController {
 		}
 		return instance;
 	}
-	
+
 	public synchronized void loadTestCaseConfiguration() {
-		if(this.loaded) {
+		if (this.loaded) {
 			return;
 		}
 		this.loaded = true;
-		String workingDirFilename = this.properties.getProperty(WORKING_DIRECTORY);
-		if (workingDirFilename == null) {
-			workingDirFilename = FileNameGenerator.getTempDir() + File.separator + "Test";
-			this.properties.setProperty(WORKING_DIRECTORY, workingDirFilename);
-		}
+		String workingDirFilename = FileNameGenerator.getTempDir() + File.separator + "Test";
+		this.properties.setProperty(WORKING_DIRECTORY, workingDirFilename);
+		Boolean isDataCaching = true;
+		this.properties.setProperty(WORKING_DIRECTORY, "" + isDataCaching);
 	}
 
 	public synchronized void loadConfiguration() {
-		if(this.loaded) {
+		if (this.loaded) {
 			return;
 		}
 		this.loaded = true;
@@ -93,12 +107,13 @@ public class SetupController {
 			ClassLoader cld = getClass().getClassLoader();
 			URL url = cld.getResources("icons/open.gif").nextElement();
 			icon = new ImageIcon(url);
-			this.view.getButton().setIcon(icon);
+			this.view.getChooseDirectoryButton().setIcon(icon);
 		} catch (Exception e) {
 			// Ignore. Only the symbol missing.
 		}
 		this.view.getOkButton().addActionListener(this.okButtonListener);
 		this.view.getCancelButton().addActionListener(this.cancelButtonListener);
+		this.view.getChooseDirectoryButton().addActionListener(chooseFileListener);
 		Tools.centerWindowOnScreen(this.view);
 		String workingDirFilename = this.properties.getProperty(WORKING_DIRECTORY);
 		if (workingDirFilename == null) {
@@ -106,6 +121,11 @@ public class SetupController {
 			this.properties.setProperty(WORKING_DIRECTORY, workingDirFilename);
 		}
 		this.view.getWorkingDirectoryTextField().setText(workingDirFilename);
+		Boolean isDataCaching = Boolean.parseBoolean(this.properties.getProperty(IS_DATA_CACHING));
+		if (isDataCaching == null) {
+			isDataCaching = true;
+			this.properties.setProperty(IS_DATA_CACHING, "" + isDataCaching);
+		}
 		this.view.setVisible(true);
 	}
 
@@ -114,6 +134,8 @@ public class SetupController {
 		File configFile = new File(appDir + File.separator + "cdktaverna2.config");
 		String workingDirFilename = this.view.getWorkingDirectoryTextField().getText();
 		this.properties.setProperty(WORKING_DIRECTORY, workingDirFilename);
+		Boolean isDataCaching = this.view.getChckbxCacheDatarecommended().isSelected();
+		this.properties.setProperty(IS_DATA_CACHING, "" + isDataCaching);
 		try {
 			this.properties.store(new FileWriter(configFile), "CDK-Taverna 2.0 properties");
 		} catch (Exception e) {
@@ -129,5 +151,10 @@ public class SetupController {
 			file.mkdir();
 		}
 		return file.getPath() + File.separator;
+	}
+
+	public boolean isDataCaching() {
+		Boolean isDataCaching = Boolean.parseBoolean(this.properties.getProperty(IS_DATA_CACHING));
+		return isDataCaching;
 	}
 }

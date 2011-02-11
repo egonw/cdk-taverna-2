@@ -11,6 +11,7 @@ import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.JCheckBox;
 
 public class SetupDialog extends JDialog {
 
@@ -21,6 +22,7 @@ public class SetupDialog extends JDialog {
 	private JButton button;
 	private JButton okButton;
 	private JButton cancelButton;
+	private JCheckBox chckbxCacheDatarecommended;
 
 	/**
 	 * Launch the application.
@@ -41,7 +43,7 @@ public class SetupDialog extends JDialog {
 	public SetupDialog() {
 		setModal(true);
 		setTitle("CDK-Taverna 2.0 Setup");
-		setBounds(100, 100, 450, 138);
+		setBounds(100, 100, 450, 165);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setResizable(false);
@@ -71,6 +73,14 @@ public class SetupDialog extends JDialog {
 		sl_contentPanel.putConstraint(SpringLayout.WEST, button, -35, SpringLayout.EAST, contentPanel);
 		sl_contentPanel.putConstraint(SpringLayout.EAST, button, -10, SpringLayout.EAST, contentPanel);
 		contentPanel.add(button);
+		
+		chckbxCacheDatarecommended = new JCheckBox("Cache data (recommended)");
+		chckbxCacheDatarecommended.setToolTipText("Cache CDK-Taverna 2.0 data on hard disk instead of using the memory or the provenance database.");
+		chckbxCacheDatarecommended.setSelected(true);
+		sl_contentPanel.putConstraint(SpringLayout.NORTH, chckbxCacheDatarecommended, 10, SpringLayout.SOUTH, workingDirectoryTextField);
+		sl_contentPanel.putConstraint(SpringLayout.WEST, chckbxCacheDatarecommended, 0, SpringLayout.WEST, lblWorkingDirectrory);
+		sl_contentPanel.putConstraint(SpringLayout.EAST, chckbxCacheDatarecommended, 316, SpringLayout.WEST, contentPanel);
+		contentPanel.add(chckbxCacheDatarecommended);
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
@@ -90,7 +100,7 @@ public class SetupDialog extends JDialog {
 		}
 	}
 
-	public JButton getButton() {
+	public JButton getChooseDirectoryButton() {
 		return button;
 	}
 
@@ -104,5 +114,8 @@ public class SetupDialog extends JDialog {
 
 	public JButton getCancelButton() {
 		return cancelButton;
+	}
+	public JCheckBox getChckbxCacheDatarecommended() {
+		return chckbxCacheDatarecommended;
 	}
 }
