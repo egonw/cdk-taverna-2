@@ -65,8 +65,8 @@ public class MDLMolFileReaderActivityTest extends CDKTavernaTestCases {
 	public void executeAsynch() throws Exception {
 		activity.configure(configBean);
 		List<String> sdTestFile = new ArrayList<String>();
-		sdTestFile.add("src" + File.separator + "test" + File.separator + "resources"
-				+ File.separator + "data" + File.separator + "mol" + File.separator + "molfile.mol");
+		sdTestFile.add("src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
+				+ File.separator + "mol" + File.separator + "molfile.mol");
 		Map<String, Object> inputs = new HashMap<String, Object>();
 		inputs.put(activity.INPUT_PORTS[0], sdTestFile);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();

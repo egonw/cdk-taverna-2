@@ -58,7 +58,8 @@ public class ReactionEnumeratorSubgraphFilterActivityTest extends CDKTavernaTest
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		configBean.setActivityName(ReactionEnumeratorSubgraphFilterActivity.REACTION_ENUMERATOR_SUBGRAPH_FILTER_ACTIVITY);
+		configBean
+				.setActivityName(ReactionEnumeratorSubgraphFilterActivity.REACTION_ENUMERATOR_SUBGRAPH_FILTER_ACTIVITY);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -70,10 +71,11 @@ public class ReactionEnumeratorSubgraphFilterActivityTest extends CDKTavernaTest
 				+ File.separator + "reSubgraph" + File.separator + "educts001.sdf";
 		CMLChemFile[] structures = CDKIOReader.readFromSDV2000File(testFile);
 		inputs.put(activity.INPUT_PORTS[0], CDKObjectHandler.getBytesList(structures));
-		testFile = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data" + File.separator
-				+ "reSubgraph" + File.separator + "reaction.rxn";
+		testFile = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
+				+ File.separator + "reSubgraph" + File.separator + "reaction.rxn";
 		Reaction reaction = CDKIOReader.readRXNV2000File(testFile);
-		CMLChemFile substructure = CMLChemFileWrapper.wrapAtomContainerInChemModel(reaction.getReactants().getAtomContainer(0));
+		CMLChemFile substructure = CMLChemFileWrapper.wrapAtomContainerInChemModel(reaction.getReactants()
+				.getAtomContainer(0));
 		inputs.put(activity.INPUT_PORTS[1], CDKObjectHandler.getBytes(substructure));
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.OUTPUT_PORTS[0], byte[].class);
@@ -82,8 +84,8 @@ public class ReactionEnumeratorSubgraphFilterActivityTest extends CDKTavernaTest
 		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
 		List<CMLChemFile> calcStructures = CDKObjectHandler.getChemFileList((List<byte[]>) outputs
 				.get(activity.OUTPUT_PORTS[0]));
-		List<CMLChemFile> notCalcStructures = CDKObjectHandler.getChemFileList((List<byte[]>) outputs.get(activity
-				.OUTPUT_PORTS[1]));
+		List<CMLChemFile> notCalcStructures = CDKObjectHandler.getChemFileList((List<byte[]>) outputs
+				.get(activity.OUTPUT_PORTS[1]));
 		Assert.assertEquals(3, calcStructures.size());
 		Assert.assertEquals(1, notCalcStructures.size());
 	}

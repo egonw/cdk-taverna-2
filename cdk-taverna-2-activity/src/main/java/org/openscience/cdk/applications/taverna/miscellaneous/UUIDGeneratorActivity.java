@@ -32,9 +32,8 @@ import java.util.UUID;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 
-public class UUIDGeneratorActivity extends AbstractCDKActivity implements IFileReader {
+public class UUIDGeneratorActivity extends AbstractCDKActivity {
 
 	public static final String UUID_GENERATOR_ACTIVITY = "UUID Generator";
 	private UUID id = null;

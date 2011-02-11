@@ -73,8 +73,8 @@ public class SubgraphIsomorphismFilterActivityTest extends CDKTavernaTestCases {
 			structures.add(CDKObjectHandler.getBytes(chemFile));
 		}
 		inputs.put(activity.INPUT_PORTS[0], structures);
-		File testFile = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
-				+ File.separator + "mol" + File.separator + "substructure.mol");
+		File testFile = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
+				+ "data" + File.separator + "mol" + File.separator + "substructure.mol");
 		MDLReader reader = new MDLReader(new FileReader(testFile));
 		reader.read(substructure);
 		inputs.put(activity.INPUT_PORTS[1], CDKObjectHandler.getBytes(substructure));
@@ -85,8 +85,8 @@ public class SubgraphIsomorphismFilterActivityTest extends CDKTavernaTestCases {
 		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
 		List<CMLChemFile> calcStructures = CDKObjectHandler.getChemFileList((List<byte[]>) outputs
 				.get(activity.OUTPUT_PORTS[0]));
-		List<CMLChemFile> notCalcStructures = CDKObjectHandler.getChemFileList((List<byte[]>) outputs.get(activity
-				.OUTPUT_PORTS[1]));
+		List<CMLChemFile> notCalcStructures = CDKObjectHandler.getChemFileList((List<byte[]>) outputs
+				.get(activity.OUTPUT_PORTS[1]));
 		Assert.assertEquals(1, calcStructures.size());
 		Assert.assertEquals(9, notCalcStructures.size());
 	}

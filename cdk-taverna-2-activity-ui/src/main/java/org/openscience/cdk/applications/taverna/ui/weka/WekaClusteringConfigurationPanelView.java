@@ -35,6 +35,7 @@ import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
+import java.awt.GridLayout;
 
 /**
  * Controller class of the weka clustering configuration panel.
@@ -52,9 +53,6 @@ public class WekaClusteringConfigurationPanelView extends JPanel {
 	private JList jobList;
 	private JButton addJobButton;
 	private JButton removeJobButton;
-	private JPanel panel;
-	private JButton chooseFileButton;
-	private JTextField choosenFileTextField;
 	private JButton btnClearAll;
 
 	public WekaClusteringConfigurationPanelView() {
@@ -87,42 +85,13 @@ public class WekaClusteringConfigurationPanelView extends JPanel {
 		JPanel centerPanel = new JPanel();
 		centerPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		add(centerPanel, BorderLayout.CENTER);
-		SpringLayout sl_centerPanel = new SpringLayout();
-		centerPanel.setLayout(sl_centerPanel);
+		centerPanel.setLayout(new GridLayout(0, 1, 0, 0));
 
 		JScrollPane scrollPane = new JScrollPane();
-		sl_centerPanel.putConstraint(SpringLayout.NORTH, scrollPane, 0, SpringLayout.NORTH, centerPanel);
-		sl_centerPanel.putConstraint(SpringLayout.WEST, scrollPane, 0, SpringLayout.WEST, centerPanel);
-		sl_centerPanel.putConstraint(SpringLayout.EAST, scrollPane, 0, SpringLayout.EAST, centerPanel);
 		centerPanel.add(scrollPane);
 
 		jobList = new JList();
 		scrollPane.setViewportView(jobList);
-
-		panel = new JPanel();
-		sl_centerPanel.putConstraint(SpringLayout.WEST, panel, 0, SpringLayout.WEST, centerPanel);
-		sl_centerPanel.putConstraint(SpringLayout.EAST, panel, 0, SpringLayout.EAST, centerPanel);
-		sl_centerPanel.putConstraint(SpringLayout.SOUTH, scrollPane, 0, SpringLayout.NORTH, panel);
-		sl_centerPanel.putConstraint(SpringLayout.NORTH, panel, -35, SpringLayout.SOUTH, centerPanel);
-		sl_centerPanel.putConstraint(SpringLayout.SOUTH, panel, 226, SpringLayout.NORTH, centerPanel);
-		centerPanel.add(panel);
-		SpringLayout sl_panel = new SpringLayout();
-		panel.setLayout(sl_panel);
-
-		chooseFileButton = new JButton((Action) null);
-		sl_panel.putConstraint(SpringLayout.NORTH, chooseFileButton, 5, SpringLayout.NORTH, panel);
-		sl_panel.putConstraint(SpringLayout.EAST, chooseFileButton, -10, SpringLayout.EAST, panel);
-		chooseFileButton.setPreferredSize(new Dimension(25, 25));
-		panel.add(chooseFileButton);
-
-		choosenFileTextField = new JTextField();
-		choosenFileTextField.setEnabled(false);
-		sl_panel.putConstraint(SpringLayout.NORTH, choosenFileTextField, 5, SpringLayout.NORTH, panel);
-		sl_panel.putConstraint(SpringLayout.EAST, choosenFileTextField, -6, SpringLayout.WEST, chooseFileButton);
-		sl_panel.putConstraint(SpringLayout.WEST, choosenFileTextField, 10, SpringLayout.WEST, panel);
-		choosenFileTextField.setPreferredSize(new Dimension(250, 25));
-		choosenFileTextField.setEditable(false);
-		panel.add(choosenFileTextField);
 
 		JPanel southPanel = new JPanel();
 		southPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
@@ -158,13 +127,6 @@ public class WekaClusteringConfigurationPanelView extends JPanel {
 		return removeJobButton;
 	}
 
-	public JButton getChooseFileButton() {
-		return chooseFileButton;
-	}
-
-	public JTextField getChoosenFileTextField() {
-		return choosenFileTextField;
-	}
 	public JButton getBtnClearAll() {
 		return btnClearAll;
 	}

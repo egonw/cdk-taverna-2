@@ -92,7 +92,8 @@ public class QSARVectorGeneratorActivityTest extends CDKTavernaTestCases {
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(descriptorActivity.OUTPUT_PORTS[0], byte[].class);
 		expectedOutputTypes.put(descriptorActivity.OUTPUT_PORTS[1], String.class);
-		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(descriptorActivity, inputs, expectedOutputTypes);
+		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(descriptorActivity, inputs,
+				expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
 		inputs.put(generatorActivity.INPUT_PORTS[0], outputs.get(descriptorActivity.OUTPUT_PORTS[0]));
 		expectedOutputTypes = new HashMap<String, Class<?>>();
@@ -100,7 +101,8 @@ public class QSARVectorGeneratorActivityTest extends CDKTavernaTestCases {
 		expectedOutputTypes.put(generatorActivity.OUTPUT_PORTS[1], byte[].class);
 		outputs = ActivityInvoker.invokeAsyncActivity(generatorActivity, inputs, expectedOutputTypes);
 		byte[] vectorData = (byte[]) outputs.get(generatorActivity.OUTPUT_PORTS[0]);
-		Map<UUID, Map<String, Object>> resultVector = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(vectorData);
+		Map<UUID, Map<String, Object>> resultVector = (Map<UUID, Map<String, Object>>) CDKObjectHandler
+				.getObject(vectorData);
 		Assert.assertEquals(10, resultVector.size());
 		byte[] nameData = (byte[]) outputs.get(generatorActivity.OUTPUT_PORTS[1]);
 		ArrayList<String> resultNames = (ArrayList<String>) CDKObjectHandler.getObject(nameData);

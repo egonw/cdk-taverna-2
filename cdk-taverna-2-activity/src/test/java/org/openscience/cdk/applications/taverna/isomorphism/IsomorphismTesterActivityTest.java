@@ -77,8 +77,8 @@ public class IsomorphismTesterActivityTest extends CDKTavernaTestCases {
 		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
 		List<CMLChemFile> calcStructures = CDKObjectHandler.getChemFileList((List<byte[]>) outputs
 				.get(activity.OUTPUT_PORTS[0]));
-		List<CMLChemFile> notCalcStructures = CDKObjectHandler.getChemFileList((List<byte[]>) outputs.get(activity
-				.OUTPUT_PORTS[1]));
+		List<CMLChemFile> notCalcStructures = CDKObjectHandler.getChemFileList((List<byte[]>) outputs
+				.get(activity.OUTPUT_PORTS[1]));
 		Assert.assertEquals(1, calcStructures.size());
 		Assert.assertEquals(9, notCalcStructures.size());
 	}

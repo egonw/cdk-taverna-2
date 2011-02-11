@@ -66,8 +66,8 @@ public class LoopSDFileReaderActivityTest extends CDKTavernaTestCases {
 		activity.configure(configBean);
 		// leave empty. No ports used
 		Map<String, Object> inputs = new HashMap<String, Object>();
-		String file = "src" + File.separator + "test" + File.separator + "resources" + File.separator
-				+ "data" + File.separator + "mol" + File.separator + "sdfile.sdf";
+		String file = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
+				+ File.separator + "mol" + File.separator + "sdfile.sdf";
 		inputs.put(this.activity.INPUT_PORTS[0], file);
 		inputs.put(this.activity.INPUT_PORTS[1], 1);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();

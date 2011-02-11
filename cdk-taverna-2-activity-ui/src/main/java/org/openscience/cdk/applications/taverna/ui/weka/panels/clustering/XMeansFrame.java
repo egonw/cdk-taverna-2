@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SpringLayout;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
 import org.openscience.cdk.applications.taverna.ui.weka.WekaClusteringConfigurationPanelController;
@@ -37,7 +38,6 @@ import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractConfigura
 
 import weka.clusterers.Clusterer;
 import weka.clusterers.XMeans;
-import javax.swing.SwingConstants;
 
 /**
  * XMeans clusterer configuration frame.

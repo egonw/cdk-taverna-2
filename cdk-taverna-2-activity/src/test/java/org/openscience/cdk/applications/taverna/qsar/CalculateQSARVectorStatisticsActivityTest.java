@@ -31,7 +31,6 @@ import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
-import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 
 /**
@@ -61,8 +60,8 @@ public class CalculateQSARVectorStatisticsActivityTest extends CDKTavernaTestCas
 		loadActivity.configure(configBean);
 		// leave empty. No ports used
 		Map<String, Object> inputs = new HashMap<String, Object>();
-		File csvFile =  new File("src" + File.separator + "test" + File.separator + "resources"
-				+ File.separator + "data" + File.separator + "qsar" + File.separator + "notcuratedqsar.csv");
+		File csvFile = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
+				+ "data" + File.separator + "qsar" + File.separator + "notcuratedqsar.csv");
 		inputs.put(loadActivity.INPUT_PORTS[0], csvFile);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(loadActivity.OUTPUT_PORTS[0], byte[].class);

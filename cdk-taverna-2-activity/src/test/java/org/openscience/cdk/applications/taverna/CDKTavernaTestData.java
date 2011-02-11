@@ -37,8 +37,8 @@ import org.openscience.cdk.smiles.SmilesParser;
 
 /**
  * 
- * Class which provides default test data for the junit tests of cdk-taverna It also provides methods which can be useful for
- * debugging
+ * Class which provides default test data for the junit tests of cdk-taverna It
+ * also provides methods which can be useful for debugging
  * 
  */
 public class CDKTavernaTestData {
@@ -137,8 +137,8 @@ public class CDKTavernaTestData {
 	 */
 	private static void createTestData() throws Exception {
 		try {
-			smiles = new String[] { "CC", "OCC", "O(C)CCC", "c1=cc=cc=c1", "C(=C)=C", "OCC=CCc1=cc=cc=c1(C=C)", "O(CC=C)CCN",
-					"CCCCCCCCCCCCCCC", "OCC=CCO", "NCCCCN" };
+			smiles = new String[] { "CC", "OCC", "O(C)CCC", "c1=cc=cc=c1", "C(=C)=C", "OCC=CCc1=cc=cc=c1(C=C)",
+					"O(CC=C)CCN", "CCCCCCCCCCCCCCC", "OCC=CCO", "NCCCCN" };
 			numberOfAtomsFromSmilesTest = new int[] { 2, 3, 5, 6, 3, 13, 7, 15, 6, 6 };
 			// String[] smiles = new String[] {"OCC=CCc1ccccc1(C=C)"};
 			SmilesParser sp = new SmilesParser(DefaultChemObjectBuilder.getInstance());
@@ -155,48 +155,48 @@ public class CDKTavernaTestData {
 			if (file.exists()) {
 				cmlChemFileWith3DCoordinates = CDKIOReader.readFromMDLFile(path);
 			}
-			path = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data" + File.separator
-					+ "rxn" + File.separator + "reactionevaluation-reaction.rxn";
+			path = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
+					+ File.separator + "rxn" + File.separator + "reactionevaluation-reaction.rxn";
 			file = new File(path);
 			if (file.exists()) {
 				reactionEvaluationReaction = CDKIOReader.readRXNV2000File(path);
 			}
-			path = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data" + File.separator
-					+ "sdf" + File.separator + "reactionevaluationedukt1a1-3.sdf";
+			path = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
+					+ File.separator + "sdf" + File.separator + "reactionevaluationedukt1a1-3.sdf";
 			file = new File(path);
 			if (file.exists()) {
 				reactionEvaluationEductOne = CDKIOReader.readFromSDV2000File(path);
 				reactionEvaluationEductOne = CMLChemFileWrapper
 						.wrapChemModelArrayInResolvedChemModelArray(reactionEvaluationEductOne);
 			}
-			path = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data" + File.separator
-					+ "sdf" + File.separator + "reactionevaluationedukt2B1-3.sdf";
+			path = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
+					+ File.separator + "sdf" + File.separator + "reactionevaluationedukt2B1-3.sdf";
 			file = new File(path);
 			if (file.exists()) {
 				reactionEvaluationEductTwo = CDKIOReader.readFromSDV2000File(path);
 				reactionEvaluationEductTwo = CMLChemFileWrapper
 						.wrapChemModelArrayInResolvedChemModelArray(reactionEvaluationEductTwo);
 			}
-			path = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data" + File.separator
-					+ "sdf" + File.separator + "ConnectivityCheckSample.sdf";
+			path = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
+					+ File.separator + "sdf" + File.separator + "ConnectivityCheckSample.sdf";
 			file = new File(path);
 			if (file.exists()) {
 				connectivityCheckSample = CDKIOReader.readFromMDLV2000File(path);
 			}
-			path = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data" + File.separator
-					+ "sdf" + File.separator + "strangeElement.sdf";
+			path = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
+					+ File.separator + "sdf" + File.separator + "strangeElement.sdf";
 			file = new File(path);
 			if (file.exists()) {
 				cmlStrangeChemFile = CDKIOReader.readFromMDLV2000File(path);
 			}
-			path = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data" + File.separator
-					+ "sdf" + File.separator + "AtomSignatureTest.sdf";
+			path = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
+					+ File.separator + "sdf" + File.separator + "AtomSignatureTest.sdf";
 			file = new File(path);
 			if (file.exists()) {
 				atomSignatureSample = CDKIOReader.readFromMDLV2000File(path);
 			}
-			path = "." + File.separator + "target" + File.separator + "test-classes" + File.separator + "data" + File.separator
-					+ "sdf" + File.separator + "reactionevaluationresult-a1-3b1-3.sdf";
+			path = "." + File.separator + "target" + File.separator + "test-classes" + File.separator + "data"
+					+ File.separator + "sdf" + File.separator + "reactionevaluationresult-a1-3b1-3.sdf";
 			file = new File(path);
 			if (file.exists()) {
 				reactionEvaluationResult = CDKIOReader.readFromSDV2000File(path);
@@ -226,7 +226,8 @@ public class CDKTavernaTestData {
 	}
 
 	/**
-	 * Method which returns a test set of smiles which is used to test the cdk-taverna processors
+	 * Method which returns a test set of smiles which is used to test the
+	 * cdk-taverna processors
 	 * 
 	 * @return list 10 smiles
 	 * @throws Exception
@@ -271,7 +272,8 @@ public class CDKTavernaTestData {
 	 *            The original CMLChemFile
 	 * @param chemFileToCompare
 	 *            The CMLChemFile to compare
-	 * @return A string which contains all lines of the of the cml which were missing in the compared file or in the original file
+	 * @return A string which contains all lines of the of the cml which were
+	 *         missing in the compared file or in the original file
 	 * @throws Exception
 	 */
 	public static String diffCMLChemFile(CMLChemFile chemFileOriginal, CMLChemFile chemFileToCompare) throws Exception {

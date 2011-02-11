@@ -69,7 +69,7 @@ public class WekaClusteringConfigurationPanelController extends
 	private List<Integer> jobClustererIdx = new ArrayList<Integer>();
 	private List<String[]> jobOptions = new ArrayList<String[]>();
 	private boolean isChanged = false;
-	private File file = null;
+//	private File file = null;
 	private volatile static int jobID = 0;
 	private static HashSet<Integer> usedIDs = new HashSet<Integer>();
 	
@@ -86,22 +86,22 @@ public class WekaClusteringConfigurationPanelController extends
 		}
 	};
 	
-	/**
-	 * Action for the choose file button.
-	 */
-	private ActionListener chooseFileAction = new ActionListener() {
-		
-		public void actionPerformed(ActionEvent e) {
-			JFileChooser openDialog = new JFileChooser(new File(DataStreamController.getInstance().getCurrentDirectory()));
-			openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			if (openDialog.showOpenDialog(view) == JFileChooser.APPROVE_OPTION) {
-				DataStreamController.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
-				file = openDialog.getSelectedFile();
-				view.getChoosenFileTextField().setText(file.getPath());
-				isChanged = true;
-			}
-		}
-	};
+//	/**
+//	 * Action for the choose file button.
+//	 */
+//	private ActionListener chooseFileAction = new ActionListener() {
+//		
+//		public void actionPerformed(ActionEvent e) {
+//			JFileChooser openDialog = new JFileChooser(new File(DataStreamController.getInstance().getCurrentDirectory()));
+//			openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+//			if (openDialog.showOpenDialog(view) == JFileChooser.APPROVE_OPTION) {
+//				DataStreamController.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
+//				file = openDialog.getSelectedFile();
+//				view.getChoosenFileTextField().setText(file.getPath());
+//				isChanged = true;
+//			}
+//		}
+//	};
 
 	/**
 	 * Action for the remove job button.
@@ -178,8 +178,8 @@ public class WekaClusteringConfigurationPanelController extends
 			ClassLoader cld = getClass().getClassLoader();
 			URL url = cld.getResources("icons/open.gif").nextElement();
 			ImageIcon icon = new ImageIcon(url);
-			this.view.getChooseFileButton().setIcon(icon);
-			this.view.getChooseFileButton().addActionListener(this.chooseFileAction);
+//			this.view.getChooseFileButton().setIcon(icon);
+//			this.view.getChooseFileButton().addActionListener(this.chooseFileAction);
 			this.view.getBtnClearAll().addActionListener(this.clearAllAction);
 			this.add(this.view);
 			this.refreshConfiguration();
@@ -197,10 +197,10 @@ public class WekaClusteringConfigurationPanelController extends
 			JOptionPane.showMessageDialog(this, "Please add jobs!", "Nothing ToDo", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
-		if (this.file == null || !this.file.exists()) {
-			JOptionPane.showMessageDialog(this, "Please choose valid directory!", "Error", JOptionPane.ERROR_MESSAGE);
-			return false;
-		}
+//		if (this.file == null || !this.file.exists()) {
+//			JOptionPane.showMessageDialog(this, "Please choose valid directory!", "Error", JOptionPane.ERROR_MESSAGE);
+//			return false;
+//		}
 		return true;
 	}
 
@@ -226,7 +226,7 @@ public class WekaClusteringConfigurationPanelController extends
 			data += ";";
 		}
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CLUSTERING_JOB_DATA, data);
-		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.file);
+//		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.file);
 		this.isChanged = false;
 	}
 
@@ -258,11 +258,11 @@ public class WekaClusteringConfigurationPanelController extends
 			}
 		}
 		this.showJobData();
-		File file = (File) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (file != null) {
-			this.file = file;
-			view.getChoosenFileTextField().setText(file.getPath());
-		}
+//		File file = (File) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+//		if (file != null) {
+//			this.file = file;
+//			view.getChoosenFileTextField().setText(file.getPath());
+//		}
 	}
 
 	/**

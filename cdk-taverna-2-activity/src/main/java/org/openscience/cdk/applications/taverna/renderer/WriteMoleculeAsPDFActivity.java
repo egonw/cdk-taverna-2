@@ -38,7 +38,6 @@ import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.basicutilities.Tools;
-import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
@@ -49,7 +48,7 @@ import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
  * @author Andreas Truszkowski
  * 
  */
-public class WriteMoleculeAsPDFActivity extends AbstractCDKActivity implements IFileWriter {
+public class WriteMoleculeAsPDFActivity extends AbstractCDKActivity {
 
 	private static final String WRITE_MOLECULE_AS_PDF_ACTIVITY = "Write Molecule As PDF";
 

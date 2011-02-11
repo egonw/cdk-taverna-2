@@ -146,8 +146,8 @@ public abstract class AbstractDescriptorTestCase extends CDKTavernaTestCases {
 		boolean notCalculatedResults = false;
 		if (resultListNOTCalculatedStructures.size() != 0) {
 			notCalculatedResults = true;
-			CDKIOFileWriter.writeListOfCMLChemFilesToFile(resultListNOTCalculatedStructures, activityName + "Problem.txt",
-					CDKTavernaTestData.getPathForWritingFilesOfUnitTests(false));
+			CDKIOFileWriter.writeListOfCMLChemFilesToFile(resultListNOTCalculatedStructures, activityName
+					+ "Problem.txt", CDKTavernaTestData.getPathForWritingFilesOfUnitTests(false));
 		}
 		assertEquals(false, notCalculatedResults);
 	}

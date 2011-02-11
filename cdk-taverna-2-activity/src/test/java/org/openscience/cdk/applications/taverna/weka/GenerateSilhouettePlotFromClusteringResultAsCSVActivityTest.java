@@ -38,7 +38,8 @@ import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator
 import org.openscience.cdk.applications.taverna.setup.SetupController;
 
 /**
- * Test class for the generate silhouette plot from clustering result as CSV activity.
+ * Test class for the generate silhouette plot from clustering result as CSV
+ * activity.
  * 
  * @author Andreas Truszkowski
  * 

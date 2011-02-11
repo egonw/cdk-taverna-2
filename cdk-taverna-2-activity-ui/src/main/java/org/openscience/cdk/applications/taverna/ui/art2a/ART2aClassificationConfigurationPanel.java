@@ -1,12 +1,5 @@
 package org.openscience.cdk.applications.taverna.ui.art2a;
 
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.net.URL;
-
-import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityConfigurationPanel;
@@ -16,7 +9,6 @@ import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.iterativeio.DataStreamController;
 
 public class ART2aClassificationConfigurationPanel extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
@@ -25,28 +17,29 @@ public class ART2aClassificationConfigurationPanel extends
 	private ART2aView view = null;
 	private AbstractCDKActivity activity;
 	private CDKActivityConfigurationBean configBean;
-	private File file = null;
 
-	private AbstractAction chooseFileAction = new AbstractAction() {
+	//	private File file = null;
 
-		private static final long serialVersionUID = 2594222854083984583L;
+	//	private AbstractAction chooseFileAction = new AbstractAction() {
+	//
+	//		private static final long serialVersionUID = 2594222854083984583L;
+	//
+	//		public void actionPerformed(ActionEvent e) {
+	//			JFileChooser openDialog = new JFileChooser(new File(DataStreamController.getInstance().getCurrentDirectory()));
+	//			openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	//			if (openDialog.showOpenDialog(ART2aClassificationConfigurationPanel.this) == JFileChooser.APPROVE_OPTION) {
+	//				DataStreamController.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
+	//				ART2aClassificationConfigurationPanel.this.file = openDialog.getSelectedFile();
+	//				ART2aClassificationConfigurationPanel.this.showValue();
+	//			}
+	//		}
+	//	};
 
-		public void actionPerformed(ActionEvent e) {
-			JFileChooser openDialog = new JFileChooser(new File(DataStreamController.getInstance().getCurrentDirectory()));
-			openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			if (openDialog.showOpenDialog(ART2aClassificationConfigurationPanel.this) == JFileChooser.APPROVE_OPTION) {
-				DataStreamController.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
-				ART2aClassificationConfigurationPanel.this.file = openDialog.getSelectedFile();
-				ART2aClassificationConfigurationPanel.this.showValue();
-			}
-		}
-	};
-
-	private void showValue() {
-		this.view.getPathTextField().setText(this.file.getPath());
-		this.view.getPathTextField().repaint();
-		this.revalidate();
-	}
+	//	private void showValue() {
+	//		this.view.getPathTextField().setText(this.file.getPath());
+	//		this.view.getPathTextField().repaint();
+	//		this.revalidate();
+	//	}
 
 	public ART2aClassificationConfigurationPanel(AbstractCDKActivity activity) {
 		this.activity = activity;
@@ -72,11 +65,11 @@ public class ART2aClassificationConfigurationPanel extends
 			boolean scaleFingerprintItems = (Boolean) this.configBean
 					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_SCALE_FINGERPRINT_ITEMS);
 			this.view.getScaleFingerprintItemsCheckBox().setSelected(scaleFingerprintItems);
-			this.view.getPathButton().addActionListener(this.chooseFileAction);
-			ClassLoader cld = getClass().getClassLoader();
-			URL url = cld.getResources("icons/open.gif").nextElement();
-			ImageIcon icon = new ImageIcon(url);
-			this.view.getPathButton().setIcon(icon);
+			//			this.view.getPathButton().addActionListener(this.chooseFileAction);
+//			ClassLoader cld = getClass().getClassLoader();
+//			URL url = cld.getResources("icons/open.gif").nextElement();
+//			ImageIcon icon = new ImageIcon(url);
+//			this.view.getPathButton().setIcon(icon);
 			this.add(this.view);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_DURING_ACTIVITY_CONFIGURATION,
@@ -118,11 +111,12 @@ public class ART2aClassificationConfigurationPanel extends
 		if (scaleFingerprintItemsCurrent != scaleFingerprintItems) {
 			return true;
 		}
-		if (this.file == null) {
-			return false;
-		}
-		File file = (File) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		return !this.file.equals(file);
+		return false;
+		//		if (this.file == null) {
+		//			return false;
+		//		}
+		//		File file = (File) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+		//		return !this.file.equals(file);
 	}
 
 	@Override
@@ -134,17 +128,19 @@ public class ART2aClassificationConfigurationPanel extends
 	public void noteConfiguration() {
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
 		int numberOfClassifications = Integer.parseInt(this.view.getNumberOfClassificationsTextField().getText());
-		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_CLASSIFICATIONS, numberOfClassifications);
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_CLASSIFICATIONS,
+				numberOfClassifications);
 		double upperVigilanceLimit = Double.parseDouble(this.view.getUpperVigilanceLimitTextField().getText());
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_UPPER_VIGILANCE_LIMIT, upperVigilanceLimit);
 		double lowerVigilanceLimit = Double.parseDouble(this.view.getLowerVigilanceLimitTextField().getText());
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_LOWER_VIGILANCE_LIMIT, lowerVigilanceLimit);
 		int maximumClassificationTime = Integer.parseInt(this.view.getMaximumClassificationTimeTextField().getText());
-		this.configBean
-				.addAdditionalProperty(CDKTavernaConstants.PROPERTY_MAXIMUM_CLASSIFICATION_TIME, maximumClassificationTime);
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_MAXIMUM_CLASSIFICATION_TIME,
+				maximumClassificationTime);
 		boolean scaleFingerprintItems = this.view.getScaleFingerprintItemsCheckBox().isSelected();
-		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_SCALE_FINGERPRINT_ITEMS, scaleFingerprintItems);
-		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.file);
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_SCALE_FINGERPRINT_ITEMS,
+				scaleFingerprintItems);
+		//		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.file);
 	}
 
 	@Override
@@ -164,11 +160,11 @@ public class ART2aClassificationConfigurationPanel extends
 		boolean scaleFingerprintItems = (Boolean) this.configBean
 				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_SCALE_FINGERPRINT_ITEMS);
 		this.view.getScaleFingerprintItemsCheckBox().setSelected(scaleFingerprintItems);
-		this.file = (File) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (this.file != null) {
-			this.view.getPathTextField().setText(this.file.getAbsolutePath());
-			this.view.getPathTextField().repaint();
-		}
+		//		this.file = (File) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+		//		if (this.file != null) {
+		//			this.view.getPathTextField().setText(this.file.getAbsolutePath());
+		//			this.view.getPathTextField().repaint();
+		//		}
 	}
 
 	@Override
@@ -178,7 +174,8 @@ public class ART2aClassificationConfigurationPanel extends
 			if (numberOfClassifications < 0) {
 				throw new CDKTavernaException(this.getClass().getSimpleName(), "Invalid Number");
 			}
-			int maximumClassificationTime = Integer.parseInt(this.view.getMaximumClassificationTimeTextField().getText());
+			int maximumClassificationTime = Integer.parseInt(this.view.getMaximumClassificationTimeTextField()
+					.getText());
 			if (maximumClassificationTime < 0) {
 				throw new CDKTavernaException(this.getClass().getSimpleName(), "Invalid Number");
 			}
@@ -196,17 +193,18 @@ public class ART2aClassificationConfigurationPanel extends
 				throw new CDKTavernaException(this.getClass().getSimpleName(), "Invalid Number");
 			}
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(this, "Please enter a valid floating point number number beetween 0.0 and 1.0!",
-					"Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this,
+					"Please enter a valid floating point number number beetween 0.0 and 1.0!", "Error",
+					JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
-
-		if (this.file != null && this.file.exists()) {
-			return true;
-		}
-		JOptionPane.showMessageDialog(this, "Chosen directory is not valid!", "Invalid directory", JOptionPane.ERROR_MESSAGE);
-		// Not valid, return false
-		return false;
+		return true;
+		//		if (this.file != null && this.file.exists()) {
+		//			return true;
+		//		}
+		//		JOptionPane.showMessageDialog(this, "Chosen directory is not valid!", "Invalid directory", JOptionPane.ERROR_MESSAGE);
+		//		// Not valid, return false
+		//		return false;
 	}
 
 }

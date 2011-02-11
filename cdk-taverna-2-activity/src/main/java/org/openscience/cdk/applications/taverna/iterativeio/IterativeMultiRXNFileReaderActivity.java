@@ -42,7 +42,6 @@ import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 
 /**
@@ -51,7 +50,7 @@ import org.openscience.cdk.io.MDLV2000Reader;
  * @author Andreas Truszkowski
  * 
  */
-public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity implements IIterativeFileReader {
+public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity {
 
 	public static final String ITERATIVE_MULTI_RXN_FILE_READER_ACTIVITY = "Iterative Multi RXN File Reader";
 

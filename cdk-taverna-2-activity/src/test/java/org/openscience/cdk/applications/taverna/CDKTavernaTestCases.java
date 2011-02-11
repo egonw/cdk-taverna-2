@@ -35,7 +35,8 @@ import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.tools.LoggingTool;
 
 /**
- * Super class for <b>all</b> CDK-Taverna TestCase implementations that ensures that the LoggingTool is configured.
+ * Super class for <b>all</b> CDK-Taverna TestCase implementations that ensures
+ * that the LoggingTool is configured.
  * 
  * 
  */

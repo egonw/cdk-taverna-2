@@ -34,7 +34,6 @@ import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 import org.junit.Assert;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
-import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 
@@ -73,7 +72,8 @@ public class CSVToQSARVectorActivityTest extends CDKTavernaTestCases {
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
 		byte[] objectData = (byte[]) outputs.get(activity.OUTPUT_PORTS[0]);
-		Map<UUID, Map<String, Object>> vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(objectData);
+		Map<UUID, Map<String, Object>> vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler
+				.getObject(objectData);
 		Assert.assertEquals(9, vectorMap.size());
 		objectData = (byte[]) outputs.get(activity.OUTPUT_PORTS[1]);
 		ArrayList<String> descriptorNames = (ArrayList<String>) CDKObjectHandler.getObject(objectData);

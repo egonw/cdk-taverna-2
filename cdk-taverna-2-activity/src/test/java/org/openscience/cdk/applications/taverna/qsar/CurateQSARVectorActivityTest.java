@@ -67,7 +67,7 @@ public class CurateQSARVectorActivityTest extends CDKTavernaTestCases {
 		loadActivity.configure(configBean);
 		// leave empty. No ports used
 		Map<String, Object> inputs = new HashMap<String, Object>();
-		File csvFile =  new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
+		File csvFile = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
 				+ "data" + File.separator + "qsar" + File.separator + "qsar.csv");
 		inputs.put(loadActivity.INPUT_PORTS[0], csvFile);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
@@ -86,7 +86,8 @@ public class CurateQSARVectorActivityTest extends CDKTavernaTestCases {
 			outputs = ActivityInvoker.invokeAsyncActivity(curateActivity, inputs, expectedOutputTypes);
 			Assert.assertEquals("Unexpected outputs", 2, outputs.size());
 			byte[] objectData = (byte[]) outputs.get(curateActivity.OUTPUT_PORTS[0]);
-			Map<UUID, Map<String, Object>> vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler.getObject(objectData);
+			Map<UUID, Map<String, Object>> vectorMap = (Map<UUID, Map<String, Object>>) CDKObjectHandler
+					.getObject(objectData);
 			Assert.assertEquals(vectorMapAsserts[i], vectorMap.size());
 			objectData = (byte[]) outputs.get(curateActivity.OUTPUT_PORTS[1]);
 			ArrayList<String> descriptorNames = (ArrayList<String>) CDKObjectHandler.getObject(objectData);

@@ -90,7 +90,7 @@ public class WekaClusteringActivityTest extends CDKTavernaTestCases {
 		wekaClusteringActivity.configure(clusteringConfigBean);
 		// load QSAR vectors
 		Map<String, Object> inputs = new HashMap<String, Object>();
-		File csvFile =  new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
+		File csvFile = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
 				+ "data" + File.separator + "qsar" + File.separator + "curatedQSARbig.csv");
 		inputs.put(loadActivity.INPUT_PORTS[0], csvFile);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
@@ -121,7 +121,8 @@ public class WekaClusteringActivityTest extends CDKTavernaTestCases {
 		WekaTools tool = new WekaTools();
 		for (int i = 0; i < 5; i++) {
 			// Load clusterer
-			ObjectInputStream reader = new ObjectInputStream(new BufferedInputStream(new FileInputStream(files.get(2 + i))));
+			ObjectInputStream reader = new ObjectInputStream(new BufferedInputStream(new FileInputStream(
+					files.get(2 + i))));
 			Clusterer clusterer = (Clusterer) reader.readObject();
 			reader.close();
 			// load data

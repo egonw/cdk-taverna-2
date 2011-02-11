@@ -2,7 +2,6 @@ package org.openscience.cdk.applications.taverna.ui.art2a;
 
 import java.awt.Dimension;
 
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -18,12 +17,10 @@ public class ART2aView extends JPanel {
 	private JTextField lowerVigilanceLimitTextField;
 	private JTextField maximumClassificationTimeTextField;
 	private JCheckBox scaleFingerprintItemsCheckBox;
-	private JTextField pathTextField;
-	private JButton pathButton;
 
 	public ART2aView() {
 		setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		setPreferredSize(new Dimension(420, 147));
+		setPreferredSize(new Dimension(420, 106));
 		SpringLayout springLayout = new SpringLayout();
 		setLayout(springLayout);
 
@@ -101,24 +98,6 @@ public class ART2aView extends JPanel {
 				lblMaximumClassificationTimew);
 		add(maximumClassificationTimeTextField);
 		maximumClassificationTimeTextField.setColumns(10);
-
-		pathTextField = new JTextField();
-		pathTextField.setEditable(false);
-		springLayout.putConstraint(SpringLayout.NORTH, pathTextField, -35, SpringLayout.SOUTH, this);
-		springLayout.putConstraint(SpringLayout.WEST, pathTextField, 10, SpringLayout.WEST, this);
-		springLayout.putConstraint(SpringLayout.SOUTH, pathTextField, -10, SpringLayout.SOUTH, this);
-		add(pathTextField);
-		pathTextField.setColumns(10);
-
-		pathButton = new JButton("");
-		pathButton.setBorderPainted(false);
-		pathButton.setContentAreaFilled(false);
-		springLayout.putConstraint(SpringLayout.NORTH, pathButton, -35, SpringLayout.SOUTH, this);
-		springLayout.putConstraint(SpringLayout.SOUTH, pathButton, -10, SpringLayout.SOUTH, this);
-		springLayout.putConstraint(SpringLayout.EAST, pathTextField, -10, SpringLayout.WEST, pathButton);
-		springLayout.putConstraint(SpringLayout.WEST, pathButton, -35, SpringLayout.EAST, this);
-		springLayout.putConstraint(SpringLayout.EAST, pathButton, -10, SpringLayout.EAST, this);
-		add(pathButton);
 	}
 
 	public JTextField getNumberOfClassificationsTextField() {
@@ -141,11 +120,4 @@ public class ART2aView extends JPanel {
 		return maximumClassificationTimeTextField;
 	}
 
-	public JTextField getPathTextField() {
-		return pathTextField;
-	}
-
-	public JButton getPathButton() {
-		return pathButton;
-	}
 }

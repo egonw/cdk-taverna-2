@@ -37,7 +37,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.basicutilities.Tools;
-import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
 
 /**
  * Class which represents the write reaction as pdf activitiy. Saves reaction
@@ -46,7 +45,7 @@ import org.openscience.cdk.applications.taverna.interfaces.IFileWriter;
  * @author Andreas Truszkowski
  * 
  */
-public class WriteReactionAsPDFActivity extends AbstractCDKActivity implements IFileWriter {
+public class WriteReactionAsPDFActivity extends AbstractCDKActivity {
 
 	private static final String WRITE_REACTION_AS_PDF_ACTIVITY = "Write Reaction As PDF";
 

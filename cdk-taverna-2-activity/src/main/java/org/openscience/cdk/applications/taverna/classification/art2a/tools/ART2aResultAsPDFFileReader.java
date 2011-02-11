@@ -30,6 +30,10 @@ import java.util.TreeMap;
 
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
+
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.openscience.cdk.applications.art2aclassification.Art2aClassificator;
@@ -39,7 +43,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ChartTool;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
-import org.openscience.cdk.applications.taverna.interfaces.IFileReader;
 import org.openscience.cdk.applications.taverna.io.XMLFileIO;
 
 /**
@@ -49,7 +52,7 @@ import org.openscience.cdk.applications.taverna.io.XMLFileIO;
  * @author Andreas Truzskowski
  * 
  */
-public class ART2aResultAsPDFFileReader extends AbstractCDKActivity implements IFileReader {
+public class ART2aResultAsPDFFileReader extends AbstractCDKActivity {
 
 	public static final String ART2A_RESULT_AS_PDF_FILE_READER_ACTIVITY = "ART-2a Result As PDF File Reader";
 
@@ -57,26 +60,27 @@ public class ART2aResultAsPDFFileReader extends AbstractCDKActivity implements I
 	 * Creates a new instance.
 	 */
 	public ART2aResultAsPDFFileReader() {
-		// empty
+		this.INPUT_PORTS = new String[] { "Files" }; 
+		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		// empty
+		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+		expectedReferences.add(FileReference.class);
+		expectedReferences.add(InlineStringReference.class);
+		addInput(this.INPUT_PORTS[0], 1, false, expectedReferences, null);
 	}
 
 	@Override
 	protected void addOutputPorts() {
-		// empty
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@Override
-	public void work() throws CDKTavernaException {
+	public void work() throws Exception {
 		// Get input
-		File[] files = (File[]) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (files == null || files.length == 0) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
-		}
+		List<File> files = this.getInputAsFileList(this.INPUT_PORTS[0]);
 		// Do work
 		List<String> resultFileNames = new ArrayList<String>();
 		List<String> pdfTitle = new ArrayList<String>();
@@ -142,7 +146,7 @@ public class ART2aResultAsPDFFileReader extends AbstractCDKActivity implements I
 				charts.add(chartTool.createBarChart(buffer.toString(), "(Class number/Number Of Vectors/Interangle)",
 						"Number Of Vectors", dataSet));
 			}
-			File file = FileNameGenerator.getNewFile(files[0].getParent(), ".pdf", "Art2aClassificationResult");
+			File file = FileNameGenerator.getNewFile(files.get(0).getParent(), ".pdf", "Art2aClassificationResult");
 			chartTool.writeChartAsPDF(file, charts);
 			resultFileNames.add(file.getAbsolutePath());
 		} catch (Exception e) {
@@ -150,6 +154,8 @@ public class ART2aResultAsPDFFileReader extends AbstractCDKActivity implements I
 					this.getActivityName(), e);
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_ART2A_RESULT_ERROR);
 		}
+		// Set output 
+		this.setOutputAsStringList(resultFileNames, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override

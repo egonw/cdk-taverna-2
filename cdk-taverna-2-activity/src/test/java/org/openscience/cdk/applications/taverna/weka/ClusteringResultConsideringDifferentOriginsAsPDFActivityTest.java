@@ -61,15 +61,16 @@ public class ClusteringResultConsideringDifferentOriginsAsPDFActivityTest extend
 	private AbstractCDKActivity wekaDatasetActivity = new CreateWekaDatasetFromQSARVectorActivity();
 
 	public ClusteringResultConsideringDifferentOriginsAsPDFActivityTest() {
-		super(ClusteringResultConsideringDifferentOriginsAsPDF.CLUSTERING_RESULT_CONSIDERING_DIFFERENT_ORIGINS_AS_PDF_ACTIVITY);
+		super(
+				ClusteringResultConsideringDifferentOriginsAsPDF.CLUSTERING_RESULT_CONSIDERING_DIFFERENT_ORIGINS_AS_PDF_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
 		this.configBean.setActivityName(this.wekaActivity.getActivityName());
 		this.dir = new File(SetupController.getInstance().getWorkingDir());
-		File relationFile = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
-				+ File.separator + "weka" + File.separator + "relationtable.txt");
+		File relationFile = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
+				+ "data" + File.separator + "weka" + File.separator + "relationtable.txt");
 		LineNumberReader reader = new LineNumberReader(new FileReader(relationFile));
 		String line;
 		while ((line = reader.readLine()) != null) {

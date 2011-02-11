@@ -30,7 +30,6 @@ import junit.framework.TestSuite;
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 
 import org.junit.Assert;
-import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
@@ -72,8 +71,7 @@ public class ReactionEnumeratorActivityTest extends CDKTavernaTestCases {
 		chemFiles = CDKTavernaTestData.getReactionEvaluationEductTwo();
 		data = CDKObjectHandler.getBytesList(chemFiles);
 		inputs.put(ReactionEnumeratorActivity.REACTANT_PORT + " " + "2", data);
-		byte[] reactionData = CDKObjectHandler.getBytes(CDKTavernaTestData
-				.getReactionEvaluationReaction());
+		byte[] reactionData = CDKObjectHandler.getBytes(CDKTavernaTestData.getReactionEvaluationReaction());
 		inputs.put(ReactionEnumeratorActivity.REACTION_PORT, reactionData);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(ReactionEnumeratorActivity.RESULT_PORT, byte[].class);
