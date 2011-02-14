@@ -21,11 +21,16 @@
  */
 package org.openscience.cdk.applications.taverna.basicutilities;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
+
+import org.openscience.cdk.applications.taverna.setup.SetupController;
 
 /**
  * Class which controls the caching process.
@@ -35,6 +40,7 @@ import java.util.UUID;
  */
 public class CacheController {
 
+	private static final int BUFFER_SIZE = 2048;
 	private static final long MAX_FILESIZE = 4294967295L;
 	private static CacheController instance = null;
 
@@ -96,6 +102,60 @@ public class CacheController {
 	}
 
 	/**
+	 * Method used for data compression.
+	 * 
+	 * @param data
+	 *            Data to be compressed.
+	 * @return Compressed data.
+	 * @throws Exception
+	 */
+	private byte[] compressData(byte[] data) throws Exception {
+		// Compressor with default level of compression
+		Deflater compressor = new Deflater();
+		compressor.setLevel(Deflater.DEFAULT_COMPRESSION);
+		// Give the compressor the data to compress
+		compressor.setInput(data);
+		compressor.finish();
+		// Create an expandable byte array to hold the compressed data.
+		// It is not necessary that the compressed data will be smaller than
+		// the uncompressed data.
+		ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length);
+		// Compress the data
+		byte[] buf = new byte[BUFFER_SIZE];
+		while (!compressor.finished()) {
+			int count = compressor.deflate(buf);
+			bos.write(buf, 0, count);
+		}
+		bos.close();
+		// Get the compressed data
+		return bos.toByteArray();
+	}
+
+	/**
+	 * Method used for data decompression
+	 * 
+	 * @param data
+	 *            Compressed data
+	 * @return Decompressed data
+	 * @throws Exception
+	 */
+	private byte[] decompressData(byte[] data) throws Exception {
+		Inflater decompressor = new Inflater();
+		// Give the decompressor the data to decompress
+		decompressor.setInput(data);
+		ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length);
+		// Decompress the data
+		byte[] buf = new byte[BUFFER_SIZE];
+		while (!decompressor.finished()) {
+			int count = decompressor.inflate(buf);
+			bos.write(buf, 0, count);
+		}
+		bos.close();
+		// Get the decompressed data
+		return bos.toByteArray();
+	}
+
+	/**
 	 * Caches the given data on the file system.
 	 * 
 	 * @param data
@@ -104,17 +164,20 @@ public class CacheController {
 	 * @throws Exception
 	 */
 	public synchronized UUID cacheByteStream(byte[] data) throws Exception {
-		// Get cache file
+		boolean isDataCompression = SetupController.getInstance().isDataCompression();
 		File cacheFile = this.getCurrentCacheFile();
+		UUID dataID = UUID.randomUUID();
+		CacheObject cacheObj = new CacheObject();
+		if (isDataCompression) {
+			data = this.compressData(data);
+		}
 		long newSize = cacheFile.length() + data.length;
 		if (newSize >= MAX_FILESIZE) {
 			cacheFile = getNewCacheFile();
 		}
-		CacheObject cacheObj = new CacheObject();
 		cacheObj.offset = cacheFile.length();
 		cacheObj.size = data.length;
 		cacheObj.fileID = this.currentFileID;
-		UUID dataID = UUID.randomUUID();
 		FileOutputStream fos = new FileOutputStream(cacheFile, true);
 		fos.write(data);
 		fos.flush();
@@ -132,6 +195,7 @@ public class CacheController {
 	 * @throws Exception
 	 */
 	public synchronized byte[] uncacheByteStream(UUID uuid) throws Exception {
+		boolean isDataCompression = SetupController.getInstance().isDataCompression();
 		CacheObject cacheObj = this.cacheMap.get(uuid);
 		File cacheFile = this.getCacheFileByID(cacheObj.fileID);
 		byte[] data = new byte[cacheObj.size];
@@ -139,6 +203,9 @@ public class CacheController {
 		raf.seek(cacheObj.offset);
 		raf.read(data);
 		raf.close();
+		if (isDataCompression) {
+			data = this.decompressData(data);
+		}
 		return data;
 	}
 }

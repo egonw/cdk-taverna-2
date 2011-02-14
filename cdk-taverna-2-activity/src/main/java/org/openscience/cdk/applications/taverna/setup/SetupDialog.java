@@ -33,6 +33,7 @@ import javax.swing.SpringLayout;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JCheckBox;
+import javax.swing.border.TitledBorder;
 
 /**
  * Setup dialog
@@ -50,6 +51,7 @@ public class SetupDialog extends JDialog {
 	private JButton okButton;
 	private JButton cancelButton;
 	private JCheckBox chckbxCacheDatarecommended;
+	private JCheckBox chckbxCompessData;
 
 	/**
 	 * Create the dialog.
@@ -57,7 +59,7 @@ public class SetupDialog extends JDialog {
 	public SetupDialog() {
 		setModal(true);
 		setTitle("CDK-Taverna 2.0 Setup");
-		setBounds(100, 100, 450, 165);
+		setBounds(100, 100, 450, 225);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setResizable(false);
@@ -88,13 +90,29 @@ public class SetupDialog extends JDialog {
 		sl_contentPanel.putConstraint(SpringLayout.EAST, button, -10, SpringLayout.EAST, contentPanel);
 		contentPanel.add(button);
 		
-		chckbxCacheDatarecommended = new JCheckBox("Cache data (recommended)");
+		JPanel panel = new JPanel();
+		panel.setBorder(new TitledBorder(null, "Data Caching", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		sl_contentPanel.putConstraint(SpringLayout.NORTH, panel, 10, SpringLayout.SOUTH, workingDirectoryTextField);
+		sl_contentPanel.putConstraint(SpringLayout.WEST, panel, 10, SpringLayout.WEST, contentPanel);
+		sl_contentPanel.putConstraint(SpringLayout.SOUTH, panel, -10, SpringLayout.SOUTH, contentPanel);
+		sl_contentPanel.putConstraint(SpringLayout.EAST, panel, -10, SpringLayout.EAST, contentPanel);
+		contentPanel.add(panel);
+		SpringLayout sl_panel = new SpringLayout();
+		panel.setLayout(sl_panel);
+		
+		chckbxCacheDatarecommended = new JCheckBox("Use Data Caching (recommended)");
+		sl_contentPanel.putConstraint(SpringLayout.NORTH, chckbxCacheDatarecommended, 25, SpringLayout.NORTH, panel);
+		sl_contentPanel.putConstraint(SpringLayout.WEST, chckbxCacheDatarecommended, 127, SpringLayout.WEST, panel);
+		panel.add(chckbxCacheDatarecommended);
 		chckbxCacheDatarecommended.setToolTipText("Cache CDK-Taverna 2.0 data on hard disk instead of using the memory or the provenance database.");
 		chckbxCacheDatarecommended.setSelected(true);
-		sl_contentPanel.putConstraint(SpringLayout.NORTH, chckbxCacheDatarecommended, 10, SpringLayout.SOUTH, workingDirectoryTextField);
-		sl_contentPanel.putConstraint(SpringLayout.WEST, chckbxCacheDatarecommended, 0, SpringLayout.WEST, lblWorkingDirectrory);
 		sl_contentPanel.putConstraint(SpringLayout.EAST, chckbxCacheDatarecommended, 316, SpringLayout.WEST, contentPanel);
-		contentPanel.add(chckbxCacheDatarecommended);
+		
+		chckbxCompessData = new JCheckBox("Compess Data");
+		chckbxCompessData.setSelected(true);
+		sl_panel.putConstraint(SpringLayout.NORTH, chckbxCompessData, 6, SpringLayout.SOUTH, chckbxCacheDatarecommended);
+		sl_panel.putConstraint(SpringLayout.WEST, chckbxCompessData, 0, SpringLayout.WEST, panel);
+		panel.add(chckbxCompessData);
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
@@ -131,5 +149,8 @@ public class SetupDialog extends JDialog {
 	}
 	public JCheckBox getChckbxCacheDatarecommended() {
 		return chckbxCacheDatarecommended;
+	}
+	public JCheckBox getChckbxCompessData() {
+		return chckbxCompessData;
 	}
 }

@@ -38,16 +38,19 @@ import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator
 import org.openscience.cdk.applications.taverna.basicutilities.Tools;
 import org.openscience.cdk.applications.taverna.iterativeio.DataStreamController;
 
+import com.ibm.icu.lang.UCharacter.WordBreak;
+
 /**
  * Controls the properties of the CDK-Taverna 2.0 project.
  * 
  * @author Andreas Truszkowski
- *
+ * 
  */
 public class SetupController {
 
 	private static final String WORKING_DIRECTORY = "Working Directory";
 	private static final String IS_DATA_CACHING = "Is Data Caching";
+	private static final String IS_DATA_COMPRESSION = "Is Data Compression";
 
 	private SetupDialog view = null;
 	private static SetupController instance = null;
@@ -107,10 +110,13 @@ public class SetupController {
 		this.properties.setProperty(WORKING_DIRECTORY, workingDirFilename);
 		Boolean isDataCaching = false; // Most unit tests are not working with the caching
 		this.properties.setProperty(IS_DATA_CACHING, "" + isDataCaching);
+		Boolean isDataCompression = false; // Most unit tests are not working with the caching
+		this.properties.setProperty(IS_DATA_COMPRESSION, "" + isDataCompression);
 	}
 
 	/**
-	 * Loads the configuration or creates a new configuration file when not available.
+	 * Loads the configuration or creates a new configuration file when not
+	 * available.
 	 */
 	public synchronized void loadConfiguration() {
 		if (this.loaded) {
@@ -124,6 +130,11 @@ public class SetupController {
 		} else {
 			try {
 				this.properties.load(new FileReader(configFile));
+				if (this.properties.getProperty(IS_DATA_CACHING) == null
+						|| this.properties.getProperty(IS_DATA_COMPRESSION) == null
+						|| this.properties.getProperty(WORKING_DIRECTORY) == null) {
+					this.showConfigurationDialog();
+				}
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + configFile.getPath(),
 						this.getClass().getSimpleName(), e);
@@ -131,7 +142,6 @@ public class SetupController {
 			}
 		}
 	}
-
 
 	/**
 	 * Shows the configuration dialog and saves the properties to hard disk.
@@ -162,6 +172,11 @@ public class SetupController {
 			isDataCaching = true;
 			this.properties.setProperty(IS_DATA_CACHING, "" + isDataCaching);
 		}
+		Boolean isDataCompression = Boolean.parseBoolean(this.properties.getProperty(IS_DATA_CACHING));
+		if (isDataCompression == null) {
+			isDataCompression = true;
+			this.properties.setProperty(IS_DATA_COMPRESSION, "" + isDataCompression);
+		}
 		this.view.setVisible(true);
 	}
 
@@ -175,6 +190,8 @@ public class SetupController {
 		this.properties.setProperty(WORKING_DIRECTORY, workingDirFilename);
 		Boolean isDataCaching = this.view.getChckbxCacheDatarecommended().isSelected();
 		this.properties.setProperty(IS_DATA_CACHING, "" + isDataCaching);
+		Boolean isDataCompression = this.view.getChckbxCacheDatarecommended().isSelected();
+		this.properties.setProperty(IS_DATA_COMPRESSION, "" + isDataCompression);
 		try {
 			this.properties.store(new FileWriter(configFile), "CDK-Taverna 2.0 properties");
 		} catch (Exception e) {
@@ -201,5 +218,13 @@ public class SetupController {
 	public boolean isDataCaching() {
 		Boolean isDataCaching = Boolean.parseBoolean(this.properties.getProperty(IS_DATA_CACHING));
 		return isDataCaching;
+	}
+
+	/**
+	 * @return True - CDK-Taverna 2.0 caches the data instead of Taverna itself.
+	 */
+	public boolean isDataCompression() {
+		Boolean isDataCompression = Boolean.parseBoolean(this.properties.getProperty(IS_DATA_COMPRESSION));
+		return isDataCompression;
 	}
 }
