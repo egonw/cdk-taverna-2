@@ -36,7 +36,6 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.Tools;
@@ -117,7 +116,7 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 		if (this.descriptorsToDo == null || this.descriptorsToDo.isEmpty()) {
 			throw new CDKTavernaException(this.getActivityName(), "No QSAR descriptors chosen!");
 		}
-		List<byte[]> dataArray = this.getInputAsList(this.INPUT_PORTS[0], byte[].class);
+		List<CMLChemFile> chemFiles = this.getInputAsList(this.INPUT_PORTS[0], CMLChemFile.class);
 		// Do work
 		this.workToDoMap.clear();
 		this.availableDescriptorsSet.clear();
@@ -127,7 +126,6 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 		int numberOfCalculations = 0;
 		LinkedList<IAtomContainer> molecules = null;
 		try {
-			List<CMLChemFile> chemFiles = CDKObjectHandler.getChemFileList(dataArray);
 			molecules = new LinkedList<IAtomContainer>();
 			for (CMLChemFile chemFile : chemFiles) {
 				molecules.addAll(ChemFileManipulator.getAllAtomContainers(chemFile));
@@ -176,8 +174,8 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 			this.currentProgress = 0;
 		}
 		// Prepare worker
-		if (dataArray.size() < numberOfThreads) {
-			numberOfThreads = dataArray.size();
+		if (chemFiles.size() < numberOfThreads) {
+			numberOfThreads = chemFiles.size();
 		}
 		this.workers = new QSARDescriptorWorker[numberOfThreads];
 		for (int i = 0; i < numberOfThreads; i++) {

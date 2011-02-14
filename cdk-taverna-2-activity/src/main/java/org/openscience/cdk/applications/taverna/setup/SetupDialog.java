@@ -1,3 +1,24 @@
+/*
+ * Copyright (C) 2011 by Andreas Truszkowski <ATruszkowski@gmx.de>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1
+ * of the License, or (at your option) any later version.
+ * All we ask is that proper credit is given for our work, which includes
+ * - but is not limited to - adding the above copyright notice to the beginning
+ * of your source code files, and to any copyright notice that you may distribute
+ * with programs based on this work.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ */
 package org.openscience.cdk.applications.taverna.setup;
 
 import java.awt.BorderLayout;
@@ -13,6 +34,12 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JCheckBox;
 
+/**
+ * Setup dialog
+ * 
+ * @author Andreas Truszkowski
+ *
+ */
 public class SetupDialog extends JDialog {
 
 	private static final long serialVersionUID = 8323781543039721448L;
@@ -23,19 +50,6 @@ public class SetupDialog extends JDialog {
 	private JButton okButton;
 	private JButton cancelButton;
 	private JCheckBox chckbxCacheDatarecommended;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			SetupDialog dialog = new SetupDialog();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	/**
 	 * Create the dialog.

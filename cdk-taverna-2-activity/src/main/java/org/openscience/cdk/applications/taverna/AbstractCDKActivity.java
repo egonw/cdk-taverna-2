@@ -39,10 +39,12 @@ import net.sf.taverna.t2.reference.impl.external.file.FileReference;
 import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
+import org.openscience.cdk.applications.taverna.basicutilities.CacheController;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.setup.SetupController;
@@ -252,21 +254,31 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 		return files;
 	}
 
+	/**
+	 * Extracts data from an input port as an object.
+	 * 
+	 * @param port
+	 *            The name of target port.
+	 * @return The object
+	 * @throws Exception
+	 */
 	protected Object getInputAsObject(String port) throws Exception {
 		ReferenceService referenceService = this.callback.getContext().getReferenceService();
 		Object obj = null;
 		try {
 			boolean isDataCaching = SetupController.getInstance().isDataCaching();
+			byte[] data = null;
 			if (isDataCaching) {
 				byte[] uuidData = (byte[]) referenceService.renderIdentifier(inputs.get(port), byte[].class,
 						this.callback.getContext());
 				UUID uuid = (UUID) CDKObjectHandler.getObject(uuidData);
-				obj = FileNameGenerator.uncacheByteStream(uuid);
+				data = CacheController.getInstance().uncacheByteStream(uuid);
 			} else {
-				byte[] data = (byte[]) referenceService.renderIdentifier(inputs.get(port), byte[].class,
+				data = (byte[]) referenceService.renderIdentifier(inputs.get(port), byte[].class,
 						this.callback.getContext());
-				obj = CDKObjectHandler.getObject(data);
+
 			}
+			obj = CDKObjectHandler.getObject(data);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR,
 					this.getActivityName(), e);
@@ -275,6 +287,16 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 		return obj;
 	}
 
+	/**
+	 * Extracts data from an input port as an object.
+	 * 
+	 * @param <T>
+	 *            Object type
+	 * @param port
+	 *            The name of target port.
+	 * @return The object casted into the target type.
+	 * @throws Exception
+	 */
 	@SuppressWarnings("unchecked")
 	protected <T> T getInputAsObject(String port, Class<T> type) throws Exception {
 		ReferenceService referenceService = this.callback.getContext().getReferenceService();
@@ -288,7 +310,7 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 					byte[] uuidData = (byte[]) referenceService.renderIdentifier(inputs.get(port), byte[].class,
 							this.callback.getContext());
 					UUID uuid = (UUID) CDKObjectHandler.getObject(uuidData);
-					obj = (T) FileNameGenerator.uncacheByteStream(uuid);
+					obj = (T) CacheController.getInstance().uncacheByteStream(uuid);
 				} else {
 					byte[] data = (byte[]) referenceService.renderIdentifier(inputs.get(port), byte[].class,
 							this.callback.getContext());
@@ -308,6 +330,16 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 		return obj;
 	}
 
+	/**
+	 * Extracts data from an input port as an object list.
+	 * 
+	 * @param <T>
+	 *            Object type
+	 * @param port
+	 *            The name of target port.
+	 * @return The object list casted into the target type.
+	 * @throws Exception
+	 */
 	@SuppressWarnings("unchecked")
 	protected <T> List<T> getInputAsList(String port, Class<T> type) throws Exception {
 		ReferenceService referenceService = this.callback.getContext().getReferenceService();
@@ -335,7 +367,7 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 				List<byte[]> uuidDataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(port),
 						byte[].class, this.callback.getContext());
 				UUID uuid = (UUID) CDKObjectHandler.getObject(uuidDataArray.get(0));
-				byte[] data = FileNameGenerator.uncacheByteStream(uuid);
+				byte[] data = CacheController.getInstance().uncacheByteStream(uuid);
 				dataList = (List<T>) CDKObjectHandler.getObject(data);
 				try {
 					dataList = (List<T>) CDKObjectHandler.getObject(data);
@@ -361,6 +393,15 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 
 	// ---- Output handling -----------------------------------------------------------------------------
 
+	/**
+	 * Registers given data list to target output port.
+	 * 
+	 * @param objectList
+	 *            Data list.
+	 * @param port
+	 *            Target port
+	 * @throws Exception
+	 */
 	protected void setOutputAsObjectList(List<?> objectList, String port) throws Exception {
 		try {
 			boolean isDataCaching = SetupController.getInstance().isDataCaching();
@@ -368,7 +409,7 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 			T2Reference containerRef;
 			if (isDataCaching) {
 				byte[] data = CDKObjectHandler.getBytes(objectList);
-				UUID uuid = FileNameGenerator.cacheByteStream(data);
+				UUID uuid = CacheController.getInstance().cacheByteStream(data);
 				List<byte[]> uuidDataList = new ArrayList<byte[]>();
 				uuidDataList.add(CDKObjectHandler.getBytes(uuid));
 				containerRef = referenceService.register(uuidDataList, 1, true, this.callback.getContext());
@@ -384,6 +425,15 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 		}
 	}
 
+	/**
+	 * Registers given object to target output port.
+	 * 
+	 * @param object
+	 *            Data.
+	 * @param port
+	 *            Target port
+	 * @throws Exception
+	 */
 	protected void setOutputAsObject(Object object, String port) throws Exception {
 		try {
 			boolean isDataCaching = SetupController.getInstance().isDataCaching();
@@ -391,7 +441,7 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 			byte[] data;
 			if (isDataCaching) {
 				byte[] objectData = CDKObjectHandler.getBytes(object);
-				UUID uuid = FileNameGenerator.cacheByteStream(objectData);
+				UUID uuid = CacheController.getInstance().cacheByteStream(objectData);
 				data = CDKObjectHandler.getBytes(uuid);
 			} else {
 				data = CDKObjectHandler.getBytes(object);
@@ -405,6 +455,15 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 		}
 	}
 
+	/**
+	 * Registers given string list to target output port.
+	 * 
+	 * @param stringList
+	 *            String list.
+	 * @param port
+	 *            Target port
+	 * @throws Exception
+	 */
 	protected void setOutputAsStringList(List<String> stringList, String port) throws Exception {
 		try {
 			ReferenceService referenceService = this.callback.getContext().getReferenceService();
@@ -417,6 +476,15 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 		}
 	}
 
+	/**
+	 * Registers given string to target output port.
+	 * 
+	 * @param s
+	 *            String.
+	 * @param port
+	 *            Target port
+	 * @throws Exception
+	 */
 	protected void setOutputAsString(String s, String port) throws Exception {
 		try {
 			ReferenceService referenceService = this.callback.getContext().getReferenceService();
@@ -429,10 +497,56 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 		}
 	}
 
+	/**
+	 * Registers given byte list to target output port.
+	 * 
+	 * @param byteList
+	 *            Byte list.
+	 * @param port
+	 *            Target port
+	 * @throws Exception
+	 */
 	protected void setOutputAsByteList(List<byte[]> byteList, String port) throws Exception {
 		try {
 			ReferenceService referenceService = this.callback.getContext().getReferenceService();
 			T2Reference containerRef = referenceService.register(byteList, 1, true, this.callback.getContext());
+			this.outputs.put(port, containerRef);
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR,
+					this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
+		}
+	}
+
+	protected T2Reference setIterativeOutputAsList(List<?> objectList, String port, int index) throws Exception {
+		ReferenceService referenceService = this.callback.getContext().getReferenceService();
+		T2Reference containerRef = null;
+		try {
+			boolean isDataCaching = SetupController.getInstance().isDataCaching();
+			if (isDataCaching) {
+				byte[] data = CDKObjectHandler.getBytes(objectList);
+				UUID uuid = CacheController.getInstance().cacheByteStream(data);
+				List<byte[]> uuidDataList = new ArrayList<byte[]>();
+				uuidDataList.add(CDKObjectHandler.getBytes(uuid));
+				containerRef = referenceService.register(uuidDataList, 1, true, this.callback.getContext());
+			} else {
+				List<byte[]> dataList = CDKObjectHandler.getBytesList(objectList);
+				containerRef = referenceService.register(dataList, 1, true, this.callback.getContext());
+			}
+			outputs.put(port, containerRef);
+			callback.receiveResult(outputs, new int[] { index });
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR,
+					this.getActivityName(), e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR);
+		}
+		return containerRef;
+	}
+
+	protected void setIterativeReferenceList(List<T2Reference> refList, String port) throws Exception {
+		ReferenceService referenceService = this.callback.getContext().getReferenceService();
+		try {
+			T2Reference containerRef = referenceService.register(refList, 1, true, this.callback.getContext());
 			this.outputs.put(port, containerRef);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.OUTPUT_PORT_CONFIGURATION_ERROR,

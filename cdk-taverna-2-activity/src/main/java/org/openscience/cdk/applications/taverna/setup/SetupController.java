@@ -1,3 +1,24 @@
+/*
+ * Copyright (C) 2011 by Andreas Truszkowski <ATruszkowski@gmx.de>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1
+ * of the License, or (at your option) any later version.
+ * All we ask is that proper credit is given for our work, which includes
+ * - but is not limited to - adding the above copyright notice to the beginning
+ * of your source code files, and to any copyright notice that you may distribute
+ * with programs based on this work.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ */
 package org.openscience.cdk.applications.taverna.setup;
 
 import java.awt.event.ActionEvent;
@@ -17,6 +38,12 @@ import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator
 import org.openscience.cdk.applications.taverna.basicutilities.Tools;
 import org.openscience.cdk.applications.taverna.iterativeio.DataStreamController;
 
+/**
+ * Controls the properties of the CDK-Taverna 2.0 project.
+ * 
+ * @author Andreas Truszkowski
+ *
+ */
 public class SetupController {
 
 	private static final String WORKING_DIRECTORY = "Working Directory";
@@ -58,6 +85,9 @@ public class SetupController {
 
 	}
 
+	/**
+	 * @return The SetupController instance.
+	 */
 	public synchronized static SetupController getInstance() {
 		if (instance == null) {
 			instance = new SetupController();
@@ -65,6 +95,9 @@ public class SetupController {
 		return instance;
 	}
 
+	/**
+	 * Load the unit test properties.
+	 */
 	public synchronized void loadTestCaseConfiguration() {
 		if (this.loaded) {
 			return;
@@ -76,6 +109,9 @@ public class SetupController {
 		this.properties.setProperty(IS_DATA_CACHING, "" + isDataCaching);
 	}
 
+	/**
+	 * Loads the configuration or creates a new configuration file when not available.
+	 */
 	public synchronized void loadConfiguration() {
 		if (this.loaded) {
 			return;
@@ -84,22 +120,22 @@ public class SetupController {
 		String appDir = FileNameGenerator.getApplicationDir();
 		File configFile = new File(appDir + File.separator + "cdktaverna2.config");
 		if (!configFile.exists()) {
-			this.createConfiguration();
+			this.showConfigurationDialog();
 		} else {
 			try {
 				this.properties.load(new FileReader(configFile));
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + configFile.getPath(),
 						this.getClass().getSimpleName(), e);
-				this.createConfiguration();
+				this.showConfigurationDialog();
 			}
 		}
 	}
 
-	private void createConfiguration() {
-		this.showConfigurationDialog();
-	}
 
+	/**
+	 * Shows the configuration dialog and saves the properties to hard disk.
+	 */
 	private void showConfigurationDialog() {
 		this.view = new SetupDialog();
 		ImageIcon icon = null;
@@ -129,6 +165,9 @@ public class SetupController {
 		this.view.setVisible(true);
 	}
 
+	/**
+	 * Saves properties into file.
+	 */
 	private void setConfiguration() {
 		String appDir = FileNameGenerator.getApplicationDir();
 		File configFile = new File(appDir + File.separator + "cdktaverna2.config");
@@ -144,6 +183,9 @@ public class SetupController {
 		}
 	}
 
+	/**
+	 * @return The working directory path.
+	 */
 	public String getWorkingDir() {
 		String path = this.properties.getProperty(WORKING_DIRECTORY);
 		File file = new File(path);
@@ -153,6 +195,9 @@ public class SetupController {
 		return file.getPath() + File.separator;
 	}
 
+	/**
+	 * @return True - CDK-Taverna 2.0 caches the data instead of Taverna itself.
+	 */
 	public boolean isDataCaching() {
 		Boolean isDataCaching = Boolean.parseBoolean(this.properties.getProperty(IS_DATA_CACHING));
 		return isDataCaching;

@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
-import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.reference.impl.external.file.FileReference;
 import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
@@ -38,7 +37,6 @@ import org.openscience.cdk.Reaction;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.io.MDLRXNV2000Reader;
 
@@ -98,7 +96,6 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity {
 	@Override
 	public void work() throws Exception {
 		// Get input
-		ReferenceService referenceService = this.callback.getContext().getReferenceService();
 		List<File> files = this.getInputAsFileList(this.INPUT_PORTS[0]);
 		int readSize = this.getInputAsObject(this.INPUT_PORTS[1], Integer.class);
 		// Do work
@@ -117,12 +114,8 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity {
 				}
 				counter++;
 				if (i == files.size() - 1 || counter >= readSize) {
-					List<byte[]> dataList = new ArrayList<byte[]>();
-					dataList = CDKObjectHandler.getBytesList(reactions);
-					T2Reference containerRef = referenceService.register(dataList, 1, true, this.callback.getContext());
+					T2Reference containerRef = this.setIterativeOutputAsList(reactions, this.OUTPUT_PORTS[0], i);
 					outputList.add(i, containerRef);
-					outputs.put(this.OUTPUT_PORTS[0], containerRef);
-					callback.receiveResult(outputs, new int[] { i });
 					reactions.clear();
 					counter = 0;
 				}
@@ -132,8 +125,7 @@ public class IterativeRXNFileReaderActivity extends AbstractCDKActivity {
 			throw new CDKTavernaException(this.getActivityName(), "Error reading RXN files!");
 		}
 		// Set output
-		T2Reference containerRef = referenceService.register(outputList, 1, true, this.callback.getContext());
-		this.outputs.put(this.OUTPUT_PORTS[0], containerRef);
+		this.setIterativeReferenceList(outputList, this.OUTPUT_PORTS[0]);
 	}
 
 }

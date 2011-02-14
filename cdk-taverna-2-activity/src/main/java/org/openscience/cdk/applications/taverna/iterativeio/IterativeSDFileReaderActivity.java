@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
-import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.reference.impl.external.file.FileReference;
 import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
@@ -18,7 +17,6 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.io.MDLV2000Reader;
 
@@ -69,7 +67,6 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity {
 	@Override
 	public void work() throws Exception {
 		// Get input
-		ReferenceService referenceService = this.callback.getContext().getReferenceService();
 		File file = this.getInputAsFile(this.INPUT_PORTS[0]);
 		int readSize = this.getInputAsObject(this.INPUT_PORTS[1], Integer.class);
 		// Do work
@@ -80,7 +77,7 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity {
 			String line;
 			String SDFilePart = "";
 			int counter = 0;
-			List<byte[]> dataList = new ArrayList<byte[]>();
+			List<CMLChemFile> resultList = new ArrayList<CMLChemFile>();
 			line = lineReader.readLine();
 			do {
 				if (line != null) {
@@ -92,7 +89,7 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity {
 									SDFilePart.getBytes()));
 							tmpMDLReader.read(cmlChemFile);
 							tmpMDLReader.close();
-							dataList.add(CDKObjectHandler.getBytes(cmlChemFile));
+							resultList.add(cmlChemFile);
 							counter++;
 						} catch (Exception e) {
 							ErrorLogger.getInstance().writeError("Error reading molecule in SD file:",
@@ -104,13 +101,11 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity {
 					}
 				}
 				if (line == null || counter >= readSize) {
-					T2Reference containerRef = referenceService.register(dataList, 1, true, this.callback.getContext());
+					T2Reference containerRef = this.setIterativeOutputAsList(resultList, this.OUTPUT_PORTS[0], index);
 					outputList.add(index, containerRef);
-					outputs.put(this.OUTPUT_PORTS[0], containerRef);
-					callback.receiveResult(outputs, new int[] { index });
 					index++;
 					counter = 0;
-					dataList.clear();
+					resultList.clear();
 				}
 				line = lineReader.readLine();
 			} while (line != null);
@@ -120,8 +115,7 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.READ_FILE_ERROR + file.getPath());
 		}
 		// Set output
-		T2Reference containerRef = referenceService.register(outputList, 1, true, this.callback.getContext());
-		outputs.put(this.OUTPUT_PORTS[0], containerRef);
+		this.setIterativeReferenceList(outputList, this.OUTPUT_PORTS[0]);
 
 	}
 

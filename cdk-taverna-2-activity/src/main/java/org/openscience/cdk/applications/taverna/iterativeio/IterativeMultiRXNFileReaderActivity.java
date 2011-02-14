@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
-import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.reference.impl.external.file.FileReference;
 import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
@@ -39,7 +38,6 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.io.MDLV2000Reader;
@@ -100,7 +98,6 @@ public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity {
 	@Override
 	public void work() throws Exception {
 		// Get input
-		ReferenceService referenceService = this.callback.getContext().getReferenceService();
 		File file = this.getInputAsFile(this.INPUT_PORTS[0]);
 		int readSize = this.getInputAsObject(this.INPUT_PORTS[1], Integer.class);
 		// Do work
@@ -121,19 +118,17 @@ public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity {
 					}
 				}
 				if (line == null || counter >= readSize) {
-					List<byte[]> dataList = new ArrayList<byte[]>();
+					List<CMLChemFile> resultList = new ArrayList<CMLChemFile>();
 					CMLChemFile cmlChemFile = new CMLChemFile();
 					MDLV2000Reader tmpMDLReader = new MDLV2000Reader(new ByteArrayInputStream(RXNFilePart.getBytes()));
 					tmpMDLReader.read(cmlChemFile);
 					cmlChemFileList = CMLChemFileWrapper.wrapInChemModelList(cmlChemFile);
 					// Congfigure output
 					for (CMLChemFile c : cmlChemFileList) {
-						dataList.add(CDKObjectHandler.getBytes(c));
+						resultList.add(c);
 					}
-					T2Reference containerRef = referenceService.register(dataList, 1, true, this.callback.getContext());
+					T2Reference containerRef = this.setIterativeOutputAsList(resultList, this.OUTPUT_PORTS[0], index);
 					outputList.add(index, containerRef);
-					outputs.put(this.OUTPUT_PORTS[0], containerRef);
-					callback.receiveResult(outputs, new int[] { index });
 					index++;
 					counter = 0;
 					RXNFilePart = "";
@@ -146,8 +141,7 @@ public class IterativeMultiRXNFileReaderActivity extends AbstractCDKActivity {
 					+ "!");
 		}
 		// Set output
-		T2Reference containerRef = referenceService.register(outputList, 1, true, this.callback.getContext());
-		outputs.put(this.OUTPUT_PORTS[0], containerRef);
+		this.setIterativeReferenceList(outputList, this.OUTPUT_PORTS[0]);
 	}
 
 }
