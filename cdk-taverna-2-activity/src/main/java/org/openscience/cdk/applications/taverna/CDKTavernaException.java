@@ -61,7 +61,8 @@ public class CDKTavernaException extends Exception {
 	public static final String ERROR_DURING_SUBSTRUCTURE_SEARCH = "Error during substructure search!";
 	public static final String ERROR_WHILE_PARSING_SMILES = "Error while parsing SMILES!";
 	public static final String ERROR_RESOLVING_FILE_INPUT = "Error resolving file input!";
-
+	public static final String ERROR_CREATING_INSTANCE_OF_DESCRIPTOR = "Error creating instance of descriptor: ";
+	
 	public CDKTavernaException(String activityName, String type) {
 		super(type + " Class: " + activityName + ".");
 	}

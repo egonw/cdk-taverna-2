@@ -22,8 +22,6 @@
 package org.openscience.cdk.applications.taverna.basicutilities;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -174,7 +172,7 @@ public class FileNameGenerator {
 	public static String getApplicationDir() {
 		return new java.io.File("").getAbsolutePath() + File.separator;
 	}
-	
+
 	/**
 	 * @return path to the cache directory. It's located in the OS temporary
 	 *         directory.
