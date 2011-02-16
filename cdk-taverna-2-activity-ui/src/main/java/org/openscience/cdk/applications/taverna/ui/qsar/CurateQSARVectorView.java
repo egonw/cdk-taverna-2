@@ -35,7 +35,7 @@ public class CurateQSARVectorView extends JPanel {
 		group.add(rdbtnCurateOnlyColumns);
 		group.add(rdbtnCurateOnlyRows);
 		group.add(rdbtnDynamicCuration);
-		chckbxRemoveMinmaxValue = new JCheckBox("Remove min/max value do not differ components ");
+		chckbxRemoveMinmaxValue = new JCheckBox("Remove values where the min/max  not differ");
 		chckbxRemoveMinmaxValue.setSelected(true);
 		add(chckbxRemoveMinmaxValue);
 	}
