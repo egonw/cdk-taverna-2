@@ -4,13 +4,13 @@
 
 	<groupId>org.openscience.cdk.applications.taverna</groupId>
 	<artifactId>cdk-taverna2</artifactId>
-	<version>0.4</version>
+	<version>0.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>CDK-Taverna 2 activity</name>
 
 	<scm>
-		<connection>scm:svn:https://cdktaverna2.svn.sourceforge.net/svnroot/cdktaverna2/tags/cdk-taverna2-0.4</connection>
-		<developerConnection>scm:svn:https://cdktaverna2.svn.sourceforge.net/svnroot/cdktaverna2/tags/cdk-taverna2-0.4</developerConnection>
+		<connection>scm:svn:https://cdktaverna2.svn.sourceforge.net/svnroot/cdktaverna2/tags/cdk-taverna2-0.3.2</connection>
+		<developerConnection>scm:svn:https://cdktaverna2.svn.sourceforge.net/svnroot/cdktaverna2/tags/cdk-taverna2-0.3.2</developerConnection>
 	</scm>
 
 	<distributionManagement>
