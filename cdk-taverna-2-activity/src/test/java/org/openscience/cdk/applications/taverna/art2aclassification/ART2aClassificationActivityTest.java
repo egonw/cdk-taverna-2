@@ -90,7 +90,6 @@ public class ART2aClassificationActivityTest extends CDKTavernaTestCases {
 		configBean = new CDKActivityConfigurationBean();
 		configBean.setActivityName(ART2aClassificationActivity.ART2A_CLASSIFICATOR_ACTIVITY);
 		this.dir = new File(SetupController.getInstance().getWorkingDir());
-		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.dir);
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".art2a");
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_CLASSIFICATIONS,
 				this.numberOfClassifications);
@@ -137,6 +136,7 @@ public class ART2aClassificationActivityTest extends CDKTavernaTestCases {
 		Map<String, Object> inputs = new HashMap<String, Object>();
 		List<byte[]> dataList = CDKObjectHandler.getBytesList(fingerprintList);
 		inputs.put(activity.INPUT_PORTS[0], dataList);
+		inputs.put(activity.INPUT_PORTS[1], this.dir);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.OUTPUT_PORTS[0], String.class);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);

@@ -28,6 +28,10 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
+
 import org.openscience.cdk.applications.art2aclassification.Art2aClassificator;
 import org.openscience.cdk.applications.art2aclassification.FingerprintItem;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
@@ -35,6 +39,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
+import org.openscience.cdk.applications.taverna.basicutilities.Tools;
 import org.openscience.cdk.applications.taverna.io.XMLFileIO;
 
 /**
@@ -96,13 +101,17 @@ public class ART2aClassificationActivity extends AbstractCDKActivity {
 	 * Creates a new instance.
 	 */
 	public ART2aClassificationActivity() {
-		this.INPUT_PORTS = new String[] { "Fingerprint Items" };
+		this.INPUT_PORTS = new String[] { "Fingerprint Items", "File" };
 		this.OUTPUT_PORTS = new String[] { "ART-2a Files" };
 	}
 
 	@Override
 	protected void addInputPorts() {
 		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
+		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+		expectedReferences.add(FileReference.class);
+		expectedReferences.add(InlineStringReference.class);
+		addInput(this.INPUT_PORTS[1], 0, false, expectedReferences, null);
 	}
 
 	@Override
@@ -114,10 +123,9 @@ public class ART2aClassificationActivity extends AbstractCDKActivity {
 	public void work() throws Exception {
 		// Get input
 		List<FingerprintItem> fingerprintItemList = this.getInputAsList(this.INPUT_PORTS[0], FingerprintItem.class);
-		File directory = (File) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		if (directory == null) {
-			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_OUTPUT_DIRECTORY_CHOSEN);
-		}
+		File targetFile = this.getInputAsFile(this.INPUT_PORTS[1]);
+		String directory = Tools.getDirectory(targetFile);
+		String name = Tools.getFileName(targetFile);
 		String extension = (String) this.getConfiguration().getAdditionalProperty(
 				CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 		// Do work
@@ -169,9 +177,9 @@ public class ART2aClassificationActivity extends AbstractCDKActivity {
 				myART.setDeterministicRandom(this.deterministicRandom);
 				myART.classify();
 				// Store the results
-				String name = "ART2a_Result" + String.valueOf(i + 1) + "of"
+				String desc= "_ART2a_Result" + String.valueOf(i + 1) + "of"
 						+ String.valueOf(this.numberOfClassifications) + "_";
-				File file = FileNameGenerator.getNewFile(directory.getPath(), extension, name);
+				File file = FileNameGenerator.getNewFile(directory, extension, name + desc);
 				writer = xmlFileIO.getXMLStreamWriterWithCompression(file);
 				writer.writeStartDocument();
 				myART.saveResultToXmlWriter(writer);

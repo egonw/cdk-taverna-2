@@ -44,6 +44,9 @@ public class CDKTavernaConstants {
 	public static final String DATABASE_FOLDER_NAME = "Database";
 	public static final String ART2A_FOLDER_NAME = "ART-2a Classification";
 	public static final String WEKA_FOLDER_NAME = "Weka";
+	public static final String MODELLING_FOLDER_NAME = "Modelling";
+	public static final String SIGNATURE_SCORING_FOLDER_NAME = "Signature Scoring";
+	
 	// --------------------Properties-------------------------------------
 	public static final String PROPERTY_FILE = "FILE";
 	public static final String PROPERTY_FILE_EXTENSION = "FILE EXTENSION";
@@ -70,4 +73,6 @@ public class CDKTavernaConstants {
 
 	// --------------------Miscellaneous-------------------------------------
 	public static final String MOLECULEID = "MOLECULEID";
+    public static final String FRAGMENT_SCORE = "SCORE";
+    public static final String SIGNATURE = "SIGNATURE";
 }

@@ -62,7 +62,8 @@ public class CDKTavernaException extends Exception {
 	public static final String ERROR_WHILE_PARSING_SMILES = "Error while parsing SMILES!";
 	public static final String ERROR_RESOLVING_FILE_INPUT = "Error resolving file input!";
 	public static final String ERROR_CREATING_INSTANCE_OF_DESCRIPTOR = "Error creating instance of descriptor: ";
-	
+	public static final String CANNOT_INITIALIZE_3DMODEL_BUILDER = "Can't initialize 3D model builder!";
+	public static final String CANNOT_GENERATE_3DCOORDINATES = "Can't generate 3D coordinates!";
 	public CDKTavernaException(String activityName, String type) {
 		super(type + " Class: " + activityName + ".");
 	}

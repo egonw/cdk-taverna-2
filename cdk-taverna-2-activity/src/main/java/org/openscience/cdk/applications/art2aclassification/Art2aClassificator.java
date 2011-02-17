@@ -2501,7 +2501,6 @@ public class Art2aClassificator {
 			mSelectClassFlag = new boolean[mNumberOfDetectedClasses];
 			mInterAngleBetweenClasses = new double[mNumberOfDetectedClasses][];
 			// initialize mNumberOfVectorsInClass
-			System.out.print("Number of detected Classes:" + mNumberOfDetectedClasses);
 			for (int i = 0; i < mNumberOfDetectedClasses; i++) {
 				mInterAngleBetweenClasses[i] = new double[mNumberOfDetectedClasses];
 				mNumberOfVectorsInClass[i] = 0;

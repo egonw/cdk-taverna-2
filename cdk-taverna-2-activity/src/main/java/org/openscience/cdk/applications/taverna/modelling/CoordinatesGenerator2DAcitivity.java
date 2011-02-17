@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 by Andreas Truszkowski <ATruszkowski@gmx.de>
+ * Copyright (C) 2011 by Andreas Truszkowski <ATruszkowski@gmx.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -19,34 +19,35 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna.curation;
+package org.openscience.cdk.applications.taverna.modelling;
 
-/**
- * Class which represents the atom signature activity.
- * 
- * @author kalai
- */
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
+import org.openscience.cdk.Molecule;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.signature.AtomSignature;
+import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
-public class AtomSignatureActivity extends AbstractCDKActivity {
+/**
+ * Activity for creating 2D-Coordinates for given molecules.
+ * 
+ * @author kalai
+ */
+public class CoordinatesGenerator2DAcitivity extends AbstractCDKActivity {
 
-	public static final String ATOM_SIGNATURE_ACTIVITY = "Generate Atom Signatures";
+	public static final String COORDINATES_GENERATOR_ACTIVITY = "2D-Coordinates Generator";
 
-	public AtomSignatureActivity() {
+	public CoordinatesGenerator2DAcitivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };
-		this.OUTPUT_PORTS = new String[] { "Atom Signatures" };
+		this.OUTPUT_PORTS = new String[] { "Structures" };
 
 	}
 
@@ -57,55 +58,55 @@ public class AtomSignatureActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
+
 		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
-	@Override
 	public void work() throws Exception {
 		// Get input
-		List<CMLChemFile> chemFileList = this.getInputAsList(this.INPUT_PORTS[0], CMLChemFile.class);
-		Integer height = (Integer) this.getConfiguration().getAdditionalProperty(
-				CDKTavernaConstants.PROPERTY_ATOM_SIGNATURE_HEIGHT);
-		// Do work	
-		ArrayList<String> allAtomSignatures = new ArrayList<String>();
-		for (CMLChemFile cml : chemFileList) {
+		List<CMLChemFile> chemfileList = this.getInputAsList(this.INPUT_PORTS[0], CMLChemFile.class);
+		// Do work
+		ArrayList<CMLChemFile> calculated = new ArrayList<CMLChemFile>();
+		for (CMLChemFile cml : chemfileList) {
 			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(cml);
 			for (IAtomContainer atomContainer : moleculeList) {
-				if (atomContainer.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
-					throw new CDKTavernaException(this.getActivityName(),
-							CDKTavernaException.MOLECULE_NOT_TAGGED_WITH_UUID);
+				Map<Object, Object> properties = atomContainer.getProperties();
+				StructureDiagramGenerator sdg = new StructureDiagramGenerator();
+				sdg.setMolecule(new Molecule(atomContainer));
+				try {
+					sdg.generateCoordinates();
+				} catch (Exception ex) {
+					throw new CDKTavernaException(this.getConfiguration().getActivityName(), ex.getMessage());
 				}
-				UUID uuid = (UUID) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID);
-				for (IAtom atom : atomContainer.atoms()) {
-					AtomSignature atomSignature = new AtomSignature(atom, height, atomContainer);
-					String signature = uuid.toString() + " - " + atomSignature.toCanonicalString();
-					allAtomSignatures.add(signature);
-				}
+				Molecule layedOutMol = (Molecule) sdg.getMolecule();
+				layedOutMol.setProperties(properties);
+				calculated.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(layedOutMol));
+
 			}
 		}
 		// Set output
-		this.setOutputAsStringList(allAtomSignatures, this.OUTPUT_PORTS[0]);
+		this.setOutputAsObjectList(calculated, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override
 	public String getActivityName() {
-		return AtomSignatureActivity.ATOM_SIGNATURE_ACTIVITY;
+		return CoordinatesGenerator2DAcitivity.COORDINATES_GENERATOR_ACTIVITY;
 	}
 
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
-		properties.put(CDKTavernaConstants.PROPERTY_ATOM_SIGNATURE_HEIGHT, 2);
 		return properties;
 	}
 
 	@Override
 	public String getDescription() {
-		return "Description: " + AtomSignatureActivity.ATOM_SIGNATURE_ACTIVITY;
+		return "Description: " + CoordinatesGenerator2DAcitivity.COORDINATES_GENERATOR_ACTIVITY;
 	}
 
 	@Override
 	public String getFolderName() {
-		return CDKTavernaConstants.CURATION_FOLDER_NAME;
+		return CDKTavernaConstants.MODELLING_FOLDER_NAME;
 	}
+
 }

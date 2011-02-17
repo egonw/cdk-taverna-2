@@ -5,7 +5,6 @@ import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityCon
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.classification.art2a.ART2aClassificationActivity;
-import org.openscience.cdk.applications.taverna.curation.AtomSignatureActivity;
 import org.openscience.cdk.applications.taverna.curation.MoleculeConnectivityCheckerActivity;
 import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileWriter;
 import org.openscience.cdk.applications.taverna.interfaces.IPortNumber;
@@ -14,6 +13,7 @@ import org.openscience.cdk.applications.taverna.qsar.CurateQSARVectorActivity;
 import org.openscience.cdk.applications.taverna.qsar.QSARDescriptorActivity;
 import org.openscience.cdk.applications.taverna.qsar.QSARDescriptorThreadedActivity;
 import org.openscience.cdk.applications.taverna.reactionenumerator.ReactionEnumeratorActivity;
+import org.openscience.cdk.applications.taverna.signaturescoring.AtomSignatureActivity;
 import org.openscience.cdk.applications.taverna.ui.EmptyConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.art2a.ART2aClassificationConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.curation.AtomSignatureConfigurationPanel;
