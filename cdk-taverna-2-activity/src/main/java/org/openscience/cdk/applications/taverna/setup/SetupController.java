@@ -31,6 +31,7 @@ import java.util.Properties;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
@@ -123,7 +124,8 @@ public class SetupController {
 			return;
 		}
 		this.loaded = true;
-		String appDir = FileNameGenerator.getApplicationDir();
+		// Under windows restricted access to the application dir -> use temp dir
+		String appDir = FileNameGenerator.getTempDir(); //FileNameGenerator.getApplicationDir();
 		File configFile = new File(appDir + File.separator + "cdktaverna2.config");
 		if (!configFile.exists()) {
 			this.showConfigurationDialog();
@@ -184,20 +186,22 @@ public class SetupController {
 	 * Saves properties into file.
 	 */
 	private void setConfiguration() {
-		String appDir = FileNameGenerator.getApplicationDir();
+		String appDir = FileNameGenerator.getTempDir();//FileNameGenerator.getApplicationDir();
 		File configFile = new File(appDir + File.separator + "cdktaverna2.config");
-		String workingDirFilename = this.view.getWorkingDirectoryTextField().getText();
-		this.properties.setProperty(WORKING_DIRECTORY, workingDirFilename);
-		Boolean isDataCaching = this.view.getChckbxCacheDatarecommended().isSelected();
-		this.properties.setProperty(IS_DATA_CACHING, "" + isDataCaching);
-		Boolean isDataCompression = this.view.getChckbxCacheDatarecommended().isSelected();
-		this.properties.setProperty(IS_DATA_COMPRESSION, "" + isDataCompression);
 		try {
+			String workingDirFilename = this.view.getWorkingDirectoryTextField().getText();
+			this.properties.setProperty(WORKING_DIRECTORY, workingDirFilename);
+			Boolean isDataCaching = this.view.getChckbxCacheDatarecommended().isSelected();
+			this.properties.setProperty(IS_DATA_CACHING, "" + isDataCaching);
+			Boolean isDataCompression = this.view.getChckbxCacheDatarecommended().isSelected();
+			this.properties.setProperty(IS_DATA_COMPRESSION, "" + isDataCompression);
 			this.properties.store(new FileWriter(configFile), "CDK-Taverna 2.0 properties");
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + configFile.getPath(),
 					this.getClass().getSimpleName(), e);
+			return;
 		}
+		JOptionPane.showMessageDialog(this.view, "The configuration file is saved in folder:" + configFile.getParent());
 	}
 
 	/**

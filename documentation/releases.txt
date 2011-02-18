@@ -52,5 +52,20 @@
 - Adapted file reader activities for the command line tools
 
 0.3.4
-- Filewriter now provide the filenames written over a output port
+- Filewriter now provide the written filenames 
 - Enabled colouring of the actvities
+
+0.4
+- Reworked the I/O port data management system
+- Updated all activities with the new I/O port management
+- Added I/O port data caching to hard disk
+- Added first time start setup dialog
+- Added new QSAR descriptors
+- Finished the rework of I/O workers to deal with the command line tool
+- Added modelling actvities (2D/3D coordinates generators)
+- Added signature scoring workers
+
+0.4.0.1
+- Qickfix for writing the configfile in the temp directory instead of in the application directory
+- Added colour management for the the new activity folders.
+ 

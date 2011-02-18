@@ -87,6 +87,10 @@ public class CDKServiceProvider implements ServiceDescriptionProvider {
 			colour = "#00FFFF"; // Cyan
 		} else if(name.startsWith("org.openscience.cdk.applications.taverna.weka")) {
 			colour = "#DB2929"; // Brownmadder
+		} else if(name.startsWith("org.openscience.cdk.applications.taverna.modelling")) {
+			colour = "#00EEEE"; // cyan 2
+		} else if(name.startsWith("org.openscience.cdk.applications.taverna.signaturescoring")) {
+			colour = "#EEEE00"; // yellow 2
 		} else {
 			colour = "#FFFFFF"; //White
 		}
