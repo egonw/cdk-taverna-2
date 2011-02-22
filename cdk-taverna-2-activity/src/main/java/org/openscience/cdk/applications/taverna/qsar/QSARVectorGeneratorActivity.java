@@ -192,13 +192,14 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 						}
 					}
 				} catch (Exception e) {
-					UUID uuid = (UUID) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID);
+					UUID uuid = UUID.fromString((String) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID));
 					ErrorLogger.getInstance().writeError(
 							"Error during generation of QSAR Vector for molecule: " + uuid.toString(),
 							this.getActivityName(), e);
 					continue;
 				}
-				vectorMap.put((UUID) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID), descritorResultMap);
+				UUID uuid = UUID.fromString((String)atomContainer.getProperty(CDKTavernaConstants.MOLECULEID));
+				vectorMap.put(uuid , descritorResultMap);
 				this.descriptorNames.addAll(tempDescriptorNames);
 			}
 		}

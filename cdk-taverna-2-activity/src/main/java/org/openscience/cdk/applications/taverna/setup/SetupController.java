@@ -39,8 +39,6 @@ import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator
 import org.openscience.cdk.applications.taverna.basicutilities.Tools;
 import org.openscience.cdk.applications.taverna.iterativeio.DataStreamController;
 
-import com.ibm.icu.lang.UCharacter.WordBreak;
-
 /**
  * Controls the properties of the CDK-Taverna 2.0 project.
  * 
@@ -201,7 +199,8 @@ public class SetupController {
 					this.getClass().getSimpleName(), e);
 			return;
 		}
-		JOptionPane.showMessageDialog(this.view, "The configuration file is saved in folder:" + configFile.getParent());
+		String workingDirFilename = this.properties.getProperty(WORKING_DIRECTORY);
+		JOptionPane.showMessageDialog(this.view, "The configuration file is saved in folder:" + workingDirFilename);
 	}
 
 	/**

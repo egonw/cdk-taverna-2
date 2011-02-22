@@ -98,7 +98,7 @@ public class TagMoleculesWithUUIDActivity extends AbstractCDKActivity {
 		for (int i = 0; i < containers.length; i++) {
 			if (containers[i].getProperty(CDKTavernaConstants.MOLECULEID) == null) {
 				UUID uuid = UUID.randomUUID();
-				containers[i].setProperty(CDKTavernaConstants.MOLECULEID, uuid);
+				containers[i].setProperty(CDKTavernaConstants.MOLECULEID, uuid.toString());
 				taggedMoleculesList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(containers[i]));
 			}
 		}

@@ -19,46 +19,46 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna.weka;
+package org.openscience.cdk.applications.taverna.weka.clustering;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.jfree.chart.JFreeChart;
-import org.jfree.data.category.DefaultCategoryDataset;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.basicutilities.ChartTool;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
+import weka.clusterers.ClusterEvaluation;
 import weka.clusterers.Clusterer;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
 import weka.filters.Filter;
 
 /**
- * Class which implements the extract clustering result as pdf activity.
+ * Class which implements the extract clustering statistics activity.
  * 
  * @author Andreas Truzskowski
  * 
  */
-public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
+public class ExtractClusteringResultAsCSVActivity extends AbstractCDKActivity {
 
-	public static final String EXTRACT_CLUSTERING_RESULT_AS_PDF_ACTIVITY = "Extract Clustering Result As PDF";
+	public static final String EXTRACT_CLUSTERING_RESULT_AS_CSV_ACTIVITY = "Extract Clustering Result As CSV";
 
 	/**
 	 * Creates a new instance.
 	 */
-	public ExtractClusteringResultAsPDFActivity() {
+	public ExtractClusteringResultAsCSVActivity() {
 		this.INPUT_PORTS = new String[] { "Weka Clustering Files" };
-		this.OUTPUT_PORTS = new String[] { "Files" };
+		this.OUTPUT_PORTS = new String[] { "Result Files" };
 	}
 
 	@Override
@@ -76,15 +76,12 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 		// Get input
 		List<String> files = this.getInputAsList(this.INPUT_PORTS[0], String.class);
 		// Do work
-		List<String> resultFiles = new ArrayList<String>();
-		List<String> pdfTitle = new ArrayList<String>();
+		ArrayList<String> resultFiles = new ArrayList<String>();
 		Instances dataset = null;
+		Instances uuids = null;
 		Clusterer clusterer = null;
-		ChartTool chartTool = new ChartTool();
-		ArrayList<JFreeChart> charts = null;
 		WekaTools tools = new WekaTools();
-		for (int i = 2; i < files.size(); i++) { // The first two file are data files
-			charts = new ArrayList<JFreeChart>();
+		for (int i = 2; i < files.size(); i++) { // The first two files are data files
 			try {
 				// Load clusterer
 				clusterer = (Clusterer) SerializationHelper.read(files.get(i));
@@ -92,6 +89,7 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 				BufferedReader buffReader = new BufferedReader(new FileReader(files.get(0)));
 				dataset = new Instances(buffReader);
 				buffReader.close();
+				uuids = Filter.useFilter(dataset, tools.getIDGetter(dataset));
 				dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR,
@@ -99,34 +97,31 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR);
 			}
 			try {
-				String row = "Number of vectors in class";
+				// Write statistics file.
+				ClusterEvaluation eval = new ClusterEvaluation();
+				eval.setClusterer(clusterer);
+				eval.evaluateClusterer(dataset);
+				String path = new File(files.get(0)).getParent();
 				String name = clusterer.getClass().getSimpleName();
-				String options = tools.getOptionsFromFile(new File(files.get(i)), name);
-				int jobID = tools.getIDFromOptions(options);
-				int[] numberOfVectorsInClass = new int[clusterer.numberOfClusters()];
+				File resultFile = FileNameGenerator.getNewFile(path, ".txt",
+						name + tools.getOptionsFromFile(new File(files.get(i)), name) + "_ClusteringStats");
+				PrintWriter writer = new PrintWriter(resultFile);
+				resultFiles.add(resultFile.getPath());
+				writer.write(eval.clusterResultsToString());
+				writer.close();
+				// Write UUID-Cluster CSV file
+				resultFile = FileNameGenerator.getNewFile(path, ".csv",
+						name + tools.getOptionsFromFile(new File(files.get(i)), name) + "_UUIDCluster");
+				writer = new PrintWriter(resultFile);
+				resultFiles.add(resultFile.getPath());
+				writer.write("UUID;Cluster_Number;\n");
 				for (int j = 0; j < dataset.numInstances(); j++) {
-					numberOfVectorsInClass[clusterer.clusterInstance(dataset.instance(j))]++;
+					Instance instance = dataset.instance(j);
+					int cluster = clusterer.clusterInstance(instance);
+					String uuid = uuids.instance(j).stringValue(0);
+					writer.write(uuid + ";" + cluster + ";\n");
 				}
-				DefaultCategoryDataset chartDataSet = new DefaultCategoryDataset();
-				for (int j = 0; j < clusterer.numberOfClusters(); j++) {
-					String column = "(" + (j + 1) + "/" + numberOfVectorsInClass[j] + ")";
-					chartDataSet.addValue(numberOfVectorsInClass[j], row, column);
-				}
-				charts.add(chartTool.createBarChart(name + " - JobID: " + jobID, "(Class number/Number of Vectors)",
-						"Number of vectors", chartDataSet));
-			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR,
-						this.getActivityName(), e);
-				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
-			}
-			try {
-				File file = new File(files.get(0));
-				String name = clusterer.getClass().getSimpleName();
-				file = FileNameGenerator.getNewFile(file.getParent(), ".pdf",
-						name + tools.getOptionsFromFile(new File(files.get(i)), name) + "-Result");
-				pdfTitle.add("Weka " + clusterer.getClass().getSimpleName() + " Clustering Result");
-				chartTool.writeChartAsPDF(file, charts);
-				resultFiles.add(file.getPath());
+				writer.close();
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR,
 						this.getActivityName(), e);
@@ -139,7 +134,7 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getActivityName() {
-		return ExtractClusteringResultAsPDFActivity.EXTRACT_CLUSTERING_RESULT_AS_PDF_ACTIVITY;
+		return ExtractClusteringResultAsCSVActivity.EXTRACT_CLUSTERING_RESULT_AS_CSV_ACTIVITY;
 	}
 
 	@Override
@@ -150,11 +145,11 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getDescription() {
-		return "Description: " + ExtractClusteringResultAsPDFActivity.EXTRACT_CLUSTERING_RESULT_AS_PDF_ACTIVITY;
+		return "Description: " + ExtractClusteringResultAsCSVActivity.EXTRACT_CLUSTERING_RESULT_AS_CSV_ACTIVITY;
 	}
 
 	@Override
 	public String getFolderName() {
-		return CDKTavernaConstants.WEKA_FOLDER_NAME;
+		return CDKTavernaConstants.WEKA_CLUSTERING_FOLDER_NAME;
 	}
 }

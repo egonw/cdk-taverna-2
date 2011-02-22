@@ -30,11 +30,11 @@ public class CDKTavernaConstants {
 	public static final String JCHEMPAINT_FOLDER_NAME = "JChemPaint";
 	public static final String REACTION_ENUMERATOR_FOLDER_NAME = "Reaction Enumerator";
 	public static final String RENDERER_FOLDER_NAME = "Renderer";
-	public static final String QSAR_MOLECULAR_DESCRIPTOR_FOLDER_NAME = "QSAR Molecular Descriptors";
-	public static final String QSAR_ATOMIC_DESCRIPTOR_FOLDER_NAME = "QSAR Atomic Descriptors";
-	public static final String QSAR_ATOMIC_PROTON_DESCRIPTOR_FOLDER_NAME = "QSAR Atomic Proton Descriptors";
-	public static final String QSAR_ATOMPAIR_DESCRIPTOR_FOLDER_NAME = "QSAR Atompair Descriptors";
-	public static final String QSAR_BOND_DESCRIPTOR_FOLDER_NAME = "QSAR Bond Descriptors";
+	public static final String QSAR_MOLECULAR_DESCRIPTOR_FOLDER_NAME = "QSAR\\Molecular Descriptors";
+	public static final String QSAR_ATOMIC_DESCRIPTOR_FOLDER_NAME = "QSAR\\Atomic Descriptors";
+	public static final String QSAR_ATOMIC_PROTON_DESCRIPTOR_FOLDER_NAME = "QSAR\\Atomic Proton Descriptors";
+	public static final String QSAR_ATOMPAIR_DESCRIPTOR_FOLDER_NAME = "QSAR\\Atompair Descriptors";
+	public static final String QSAR_BOND_DESCRIPTOR_FOLDER_NAME = "QSAR\\Bond Descriptors";
 	public static final String QSAR_FOLDER_NAME = "QSAR";
 	public static final String ISOMORPHISM_FOLDER_NAME = "Isomorphism";
 	public static final String MISCELLANEOUS_FOLDER_NAME = "Miscellaneous";
@@ -44,6 +44,8 @@ public class CDKTavernaConstants {
 	public static final String DATABASE_FOLDER_NAME = "Database";
 	public static final String ART2A_FOLDER_NAME = "ART-2a Classification";
 	public static final String WEKA_FOLDER_NAME = "Weka";
+	public static final String WEKA_CLUSTERING_FOLDER_NAME = "Weka\\Clustering";
+	public static final String WEKA_LEARNING_FOLDER_NAME = "Weka\\Learning";
 	public static final String MODELLING_FOLDER_NAME = "Modelling";
 	public static final String SIGNATURE_SCORING_FOLDER_NAME = "Signature Scoring";
 	

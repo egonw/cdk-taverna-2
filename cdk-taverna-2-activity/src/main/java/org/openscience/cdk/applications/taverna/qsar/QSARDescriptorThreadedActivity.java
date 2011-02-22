@@ -91,8 +91,7 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> additionalProperties = new HashMap<String, Object>();
-		additionalProperties.put(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, Runtime.getRuntime()
-				.availableProcessors());
+		additionalProperties.put(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, Runtime.getRuntime().availableProcessors());
 		additionalProperties.put(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS, true);
 		return additionalProperties;
 	}
@@ -131,8 +130,7 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 				molecules.addAll(ChemFileManipulator.getAllAtomContainers(chemFile));
 			}
 			if (molecules.isEmpty()) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.DATA_CONTAINS_NO_MOLECULE,
-						this.getActivityName());
+				ErrorLogger.getInstance().writeError(CDKTavernaException.DATA_CONTAINS_NO_MOLECULE, this.getActivityName());
 				return; // FIXME Is it good to return only a empty list?
 			}
 			// Check for ID
@@ -142,7 +140,7 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 					throw new CDKTavernaException(this.getClass().getSimpleName(),
 							CDKTavernaException.MOLECULE_NOT_TAGGED_WITH_UUID);
 				} else {
-					UUID uuid = (UUID) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID);
+					UUID uuid = UUID.fromString((String) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID));
 					this.resultMap.put(uuid, atomContainer);
 				}
 			}
@@ -300,7 +298,7 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 	 */
 	public synchronized void publishResult(IAtomContainer result) {
 		// Merge result
-		UUID uuid = (UUID) result.getProperty(CDKTavernaConstants.MOLECULEID);
+		UUID uuid = UUID.fromString((String) result.getProperty(CDKTavernaConstants.MOLECULEID));
 		IAtomContainer target = this.resultMap.get(uuid);
 		for (Entry<Object, Object> property : result.getProperties().entrySet()) {
 			target.setProperty(property.getKey(), property.getValue());

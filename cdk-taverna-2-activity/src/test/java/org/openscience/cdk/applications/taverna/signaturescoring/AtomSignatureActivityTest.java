@@ -40,7 +40,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaTestData;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
-import org.openscience.cdk.applications.taverna.signaturescoring.AtomSignatureActivity;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
@@ -71,7 +70,7 @@ public class AtomSignatureActivityTest extends CDKTavernaTestCases {
 		HashMap<Object, Object> properties = new HashMap<Object, Object>();
 		List<CMLChemFile> cmlInputList = new ArrayList<CMLChemFile>();
 		UUID uuid = UUID.randomUUID();
-		properties.put(CDKTavernaConstants.MOLECULEID, uuid);
+		properties.put(CDKTavernaConstants.MOLECULEID, uuid.toString());
 		for (CMLChemFile cml : cmlFiles) {
 			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(cml);
 			for (IAtomContainer atomContainer : moleculeList) {

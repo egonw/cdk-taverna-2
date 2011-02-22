@@ -19,15 +19,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna.weka;
+package org.openscience.cdk.applications.taverna.weka.clustering;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
@@ -36,29 +39,28 @@ import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
-import weka.clusterers.ClusterEvaluation;
 import weka.clusterers.Clusterer;
-import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
 import weka.filters.Filter;
 
 /**
- * Class which implements the extract clustering statistics activity.
+ * Class which implements the generate silhouette plot from clustering result as
+ * csv activity.
  * 
  * @author Andreas Truzskowski
  * 
  */
-public class ExtractClusteringResultAsCSVActivity extends AbstractCDKActivity {
+public class GenerateSilhouettePlotFromClusteringResultAsCSVActivity extends AbstractCDKActivity {
 
-	public static final String EXTRACT_CLUSTERING_RESULT_AS_CSV_ACTIVITY = "Extract Clustering Result As CSV";
+	public static final String GENERATE_SILHOUETTE_PLOT_FROM_CLUSTERING_RESULT_AS_CSV_ACTIVITY = "Generate Silhouette Plot From Clustering Result As CSV";
 
 	/**
 	 * Creates a new instance.
 	 */
-	public ExtractClusteringResultAsCSVActivity() {
+	public GenerateSilhouettePlotFromClusteringResultAsCSVActivity() {
 		this.INPUT_PORTS = new String[] { "Weka Clustering Files" };
-		this.OUTPUT_PORTS = new String[] { "Result Files" };
+		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
 	@Override
@@ -78,10 +80,10 @@ public class ExtractClusteringResultAsCSVActivity extends AbstractCDKActivity {
 		// Do work
 		ArrayList<String> resultFiles = new ArrayList<String>();
 		Instances dataset = null;
-		Instances uuids = null;
 		Clusterer clusterer = null;
 		WekaTools tools = new WekaTools();
-		for (int i = 2; i < files.size(); i++) { // The first two files are data files
+		HashMap<Integer, LinkedList<String>> meanTable = new HashMap<Integer, LinkedList<String>>();
+		for (int i = 2; i < files.size(); i++) { // The first two file are data files
 			try {
 				// Load clusterer
 				clusterer = (Clusterer) SerializationHelper.read(files.get(i));
@@ -89,7 +91,6 @@ public class ExtractClusteringResultAsCSVActivity extends AbstractCDKActivity {
 				BufferedReader buffReader = new BufferedReader(new FileReader(files.get(0)));
 				dataset = new Instances(buffReader);
 				buffReader.close();
-				uuids = Filter.useFilter(dataset, tools.getIDGetter(dataset));
 				dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR,
@@ -97,44 +98,63 @@ public class ExtractClusteringResultAsCSVActivity extends AbstractCDKActivity {
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR);
 			}
 			try {
-				// Write statistics file.
-				ClusterEvaluation eval = new ClusterEvaluation();
-				eval.setClusterer(clusterer);
-				eval.evaluateClusterer(dataset);
-				String path = new File(files.get(0)).getParent();
+				double[][] s = tools.generateSilhouettePlot(dataset, clusterer);
+				// Generate csv
+				File file = new File(files.get(0));
 				String name = clusterer.getClass().getSimpleName();
-				File resultFile = FileNameGenerator.getNewFile(path, ".txt",
-						name + tools.getOptionsFromFile(new File(files.get(i)), name) + "_ClusteringStats");
-				PrintWriter writer = new PrintWriter(resultFile);
-				resultFiles.add(resultFile.getPath());
-				writer.write(eval.clusterResultsToString());
-				writer.close();
-				// Write UUID-Cluster CSV file
-				resultFile = FileNameGenerator.getNewFile(path, ".csv",
-						name + tools.getOptionsFromFile(new File(files.get(i)), name) + "_UUIDCluster");
-				writer = new PrintWriter(resultFile);
-				resultFiles.add(resultFile.getPath());
-				writer.write("UUID;Cluster_Number;\n");
-				for (int j = 0; j < dataset.numInstances(); j++) {
-					Instance instance = dataset.instance(j);
-					int cluster = clusterer.clusterInstance(instance);
-					String uuid = uuids.instance(j).stringValue(0);
-					writer.write(uuid + ";" + cluster + ";\n");
+				String options = tools.getOptionsFromFile(new File(files.get(i)), name);
+				int jobID = tools.getIDFromOptions(options);
+				file = FileNameGenerator.getNewFile(file.getParent(), ".csv", name + options + "-Silhouette");
+				String line = "";
+				PrintWriter writer = new PrintWriter(file);
+				line += "Cluster;Index;SilhouetteWidth;";
+				writer.write(line + "\n");
+				for (int j = 0; j < clusterer.numberOfClusters(); j++) {
+					Arrays.sort(s[j]);
+					for (int k = 0; k < s[j].length; k++) {
+						line = (j + 1) + ";" + (k + 1) + ";" + String.format("%.2f", s[j][k]) + ";";
+						writer.write(line + "\n");
+					}
 				}
 				writer.close();
+				resultFiles.add(file.getPath());
+				// Save mean value
+				LinkedList<String> meanList = meanTable.get(jobID);
+				double mean = tools.calculateSilhouetteMean(s);
+				if (meanList == null) {
+					meanList = new LinkedList<String>();
+					meanTable.put(jobID, meanList);
+				}
+				meanList.add(clusterer.numberOfClusters() + ";" + mean + ";");
+				if (i == (files.size() - 1)) {
+					// Write mean csv
+					file = FileNameGenerator.getNewFile(file.getParent(), ".csv", "Silhouette-Mean");
+					writer = new PrintWriter(file);
+					line = "JobID;NumberOfClusters;Mean;";
+					writer.write(line + "\n");
+					for (Entry<Integer, LinkedList<String>> entry : meanTable.entrySet()) {
+						int id = entry.getKey();
+						LinkedList<String> ml = entry.getValue();
+						for (String m : ml) {
+							line = id + ";" + m;
+							writer.write(line + "\n");
+						}
+					}
+					writer.close();
+					resultFiles.add(file.getPath());
+				}
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR,
 						this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
 			}
 		}
-		// Set output
 		this.setOutputAsStringList(resultFiles, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override
 	public String getActivityName() {
-		return ExtractClusteringResultAsCSVActivity.EXTRACT_CLUSTERING_RESULT_AS_CSV_ACTIVITY;
+		return GenerateSilhouettePlotFromClusteringResultAsCSVActivity.GENERATE_SILHOUETTE_PLOT_FROM_CLUSTERING_RESULT_AS_CSV_ACTIVITY;
 	}
 
 	@Override
@@ -145,11 +165,12 @@ public class ExtractClusteringResultAsCSVActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getDescription() {
-		return "Description: " + ExtractClusteringResultAsCSVActivity.EXTRACT_CLUSTERING_RESULT_AS_CSV_ACTIVITY;
+		return "Description: "
+				+ GenerateSilhouettePlotFromClusteringResultAsCSVActivity.GENERATE_SILHOUETTE_PLOT_FROM_CLUSTERING_RESULT_AS_CSV_ACTIVITY;
 	}
 
 	@Override
 	public String getFolderName() {
-		return CDKTavernaConstants.WEKA_FOLDER_NAME;
+		return CDKTavernaConstants.WEKA_CLUSTERING_FOLDER_NAME;
 	}
 }

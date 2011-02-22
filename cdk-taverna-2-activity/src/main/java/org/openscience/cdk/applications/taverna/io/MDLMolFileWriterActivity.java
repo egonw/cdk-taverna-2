@@ -93,7 +93,7 @@ public class MDLMolFileWriterActivity extends AbstractCDKActivity {
 				if (atomContainer.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
 					file = FileNameGenerator.getNewFile(directory, extension, name, this.iteration);
 				} else {
-					UUID uuid = (UUID) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID);
+					UUID uuid = UUID.fromString((String) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID));
 					file = FileNameGenerator.getNewFileFromUUID(directory, extension, uuid);
 				}
 				try {

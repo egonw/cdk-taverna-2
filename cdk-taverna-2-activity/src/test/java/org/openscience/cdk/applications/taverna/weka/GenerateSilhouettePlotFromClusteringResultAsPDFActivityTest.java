@@ -36,6 +36,7 @@ import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.setup.SetupController;
+import org.openscience.cdk.applications.taverna.weka.clustering.GenerateSilhouettePlotFromClusteringResultAsPDFActivity;
 
 /**
  * Test class for the generate silhouette plot from clustering result as CSV

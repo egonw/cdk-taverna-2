@@ -25,7 +25,7 @@ import org.openscience.cdk.applications.taverna.ui.qsar.CurateQSARVectorConfigur
 import org.openscience.cdk.applications.taverna.ui.qsar.QSARDescriptorConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.reactionenumerator.ReactionEnumeratorConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.weka.WekaClusteringConfigurationPanelController;
-import org.openscience.cdk.applications.taverna.weka.WekaClusteringActivity;
+import org.openscience.cdk.applications.taverna.weka.clustering.WekaClusteringActivity;
 
 public class CDKConfigurationPanelFactory {
 

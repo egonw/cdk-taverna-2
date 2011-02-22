@@ -152,9 +152,6 @@ public class QueryFragmentScorerActivity extends AbstractCDKActivity {
 				if (fragment_molecule.getProperty(CDKTavernaConstants.FRAGMENT_SCORE) == null) {
 					fragment_molecule.setProperty(CDKTavernaConstants.FRAGMENT_SCORE, fragment_Weight);
 				}
-				if (fragment_molecule.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
-					fragment_molecule.setProperty(CDKTavernaConstants.MOLECULEID, molecule);
-				}
 				if (fragment_molecule.getProperty(CDKTavernaConstants.SIGNATURE) == null) {
 					fragment_molecule.setProperty(CDKTavernaConstants.SIGNATURE, fragment);
 				}

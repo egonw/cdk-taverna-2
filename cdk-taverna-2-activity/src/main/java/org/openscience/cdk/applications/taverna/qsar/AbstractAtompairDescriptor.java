@@ -111,7 +111,7 @@ public abstract class AbstractAtompairDescriptor extends AbstractCDKActivity {
 				try {
 					if (molecule.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
 						UUID uuid = UUID.randomUUID();
-						molecule.setProperty(CDKTavernaConstants.MOLECULEID, uuid);
+						molecule.setProperty(CDKTavernaConstants.MOLECULEID, uuid.toString());
 					}
 					for (int j = 0; j < molecule.getAtomCount(); j++) {
 						for (int i = 0; i < molecule.getAtomCount(); i++) {

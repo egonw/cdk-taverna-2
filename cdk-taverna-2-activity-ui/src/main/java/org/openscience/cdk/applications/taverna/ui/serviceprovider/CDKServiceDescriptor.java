@@ -1,6 +1,7 @@
 package org.openscience.cdk.applications.taverna.ui.serviceprovider;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -81,8 +82,13 @@ public class CDKServiceDescriptor extends ServiceDescription<CDKActivityConfigur
 	 */
 	@Override
 	public List<String> getPath() {
-		// For deeper paths you may return several strings
-		return Arrays.asList(CDKTavernaConstants.CDK_TAVERNA_FOLDER_NAME, this.folderName);
+		List<String> folders = new ArrayList<String>();
+		folders.add(CDKTavernaConstants.CDK_TAVERNA_FOLDER_NAME);
+		String[] subfolders = this.folderName.split("\\\\");
+		for (String s : subfolders) {
+			folders.add(s);
+		}
+		return folders;
 	}
 
 	/**

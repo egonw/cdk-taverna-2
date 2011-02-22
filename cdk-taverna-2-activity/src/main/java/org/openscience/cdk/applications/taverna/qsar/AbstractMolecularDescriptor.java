@@ -109,7 +109,7 @@ public abstract class AbstractMolecularDescriptor extends AbstractCDKActivity {
 				try {
 					if (molecule.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
 						UUID uuid = UUID.randomUUID();
-						molecule.setProperty(CDKTavernaConstants.MOLECULEID, uuid);
+						molecule.setProperty(CDKTavernaConstants.MOLECULEID, uuid.toString());
 					}
 					DescriptorValue value = this.descriptor.calculate(molecule);
 					molecule.setProperty(value.getSpecification(), value);

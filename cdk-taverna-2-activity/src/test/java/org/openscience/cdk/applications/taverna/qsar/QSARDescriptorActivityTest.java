@@ -82,7 +82,7 @@ public class QSARDescriptorActivityTest extends CDKTavernaTestCases {
 		for (CMLChemFile chemFile : chemFiles) {
 			IAtomContainer container = chemFile.getChemSequence(0).getChemModel(0).getMoleculeSet().getAtomContainer(0);
 			UUID uuid = UUID.randomUUID();
-			container.setProperty(CDKTavernaConstants.MOLECULEID, uuid);
+			container.setProperty(CDKTavernaConstants.MOLECULEID, uuid.toString());
 		}
 		List<byte[]> data = CDKObjectHandler.getBytesList(chemFiles);
 		inputs.put(activity.INPUT_PORTS[0], data);

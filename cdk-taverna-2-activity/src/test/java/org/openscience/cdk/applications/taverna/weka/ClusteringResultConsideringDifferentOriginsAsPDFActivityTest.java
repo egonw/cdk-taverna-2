@@ -41,6 +41,8 @@ import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.qsar.CSVToQSARVectorActivity;
 import org.openscience.cdk.applications.taverna.setup.SetupController;
+import org.openscience.cdk.applications.taverna.weka.clustering.ClusteringResultConsideringDifferentOriginsAsPDF;
+import org.openscience.cdk.applications.taverna.weka.clustering.WekaClusteringActivity;
 
 /**
  * Test class for the create extract clustering result as PDF activity.

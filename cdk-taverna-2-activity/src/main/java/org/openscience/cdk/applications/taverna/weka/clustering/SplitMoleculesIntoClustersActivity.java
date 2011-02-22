@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna.weka;
+package org.openscience.cdk.applications.taverna.weka.clustering;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -158,6 +158,6 @@ public class SplitMoleculesIntoClustersActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getFolderName() {
-		return CDKTavernaConstants.WEKA_FOLDER_NAME;
+		return CDKTavernaConstants.WEKA_CLUSTERING_FOLDER_NAME;
 	}
 }

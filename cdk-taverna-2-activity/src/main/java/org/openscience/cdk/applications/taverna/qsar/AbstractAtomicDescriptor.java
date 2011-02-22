@@ -111,7 +111,7 @@ public abstract class AbstractAtomicDescriptor extends AbstractCDKActivity {
 				try {
 					if (molecule.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
 						UUID uuid = UUID.randomUUID();
-						molecule.setProperty(CDKTavernaConstants.MOLECULEID, uuid);
+						molecule.setProperty(CDKTavernaConstants.MOLECULEID, uuid.toString());
 					}
 					for (int j = 0; j < molecule.getAtomCount(); j++) {
 						DescriptorValue value = this.descriptor.calculate(molecule.getAtom(j), molecule);

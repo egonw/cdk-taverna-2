@@ -34,12 +34,16 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.AreaRenderer;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.xy.XYDataset;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 
 import com.itextpdf.text.Document;
@@ -94,6 +98,31 @@ public class ChartTool {
 		renderer.setSeriesPaint(4, Color.green);
 		return chart;
 	}
+	
+    public JFreeChart createScatterPlot(XYDataset dataset) {
+        JFreeChart chart = ChartFactory.createScatterPlot("Scatter Plot Demo 1",
+                "X", "Y", dataset, PlotOrientation.VERTICAL, true, false, false);
+
+        XYPlot plot = (XYPlot) chart.getPlot();
+        plot.setNoDataMessage("NO DATA");
+        plot.setDomainZeroBaselineVisible(true);
+        plot.setRangeZeroBaselineVisible(true);
+
+        XYLineAndShapeRenderer renderer
+                = (XYLineAndShapeRenderer) plot.getRenderer();
+        renderer.setSeriesOutlinePaint(0, Color.black);
+        renderer.setUseOutlinePaint(true);
+        NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
+        domainAxis.setAutoRangeIncludesZero(false);
+        domainAxis.setTickMarkInsideLength(2.0f);
+        domainAxis.setTickMarkOutsideLength(0.0f);
+
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setTickMarkInsideLength(2.0f);
+        rangeAxis.setTickMarkOutsideLength(0.0f);
+
+        return chart;
+    }
 
 	/**
 	 * Creates a bar chart.

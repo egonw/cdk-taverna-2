@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.weka.WekaClusteringActivity;
+import org.openscience.cdk.applications.taverna.weka.clustering.WekaClusteringActivity;
 
 import weka.clusterers.Clusterer;
 import weka.core.Instances;
