@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.LineNumberReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,11 +14,14 @@ import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.reference.impl.external.file.FileReference;
 import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 
+import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
+import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.MDLV2000Reader;
 
 public class IterativeSDFileReaderActivity extends AbstractCDKActivity {
@@ -76,10 +80,9 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity {
 			LineNumberReader lineReader = new LineNumberReader(new FileReader(file));
 			String line;
 			String SDFilePart = "";
-			int counter = 0;
 			List<CMLChemFile> resultList = new ArrayList<CMLChemFile>();
-			line = lineReader.readLine();
 			do {
+				line = lineReader.readLine();
 				if (line != null) {
 					SDFilePart += line + "\n";
 					if (line.contains("$$$$")) {
@@ -89,8 +92,7 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity {
 									SDFilePart.getBytes()));
 							tmpMDLReader.read(cmlChemFile);
 							tmpMDLReader.close();
-							resultList.add(cmlChemFile);
-							counter++;
+							resultList.add(cmlChemFile);	
 						} catch (Exception e) {
 							ErrorLogger.getInstance().writeError("Error reading molecule in SD file:",
 									this.getActivityName(), e);
@@ -100,14 +102,12 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity {
 						}
 					}
 				}
-				if (line == null || counter >= readSize) {
+				if (line == null || resultList.size() >= readSize) {
 					T2Reference containerRef = this.setIterativeOutputAsList(resultList, this.OUTPUT_PORTS[0], index);
 					outputList.add(index, containerRef);
 					index++;
-					counter = 0;
 					resultList.clear();
 				}
-				line = lineReader.readLine();
 			} while (line != null);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.READ_FILE_ERROR + file.getPath(),
