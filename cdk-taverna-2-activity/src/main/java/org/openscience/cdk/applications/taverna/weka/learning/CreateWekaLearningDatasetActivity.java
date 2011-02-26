@@ -21,11 +21,12 @@
  */
 package org.openscience.cdk.applications.taverna.weka.learning;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
-import org.openscience.cdk.applications.art2aclassification.FingerprintItem;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
@@ -51,7 +52,7 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 	 */
 	public CreateWekaLearningDatasetActivity() {
 		this.INPUT_PORTS = new String[] { "Weka Dataset", "ID Class CSV" };
-		this.OUTPUT_PORTS = new String[] { "Weka Learning Dataset" };
+		this.OUTPUT_PORTS = new String[] { "Weka Train Datasets", "Weka Test Datasets" };
 	}
 
 	@Override
@@ -62,7 +63,8 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.OUTPUT_PORTS[0], 0);
+		addOutput(this.OUTPUT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[1], 1);
 	}
 
 	@Override
@@ -77,7 +79,10 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 			classMap.put(UUID.fromString(frag[0]), Double.valueOf(frag[1]));
 		}
 		Instances learningSet = null;
+		List<Instances> trainSets = new ArrayList<Instances>();
+		List<Instances> testSets = new ArrayList<Instances>();
 		try {
+			// Create the whole dataset
 			FastVector attributes = new FastVector();
 			for (int i = 0; i < dataset.numAttributes(); i++) {
 				attributes.addElement(dataset.attribute(i));
@@ -98,12 +103,23 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 				inst.setClassValue(classMap.get(uuid));
 				learningSet.add(inst);
 			}
+			learningSet.randomize(new Random());
+			// Split into train/test set
+			for (double fraction = 0.05; fraction <= 0.8; fraction += 0.05) {
+				int numTrain = (int) (learningSet.numInstances() * fraction);
+				int numTest = learningSet.numInstances() - numTrain;
+				Instances trainset = new Instances(learningSet, 0, numTrain);
+				Instances testset = new Instances(learningSet, numTrain, numTest);
+				trainSets.add(trainset);
+				testSets.add(testset);
+			}
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError("Error during learning dataset creation!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		// Set output
-		this.setOutputAsObject(learningSet, this.OUTPUT_PORTS[0]);
+		this.setOutputAsObjectList(trainSets, this.OUTPUT_PORTS[0]);
+		this.setOutputAsObjectList(testSets, this.OUTPUT_PORTS[1]);
 	}
 
 	@Override

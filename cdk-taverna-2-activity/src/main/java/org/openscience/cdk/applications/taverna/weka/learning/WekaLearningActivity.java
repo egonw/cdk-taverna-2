@@ -25,7 +25,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.reference.impl.external.file.FileReference;
@@ -37,11 +36,10 @@ import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator
 import org.openscience.cdk.applications.taverna.basicutilities.Tools;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
-import weka.classifiers.Evaluation;
+import weka.classifiers.Classifier;
 import weka.classifiers.functions.LibSVM;
 import weka.classifiers.functions.LinearRegression;
 import weka.classifiers.functions.MultilayerPerceptron;
-import weka.classifiers.trees.J48;
 import weka.classifiers.trees.M5P;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
@@ -61,13 +59,13 @@ public class WekaLearningActivity extends AbstractCDKActivity {
 	 * Creates a new instance.
 	 */
 	public WekaLearningActivity() {
-		this.INPUT_PORTS = new String[] { "Weka Learning Dataset", "File" };
-		this.OUTPUT_PORTS = new String[] { "Model File" };
+		this.INPUT_PORTS = new String[] { "Weka Train Datasets", "File" };
+		this.OUTPUT_PORTS = new String[] { "Models Files", "Train Data Files" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		addInput(this.INPUT_PORTS[0], 0, true, null, byte[].class);
+		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
 		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
 		expectedReferences.add(FileReference.class);
 		expectedReferences.add(InlineStringReference.class);
@@ -76,28 +74,41 @@ public class WekaLearningActivity extends AbstractCDKActivity {
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.OUTPUT_PORTS[0], 0);
+		addOutput(this.OUTPUT_PORTS[0], 1);
+		addOutput(this.OUTPUT_PORTS[1], 1);
 	}
 
 	@Override
 	public void work() throws Exception {
 		// Get input
-		Instances dataset = this.getInputAsObject(this.INPUT_PORTS[0], Instances.class);
+		List<Instances> dataset = this.getInputAsList(this.INPUT_PORTS[0], Instances.class);
 		File targetFile = this.getInputAsFile(this.INPUT_PORTS[1]);
 		String directory = Tools.getDirectory(targetFile);
 		String name = Tools.getFileName(targetFile);
-		// Do work
-		ArrayList<String> resultFiles = new ArrayList<String>();
+		// Do work 0
+		Classifier[] classifiers = new Classifier[] { new LinearRegression(), new M5P(), new MultilayerPerceptron(),
+				new LibSVM(), new LibSVM() };
+		String[] options = new String[] { "", "", "", "-S 3 -K 3", "-S 4 -K 3" };
+		ArrayList<String> modelFiles = new ArrayList<String>();
+		ArrayList<String> dataFiles = new ArrayList<String>();
 		WekaTools tools = new WekaTools();
-		dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
-		Evaluation eval = new Evaluation(dataset);
-		LinearRegression tree = new LinearRegression();
-		eval.crossValidateModel(tree, dataset, 10, new Random(1));
-		File classifierFile = FileNameGenerator.getNewFile(directory, ".model", name + "_" + tree.getClass().getSimpleName());
-		SerializationHelper.write(classifierFile.getPath(), tree);
-		resultFiles.add(classifierFile.getPath());
+		for (int i = 0; i < dataset.size(); i++) {
+			Instances trainset = dataset.get(i);
+			File dataFile = FileNameGenerator.getNewFile(directory, ".data", name + "_set");
+			SerializationHelper.write(dataFile.getPath(), trainset);
+			dataFiles.add(dataFile.getPath());
+			trainset = Filter.useFilter(trainset, tools.getIDRemover(trainset));
+			Classifier classifier = classifiers[1];
+			classifier.setOptions(options[1].split(" "));
+			classifier.buildClassifier(trainset);
+			File classifierFile = FileNameGenerator.getNewFile(directory, ".model", name + "_"
+					+ classifier.getClass().getSimpleName());
+			SerializationHelper.write(classifierFile.getPath(), classifier);
+			modelFiles.add(classifierFile.getPath());
+		}
 		// Set output
-		this.setOutputAsString(resultFiles.get(0), this.OUTPUT_PORTS[0]);
+		this.setOutputAsStringList(modelFiles, this.OUTPUT_PORTS[0]);
+		this.setOutputAsStringList(dataFiles, this.OUTPUT_PORTS[1]);
 	}
 
 	@Override

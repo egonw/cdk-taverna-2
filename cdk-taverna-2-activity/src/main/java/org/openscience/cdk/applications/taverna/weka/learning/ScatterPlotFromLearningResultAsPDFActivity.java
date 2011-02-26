@@ -33,6 +33,7 @@ import net.sf.taverna.t2.reference.impl.external.file.FileReference;
 import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 
 import org.jfree.chart.JFreeChart;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
@@ -42,6 +43,7 @@ import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
 import weka.classifiers.Classifier;
+import weka.classifiers.Evaluation;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
 import weka.filters.Filter;
@@ -60,7 +62,7 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 	 * Creates a new instance.
 	 */
 	public ScatterPlotFromLearningResultAsPDFActivity() {
-		this.INPUT_PORTS = new String[] { "Model File", "Weka Dataset", "ID Class CSV" };
+		this.INPUT_PORTS = new String[] { "Model Files", "Train Data Files", "Test Datasets", "ID Class CSV" };
 		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
@@ -69,9 +71,13 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
 		expectedReferences.add(FileReference.class);
 		expectedReferences.add(InlineStringReference.class);
-		addInput(this.INPUT_PORTS[0], 0, false, expectedReferences, null);
-		addInput(this.INPUT_PORTS[1], 0, true, null, byte[].class);
-		addInput(this.INPUT_PORTS[2], 1, true, null, String.class);
+		addInput(this.INPUT_PORTS[0], 1, false, expectedReferences, null);
+		expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+		expectedReferences.add(FileReference.class);
+		expectedReferences.add(InlineStringReference.class);
+		addInput(this.INPUT_PORTS[1], 1, false, expectedReferences, null);
+		addInput(this.INPUT_PORTS[2], 1, true, null, byte[].class);
+		addInput(this.INPUT_PORTS[3], 1, true, null, String.class);
 	}
 
 	@Override
@@ -82,40 +88,101 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 	@Override
 	public void work() throws Exception {
 		// Get input
-		File targetFile = this.getInputAsFile(this.INPUT_PORTS[0]);
-		Instances dataset = this.getInputAsObject(this.INPUT_PORTS[1], Instances.class);
-		List<String> csv = this.getInputAsList(this.INPUT_PORTS[2], String.class);
+		List<File> modelFiles = this.getInputAsFileList(this.INPUT_PORTS[0]);
+		List<File> trainDataFiles = this.getInputAsFileList(this.INPUT_PORTS[1]);
+		List<Instances> testDatasets = this.getInputAsList(this.INPUT_PORTS[2], Instances.class);
+		List<String> csv = this.getInputAsList(this.INPUT_PORTS[3], String.class);
 		// Do work
 		ArrayList<String> resultFiles = new ArrayList<String>();
+		List<JFreeChart> charts = new LinkedList<JFreeChart>();
+		List<String> summary = new LinkedList<String>();
 		try {
 			HashMap<UUID, Double> orgClassMap = new HashMap<UUID, Double>();
 			HashMap<UUID, Double> calcClassMap = new HashMap<UUID, Double>();
+			ArrayList<UUID> uuids = new ArrayList<UUID>();
+			WekaTools tools = new WekaTools();
+			ChartTool chartTool = new ChartTool();
 			for (int i = 1; i < csv.size(); i++) {
 				String[] frag = csv.get(i).split(";");
-				orgClassMap.put(UUID.fromString(frag[0]), Double.valueOf(frag[1]));
+				UUID uuid = UUID.fromString(frag[0]);
+				uuids.add(uuid);
+				orgClassMap.put(uuid, Double.valueOf(frag[1]));
 			}
-			Classifier classifier = (Classifier) SerializationHelper.read(targetFile.getPath());
-			WekaTools tools = new WekaTools();
-			Instances uuidSet = Filter.useFilter(dataset, tools.getIDGetter(dataset));
-			dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
-			for (int i = 0; i < dataset.numInstances(); i++) {
-				UUID uuid = UUID.fromString(uuidSet.instance(i).stringValue(0));
-				calcClassMap.put(uuid, classifier.classifyInstance(dataset.instance(i)));
+			List<Double> trainRMSE = new ArrayList<Double>();
+			List<Double> testRMSE = new ArrayList<Double>();
+			List<Double> trainingSetRatios = new ArrayList<Double>();
+			for (int i = 0; i < trainDataFiles.size(); i++) {
+				Instances trainset = (Instances) SerializationHelper.read(trainDataFiles.get(i).getPath());
+				Instances testset = testDatasets.get(i);
+				Instances trainUUIDSet = Filter.useFilter(trainset, tools.getIDGetter(trainset));
+				trainset = Filter.useFilter(trainset, tools.getIDRemover(trainset));
+				Instances testUUIDSet = Filter.useFilter(testset, tools.getIDGetter(testset));
+				testset = Filter.useFilter(testset, tools.getIDRemover(testset));
+				// for (File modelFile : modelFiles) {
+				calcClassMap.clear();
+				double trainingSetRatio = trainset.numInstances()
+						/ (double) (trainset.numInstances() + testset.numInstances());
+				trainingSetRatios.add(trainingSetRatio);
+				Classifier classifier = (Classifier) SerializationHelper.read(modelFiles.get(i).getPath());
+				// Predict
+				for (int j = 0; j < trainset.numInstances(); j++) {
+					UUID uuid = UUID.fromString(trainUUIDSet.instance(j).stringValue(0));
+					calcClassMap.put(uuid, classifier.classifyInstance(trainset.instance(j)));
+				}
+				for (int j = 0; j < testset.numInstances(); j++) {
+					UUID uuid = UUID.fromString(testUUIDSet.instance(j).stringValue(0));
+					calcClassMap.put(uuid, classifier.classifyInstance(testset.instance(j)));
+				}
+				// Evaluate model
+				Evaluation trainEval = new Evaluation(trainset);
+				trainEval.evaluateModel(classifier, trainset);
+				Evaluation testEval = new Evaluation(testset);
+				testEval.evaluateModel(classifier, testset);
+				// Create chart
+				DefaultXYDataset xyDataSet = new DefaultXYDataset();
+				String trainSeries = "Training Set (RMSE: " + String.format("%.2f", trainEval.rootMeanSquaredError()) + ")";
+				XYSeries series = new XYSeries(trainSeries);
+				for (int j = 0; j < trainUUIDSet.numInstances(); j++) {
+					UUID uuid = UUID.fromString(trainUUIDSet.instance(j).stringValue(0));
+					double org = orgClassMap.get(uuid);
+					double calc = calcClassMap.get(uuid);
+					series.add(org, calc);
+				}
+				xyDataSet.addSeries(trainSeries, series.toArray());
+				String testSeries = "Test Set (RMSE: " + String.format("%.2f", testEval.rootMeanSquaredError()) + ")";
+				series = new XYSeries(testSeries);
+				for (int j = 0; j < testUUIDSet.numInstances(); j++) {
+					UUID uuid = UUID.fromString(testUUIDSet.instance(j).stringValue(0));
+					double org = orgClassMap.get(uuid);
+					double calc = calcClassMap.get(uuid);
+					series.add(org, calc);
+				}
+				xyDataSet.addSeries(testSeries, series.toArray());
+				charts.add(chartTool.createScatterPlot(xyDataSet, classifier.getClass().getSimpleName()
+						+ "\n Training set ratio: " + String.format("%.2f", trainingSetRatios.get(i)) + "%", "Original values",
+						"Predicted values"));
+				// Create summary
+				String sum = "Method: " + classifier.getClass().getSimpleName() + "\n\n";
+				sum += "Training Set:\n";
+				trainRMSE.add(trainEval.rootMeanSquaredError());
+				sum += trainEval.toSummaryString(true);
+				sum += "\nTest Set:\n";
+				testRMSE.add(testEval.rootMeanSquaredError());
+				sum += testEval.toSummaryString(true);
+				summary.add(sum);
 			}
-			List<JFreeChart> charts = new LinkedList<JFreeChart>();
-			ChartTool chartTool = new ChartTool();
-			DefaultXYDataset xyDataSet = new DefaultXYDataset();
-			XYSeries series = new XYSeries("Result");
-			for (int i = 0; i < uuidSet.numInstances(); i++) {
-				UUID uuid = UUID.fromString(uuidSet.instance(i).stringValue(0));
-				double org = orgClassMap.get(uuid);
-				double calc = calcClassMap.get(uuid);
-				series.add(org, calc);
+			// }
+			// Create RMSE Plot
+			DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
+			for (int i = 0; i < trainRMSE.size(); i++) {
+				dataSet.addValue(trainRMSE.get(i), "Training Set", String.format("%.2f", trainingSetRatios.get(i))
+						+ "%");
+				dataSet.addValue(testRMSE.get(i), "Test Set", String.format("%.2f", trainingSetRatios.get(i)) + "%");
 			}
-			xyDataSet.addSeries("Result", series.toArray());
-			charts.add(chartTool.createScatterPlot(xyDataSet));
-			File file = FileNameGenerator.getNewFile(targetFile.getParent(), ".pdf", "ScatterPlot");
-			chartTool.writeChartAsPDF(file, charts);
+			charts.add(chartTool.createLineChart("RMSE Plot", "Training set ratio", "RMSE", dataSet));
+			// Write PDF
+			File file = FileNameGenerator.getNewFile(modelFiles.get(0).getParent(), ".pdf", "ScatterPlot");
+			chartTool.writeChartAsPDF(file, charts, summary);
 			resultFiles.add(file.getPath());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -137,7 +204,8 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 
 	@Override
 	public String getDescription() {
-		return "Description: " + ScatterPlotFromLearningResultAsPDFActivity.SCATTER_PLOT_FROM_LEARNING_RESULT_AS_PDF_ACTIVITY;
+		return "Description: "
+				+ ScatterPlotFromLearningResultAsPDFActivity.SCATTER_PLOT_FROM_LEARNING_RESULT_AS_PDF_ACTIVITY;
 	}
 
 	@Override

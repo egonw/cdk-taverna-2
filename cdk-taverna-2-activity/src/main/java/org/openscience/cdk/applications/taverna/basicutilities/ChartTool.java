@@ -32,6 +32,7 @@ import java.util.List;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.NumberAxis;
@@ -48,6 +49,9 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.DefaultFontMapper;
 import com.itextpdf.text.pdf.PdfContentByte;
@@ -98,31 +102,31 @@ public class ChartTool {
 		renderer.setSeriesPaint(4, Color.green);
 		return chart;
 	}
-	
-    public JFreeChart createScatterPlot(XYDataset dataset) {
-        JFreeChart chart = ChartFactory.createScatterPlot("Scatter Plot Demo 1",
-                "X", "Y", dataset, PlotOrientation.VERTICAL, true, false, false);
 
-        XYPlot plot = (XYPlot) chart.getPlot();
-        plot.setNoDataMessage("NO DATA");
-        plot.setDomainZeroBaselineVisible(true);
-        plot.setRangeZeroBaselineVisible(true);
+	public JFreeChart createScatterPlot(XYDataset dataset, String header, String xAxis, String yAxis) {
+		JFreeChart chart = ChartFactory.createScatterPlot(header, xAxis, yAxis, dataset,
+				PlotOrientation.VERTICAL, true, false, false);
 
-        XYLineAndShapeRenderer renderer
-                = (XYLineAndShapeRenderer) plot.getRenderer();
-        renderer.setSeriesOutlinePaint(0, Color.black);
-        renderer.setUseOutlinePaint(true);
-        NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
-        domainAxis.setAutoRangeIncludesZero(false);
-        domainAxis.setTickMarkInsideLength(2.0f);
-        domainAxis.setTickMarkOutsideLength(0.0f);
+		XYPlot plot = (XYPlot) chart.getPlot();
+		plot.setNoDataMessage("NO DATA");
+		plot.setDomainZeroBaselineVisible(true);
+		plot.setRangeZeroBaselineVisible(true);
+		XYLineAnnotation annotation = new XYLineAnnotation(-100, -100, 100, 100);
+		plot.addAnnotation(annotation);
+		XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
+		renderer.setSeriesOutlinePaint(0, Color.black);
+		renderer.setUseOutlinePaint(true);
+		NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
+		domainAxis.setAutoRangeIncludesZero(false);
+		domainAxis.setTickMarkInsideLength(2.0f);
+		domainAxis.setTickMarkOutsideLength(0.0f);
 
-        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-        rangeAxis.setTickMarkInsideLength(2.0f);
-        rangeAxis.setTickMarkOutsideLength(0.0f);
+		NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+		rangeAxis.setTickMarkInsideLength(2.0f);
+		rangeAxis.setTickMarkOutsideLength(0.0f);
 
-        return chart;
-    }
+		return chart;
+	}
 
 	/**
 	 * Creates a bar chart.
@@ -200,6 +204,19 @@ public class ChartTool {
 	 * @throws IOException
 	 */
 	public synchronized void writeChartAsPDF(File file, List<JFreeChart> charts) throws IOException {
+		this.writeChartAsPDF(file, charts, null);
+	}
+
+	/**
+	 * Writes given charts into target PDF file.
+	 * 
+	 * @param file
+	 * @param charts
+	 * @param annotations
+	 * @throws IOException
+	 */
+	public synchronized void writeChartAsPDF(File file, List<JFreeChart> charts, List<String> annotations)
+			throws IOException {
 		Rectangle pagesize = new Rectangle(this.width, this.height);
 		Document document = new Document(pagesize, 50, 50, 50, 50);
 		try {
@@ -207,20 +224,37 @@ public class ChartTool {
 			document.addAuthor("CDK-Taverna 2.0");
 			document.open();
 			PdfContentByte cb = writer.getDirectContent();
-			for (JFreeChart chart : charts) {
-				PdfTemplate tp = cb.createTemplate(this.width, this.height);
-				Graphics2D g2 = tp.createGraphics(this.width, this.height, new DefaultFontMapper());
-				Rectangle2D r2D = new Rectangle2D.Double(0, 0, this.width, this.height);
-				chart.draw(g2, r2D);
-				g2.dispose();
-				cb.addTemplate(tp, 0, 0);
+			for (int i = 0; i < charts.size(); i++) {
+				JFreeChart chart = charts.get(i);
+				this.addChartPageToPDF(chart, cb);
 				document.newPage();
+				if (annotations != null && annotations.size() >= i + 1) {
+					this.addAnnotationToPDF(annotations.get(i), document);
+					document.newPage();
+				}
 			}
 		} catch (DocumentException e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.CANT_CREATE_PDF_FILE + file.getPath(),
 					this.getClass().getSimpleName(), e);
 		}
 		document.close();
+	}
+
+	private void addChartPageToPDF(JFreeChart chart, PdfContentByte cb) {
+		PdfTemplate tp = cb.createTemplate(this.width, this.height);
+		Graphics2D g2 = tp.createGraphics(this.width, this.height, new DefaultFontMapper());
+		Rectangle2D r2D = new Rectangle2D.Double(0, 0, this.width, this.height);
+		chart.draw(g2, r2D);
+		g2.dispose();
+		cb.addTemplate(tp, 0, 0);
+	}
+
+	private void addAnnotationToPDF(String annotation, Document document) throws DocumentException {
+		Paragraph para = new Paragraph();
+		Font font = FontFactory.getFont(FontFactory.HELVETICA, 18);
+		para.setFont(font);
+		para.add(annotation);
+		document.add(para);
 	}
 
 	/**
