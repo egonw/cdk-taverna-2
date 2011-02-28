@@ -38,7 +38,7 @@ import javax.swing.border.BevelBorder;
  * 
  * @author Andreas Truszkowski
  */
-public abstract class AbstractConfigurationFrame extends JDialog {
+public abstract class AbstractClusteringConfigurationFrame extends JDialog {
 
 	private static final long serialVersionUID = 8133794885345768027L;
 
@@ -54,7 +54,7 @@ public abstract class AbstractConfigurationFrame extends JDialog {
 	/**
 	 * Creates a new instance.
 	 */
-	public AbstractConfigurationFrame() {
+	public AbstractClusteringConfigurationFrame() {
 		setAlwaysOnTop(true);
 		setModal(true);
 		this.setTitle(this.getConfiguredClass().getSimpleName());

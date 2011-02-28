@@ -33,7 +33,7 @@ import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 
 import org.openscience.cdk.applications.taverna.ui.weka.WekaClusteringConfigurationPanelController;
-import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractConfigurationFrame;
+import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClusteringConfigurationFrame;
 
 import weka.clusterers.Clusterer;
 import weka.clusterers.HierarchicalClusterer;
@@ -44,7 +44,7 @@ import weka.clusterers.HierarchicalClusterer;
  * @author Andreas Truszkowski
  * 
  */
-public class HierarchicalClustererFrame extends AbstractConfigurationFrame {
+public class HierarchicalClustererFrame extends AbstractClusteringConfigurationFrame {
 
 	private static final long serialVersionUID = 3225727167693843163L;
 	private static final String[] LINK_TYPES = { "SINGLE", "COMPLETE", "AVERAGE", "MEAN", "CENTROID", "WARD", "ADJCOMLPETE",

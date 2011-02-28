@@ -34,7 +34,7 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
 import org.openscience.cdk.applications.taverna.ui.weka.WekaClusteringConfigurationPanelController;
-import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractConfigurationFrame;
+import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClusteringConfigurationFrame;
 
 import weka.clusterers.Clusterer;
 import weka.clusterers.EM;
@@ -45,7 +45,7 @@ import weka.clusterers.EM;
  * @author Andreas Truszkowski
  * 
  */
-public class EMFrame extends AbstractConfigurationFrame {
+public class EMFrame extends AbstractClusteringConfigurationFrame {
 
 	private static final long serialVersionUID = 3225727167693843163L;
 	private final JLabel numberOfClustersLabel = new JLabel(" Number of clusters:");

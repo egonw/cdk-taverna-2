@@ -47,7 +47,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.iterativeio.DataStreamController;
-import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractConfigurationFrame;
+import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClusteringConfigurationFrame;
 
 /**
  * Controller class of the weka clustering configuration panel.
@@ -60,12 +60,13 @@ public class WekaClusteringConfigurationPanelController extends
 
 	private static final long serialVersionUID = -2741333043525860868L;
 	private static final String CONFIG_PACKAGE = "org.openscience.cdk.applications.taverna.ui.weka.panels.clustering";
+	
 	private WekaClusteringConfigurationPanelView view = null;
 	private AbstractCDKActivity activity;
 	private CDKActivityConfigurationBean configBean;
-	private SPIRegistry<AbstractConfigurationFrame> cdkClusteringConfigFramesRegistry = new SPIRegistry<AbstractConfigurationFrame>(
-			AbstractConfigurationFrame.class);
-	private List<AbstractConfigurationFrame> configFrames = null;
+	private SPIRegistry<AbstractClusteringConfigurationFrame> cdkClusteringConfigFramesRegistry = new SPIRegistry<AbstractClusteringConfigurationFrame>(
+			AbstractClusteringConfigurationFrame.class);
+	private List<AbstractClusteringConfigurationFrame> configFrames = null;
 	private List<Integer> jobClustererIdx = new ArrayList<Integer>();
 	private List<String[]> jobOptions = new ArrayList<String[]>();
 	private boolean isChanged = false;
@@ -163,8 +164,8 @@ public class WekaClusteringConfigurationPanelController extends
 			this.configBean = this.activity.getConfiguration();
 			this.view = new WekaClusteringConfigurationPanelView();
 			Vector<String> clustererNames = new Vector<String>();
-			this.configFrames = new ArrayList<AbstractConfigurationFrame>();
-			for (AbstractConfigurationFrame configFrame : cdkClusteringConfigFramesRegistry.getInstances()) {
+			this.configFrames = new ArrayList<AbstractClusteringConfigurationFrame>();
+			for (AbstractClusteringConfigurationFrame configFrame : cdkClusteringConfigFramesRegistry.getInstances()) {
 				if (configFrame.getClass().getName().startsWith(CONFIG_PACKAGE)) {
 					clustererNames.add(configFrame.getName());
 					this.configFrames.add(configFrame);
@@ -175,9 +176,9 @@ public class WekaClusteringConfigurationPanelController extends
 			this.view.getConfigureButton().addActionListener(this.configureAction);
 			this.view.getAddJobButton().addActionListener(this.addJobListener);
 			this.view.getRemoveJobButton().addActionListener(this.removeJobAction);
-			ClassLoader cld = getClass().getClassLoader();
-			URL url = cld.getResources("icons/open.gif").nextElement();
-			ImageIcon icon = new ImageIcon(url);
+//			ClassLoader cld = getClass().getClassLoader();
+//			URL url = cld.getResources("icons/open.gif").nextElement();
+//			ImageIcon icon = new ImageIcon(url);
 //			this.view.getChooseFileButton().setIcon(icon);
 //			this.view.getChooseFileButton().addActionListener(this.chooseFileAction);
 			this.view.getBtnClearAll().addActionListener(this.clearAllAction);

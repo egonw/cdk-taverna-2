@@ -24,6 +24,7 @@ package org.openscience.cdk.applications.taverna.weka.learning;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -92,10 +93,10 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 		List<File> trainDataFiles = this.getInputAsFileList(this.INPUT_PORTS[1]);
 		List<Instances> testDatasets = this.getInputAsList(this.INPUT_PORTS[2], Instances.class);
 		List<String> csv = this.getInputAsList(this.INPUT_PORTS[3], String.class);
+		String directory = modelFiles.get(0).getParent();
 		// Do work
 		ArrayList<String> resultFiles = new ArrayList<String>();
-		List<JFreeChart> charts = new LinkedList<JFreeChart>();
-		List<String> summary = new LinkedList<String>();
+
 		try {
 			HashMap<UUID, Double> orgClassMap = new HashMap<UUID, Double>();
 			HashMap<UUID, Double> calcClassMap = new HashMap<UUID, Double>();
@@ -108,81 +109,108 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 				uuids.add(uuid);
 				orgClassMap.put(uuid, Double.valueOf(frag[1]));
 			}
-			List<Double> trainRMSE = new ArrayList<Double>();
-			List<Double> testRMSE = new ArrayList<Double>();
-			List<Double> trainingSetRatios = new ArrayList<Double>();
-			for (int i = 0; i < trainDataFiles.size(); i++) {
-				Instances trainset = (Instances) SerializationHelper.read(trainDataFiles.get(i).getPath());
-				Instances testset = testDatasets.get(i);
-				Instances trainUUIDSet = Filter.useFilter(trainset, tools.getIDGetter(trainset));
-				trainset = Filter.useFilter(trainset, tools.getIDRemover(trainset));
-				Instances testUUIDSet = Filter.useFilter(testset, tools.getIDGetter(testset));
-				testset = Filter.useFilter(testset, tools.getIDRemover(testset));
-				// for (File modelFile : modelFiles) {
-				calcClassMap.clear();
-				double trainingSetRatio = trainset.numInstances()
-						/ (double) (trainset.numInstances() + testset.numInstances());
-				trainingSetRatios.add(trainingSetRatio);
-				Classifier classifier = (Classifier) SerializationHelper.read(modelFiles.get(i).getPath());
-				// Predict
-				for (int j = 0; j < trainset.numInstances(); j++) {
-					UUID uuid = UUID.fromString(trainUUIDSet.instance(j).stringValue(0));
-					calcClassMap.put(uuid, classifier.classifyInstance(trainset.instance(j)));
+			List<JFreeChart> rmseCharts = new ArrayList<JFreeChart>();
+			while (!modelFiles.isEmpty()) {
+				List<Double> trainRMSE = new ArrayList<Double>();
+				HashSet<Integer> trainSkippedRMSE = new HashSet<Integer>();
+				List<Double> testRMSE = new ArrayList<Double>();
+				HashSet<Integer> testSkippedRMSE = new HashSet<Integer>();
+				List<Double> trainingSetRatios = new ArrayList<Double>();
+				List<JFreeChart> charts = new LinkedList<JFreeChart>();
+				List<String> summary = new LinkedList<String>();
+				for (int j = 0; j < trainDataFiles.size(); j++) {
+					if (modelFiles.isEmpty()) {
+						break;
+					}
+					File modelFile = modelFiles.remove(0);
+					Instances trainset = (Instances) SerializationHelper.read(trainDataFiles.get(j).getPath());
+					Instances testset = testDatasets.get(j);
+					Instances trainUUIDSet = Filter.useFilter(trainset, tools.getIDGetter(trainset));
+					trainset = Filter.useFilter(trainset, tools.getIDRemover(trainset));
+					Instances testUUIDSet = Filter.useFilter(testset, tools.getIDGetter(testset));
+					testset = Filter.useFilter(testset, tools.getIDRemover(testset));
+					calcClassMap.clear();
+					double trainingSetRatio = trainset.numInstances()
+							/ (double) (trainset.numInstances() + testset.numInstances());
+					trainingSetRatios.add(trainingSetRatio);
+					Classifier classifier = (Classifier) SerializationHelper.read(modelFile.getPath());
+					// Predict
+					for (int k = 0; k < trainset.numInstances(); k++) {
+						UUID uuid = UUID.fromString(trainUUIDSet.instance(k).stringValue(0));
+						calcClassMap.put(uuid, classifier.classifyInstance(trainset.instance(k)));
+					}
+					for (int k = 0; k < testset.numInstances(); k++) {
+						UUID uuid = UUID.fromString(testUUIDSet.instance(k).stringValue(0));
+						calcClassMap.put(uuid, classifier.classifyInstance(testset.instance(k)));
+					}
+					// Evaluate model
+					Evaluation trainEval = new Evaluation(trainset);
+					trainEval.evaluateModel(classifier, trainset);
+					Evaluation testEval = new Evaluation(testset);
+					testEval.evaluateModel(classifier, testset);
+					// Create chart
+					DefaultXYDataset xyDataSet = new DefaultXYDataset();
+					String trainSeries = "Training Set (RMSE: "
+							+ String.format("%.2f", trainEval.rootMeanSquaredError()) + ")";
+					XYSeries series = new XYSeries(trainSeries);
+					for (int k = 0; k < trainUUIDSet.numInstances(); k++) {
+						UUID uuid = UUID.fromString(trainUUIDSet.instance(k).stringValue(0));
+						double org = orgClassMap.get(uuid);
+						double calc = calcClassMap.get(uuid);
+						series.add(org, calc);
+					}
+					xyDataSet.addSeries(trainSeries, series.toArray());
+					String testSeries = "Test Set (RMSE: " + String.format("%.2f", testEval.rootMeanSquaredError())
+							+ ")";
+					series = new XYSeries(testSeries);
+					for (int k = 0; k < testUUIDSet.numInstances(); k++) {
+						UUID uuid = UUID.fromString(testUUIDSet.instance(k).stringValue(0));
+						double org = orgClassMap.get(uuid);
+						double calc = calcClassMap.get(uuid);
+						series.add(org, calc);
+					}
+					xyDataSet.addSeries(testSeries, series.toArray());
+					charts.add(chartTool.createScatterPlot(xyDataSet, classifier.getClass().getSimpleName()
+							+ "\n Training set ratio: " + String.format("%.2f", trainingSetRatios.get(j)) + "%",
+							"Original values", "Predicted values"));
+					// Create summary
+					String sum = "Method: " + classifier.getClass().getSimpleName() + "\n\n";
+					sum += "Training Set:\n";
+					if (trainEval.rootRelativeSquaredError() > 300) {
+						trainSkippedRMSE.add(j);
+					}
+					trainRMSE.add(trainEval.rootMeanSquaredError());
+					sum += trainEval.toSummaryString(true);
+					sum += "\nTest Set:\n";
+					if (testEval.rootRelativeSquaredError() > 300) {
+						testSkippedRMSE.add(j);
+					}
+					testRMSE.add(testEval.rootMeanSquaredError());
+					sum += testEval.toSummaryString(true);
+					summary.add(sum);
 				}
-				for (int j = 0; j < testset.numInstances(); j++) {
-					UUID uuid = UUID.fromString(testUUIDSet.instance(j).stringValue(0));
-					calcClassMap.put(uuid, classifier.classifyInstance(testset.instance(j)));
+				// Create RMSE Plot
+				DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
+				for (int i = 0; i < trainRMSE.size(); i++) {
+					if (!trainSkippedRMSE.contains(i)) {
+						dataSet.addValue(trainRMSE.get(i), "Training Set",
+								String.format("%.2f", trainingSetRatios.get(i)) + "%");
+					}
+					if (!testSkippedRMSE.contains(i)) {
+						dataSet.addValue(testRMSE.get(i), "Test Set", String.format("%.2f", trainingSetRatios.get(i))
+								+ "%");
+					}
 				}
-				// Evaluate model
-				Evaluation trainEval = new Evaluation(trainset);
-				trainEval.evaluateModel(classifier, trainset);
-				Evaluation testEval = new Evaluation(testset);
-				testEval.evaluateModel(classifier, testset);
-				// Create chart
-				DefaultXYDataset xyDataSet = new DefaultXYDataset();
-				String trainSeries = "Training Set (RMSE: " + String.format("%.2f", trainEval.rootMeanSquaredError()) + ")";
-				XYSeries series = new XYSeries(trainSeries);
-				for (int j = 0; j < trainUUIDSet.numInstances(); j++) {
-					UUID uuid = UUID.fromString(trainUUIDSet.instance(j).stringValue(0));
-					double org = orgClassMap.get(uuid);
-					double calc = calcClassMap.get(uuid);
-					series.add(org, calc);
-				}
-				xyDataSet.addSeries(trainSeries, series.toArray());
-				String testSeries = "Test Set (RMSE: " + String.format("%.2f", testEval.rootMeanSquaredError()) + ")";
-				series = new XYSeries(testSeries);
-				for (int j = 0; j < testUUIDSet.numInstances(); j++) {
-					UUID uuid = UUID.fromString(testUUIDSet.instance(j).stringValue(0));
-					double org = orgClassMap.get(uuid);
-					double calc = calcClassMap.get(uuid);
-					series.add(org, calc);
-				}
-				xyDataSet.addSeries(testSeries, series.toArray());
-				charts.add(chartTool.createScatterPlot(xyDataSet, classifier.getClass().getSimpleName()
-						+ "\n Training set ratio: " + String.format("%.2f", trainingSetRatios.get(i)) + "%", "Original values",
-						"Predicted values"));
-				// Create summary
-				String sum = "Method: " + classifier.getClass().getSimpleName() + "\n\n";
-				sum += "Training Set:\n";
-				trainRMSE.add(trainEval.rootMeanSquaredError());
-				sum += trainEval.toSummaryString(true);
-				sum += "\nTest Set:\n";
-				testRMSE.add(testEval.rootMeanSquaredError());
-				sum += testEval.toSummaryString(true);
-				summary.add(sum);
+				JFreeChart rmseChart = chartTool.createLineChart("RMSE Plot", "Training set ratio", "RMSE", dataSet);
+				charts.add(rmseChart);
+				rmseCharts.add(rmseChart);
+				// Write PDF
+				File file = FileNameGenerator.getNewFile(directory, ".pdf", "ScatterPlot");
+				chartTool.writeChartAsPDF(file, charts, summary);
+				resultFiles.add(file.getPath());
 			}
-			// }
-			// Create RMSE Plot
-			DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
-			for (int i = 0; i < trainRMSE.size(); i++) {
-				dataSet.addValue(trainRMSE.get(i), "Training Set", String.format("%.2f", trainingSetRatios.get(i))
-						+ "%");
-				dataSet.addValue(testRMSE.get(i), "Test Set", String.format("%.2f", trainingSetRatios.get(i)) + "%");
-			}
-			charts.add(chartTool.createLineChart("RMSE Plot", "Training set ratio", "RMSE", dataSet));
-			// Write PDF
-			File file = FileNameGenerator.getNewFile(modelFiles.get(0).getParent(), ".pdf", "ScatterPlot");
-			chartTool.writeChartAsPDF(file, charts, summary);
+			File file = FileNameGenerator.getNewFile(directory, ".pdf", "RMSE-Sum");
+			chartTool.writeChartAsPDF(file, rmseCharts);
 			resultFiles.add(file.getPath());
 		} catch (Exception e) {
 			e.printStackTrace();

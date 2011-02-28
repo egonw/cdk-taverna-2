@@ -41,6 +41,7 @@ import weka.classifiers.functions.LibSVM;
 import weka.classifiers.functions.LinearRegression;
 import weka.classifiers.functions.MultilayerPerceptron;
 import weka.classifiers.trees.M5P;
+import weka.clusterers.Clusterer;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
 import weka.filters.Filter;
@@ -85,26 +86,37 @@ public class WekaLearningActivity extends AbstractCDKActivity {
 		File targetFile = this.getInputAsFile(this.INPUT_PORTS[1]);
 		String directory = Tools.getDirectory(targetFile);
 		String name = Tools.getFileName(targetFile);
-		// Do work 0
-		Classifier[] classifiers = new Classifier[] { new LinearRegression(), new M5P(), new MultilayerPerceptron(),
-				new LibSVM(), new LibSVM() };
-		String[] options = new String[] { "", "", "", "-S 3 -K 3", "-S 4 -K 3" };
-		ArrayList<String> modelFiles = new ArrayList<String>();
+		// Do work
+		// Get job informations
+		String className = (String) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_LEARNER_NAME);
+		Class<? extends Classifier> clustererClass = (Class<? extends Classifier>) Class.forName(className);
+		String optString = (String) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_LEARNER_OPTIONS);
+		String[] options = optString.split(";");
+		// Save data
 		ArrayList<String> dataFiles = new ArrayList<String>();
-		WekaTools tools = new WekaTools();
-		for (int i = 0; i < dataset.size(); i++) {
-			Instances trainset = dataset.get(i);
+		for (int j = 0; j < dataset.size(); j++) {
+			Instances trainset = dataset.get(j);
 			File dataFile = FileNameGenerator.getNewFile(directory, ".data", name + "_set");
 			SerializationHelper.write(dataFile.getPath(), trainset);
 			dataFiles.add(dataFile.getPath());
-			trainset = Filter.useFilter(trainset, tools.getIDRemover(trainset));
-			Classifier classifier = classifiers[2];
-			classifier.setOptions(options[2].split(" "));
-			classifier.buildClassifier(trainset);
-			File classifierFile = FileNameGenerator.getNewFile(directory, ".model", name + "_"
-					+ classifier.getClass().getSimpleName());
-			SerializationHelper.write(classifierFile.getPath(), classifier);
-			modelFiles.add(classifierFile.getPath());
+		}
+		// Do the job
+		ArrayList<String> modelFiles = new ArrayList<String>();
+		WekaTools tools = new WekaTools();
+		for (int i = 0; i < options.length; i++) {
+			for (int j = 0; j < dataset.size(); j++) {
+				Instances trainset = dataset.get(j);
+				trainset = Filter.useFilter(trainset, tools.getIDRemover(trainset));
+				Classifier classifier = clustererClass.newInstance();
+				classifier.setOptions(options[i].split(" "));
+				classifier.buildClassifier(trainset);
+				File classifierFile = FileNameGenerator.getNewFile(directory, ".model", name + "_"
+						+ classifier.getClass().getSimpleName(), i + 1);
+				SerializationHelper.write(classifierFile.getPath(), classifier);
+				modelFiles.add(classifierFile.getPath());
+			}
 		}
 		// Set output
 		this.setOutputAsStringList(modelFiles, this.OUTPUT_PORTS[0]);

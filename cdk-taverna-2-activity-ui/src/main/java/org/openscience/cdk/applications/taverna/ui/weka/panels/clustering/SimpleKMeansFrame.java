@@ -32,7 +32,7 @@ import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 
 import org.openscience.cdk.applications.taverna.ui.weka.WekaClusteringConfigurationPanelController;
-import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractConfigurationFrame;
+import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClusteringConfigurationFrame;
 
 import weka.clusterers.Clusterer;
 import weka.clusterers.SimpleKMeans;
@@ -43,7 +43,7 @@ import weka.clusterers.SimpleKMeans;
  * @author Andreas Truszkowski
  * 
  */
-public class SimpleKMeansFrame extends AbstractConfigurationFrame {
+public class SimpleKMeansFrame extends AbstractClusteringConfigurationFrame {
 
 	private static final long serialVersionUID = 3225727167693843163L;
 	private final JLabel numberOfClustersLabel = new JLabel("Number of clusters:");

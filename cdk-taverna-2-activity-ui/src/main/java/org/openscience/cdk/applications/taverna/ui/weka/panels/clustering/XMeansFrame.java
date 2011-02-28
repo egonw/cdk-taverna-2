@@ -34,7 +34,7 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
 import org.openscience.cdk.applications.taverna.ui.weka.WekaClusteringConfigurationPanelController;
-import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractConfigurationFrame;
+import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClusteringConfigurationFrame;
 
 import weka.clusterers.Clusterer;
 import weka.clusterers.XMeans;
@@ -45,7 +45,7 @@ import weka.clusterers.XMeans;
  * @author Andreas Truszkowski
  * 
  */
-public class XMeansFrame extends AbstractConfigurationFrame {
+public class XMeansFrame extends AbstractClusteringConfigurationFrame {
 
 	private static final long serialVersionUID = 3225727167693843163L;
 	private final JTextField iterationsOverallTextField = new JTextField();
