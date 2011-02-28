@@ -98,8 +98,8 @@ public class WekaLearningActivity extends AbstractCDKActivity {
 			SerializationHelper.write(dataFile.getPath(), trainset);
 			dataFiles.add(dataFile.getPath());
 			trainset = Filter.useFilter(trainset, tools.getIDRemover(trainset));
-			Classifier classifier = classifiers[1];
-			classifier.setOptions(options[1].split(" "));
+			Classifier classifier = classifiers[2];
+			classifier.setOptions(options[2].split(" "));
 			classifier.buildClassifier(trainset);
 			File classifierFile = FileNameGenerator.getNewFile(directory, ".model", name + "_"
 					+ classifier.getClass().getSimpleName());

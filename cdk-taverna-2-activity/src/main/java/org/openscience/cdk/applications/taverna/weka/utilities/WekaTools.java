@@ -83,8 +83,8 @@ public class WekaTools {
 	}
 
 	/**
-	 * Method which returns a filter to remove the identifier from a given
-	 * instance IMPORTANT: The identifier is the first attribute within the
+	 * Method which returns a filter to remove the identifier from given
+	 * instances. IMPORTANT: The identifier is the first attribute within the
 	 * instances
 	 * 
 	 * @param instances
@@ -104,7 +104,28 @@ public class WekaTools {
 	}
 
 	/**
-	 * Method which returns a filter to get the identifier from a given instance
+	 * Method which returns a filter to remove the class attribute from given
+	 * instances. IMPORTANT: The class attribute is the last attribute within the
+	 * instances
+	 * 
+	 * @param instances
+	 *            Instances which contains the format of the input instances
+	 * @return Weka remover filter which is configured to remove the identifier
+	 *         from the instance
+	 * @throws Exception
+	 */
+	public Remove getClassRemover(Instances instances) throws Exception {
+		Remove removeFilter = new Remove();
+		String[] removerOptionArray = new String[2];
+		removerOptionArray[0] = "-R";
+		removerOptionArray[1] = "" + (instances.numAttributes() - 1);
+		removeFilter.setOptions(removerOptionArray);
+		removeFilter.setInputFormat(instances);
+		return removeFilter;
+	}
+	
+	/**
+	 * Method which returns a filter to get the identifier from given instances.
 	 * IMPORTANT: The identifier is the first attribute within the instances
 	 * 
 	 * @param instances

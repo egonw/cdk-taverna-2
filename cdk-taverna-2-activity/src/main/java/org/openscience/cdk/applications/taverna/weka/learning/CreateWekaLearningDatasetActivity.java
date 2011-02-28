@@ -23,6 +23,7 @@ package org.openscience.cdk.applications.taverna.weka.learning;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -31,11 +32,15 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
+import weka.clusterers.EM;
+import weka.clusterers.SimpleKMeans;
 import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.filters.Filter;
 
 /**
  * Class which represents the create Weka learning dataset activity.
@@ -105,11 +110,38 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 			}
 			learningSet.randomize(new Random());
 			// Split into train/test set
-			for (double fraction = 0.05; fraction <= 0.8; fraction += 0.05) {
+			Instances trainset;
+			Instances testset;
+			for (double fraction = 0.05; fraction <= 0.5; fraction += 0.025) {
 				int numTrain = (int) (learningSet.numInstances() * fraction);
 				int numTest = learningSet.numInstances() - numTrain;
-				Instances trainset = new Instances(learningSet, 0, numTrain);
-				Instances testset = new Instances(learningSet, numTrain, numTest);
+				if (true) {
+					WekaTools tools = new WekaTools();
+					Instances clusterSet = Filter.useFilter(learningSet, tools.getIDRemover(learningSet));
+					clusterSet = Filter.useFilter(clusterSet, tools.getClassRemover(clusterSet));
+					clusterSet.setClassIndex(-1);
+					SimpleKMeans clusterer = new SimpleKMeans();
+					clusterer.setOptions(new String[] { "-N", "" + numTrain });
+					clusterer.buildClusterer(clusterSet);
+					trainset = new Instances(learningSet);
+					trainset.delete();
+					testset = new Instances(learningSet);
+					testset.delete();
+					HashSet<Integer> usedClusters = new HashSet<Integer>();
+					for (int i = 0; i < learningSet.numInstances(); i++) {
+						Instance instance = learningSet.instance(i);
+						int cluster = clusterer.clusterInstance(clusterSet.instance(i));
+						if (usedClusters.contains(cluster)) {
+							testset.add(instance);
+						} else {
+							usedClusters.add(cluster);
+							trainset.add(instance);
+						}
+					}
+				} else {
+					trainset = new Instances(learningSet, 0, numTrain);
+					testset = new Instances(learningSet, numTrain, numTest);
+				}
 				trainSets.add(trainset);
 				testSets.add(testset);
 			}
