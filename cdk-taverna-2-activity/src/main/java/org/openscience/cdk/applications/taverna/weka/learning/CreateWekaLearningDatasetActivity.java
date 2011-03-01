@@ -112,7 +112,7 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 			// Split into train/test set
 			Instances trainset;
 			Instances testset;
-			for (double fraction = 0.05; fraction <= 0.5; fraction += 0.025) {
+			for (double fraction = 0.1; fraction <= 0.75; fraction += 0.05) {
 				int numTrain = (int) (learningSet.numInstances() * fraction);
 				int numTest = learningSet.numInstances() - numTrain;
 				if (true) {

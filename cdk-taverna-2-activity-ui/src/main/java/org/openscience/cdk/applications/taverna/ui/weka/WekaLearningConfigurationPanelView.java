@@ -22,15 +22,13 @@ public class WekaLearningConfigurationPanelView extends JPanel {
 	 * Create the frame.
 	 */
 	public WekaLearningConfigurationPanelView() {
+		setLayout(new BorderLayout(0, 0));
 		//		setBounds(100, 100, 450, 300);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(new BorderLayout(0, 0));
 		
 		JPanel panel = new JPanel();
 		panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		panel.setPreferredSize(new Dimension(10, 35));
-		contentPane.add(panel, BorderLayout.NORTH);
+		add(panel, BorderLayout.NORTH);
 		SpringLayout sl_panel = new SpringLayout();
 		panel.setLayout(sl_panel);
 		

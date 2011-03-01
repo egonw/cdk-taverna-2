@@ -158,7 +158,7 @@ public class FileNameGenerator {
 	 * @return path of the OS temporary directory.
 	 */
 	public synchronized static String getTempDir() {
-		String tmpDir = System.getProperty("java.io.tmpdir") + "cdk-taverna_2" + File.separator;
+		String tmpDir = System.getProperty("java.io.tmpdir") + File.separator + "cdk-taverna_2" + File.separator;
 		File file = new File(tmpDir);
 		if (!file.exists()) {
 			file.mkdir();
