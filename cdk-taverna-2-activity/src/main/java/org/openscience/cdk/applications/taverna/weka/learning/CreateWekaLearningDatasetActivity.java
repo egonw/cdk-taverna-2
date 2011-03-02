@@ -33,7 +33,10 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
+import org.openscience.cdk.geometry.surface.Triangle;
 
+import weka.classifiers.Evaluation;
+import weka.classifiers.functions.MultilayerPerceptron;
 import weka.clusterers.EM;
 import weka.clusterers.SimpleKMeans;
 import weka.core.Attribute;
@@ -112,6 +115,8 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 			// Split into train/test set
 			Instances trainset;
 			Instances testset;
+			HashMap<Integer, Integer> trainClusterMap = new HashMap<Integer, Integer>();
+			HashMap<Integer, Integer> testClusterMap = new HashMap<Integer, Integer>();
 			for (double fraction = 0.1; fraction <= 0.75; fraction += 0.05) {
 				int numTrain = (int) (learningSet.numInstances() * fraction);
 				int numTest = learningSet.numInstances() - numTrain;
@@ -132,15 +137,45 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 						Instance instance = learningSet.instance(i);
 						int cluster = clusterer.clusterInstance(clusterSet.instance(i));
 						if (usedClusters.contains(cluster)) {
+							testClusterMap.put(testset.numInstances(), cluster);
 							testset.add(instance);
 						} else {
 							usedClusters.add(cluster);
+							trainClusterMap.put(cluster, trainset.numInstances());
 							trainset.add(instance);
 						}
 					}
 				} else {
 					trainset = new Instances(learningSet, 0, numTrain);
 					testset = new Instances(learningSet, numTrain, numTest);
+				}
+				if (true) {
+					for (int i = 0; i < 10; i++) {
+						MultilayerPerceptron classifier = new MultilayerPerceptron();
+						classifier.buildClassifier(trainset);
+						Double biggestError = null;
+						int biggestErrorInst = 0;
+						for (int j = 0; j < testset.numInstances(); j++) {
+							Instance instance = testset.instance(j);
+							double rt = Double.parseDouble(instance.stringValue(testset.classIndex()));
+							double predrt = classifier.classifyInstance(instance);
+							double error = Math.abs(rt - predrt);
+							if (biggestError == null) {
+								biggestError = error;
+								biggestErrorInst = j;
+							} else {
+								if (biggestError < error) {
+									biggestError = error;
+									biggestErrorInst = j;
+								}
+							}
+						}
+						int cluster = testClusterMap.get(biggestErrorInst);
+						int trainInstance = trainClusterMap.get(cluster);
+						Instance temp = trainset.instance(trainInstance);
+						trainset = this.replaceInstance(trainset, testset.instance(biggestErrorInst), trainInstance);
+						testset = this.replaceInstance(testset, temp, biggestErrorInst);
+					}
 				}
 				trainSets.add(trainset);
 				testSets.add(testset);
@@ -152,6 +187,19 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 		// Set output
 		this.setOutputAsObjectList(trainSets, this.OUTPUT_PORTS[0]);
 		this.setOutputAsObjectList(testSets, this.OUTPUT_PORTS[1]);
+	}
+
+	private Instances replaceInstance(Instances instances, Instance newInst, int index) {
+		Instances temp = new Instances(instances);
+		temp.delete();
+		for (int i = 0; i < instances.numInstances(); i++) {
+			if (i != index) {
+				temp.add(instances.instance(i));
+			} else {
+				temp.add(newInst);
+			}
+		}
+		return temp;
 	}
 
 	@Override
