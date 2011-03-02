@@ -24,6 +24,7 @@ package org.openscience.cdk.applications.taverna.weka.learning;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -77,6 +78,7 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 
 	@Override
 	public void work() throws Exception {
+		WekaTools tools = new WekaTools();
 		// Get input
 		Instances dataset = this.getInputAsObject(this.INPUT_PORTS[0], Instances.class);
 		List<String> csv = this.getInputAsList(this.INPUT_PORTS[1], String.class);
@@ -121,7 +123,6 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 				int numTrain = (int) (learningSet.numInstances() * fraction);
 				int numTest = learningSet.numInstances() - numTrain;
 				if (true) {
-					WekaTools tools = new WekaTools();
 					Instances clusterSet = Filter.useFilter(learningSet, tools.getIDRemover(learningSet));
 					clusterSet = Filter.useFilter(clusterSet, tools.getClassRemover(clusterSet));
 					clusterSet.setClassIndex(-1);
@@ -150,31 +151,47 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 					testset = new Instances(learningSet, numTrain, numTest);
 				}
 				if (true) {
+					System.out.println("Set: " + fraction);
+					LinkedList<Integer> blacklist = new LinkedList<Integer>(); 
 					for (int i = 0; i < 10; i++) {
+						Instances cleanTrainSet =  Filter.useFilter(trainset, tools.getIDRemover(trainset));
+						Instances cleanTestSet =  Filter.useFilter(testset, tools.getIDRemover(testset));
 						MultilayerPerceptron classifier = new MultilayerPerceptron();
-						classifier.buildClassifier(trainset);
+						classifier.setOptions(new String[] { "-N", "250"});
+						classifier.buildClassifier(cleanTrainSet);
 						Double biggestError = null;
 						int biggestErrorInst = 0;
+						if(blacklist.size() > 5) {
+							blacklist.remove();
+						}
 						for (int j = 0; j < testset.numInstances(); j++) {
 							Instance instance = testset.instance(j);
-							double rt = Double.parseDouble(instance.stringValue(testset.classIndex()));
-							double predrt = classifier.classifyInstance(instance);
+							double rt = instance.value(testset.classIndex());
+							double predrt = classifier.classifyInstance(cleanTestSet.instance(j));
 							double error = Math.abs(rt - predrt);
-							if (biggestError == null) {
+							int c = testClusterMap.get(j);
+							if(blacklist.contains(c)) {
+								continue;
+							}
+							if (biggestError == null || biggestError < error) {
 								biggestError = error;
 								biggestErrorInst = j;
-							} else {
-								if (biggestError < error) {
-									biggestError = error;
-									biggestErrorInst = j;
-								}
-							}
+								blacklist.add(c);
+							} 
+						}
+						if(biggestError == null) {
+							System.out.println("Stopped!");
+							break;
 						}
 						int cluster = testClusterMap.get(biggestErrorInst);
+						System.out.println("Switched Cluster: " + cluster);
 						int trainInstance = trainClusterMap.get(cluster);
 						Instance temp = trainset.instance(trainInstance);
 						trainset = this.replaceInstance(trainset, testset.instance(biggestErrorInst), trainInstance);
 						testset = this.replaceInstance(testset, temp, biggestErrorInst);
+						Evaluation eval = new Evaluation(cleanTrainSet);
+						eval.evaluateModel(classifier, cleanTestSet);
+						System.out.println("RMSE Step " + i + ": " + String.format("%.2f", eval.rootMeanSquaredError()));
 					}
 				}
 				trainSets.add(trainset);

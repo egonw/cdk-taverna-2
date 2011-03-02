@@ -207,6 +207,9 @@ public class SetupController {
 	 * @return The working directory path.
 	 */
 	public String getWorkingDir() {
+		if(!this.loaded) {
+			this.loadConfiguration();
+		}
 		String path = this.properties.getProperty(WORKING_DIRECTORY);
 		File file = new File(path);
 		if (!file.exists()) {
@@ -219,6 +222,9 @@ public class SetupController {
 	 * @return True - CDK-Taverna 2.0 caches the data instead of Taverna itself.
 	 */
 	public boolean isDataCaching() {
+		if(!this.loaded) {
+			this.loadConfiguration();
+		}
 		Boolean isDataCaching = Boolean.parseBoolean(this.properties.getProperty(IS_DATA_CACHING));
 		return isDataCaching;
 	}
@@ -227,6 +233,9 @@ public class SetupController {
 	 * @return True - CDK-Taverna 2.0 caches the data instead of Taverna itself.
 	 */
 	public boolean isDataCompression() {
+		if(!this.loaded) {
+			this.loadConfiguration();
+		}
 		Boolean isDataCompression = Boolean.parseBoolean(this.properties.getProperty(IS_DATA_COMPRESSION));
 		return isDataCompression;
 	}
