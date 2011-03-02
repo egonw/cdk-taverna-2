@@ -4,7 +4,7 @@
 
 	<groupId>org.openscience.cdk.applications.taverna</groupId>
 	<artifactId>cdk-taverna2</artifactId>
-	<version>0.4.0.3</version>
+	<version>0.4.0.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>CDK-Taverna 2 activity</name>
 
