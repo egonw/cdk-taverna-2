@@ -25,7 +25,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
@@ -100,6 +102,23 @@ public class CacheController {
 		filename += ".cache";
 		return new File(filename);
 	}
+	
+	/**
+	 * Method used for data decompression
+	 * 
+	 * @param dataList
+	 *            Decompressed data.
+	 * @return Compressed data.
+	 * @throws Exception
+	 */
+	public List<byte[]> compressDataList(List<byte[]> dataList) throws Exception {
+		List<byte[]> temp = new ArrayList<byte[]>();
+		for (byte[] data : dataList) {
+			temp.add(this.compressData(data));
+		}
+		return temp;
+	}
+
 
 	/**
 	 * Method used for data compression.
@@ -109,7 +128,7 @@ public class CacheController {
 	 * @return Compressed data.
 	 * @throws Exception
 	 */
-	private byte[] compressData(byte[] data) throws Exception {
+	public byte[] compressData(byte[] data) throws Exception {
 		// Compressor with default level of compression
 		Deflater compressor = new Deflater();
 		compressor.setLevel(Deflater.DEFAULT_COMPRESSION);
@@ -134,12 +153,28 @@ public class CacheController {
 	/**
 	 * Method used for data decompression
 	 * 
-	 * @param data
-	 *            Compressed data
-	 * @return Decompressed data
+	 * @param dataList
+	 *            Compressed data.
+	 * @return Decompressed data.
 	 * @throws Exception
 	 */
-	private byte[] decompressData(byte[] data) throws Exception {
+	public List<byte[]> decompressDataList(List<byte[]> dataList) throws Exception {
+		List<byte[]> temp = new ArrayList<byte[]>();
+		for (byte[] data : dataList) {
+			temp.add(this.decompressData(data));
+		}
+		return temp;
+	}
+
+	/**
+	 * Method used for data decompression
+	 * 
+	 * @param data
+	 *            Compressed data.
+	 * @return Decompressed data.
+	 * @throws Exception
+	 */
+	public byte[] decompressData(byte[] data) throws Exception {
 		Inflater decompressor = new Inflater();
 		// Give the decompressor the data to decompress
 		decompressor.setInput(data);
@@ -164,13 +199,9 @@ public class CacheController {
 	 * @throws Exception
 	 */
 	public synchronized UUID cacheByteStream(byte[] data) throws Exception {
-		boolean isDataCompression = SetupController.getInstance().isDataCompression();
 		File cacheFile = this.getCurrentCacheFile();
 		UUID dataID = UUID.randomUUID();
 		CacheObject cacheObj = new CacheObject();
-		if (isDataCompression) {
-			data = this.compressData(data);
-		}
 		long newSize = cacheFile.length() + data.length;
 		if (newSize >= MAX_FILESIZE) {
 			cacheFile = getNewCacheFile();
@@ -195,7 +226,6 @@ public class CacheController {
 	 * @throws Exception
 	 */
 	public synchronized byte[] uncacheByteStream(UUID uuid) throws Exception {
-		boolean isDataCompression = SetupController.getInstance().isDataCompression();
 		CacheObject cacheObj = this.cacheMap.get(uuid);
 		File cacheFile = this.getCacheFileByID(cacheObj.fileID);
 		byte[] data = new byte[cacheObj.size];
@@ -203,9 +233,6 @@ public class CacheController {
 		raf.seek(cacheObj.offset);
 		raf.read(data);
 		raf.close();
-		if (isDataCompression) {
-			data = this.decompressData(data);
-		}
 		return data;
 	}
 }

@@ -54,6 +54,7 @@ import weka.filters.Filter;
  */
 public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 
+	public static final String[] METHODS = new String[] { "Random", "ClusterRepresentatives", "SimpleGlobalMax" };
 	public static final String CREATE_WEKA_LEARNING_DATASET_ACTIVITY = "Create Weka Learning Dataset";
 
 	/**
@@ -82,6 +83,12 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 		// Get input
 		Instances dataset = this.getInputAsObject(this.INPUT_PORTS[0], Instances.class);
 		List<String> csv = this.getInputAsList(this.INPUT_PORTS[1], String.class);
+		if (this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_CREATE_SET_OPTIONS) == null) {
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PLEASE_CONFIGURE_ACTIVITY);
+		}
+		String optionsString = (String) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_CREATE_SET_OPTIONS);
+		String[] options = optionsString.split(";");
 		// Do work
 		HashMap<UUID, Double> classMap = new HashMap<UUID, Double>();
 		for (int i = 1; i < csv.size(); i++) {
@@ -92,6 +99,7 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 		List<Instances> trainSets = new ArrayList<Instances>();
 		List<Instances> testSets = new ArrayList<Instances>();
 		try {
+			
 			// Create the whole dataset
 			FastVector attributes = new FastVector();
 			for (int i = 0; i < dataset.numAttributes(); i++) {
@@ -117,12 +125,16 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 			// Split into train/test set
 			Instances trainset;
 			Instances testset;
+			
 			HashMap<Integer, Integer> trainClusterMap = new HashMap<Integer, Integer>();
 			HashMap<Integer, Integer> testClusterMap = new HashMap<Integer, Integer>();
 			for (double fraction = 0.1; fraction <= 0.75; fraction += 0.05) {
 				int numTrain = (int) (learningSet.numInstances() * fraction);
 				int numTest = learningSet.numInstances() - numTrain;
-				if (true) {
+				if(options[0].equals(METHODS[0])) {
+				trainset = new Instances(learningSet, 0, numTrain);
+				testset = new Instances(learningSet, numTrain, numTest);
+			}if (true) {
 					Instances clusterSet = Filter.useFilter(learningSet, tools.getIDRemover(learningSet));
 					clusterSet = Filter.useFilter(clusterSet, tools.getClassRemover(clusterSet));
 					clusterSet.setClassIndex(-1);
@@ -147,21 +159,19 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 						}
 					}
 				} else {
-					trainset = new Instances(learningSet, 0, numTrain);
-					testset = new Instances(learningSet, numTrain, numTest);
+					
 				}
-				if (true) {
+				if (false) {
 					System.out.println("Set: " + fraction);
-					LinkedList<Integer> blacklist = new LinkedList<Integer>(); 
+					LinkedList<Integer> blacklist = new LinkedList<Integer>();
 					for (int i = 0; i < 10; i++) {
-						Instances cleanTrainSet =  Filter.useFilter(trainset, tools.getIDRemover(trainset));
-						Instances cleanTestSet =  Filter.useFilter(testset, tools.getIDRemover(testset));
+						Instances cleanTrainSet = Filter.useFilter(trainset, tools.getIDRemover(trainset));
+						Instances cleanTestSet = Filter.useFilter(testset, tools.getIDRemover(testset));
 						MultilayerPerceptron classifier = new MultilayerPerceptron();
-						classifier.setOptions(new String[] { "-N", "250"});
 						classifier.buildClassifier(cleanTrainSet);
 						Double biggestError = null;
 						int biggestErrorInst = 0;
-						if(blacklist.size() > 5) {
+						if (blacklist.size() > 5) {
 							blacklist.remove();
 						}
 						for (int j = 0; j < testset.numInstances(); j++) {
@@ -170,16 +180,16 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 							double predrt = classifier.classifyInstance(cleanTestSet.instance(j));
 							double error = Math.abs(rt - predrt);
 							int c = testClusterMap.get(j);
-							if(blacklist.contains(c)) {
+							if (blacklist.contains(c)) {
 								continue;
 							}
 							if (biggestError == null || biggestError < error) {
 								biggestError = error;
 								biggestErrorInst = j;
 								blacklist.add(c);
-							} 
+							}
 						}
-						if(biggestError == null) {
+						if (biggestError == null) {
 							System.out.println("Stopped!");
 							break;
 						}
@@ -191,7 +201,8 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 						testset = this.replaceInstance(testset, temp, biggestErrorInst);
 						Evaluation eval = new Evaluation(cleanTrainSet);
 						eval.evaluateModel(classifier, cleanTestSet);
-						System.out.println("RMSE Step " + i + ": " + String.format("%.2f", eval.rootMeanSquaredError()));
+						System.out
+								.println("RMSE Step " + i + ": " + String.format("%.2f", eval.rootMeanSquaredError()));
 					}
 				}
 				trainSets.add(trainset);

@@ -100,7 +100,7 @@ public class SetupController {
 	/**
 	 * Load the unit test properties.
 	 */
-	public synchronized void loadTestCaseConfiguration() {
+	public synchronized void loadTestConfiguration() {
 		if (this.loaded) {
 			return;
 		}
@@ -110,6 +110,22 @@ public class SetupController {
 		Boolean isDataCaching = false; // Most unit tests are not working with the caching
 		this.properties.setProperty(IS_DATA_CACHING, "" + isDataCaching);
 		Boolean isDataCompression = false; // Most unit tests are not working with the caching
+		this.properties.setProperty(IS_DATA_COMPRESSION, "" + isDataCompression);
+	}
+	
+	/**
+	 * Load the unit test properties.
+	 */
+	public synchronized void loadFailsafeConfiguration() {
+		if (this.loaded) {
+			return;
+		}
+		this.loaded = true;
+		String workingDirFilename = FileNameGenerator.getTempDir() + File.separator + "Test";
+		this.properties.setProperty(WORKING_DIRECTORY, workingDirFilename);
+		Boolean isDataCaching = false; // Most unit tests are not working with the caching
+		this.properties.setProperty(IS_DATA_CACHING, "" + isDataCaching);
+		Boolean isDataCompression = true; // Most unit tests are not working with the caching
 		this.properties.setProperty(IS_DATA_COMPRESSION, "" + isDataCompression);
 	}
 
@@ -208,7 +224,7 @@ public class SetupController {
 	 */
 	public String getWorkingDir() {
 		if(!this.loaded) {
-			this.loadConfiguration();
+			this.loadFailsafeConfiguration();
 		}
 		String path = this.properties.getProperty(WORKING_DIRECTORY);
 		File file = new File(path);
@@ -223,7 +239,7 @@ public class SetupController {
 	 */
 	public boolean isDataCaching() {
 		if(!this.loaded) {
-			this.loadConfiguration();
+			this.loadFailsafeConfiguration();
 		}
 		Boolean isDataCaching = Boolean.parseBoolean(this.properties.getProperty(IS_DATA_CACHING));
 		return isDataCaching;
@@ -234,7 +250,7 @@ public class SetupController {
 	 */
 	public boolean isDataCompression() {
 		if(!this.loaded) {
-			this.loadConfiguration();
+			this.loadFailsafeConfiguration();
 		}
 		Boolean isDataCompression = Boolean.parseBoolean(this.properties.getProperty(IS_DATA_COMPRESSION));
 		return isDataCompression;

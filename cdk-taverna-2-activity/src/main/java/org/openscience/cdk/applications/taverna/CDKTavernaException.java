@@ -64,6 +64,8 @@ public class CDKTavernaException extends Exception {
 	public static final String ERROR_CREATING_INSTANCE_OF_DESCRIPTOR = "Error creating instance of descriptor: ";
 	public static final String CANNOT_INITIALIZE_3DMODEL_BUILDER = "Can't initialize 3D model builder!";
 	public static final String CANNOT_GENERATE_3DCOORDINATES = "Can't generate 3D coordinates!";
+	public static final String PLEASE_CONFIGURE_ACTIVITY = "Please configure activity!";
+	
 	public CDKTavernaException(String activityName, String type) {
 		super(type + " Class: " + activityName + ".");
 	}

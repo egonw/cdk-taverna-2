@@ -48,7 +48,7 @@ public abstract class CDKTavernaTestCases extends TestCase {
 
 	public CDKTavernaTestCases() {
 		super();
-		SetupController.getInstance().loadTestCaseConfiguration();
+		SetupController.getInstance().loadTestConfiguration();
 	}
 
 	public CDKTavernaTestCases(String name) {

@@ -34,6 +34,8 @@ import javax.swing.SpringLayout;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.UIManager;
+import java.awt.Color;
 
 /**
  * Setup dialog
@@ -91,7 +93,7 @@ public class SetupDialog extends JDialog {
 		contentPanel.add(button);
 		
 		JPanel panel = new JPanel();
-		panel.setBorder(new TitledBorder(null, "Data Caching", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Data Management", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		sl_contentPanel.putConstraint(SpringLayout.NORTH, panel, 10, SpringLayout.SOUTH, workingDirectoryTextField);
 		sl_contentPanel.putConstraint(SpringLayout.WEST, panel, 10, SpringLayout.WEST, contentPanel);
 		sl_contentPanel.putConstraint(SpringLayout.SOUTH, panel, -10, SpringLayout.SOUTH, contentPanel);
