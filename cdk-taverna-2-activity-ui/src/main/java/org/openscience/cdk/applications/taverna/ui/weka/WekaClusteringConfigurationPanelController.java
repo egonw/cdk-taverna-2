@@ -26,16 +26,12 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import net.sf.taverna.t2.spi.SPIRegistry;
@@ -46,7 +42,6 @@ import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.iterativeio.DataStreamController;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClusteringConfigurationFrame;
 
 /**
@@ -60,7 +55,7 @@ public class WekaClusteringConfigurationPanelController extends
 
 	private static final long serialVersionUID = -2741333043525860868L;
 	private static final String CONFIG_PACKAGE = "org.openscience.cdk.applications.taverna.ui.weka.panels.clustering";
-	
+
 	private WekaClusteringConfigurationPanelView view = null;
 	private AbstractCDKActivity activity;
 	private CDKActivityConfigurationBean configBean;
@@ -70,15 +65,15 @@ public class WekaClusteringConfigurationPanelController extends
 	private List<Integer> jobClustererIdx = new ArrayList<Integer>();
 	private List<String[]> jobOptions = new ArrayList<String[]>();
 	private boolean isChanged = false;
-//	private File file = null;
+	// private File file = null;
 	private volatile static int jobID = 0;
 	private static HashSet<Integer> usedIDs = new HashSet<Integer>();
-	
+
 	/**
 	 * Action for the clear all button.
 	 */
 	private ActionListener clearAllAction = new ActionListener() {
-		
+
 		public void actionPerformed(ActionEvent e) {
 			jobClustererIdx.clear();
 			jobOptions.clear();
@@ -86,23 +81,24 @@ public class WekaClusteringConfigurationPanelController extends
 			isChanged = true;
 		}
 	};
-	
-//	/**
-//	 * Action for the choose file button.
-//	 */
-//	private ActionListener chooseFileAction = new ActionListener() {
-//		
-//		public void actionPerformed(ActionEvent e) {
-//			JFileChooser openDialog = new JFileChooser(new File(DataStreamController.getInstance().getCurrentDirectory()));
-//			openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-//			if (openDialog.showOpenDialog(view) == JFileChooser.APPROVE_OPTION) {
-//				DataStreamController.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
-//				file = openDialog.getSelectedFile();
-//				view.getChoosenFileTextField().setText(file.getPath());
-//				isChanged = true;
-//			}
-//		}
-//	};
+
+	// /**
+	// * Action for the choose file button.
+	// */
+	// private ActionListener chooseFileAction = new ActionListener() {
+	//
+	// public void actionPerformed(ActionEvent e) {
+	// JFileChooser openDialog = new JFileChooser(new
+	// File(DataStreamController.getInstance().getCurrentDirectory()));
+	// openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	// if (openDialog.showOpenDialog(view) == JFileChooser.APPROVE_OPTION) {
+	// DataStreamController.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
+	// file = openDialog.getSelectedFile();
+	// view.getChoosenFileTextField().setText(file.getPath());
+	// isChanged = true;
+	// }
+	// }
+	// };
 
 	/**
 	 * Action for the remove job button.
@@ -134,11 +130,11 @@ public class WekaClusteringConfigurationPanelController extends
 			showJobData();
 			isChanged = true;
 		}
-		
+
 		private void updateUsedOptions(List<String[]> jobOptions) {
 			usedIDs.clear();
-			for(String[] options : jobOptions) {
-				usedIDs.add(Integer.parseInt(options[options.length-1]));
+			for (String[] options : jobOptions) {
+				usedIDs.add(Integer.parseInt(options[options.length - 1]));
 			}
 		}
 	};
@@ -176,11 +172,11 @@ public class WekaClusteringConfigurationPanelController extends
 			this.view.getConfigureButton().addActionListener(this.configureAction);
 			this.view.getAddJobButton().addActionListener(this.addJobListener);
 			this.view.getRemoveJobButton().addActionListener(this.removeJobAction);
-//			ClassLoader cld = getClass().getClassLoader();
-//			URL url = cld.getResources("icons/open.gif").nextElement();
-//			ImageIcon icon = new ImageIcon(url);
-//			this.view.getChooseFileButton().setIcon(icon);
-//			this.view.getChooseFileButton().addActionListener(this.chooseFileAction);
+			// ClassLoader cld = getClass().getClassLoader();
+			// URL url = cld.getResources("icons/open.gif").nextElement();
+			// ImageIcon icon = new ImageIcon(url);
+			// this.view.getChooseFileButton().setIcon(icon);
+			// this.view.getChooseFileButton().addActionListener(this.chooseFileAction);
 			this.view.getBtnClearAll().addActionListener(this.clearAllAction);
 			this.add(this.view);
 			this.refreshConfiguration();
@@ -198,10 +194,11 @@ public class WekaClusteringConfigurationPanelController extends
 			JOptionPane.showMessageDialog(this, "Please add jobs!", "Nothing ToDo", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
-//		if (this.file == null || !this.file.exists()) {
-//			JOptionPane.showMessageDialog(this, "Please choose valid directory!", "Error", JOptionPane.ERROR_MESSAGE);
-//			return false;
-//		}
+		// if (this.file == null || !this.file.exists()) {
+		// JOptionPane.showMessageDialog(this, "Please choose valid directory!",
+		// "Error", JOptionPane.ERROR_MESSAGE);
+		// return false;
+		// }
 		return true;
 	}
 
@@ -227,7 +224,8 @@ public class WekaClusteringConfigurationPanelController extends
 			data += ";";
 		}
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CLUSTERING_JOB_DATA, data);
-//		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.file);
+		// this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE,
+		// this.file);
 		this.isChanged = false;
 	}
 
@@ -251,7 +249,8 @@ public class WekaClusteringConfigurationPanelController extends
 			} else {
 				tempOption.add(splittedData[i]);
 			}
-			if (!tempOption.isEmpty() && (splittedData[i].startsWith("weka.clusterers") || i == splittedData.length - 1)) {
+			if (!tempOption.isEmpty()
+					&& (splittedData[i].startsWith("weka.clusterers") || i == splittedData.length - 1)) {
 				String[] option = new String[tempOption.size()];
 				option = tempOption.toArray(option);
 				this.jobOptions.add(option);
@@ -259,11 +258,12 @@ public class WekaClusteringConfigurationPanelController extends
 			}
 		}
 		this.showJobData();
-//		File file = (File) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-//		if (file != null) {
-//			this.file = file;
-//			view.getChoosenFileTextField().setText(file.getPath());
-//		}
+		// File file = (File)
+		// this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+		// if (file != null) {
+		// this.file = file;
+		// view.getChoosenFileTextField().setText(file.getPath());
+		// }
 	}
 
 	/**
@@ -296,7 +296,7 @@ public class WekaClusteringConfigurationPanelController extends
 	public static int getJobID() {
 		do {
 			jobID++;
-		} while(usedIDs.contains(jobID));
+		} while (usedIDs.contains(jobID));
 		return jobID;
 	}
 }

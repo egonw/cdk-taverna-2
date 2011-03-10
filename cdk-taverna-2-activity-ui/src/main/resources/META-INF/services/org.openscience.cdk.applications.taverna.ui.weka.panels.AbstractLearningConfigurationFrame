@@ -1,1 +1,4 @@
+org.openscience.cdk.applications.taverna.ui.weka.panels.learning.MultipleLinearRegressionFrame
 org.openscience.cdk.applications.taverna.ui.weka.panels.learning.MultilayerPerceptronFrame
+org.openscience.cdk.applications.taverna.ui.weka.panels.learning.RegressionTreesFrame
+org.openscience.cdk.applications.taverna.ui.weka.panels.learning.SupportVectorMachinesFrame

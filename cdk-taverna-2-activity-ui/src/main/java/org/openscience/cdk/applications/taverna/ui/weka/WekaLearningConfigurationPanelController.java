@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
@@ -18,11 +17,12 @@ import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClusteringConfigurationFrame;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractLearningConfigurationFrame;
 
 public class WekaLearningConfigurationPanelController extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
+
+	private static final long serialVersionUID = 1159635990433702962L;
 
 	private static final String CONFIG_PACKAGE = "org.openscience.cdk.applications.taverna.ui.weka.panels.learning";
 
@@ -32,12 +32,17 @@ public class WekaLearningConfigurationPanelController extends
 	private SPIRegistry<AbstractLearningConfigurationFrame> cdkLearningConfigFramesRegistry = new SPIRegistry<AbstractLearningConfigurationFrame>(
 			AbstractLearningConfigurationFrame.class);
 	private List<AbstractLearningConfigurationFrame> configFrames = null;
+	private int currentSelection;
 
 	private ActionListener comboBoxListener = new ActionListener() {
 
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
-
+			view.remove(configFrames.get(currentSelection));
+			int idx = view.getLearnerComboBox().getSelectedIndex();
+			view.add(configFrames.get(idx), BorderLayout.CENTER);
+			currentSelection = idx;
+			view.revalidate();
+			view.repaint();
 		}
 	};
 
@@ -66,8 +71,8 @@ public class WekaLearningConfigurationPanelController extends
 		}
 		DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel(learnerNames.toArray());
 		this.view.getLearnerComboBox().setModel(comboBoxModel);
-		int idx = view.getLearnerComboBox().getSelectedIndex();
-		this.view.add(this.configFrames.get(idx), BorderLayout.CENTER);
+		this.view.getLearnerComboBox().addActionListener(this.comboBoxListener);
+		this.refreshConfiguration();
 		this.add(this.view);
 	}
 
@@ -84,8 +89,16 @@ public class WekaLearningConfigurationPanelController extends
 
 	@Override
 	public boolean isConfigurationChanged() {
+		String name = (String) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_LEARNER_NAME);
 		int idx = view.getLearnerComboBox().getSelectedIndex();
-		return this.configFrames.get(idx).isConfigurationChanged();
+		if (!name.equals(this.configFrames.get(idx).getConfiguredClass().getName())) {
+			return true;
+		}
+		String opts = (String) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_LEARNER_OPTIONS);
+		if (!opts.equals(this.getConfString())) {
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -94,18 +107,40 @@ public class WekaLearningConfigurationPanelController extends
 		int idx = view.getLearnerComboBox().getSelectedIndex();
 		String name = this.configFrames.get(idx).getConfiguredClass().getName();
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_LEARNER_NAME, name);
+		String opts = this.getConfString();
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_LEARNER_OPTIONS, opts);
+	}
+
+	private String getConfString() {
+		int idx = view.getLearnerComboBox().getSelectedIndex();
 		String[] options = this.configFrames.get(idx).getOptions();
 		String opts = "";
 		for (String o : options) {
 			opts += o + ";";
 		}
-		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_LEARNER_OPTIONS, opts);
+		return opts;
 	}
 
 	@Override
 	public void refreshConfiguration() {
-		// TODO Auto-generated method stub
-
+		if (this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_LEARNER_NAME) != null) {
+			for (int i = 0; i < this.configFrames.size(); i++) {
+				String name = (String) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_LEARNER_NAME);
+				if (this.configFrames.get(i).getConfiguredClass().getName().equals(name)) {
+					this.currentSelection = i;
+					String options = (String) this.configBean
+							.getAdditionalProperty(CDKTavernaConstants.PROPERTY_LEARNER_OPTIONS);
+					this.configFrames.get(i).setOptions(options.split(";"));
+					this.view.getLearnerComboBox().setSelectedIndex(i);
+					break;
+				}
+			}
+		} else {
+			this.currentSelection = view.getLearnerComboBox().getSelectedIndex();
+		}
+		this.view.add(this.configFrames.get(this.currentSelection), BorderLayout.CENTER);
+		this.view.revalidate();
+		this.view.repaint();
 	}
 
 }

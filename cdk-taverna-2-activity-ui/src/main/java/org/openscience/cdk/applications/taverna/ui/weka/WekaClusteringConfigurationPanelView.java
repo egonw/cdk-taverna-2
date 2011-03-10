@@ -24,18 +24,16 @@ package org.openscience.cdk.applications.taverna.ui.weka;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 
-import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
-import java.awt.GridLayout;
 
 /**
  * Controller class of the weka clustering configuration panel.
@@ -102,7 +100,7 @@ public class WekaClusteringConfigurationPanelView extends JPanel {
 		removeJobButton = new JButton("Remove Job");
 		removeJobButton.setHorizontalAlignment(SwingConstants.RIGHT);
 		southPanel.add(removeJobButton);
-		
+
 		btnClearAll = new JButton("Clear All");
 		southPanel.add(btnClearAll);
 	}

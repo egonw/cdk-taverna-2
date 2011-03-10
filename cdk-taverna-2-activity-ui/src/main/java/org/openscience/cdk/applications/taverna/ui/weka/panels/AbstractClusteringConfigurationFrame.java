@@ -28,9 +28,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 
 /**
@@ -93,57 +91,4 @@ public abstract class AbstractClusteringConfigurationFrame extends JDialog {
 	 */
 	public abstract String[][] getOptions();
 
-	/**
-	 * Checks whether the JTextFiels is an legal argument.
-	 * 
-	 * @param name
-	 *            Name of the field
-	 * @param textField
-	 *            The checked text field
-	 * @param minValue
-	 * @param maxValue
-	 * @return True whether the input is correct.
-	 */
-	public boolean checkTextFieldValueInt(String name, JTextField textField, int minValue, int maxValue) {
-		try {
-			int value = Integer.parseInt(textField.getText());
-			if (value < minValue || value > maxValue) {
-				JOptionPane.showMessageDialog(this, "Please enter a valid number! Field: " + name, "Illegal Argument",
-						JOptionPane.ERROR_MESSAGE);
-				return false;
-			}
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(this, "Please enter a valid number! Field: " + name, "Illegal Argument",
-					JOptionPane.ERROR_MESSAGE);
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Checks whether the JTextFiels is an legal argument.
-	 * 
-	 * @param name
-	 *            Name of the field
-	 * @param textField
-	 *            The checked text field
-	 * @param minValue
-	 * @param maxValue
-	 * @return True whether the input is correct.
-	 */
-	public boolean checkTextFieldValueDouble(String name, JTextField textField, int minValue, int maxValue) {
-		try {
-			double value = Double.parseDouble(textField.getText());
-			if (value < minValue || value > maxValue) {
-				JOptionPane.showMessageDialog(this, "Please enter a valid number! Field: " + name, "Illegal Argument",
-						JOptionPane.ERROR_MESSAGE);
-				return false;
-			}
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(this, "Please enter a valid number! Field: " + name, "Illegal Argument",
-					JOptionPane.ERROR_MESSAGE);
-			return false;
-		}
-		return true;
-	}
 }

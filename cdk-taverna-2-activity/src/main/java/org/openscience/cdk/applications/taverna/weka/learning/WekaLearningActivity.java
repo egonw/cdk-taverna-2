@@ -37,11 +37,6 @@ import org.openscience.cdk.applications.taverna.basicutilities.Tools;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
 import weka.classifiers.Classifier;
-import weka.classifiers.functions.LibSVM;
-import weka.classifiers.functions.LinearRegression;
-import weka.classifiers.functions.MultilayerPerceptron;
-import weka.classifiers.trees.M5P;
-import weka.clusterers.Clusterer;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
 import weka.filters.Filter;
@@ -79,6 +74,7 @@ public class WekaLearningActivity extends AbstractCDKActivity {
 		addOutput(this.OUTPUT_PORTS[1], 1);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void work() throws Exception {
 		// Get input

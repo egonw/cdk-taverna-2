@@ -32,6 +32,7 @@ import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 
+import org.openscience.cdk.applications.taverna.ui.UITools;
 import org.openscience.cdk.applications.taverna.ui.weka.WekaClusteringConfigurationPanelController;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClusteringConfigurationFrame;
 
@@ -143,8 +144,8 @@ public class HierarchicalClustererFrame extends AbstractClusteringConfigurationF
 
 	@Override
 	public boolean checkValues() {
-		if (!this.checkTextFieldValueInt("Min number of clusters", this.minNumberOfClustersTextField, 2, Integer.MAX_VALUE)
-				|| !this.checkTextFieldValueInt("Max number of clusters", this.maxNumberOfClustersTextField, 2, Integer.MAX_VALUE)) {
+		if (!UITools.checkTextFieldValueInt(this, "Min number of clusters", this.minNumberOfClustersTextField, 2, Integer.MAX_VALUE)
+				|| !UITools.checkTextFieldValueInt(this,"Max number of clusters", this.maxNumberOfClustersTextField, 2, Integer.MAX_VALUE)) {
 			return false;
 		}
 		int min = Integer.parseInt(this.minNumberOfClustersTextField.getText());

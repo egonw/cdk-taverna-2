@@ -167,6 +167,9 @@ org.openscience.cdk.applications.taverna.weka.clustering.ExtractClusteringResult
 org.openscience.cdk.applications.taverna.weka.clustering.GenerateSilhouettePlotFromClusteringResultAsPDFActivity
 org.openscience.cdk.applications.taverna.weka.clustering.GenerateSilhouettePlotFromClusteringResultAsCSVActivity
 org.openscience.cdk.applications.taverna.weka.clustering.SplitMoleculesIntoClustersActivity
+org.openscience.cdk.applications.taverna.weka.learning.WekaLearningActivity
+org.openscience.cdk.applications.taverna.weka.learning.ScatterPlotFromLearningResultAsPDFActivity
+org.openscience.cdk.applications.taverna.weka.learning.CreateWekaLearningDatasetActivity
 org.openscience.cdk.applications.taverna.modelling.CoordinatesGenerator2DAcitivity
 org.openscience.cdk.applications.taverna.modelling.MM2_3DCoordinatesGeneratorActivity
 org.openscience.cdk.applications.taverna.modelling.MMFF94_3DCoordinatesGeneratorActivity

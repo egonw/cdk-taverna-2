@@ -34,12 +34,11 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
-import org.openscience.cdk.geometry.surface.Triangle;
 
+import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
-import weka.classifiers.functions.MultilayerPerceptron;
+import weka.classifiers.functions.LibSVM;
 import weka.clusterers.EM;
-import weka.clusterers.SimpleKMeans;
 import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
@@ -99,7 +98,6 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 		List<Instances> trainSets = new ArrayList<Instances>();
 		List<Instances> testSets = new ArrayList<Instances>();
 		try {
-			
 			// Create the whole dataset
 			FastVector attributes = new FastVector();
 			for (int i = 0; i < dataset.numAttributes(); i++) {
@@ -123,90 +121,138 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 			}
 			learningSet.randomize(new Random());
 			// Split into train/test set
-			Instances trainset;
-			Instances testset;
-			
+			Instances trainset = null;
+			Instances testset = null;
 			HashMap<Integer, Integer> trainClusterMap = new HashMap<Integer, Integer>();
 			HashMap<Integer, Integer> testClusterMap = new HashMap<Integer, Integer>();
-			for (double fraction = 0.1; fraction <= 0.75; fraction += 0.05) {
+			double lowerFraction = Double.parseDouble(options[0]) / 100D;
+			double higherFraction = Double.parseDouble(options[1]) / 100D;
+			int steps = Integer.parseInt(options[2]);
+			double stepSize = (higherFraction - lowerFraction) / (double) (steps - 1);
+			for (double fraction = lowerFraction; fraction <= higherFraction; fraction += stepSize) {
 				int numTrain = (int) (learningSet.numInstances() * fraction);
 				int numTest = learningSet.numInstances() - numTrain;
-				if(options[0].equals(METHODS[0])) {
-				trainset = new Instances(learningSet, 0, numTrain);
-				testset = new Instances(learningSet, numTrain, numTest);
-			}if (true) {
+				if (options[3].equals(METHODS[0])) {
+					trainset = new Instances(learningSet, 0, numTrain);
+					testset = new Instances(learningSet, numTrain, numTest);
+				} else if (options[3].equals(METHODS[1]) || options[3].equals(METHODS[2])) {
 					Instances clusterSet = Filter.useFilter(learningSet, tools.getIDRemover(learningSet));
 					clusterSet = Filter.useFilter(clusterSet, tools.getClassRemover(clusterSet));
 					clusterSet.setClassIndex(-1);
-					SimpleKMeans clusterer = new SimpleKMeans();
+					EM clusterer = new EM();
 					clusterer.setOptions(new String[] { "-N", "" + numTrain });
 					clusterer.buildClusterer(clusterSet);
-					trainset = new Instances(learningSet);
-					trainset.delete();
-					testset = new Instances(learningSet);
-					testset.delete();
+					Instances currentTrain = new Instances(learningSet);
+					currentTrain.delete();
+					Instances currentTest = new Instances(learningSet);
+					currentTest.delete();
 					HashSet<Integer> usedClusters = new HashSet<Integer>();
 					for (int i = 0; i < learningSet.numInstances(); i++) {
 						Instance instance = learningSet.instance(i);
 						int cluster = clusterer.clusterInstance(clusterSet.instance(i));
 						if (usedClusters.contains(cluster)) {
-							testClusterMap.put(testset.numInstances(), cluster);
-							testset.add(instance);
+							testClusterMap.put(currentTest.numInstances(), cluster);
+							currentTest.add(instance);
 						} else {
 							usedClusters.add(cluster);
-							trainClusterMap.put(cluster, trainset.numInstances());
-							trainset.add(instance);
+							trainClusterMap.put(cluster, currentTrain.numInstances());
+							currentTrain.add(instance);
 						}
 					}
-				} else {
-					
-				}
-				if (false) {
-					System.out.println("Set: " + fraction);
-					LinkedList<Integer> blacklist = new LinkedList<Integer>();
-					for (int i = 0; i < 10; i++) {
-						Instances cleanTrainSet = Filter.useFilter(trainset, tools.getIDRemover(trainset));
-						Instances cleanTestSet = Filter.useFilter(testset, tools.getIDRemover(testset));
-						MultilayerPerceptron classifier = new MultilayerPerceptron();
+					if (options[3].equals(METHODS[2])) {
+						Class<?> classifierClass = Class.forName(options[4]);
+						int iterations = Integer.parseInt(options[6]);
+						boolean isBlacklisting = Boolean.parseBoolean(options[7]);
+						boolean isChooseBest = Boolean.parseBoolean(options[8]);
+						System.out.println("Set: " + fraction);
+						LinkedList<Integer> blacklist = new LinkedList<Integer>();
+						Double previousRMSE = null;
+						Instances cleanTrainSet = Filter.useFilter(currentTrain, tools.getIDRemover(currentTrain));
+						Instances cleanTestSet = Filter.useFilter(currentTest, tools.getIDRemover(currentTest));
+						for (int i = 0; i < iterations; i++) {
+							Classifier classifier = (Classifier) classifierClass.newInstance();
+							String[] classOptions = options[5].split(" ");
+							classifier.setOptions(classOptions);
+							classifier.buildClassifier(cleanTrainSet);
+							Double biggestError = null;
+							int biggestErrorInst = 0;
+							if (blacklist.size() > 5) {
+								blacklist.remove();
+							}
+							for (int j = 0; j < currentTest.numInstances(); j++) {
+								Instance instance = currentTest.instance(j);
+								double rt = instance.value(currentTest.classIndex());
+								double predrt = classifier.classifyInstance(cleanTestSet.instance(j));
+								double error = Math.abs(rt - predrt);
+								int c = testClusterMap.get(j);
+								if (blacklist.contains(c) && isBlacklisting) {
+									continue;
+								}
+								if (biggestError == null || biggestError < error) {
+									biggestError = error;
+									biggestErrorInst = j;
+									blacklist.add(c);
+								}
+							}
+							if (biggestError == null) {
+								System.out.println("Stopped!");
+								break;
+							}
+							Evaluation eval = new Evaluation(cleanTrainSet);
+							eval.evaluateModel(classifier, cleanTestSet);
+							System.out.println("RMSE Step " + i + ": "
+									+ String.format("%.2f", eval.rootMeanSquaredError()));
+							if (isChooseBest) {
+								Evaluation trainEval = new Evaluation(cleanTrainSet);
+								eval.evaluateModel(classifier, cleanTrainSet);
+								double currentRMSE = eval.rootMeanSquaredError() * (1 - fraction);
+								currentRMSE += trainEval.rootMeanSquaredError() * fraction;
+								if (previousRMSE == null || previousRMSE > currentRMSE) {
+									previousRMSE = currentRMSE;
+									trainset = currentTrain;
+									testset = currentTest;
+								}
+							} else {
+								trainset = currentTrain;
+								testset = currentTest;
+							}
+							int cluster = testClusterMap.get(biggestErrorInst);
+							System.out.println("Switched Cluster: " + cluster);
+							int trainInstance = trainClusterMap.get(cluster);
+							Instance temp = currentTrain.instance(trainInstance);
+							currentTrain = this.replaceInstance(currentTrain, currentTest.instance(biggestErrorInst),
+									trainInstance);
+							currentTest = this.replaceInstance(currentTest, temp, biggestErrorInst);
+							cleanTrainSet = Filter.useFilter(currentTrain, tools.getIDRemover(currentTrain));
+							cleanTestSet = Filter.useFilter(currentTest, tools.getIDRemover(currentTest));
+						}
+						Classifier classifier = (Classifier) classifierClass.newInstance();
+						if (classifier instanceof LibSVM) {
+							classifier.setOptions(new String[] { "-S", "3" });
+						}
 						classifier.buildClassifier(cleanTrainSet);
-						Double biggestError = null;
-						int biggestErrorInst = 0;
-						if (blacklist.size() > 5) {
-							blacklist.remove();
-						}
-						for (int j = 0; j < testset.numInstances(); j++) {
-							Instance instance = testset.instance(j);
-							double rt = instance.value(testset.classIndex());
-							double predrt = classifier.classifyInstance(cleanTestSet.instance(j));
-							double error = Math.abs(rt - predrt);
-							int c = testClusterMap.get(j);
-							if (blacklist.contains(c)) {
-								continue;
-							}
-							if (biggestError == null || biggestError < error) {
-								biggestError = error;
-								biggestErrorInst = j;
-								blacklist.add(c);
-							}
-						}
-						if (biggestError == null) {
-							System.out.println("Stopped!");
-							break;
-						}
-						int cluster = testClusterMap.get(biggestErrorInst);
-						System.out.println("Switched Cluster: " + cluster);
-						int trainInstance = trainClusterMap.get(cluster);
-						Instance temp = trainset.instance(trainInstance);
-						trainset = this.replaceInstance(trainset, testset.instance(biggestErrorInst), trainInstance);
-						testset = this.replaceInstance(testset, temp, biggestErrorInst);
 						Evaluation eval = new Evaluation(cleanTrainSet);
 						eval.evaluateModel(classifier, cleanTestSet);
-						System.out
-								.println("RMSE Step " + i + ": " + String.format("%.2f", eval.rootMeanSquaredError()));
+						System.out.println("RMSE Step " + (iterations) + ": "
+								+ String.format("%.2f", eval.rootMeanSquaredError()));
+						if (isChooseBest) {
+							Evaluation trainEval = new Evaluation(cleanTrainSet);
+							eval.evaluateModel(classifier, cleanTrainSet);
+							double currentRMSE = eval.rootMeanSquaredError() * (1 - fraction);
+							currentRMSE += trainEval.rootMeanSquaredError() * fraction;
+							if (previousRMSE == null || previousRMSE > currentRMSE) {
+								previousRMSE = currentRMSE;
+								trainset = currentTrain;
+								testset = currentTest;
+							}
+						} else {
+							trainset = currentTrain;
+							testset = currentTest;
+						}
 					}
+					trainSets.add(trainset);
+					testSets.add(testset);
 				}
-				trainSets.add(trainset);
-				testSets.add(testset);
 			}
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError("Error during learning dataset creation!", this.getActivityName(), e);
@@ -216,6 +262,14 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 		this.setOutputAsObjectList(trainSets, this.OUTPUT_PORTS[0]);
 		this.setOutputAsObjectList(testSets, this.OUTPUT_PORTS[1]);
 	}
+
+	// private Instances getFullSet(Instances trainset, Instances testset) {
+	// Instances full = new Instances(trainset);
+	// for (int i = 0; i < testset.numInstances(); i++) {
+	// full.add(testset.instance(i));
+	// }
+	// return full;
+	// }
 
 	private Instances replaceInstance(Instances instances, Instance newInst, int index) {
 		Instances temp = new Instances(instances);

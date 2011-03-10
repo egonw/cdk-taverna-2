@@ -1,8 +1,14 @@
 package org.openscience.cdk.applications.taverna.ui.weka;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 
+import net.sf.taverna.t2.spi.SPIRegistry;
 import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityConfigurationPanel;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
@@ -10,32 +16,52 @@ import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.applications.taverna.ui.UITools;
+import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractLearningConfigurationFrame;
+import org.openscience.cdk.applications.taverna.ui.weka.panels.LearningDatasetClassifierFrame;
 import org.openscience.cdk.applications.taverna.weka.learning.CreateWekaLearningDatasetActivity;
-
-import weka.classifiers.Classifier;
-import weka.classifiers.functions.LibSVM;
-import weka.classifiers.functions.LinearRegression;
-import weka.classifiers.functions.MultilayerPerceptron;
-import weka.classifiers.trees.M5P;
 
 public class CreateLearningDatasetConfigurationPanelController extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
 
-	private static final String[] CLASSIFIERS = new String[] { "Multiple Lineare Regression",
-			"Multilayer Perceptron Neural Network", "Regression Tree", "Support Vector Machine" };
-	private static final Class<?>[] classifierClasses = new Class<?>[] { LinearRegression.class,
-			MultilayerPerceptron.class, M5P.class, LibSVM.class };
+	private static final long serialVersionUID = 4885493705007067285L;
+	private static final String CONFIG_PACKAGE = "org.openscience.cdk.applications.taverna.ui.weka.panels.learning";
+
+	private SPIRegistry<AbstractLearningConfigurationFrame> cdkLearningConfigFramesRegistry = new SPIRegistry<AbstractLearningConfigurationFrame>(
+			AbstractLearningConfigurationFrame.class);
+	private List<AbstractLearningConfigurationFrame> configFrames = null;
 
 	private AbstractCDKActivity activity;
 	private CDKActivityConfigurationBean configBean;
 	private CreateLearningDatasetConfigurationPanelView view = new CreateLearningDatasetConfigurationPanelView();
 
+	private ActionListener configureClassifierAction = new ActionListener() {
+
+		public void actionPerformed(ActionEvent e) {
+			int idx = view.getClassifierComboBox().getSelectedIndex();
+			LearningDatasetClassifierFrame dialog = new LearningDatasetClassifierFrame();
+			dialog.getContentPanel().add(configFrames.get(idx));
+			dialog.pack();
+			dialog.setVisible(true);
+		}
+	};
+
 	public CreateLearningDatasetConfigurationPanelController(AbstractCDKActivity activity) {
 		try {
 			this.activity = activity;
 			this.configBean = this.activity.getConfiguration();
-			DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel(CLASSIFIERS);
+			this.configFrames = new ArrayList<AbstractLearningConfigurationFrame>();
+			List<String> learnerNames = new ArrayList<String>();
+			for (AbstractLearningConfigurationFrame configFrame : this.cdkLearningConfigFramesRegistry.getInstances()) {
+				if (configFrame.getClass().getName().startsWith(CONFIG_PACKAGE)) {
+					learnerNames.add(configFrame.getName());
+					configFrame.makeSingleOption();
+					this.configFrames.add(configFrame);
+				}
+			}
+			DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel(learnerNames.toArray());
 			this.view.getClassifierComboBox().setModel(comboBoxModel);
+			this.view.getBtnConfigure().addActionListener(this.configureClassifierAction);
 			this.add(this.view);
 			this.refreshConfiguration();
 		} catch (Exception e) {
@@ -48,6 +74,9 @@ public class CreateLearningDatasetConfigurationPanelController extends
 
 	private String generateOptionsString() {
 		String options = "";
+		options += this.view.getLowerRatioTextField().getText() + ";";
+		options += this.view.getHigherRatioTextField().getText() + ";";
+		options += this.view.getStepsTextField().getText() + ";";
 		if (this.view.getRandomRadioButton().isSelected()) {
 			options += CreateWekaLearningDatasetActivity.METHODS[0] + ";";
 		} else if (this.view.getClusterRadioButton().isSelected()) {
@@ -55,27 +84,36 @@ public class CreateLearningDatasetConfigurationPanelController extends
 		} else if (this.view.getSingleGlobalMaxRadioButton().isSelected()) {
 			options += CreateWekaLearningDatasetActivity.METHODS[2] + ";";
 			int idx = this.view.getClassifierComboBox().getSelectedIndex();
-			options += classifierClasses[idx].getName() + ";";
+			options += this.configFrames.get(idx).getConfiguredClass().getName() + ";";
+			options += this.configFrames.get(idx).getOptions()[0] + ";";
 			options += this.view.getIterationsTextField().getText() + ";";
 			options += this.view.getUseBlacklistingCheckBox().isSelected() + ";";
+			options += this.view.getChooseBestCheckBox().isSelected() + ";";
 		}
 		return options;
-
 	}
 
 	@Override
 	public boolean checkValues() {
-		if (this.view.getSingleGlobalMaxRadioButton().isSelected()) {
-			Integer value = null;
-			try {
-				value = Integer.parseInt(this.view.getIterationsTextField().getText());
-			} catch (Exception e) {
-			}
-			if (value == null || value < 1) {
-				JOptionPane.showMessageDialog(this.view, "Please set a valid naumber of iterations!",
-						"Illegal Argument", JOptionPane.ERROR_MESSAGE);
-				return false;
-			}
+		if (this.view.getSingleGlobalMaxRadioButton().isSelected()
+				&& !UITools.checkTextFieldValueInt(this, "# of Iterations", this.view.getIterationsTextField(), 1,
+						Integer.MAX_VALUE)) {
+			return false;
+		}
+		if (!UITools
+				.checkTextFieldValueDouble(this, "Lower fraction limit", this.view.getLowerRatioTextField(), 1, 100)
+				|| !UITools.checkTextFieldValueDouble(this, "Higher fraction limit",
+						this.view.getHigherRatioTextField(), 1, 100)
+				|| !UITools.checkTextFieldValueInt(this, "Number of steps", this.view.getStepsTextField(), 1,
+						Integer.MAX_VALUE)) {
+			return false;
+		}
+		double lower = Double.parseDouble(this.view.getLowerRatioTextField().getText());
+		double higher = Double.parseDouble(this.view.getHigherRatioTextField().getText());
+		if (higher <= lower) {
+			JOptionPane.showMessageDialog(this, "The higher fraction limit has to be greater than the lower limit!",
+					"Illegal Argument", JOptionPane.ERROR_MESSAGE);
+			return false;
 		}
 		return true;
 	}
@@ -90,6 +128,9 @@ public class CreateLearningDatasetConfigurationPanelController extends
 		String currentOption = (String) this.configBean
 				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_CREATE_SET_OPTIONS);
 		String newOptions = this.generateOptionsString();
+		if (currentOption == null) {
+			return true;
+		}
 		return !currentOption.equals(newOptions);
 	}
 
@@ -109,32 +150,37 @@ public class CreateLearningDatasetConfigurationPanelController extends
 		String currentOption = (String) this.configBean
 				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_CREATE_SET_OPTIONS);
 		String[] options = currentOption.split(";");
-		if (options[0].equals(CreateWekaLearningDatasetActivity.METHODS[0])) {
+		this.view.getLowerRatioTextField().setText(options[0]);
+		this.view.getHigherRatioTextField().setText(options[1]);
+		this.view.getStepsTextField().setText(options[2]);
+		if (options[3].equals(CreateWekaLearningDatasetActivity.METHODS[0])) {
 			this.view.getRandomRadioButton().setSelected(true);
 			this.view.getIterationsTextField().setEnabled(false);
 			this.view.getClassifierComboBox().setEnabled(false);
 			this.view.getUseBlacklistingCheckBox().setEnabled(false);
-		} else if (options[0].equals(CreateWekaLearningDatasetActivity.METHODS[1])) {
+			this.view.getChooseBestCheckBox().setEnabled(false);
+		} else if (options[3].equals(CreateWekaLearningDatasetActivity.METHODS[1])) {
 			this.view.getClusterRadioButton().setSelected(true);
 			this.view.getIterationsTextField().setEnabled(false);
 			this.view.getClassifierComboBox().setEnabled(false);
 			this.view.getUseBlacklistingCheckBox().setEnabled(false);
-		} else if (options[0].equals(CreateWekaLearningDatasetActivity.METHODS[2])) {
+			this.view.getChooseBestCheckBox().setEnabled(false);
+		} else if (options[3].equals(CreateWekaLearningDatasetActivity.METHODS[2])) {
 			this.view.getSingleGlobalMaxRadioButton().setSelected(true);
-			if (options[1].equals(classifierClasses[0].getName())) {
-				this.view.getClassifierComboBox().setSelectedIndex(0);
-			} else if (options[1].equals(classifierClasses[1].getName())) {
-				this.view.getClassifierComboBox().setSelectedIndex(1);
-			} else if (options[1].equals(classifierClasses[2].getName())) {
-				this.view.getClassifierComboBox().setSelectedIndex(2);
-			} else if (options[1].equals(classifierClasses[3].getName())) {
-				this.view.getClassifierComboBox().setSelectedIndex(3);
+			for (int i = 0; i < this.configFrames.size(); i++) {
+				if (options[4].equals(this.configFrames.get(i).getConfiguredClass().getName())) {
+					this.configFrames.get(i).setOptions(new String[] { options[5] });
+					this.view.getClassifierComboBox().setSelectedIndex(i);
+					break;
+				}
 			}
-			this.view.getIterationsTextField().setText(options[2]);
-			this.view.getUseBlacklistingCheckBox().setSelected(Boolean.parseBoolean(options[3]));
+			this.view.getIterationsTextField().setText(options[6]);
+			this.view.getUseBlacklistingCheckBox().setSelected(Boolean.parseBoolean(options[7]));
+			this.view.getChooseBestCheckBox().setSelected(Boolean.parseBoolean(options[8]));
 			this.view.getIterationsTextField().setEnabled(true);
 			this.view.getClassifierComboBox().setEnabled(true);
 			this.view.getUseBlacklistingCheckBox().setEnabled(true);
+			this.view.getChooseBestCheckBox().setEnabled(true);
 		}
 	}
 

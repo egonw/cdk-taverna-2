@@ -1,21 +1,17 @@
 package org.openscience.cdk.applications.taverna.ui.weka;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JComboBox;
-import javax.swing.SpringLayout;
 import java.awt.Dimension;
+
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
 import javax.swing.border.EtchedBorder;
-import java.awt.GridLayout;
 
 public class WekaLearningConfigurationPanelView extends JPanel {
 
-	private JPanel contentPane;
+	private static final long serialVersionUID = 6788886457794959717L;
 	private JComboBox learnerComboBox;
 
 	/**
@@ -23,20 +19,20 @@ public class WekaLearningConfigurationPanelView extends JPanel {
 	 */
 	public WekaLearningConfigurationPanelView() {
 		setLayout(new BorderLayout(0, 0));
-		//		setBounds(100, 100, 450, 300);
-		
+		// setBounds(100, 100, 450, 300);
+
 		JPanel panel = new JPanel();
 		panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		panel.setPreferredSize(new Dimension(10, 35));
 		add(panel, BorderLayout.NORTH);
 		SpringLayout sl_panel = new SpringLayout();
 		panel.setLayout(sl_panel);
-		
+
 		learnerComboBox = new JComboBox();
 		sl_panel.putConstraint(SpringLayout.SOUTH, learnerComboBox, -7, SpringLayout.SOUTH, panel);
 		sl_panel.putConstraint(SpringLayout.EAST, learnerComboBox, -10, SpringLayout.EAST, panel);
 		panel.add(learnerComboBox);
-		
+
 		JLabel lblNewLabel = new JLabel("Select Algorithm:");
 		sl_panel.putConstraint(SpringLayout.WEST, learnerComboBox, 6, SpringLayout.EAST, lblNewLabel);
 		sl_panel.putConstraint(SpringLayout.SOUTH, lblNewLabel, -10, SpringLayout.SOUTH, panel);
