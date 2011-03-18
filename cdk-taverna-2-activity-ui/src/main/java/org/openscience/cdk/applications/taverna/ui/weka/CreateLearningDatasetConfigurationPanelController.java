@@ -159,12 +159,14 @@ public class CreateLearningDatasetConfigurationPanelController extends
 			this.view.getClassifierComboBox().setEnabled(false);
 			this.view.getUseBlacklistingCheckBox().setEnabled(false);
 			this.view.getChooseBestCheckBox().setEnabled(false);
+			this.view.getBtnConfigure().setEnabled(false);
 		} else if (options[3].equals(CreateWekaLearningDatasetActivity.METHODS[1])) {
 			this.view.getClusterRadioButton().setSelected(true);
 			this.view.getIterationsTextField().setEnabled(false);
 			this.view.getClassifierComboBox().setEnabled(false);
 			this.view.getUseBlacklistingCheckBox().setEnabled(false);
 			this.view.getChooseBestCheckBox().setEnabled(false);
+			this.view.getBtnConfigure().setEnabled(false);
 		} else if (options[3].equals(CreateWekaLearningDatasetActivity.METHODS[2])) {
 			this.view.getSingleGlobalMaxRadioButton().setSelected(true);
 			for (int i = 0; i < this.configFrames.size(); i++) {
@@ -181,6 +183,7 @@ public class CreateLearningDatasetConfigurationPanelController extends
 			this.view.getClassifierComboBox().setEnabled(true);
 			this.view.getUseBlacklistingCheckBox().setEnabled(true);
 			this.view.getChooseBestCheckBox().setEnabled(true);
+			this.view.getBtnConfigure().setEnabled(true);
 		}
 	}
 

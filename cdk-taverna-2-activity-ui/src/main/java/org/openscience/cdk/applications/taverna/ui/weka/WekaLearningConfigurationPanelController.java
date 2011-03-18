@@ -72,6 +72,9 @@ public class WekaLearningConfigurationPanelController extends
 		DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel(learnerNames.toArray());
 		this.view.getLearnerComboBox().setModel(comboBoxModel);
 		this.view.getLearnerComboBox().addActionListener(this.comboBoxListener);
+		int numberOfThreads = (Integer) this.configBean
+				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS);
+		this.view.getThreadsTextField().setText("" + numberOfThreads);
 		this.refreshConfiguration();
 		this.add(this.view);
 	}
@@ -91,11 +94,11 @@ public class WekaLearningConfigurationPanelController extends
 	public boolean isConfigurationChanged() {
 		String name = (String) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_LEARNER_NAME);
 		int idx = view.getLearnerComboBox().getSelectedIndex();
-		if (!name.equals(this.configFrames.get(idx).getConfiguredClass().getName())) {
+		if (name == null || !name.equals(this.configFrames.get(idx).getConfiguredClass().getName())) {
 			return true;
 		}
 		String opts = (String) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_LEARNER_OPTIONS);
-		if (!opts.equals(this.getConfString())) {
+		if (opts == null || !opts.equals(this.getConfString())) {
 			return true;
 		}
 		return false;

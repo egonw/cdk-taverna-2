@@ -50,6 +50,7 @@ public class CDKTavernaException extends Exception {
 	public static final String DATA_CONTAINS_NO_MOLECULE = "Data contains no molecules!";
 	public static final String CONVERTION_ERROR = "Error during data convertion!";
 	public static final String CLUSTERING_ERROR = "Error during clustering process!";
+	public static final String CLASSIFICATION_ERROR = "Error during classification process!";
 	public static final String NO_CLUSTERING_DATA_AVAILABLE = "Error, no clustering data available!";
 	public static final String LOADING_CLUSTERING_DATA_ERROR = "Error loadin clustering data!";
 	public static final String NO_CLUSTER_INFORMATION_AVAILABLE = "Error, no cluster information for molecule available!";

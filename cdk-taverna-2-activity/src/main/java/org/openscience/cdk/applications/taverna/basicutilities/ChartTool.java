@@ -97,15 +97,15 @@ public class ChartTool {
 		AreaRenderer renderer = (AreaRenderer) plot.getRenderer();
 		renderer.setSeriesPaint(0, Color.blue);
 		renderer.setSeriesPaint(1, Color.red);
-		renderer.setSeriesPaint(2, Color.yellow);
+		renderer.setSeriesPaint(2, Color.green);
 		renderer.setSeriesPaint(3, Color.darkGray);
-		renderer.setSeriesPaint(4, Color.green);
+		renderer.setSeriesPaint(4, Color.yellow);
 		return chart;
 	}
 
 	public JFreeChart createScatterPlot(XYDataset dataset, String header, String xAxis, String yAxis) {
-		JFreeChart chart = ChartFactory.createScatterPlot(header, xAxis, yAxis, dataset,
-				PlotOrientation.VERTICAL, true, false, false);
+		JFreeChart chart = ChartFactory.createScatterPlot(header, xAxis, yAxis, dataset, PlotOrientation.VERTICAL,
+				true, false, false);
 
 		XYPlot plot = (XYPlot) chart.getPlot();
 		plot.setNoDataMessage("NO DATA");
@@ -154,9 +154,9 @@ public class ChartTool {
 		BarRenderer renderer = (BarRenderer) plot.getRenderer();
 		renderer.setSeriesPaint(0, Color.blue);
 		renderer.setSeriesPaint(1, Color.red);
-		renderer.setSeriesPaint(2, Color.yellow);
+		renderer.setSeriesPaint(2, Color.green);
 		renderer.setSeriesPaint(3, Color.darkGray);
-		renderer.setSeriesPaint(4, Color.green);
+		renderer.setSeriesPaint(4, Color.yellow);
 		return chart;
 	}
 
@@ -173,6 +173,24 @@ public class ChartTool {
 	 */
 	public JFreeChart createLineChart(String title, String categoryAxisLabel, String valueAxisLabel,
 			CategoryDataset dataset) {
+		return this.createLineChart(title, categoryAxisLabel, valueAxisLabel, dataset, true);
+	}
+
+	/**
+	 * Creates a line chart.
+	 * 
+	 * @param title
+	 * @param categoryAxisLabel
+	 *            (X-Axis label)
+	 * @param valueAxisLabel
+	 *            (Y-Axis label)
+	 * @param dataset
+	 * @param includeZero
+	 *            True when zero shall be included to the axis range.
+	 * @return JfreeChart instance.
+	 */
+	public JFreeChart createLineChart(String title, String categoryAxisLabel, String valueAxisLabel,
+			CategoryDataset dataset, boolean includeZero) {
 		JFreeChart chart = ChartFactory.createLineChart(title, categoryAxisLabel, valueAxisLabel, dataset,
 				this.orientation, this.drawLegend, false, false);
 		// set the background color for the chart...
@@ -183,12 +201,14 @@ public class ChartTool {
 		domainAxis.setLowerMargin(0.025);
 		domainAxis.setUpperMargin(0.025);
 		domainAxis.setCategoryLabelPositions(CategoryLabelPositions.DOWN_90);
+		NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+		rangeAxis.setAutoRangeIncludesZero(includeZero);
 		LineAndShapeRenderer renderer = (LineAndShapeRenderer) plot.getRenderer();
 		renderer.setSeriesPaint(0, Color.blue);
 		renderer.setSeriesPaint(1, Color.red);
-		renderer.setSeriesPaint(2, Color.yellow);
+		renderer.setSeriesPaint(2, Color.green);
 		renderer.setSeriesPaint(3, Color.darkGray);
-		renderer.setSeriesPaint(4, Color.green);
+		renderer.setSeriesPaint(4, Color.yellow);
 		renderer.setDrawOutlines(true);
 		renderer.setUseFillPaint(true);
 		renderer.setBaseShapesVisible(true);
@@ -251,8 +271,9 @@ public class ChartTool {
 
 	private void addAnnotationToPDF(String annotation, Document document) throws DocumentException {
 		Paragraph para = new Paragraph();
-		Font font = FontFactory.getFont(FontFactory.HELVETICA, 18);
+		Font font = FontFactory.getFont(FontFactory.HELVETICA, 12);
 		para.setFont(font);
+		para.setLeading(14F);
 		para.add(annotation);
 		document.add(para);
 	}

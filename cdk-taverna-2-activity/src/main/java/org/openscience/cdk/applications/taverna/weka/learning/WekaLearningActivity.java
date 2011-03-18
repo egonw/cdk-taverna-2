@@ -23,7 +23,9 @@ package org.openscience.cdk.applications.taverna.weka.learning;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
@@ -34,6 +36,8 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.basicutilities.Tools;
+import org.openscience.cdk.applications.taverna.weka.utilities.WekaLearningWork;
+import org.openscience.cdk.applications.taverna.weka.utilities.WekaLearningWorker;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
 import weka.classifiers.Classifier;
@@ -50,6 +54,9 @@ import weka.filters.Filter;
 public class WekaLearningActivity extends AbstractCDKActivity {
 
 	public static final String WEKA_LEARNING_ACTIVITY = "Weka Learning";
+	private LinkedList<WekaLearningWork> workList = null;
+	private WekaLearningWorker[] workers = null;
+	private String[] modelFiles = null;
 
 	/**
 	 * Creates a new instance.
@@ -82,11 +89,14 @@ public class WekaLearningActivity extends AbstractCDKActivity {
 		File targetFile = this.getInputAsFile(this.INPUT_PORTS[1]);
 		String directory = Tools.getDirectory(targetFile);
 		String name = Tools.getFileName(targetFile);
+		int numberOfThreads = (Integer) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS);
 		// Do work
+		this.workList = new LinkedList<WekaLearningWork>();
+
 		// Get job informations
 		String className = (String) this.getConfiguration().getAdditionalProperty(
 				CDKTavernaConstants.PROPERTY_LEARNER_NAME);
-		Class<? extends Classifier> clustererClass = (Class<? extends Classifier>) Class.forName(className);
 		String optString = (String) this.getConfiguration().getAdditionalProperty(
 				CDKTavernaConstants.PROPERTY_LEARNER_OPTIONS);
 		String[] options = optString.split(";");
@@ -98,25 +108,73 @@ public class WekaLearningActivity extends AbstractCDKActivity {
 			SerializationHelper.write(dataFile.getPath(), trainset);
 			dataFiles.add(dataFile.getPath());
 		}
-		// Do the job
-		ArrayList<String> modelFiles = new ArrayList<String>();
+		// Create job list
+		int id = 0;
 		WekaTools tools = new WekaTools();
+		this.modelFiles = new String[options.length * dataset.size()];
 		for (int i = 0; i < options.length; i++) {
 			for (int j = 0; j < dataset.size(); j++) {
-				Instances trainset = dataset.get(j);
-				trainset = Filter.useFilter(trainset, tools.getIDRemover(trainset));
-				Classifier classifier = clustererClass.newInstance();
-				classifier.setOptions(options[i].split(" "));
-				classifier.buildClassifier(trainset);
-				File classifierFile = FileNameGenerator.getNewFile(directory, ".model", name + "_"
-						+ classifier.getClass().getSimpleName(), i + 1);
-				SerializationHelper.write(classifierFile.getPath(), classifier);
-				modelFiles.add(classifierFile.getPath());
+				 
+				WekaLearningWork work = new WekaLearningWork();
+				work.classifierClass = (Class<? extends Classifier>) Class.forName(className);
+				work.option = options[i];
+				work.trainingSet = Filter.useFilter(dataset.get(j), tools.getIDRemover(dataset.get(j)));
+				work.id = id;File classifierFile = FileNameGenerator.getNewFile(directory,
+						 ".model", name + "_"
+						 + work.classifierClass.getSimpleName() + options[i].replaceAll(" ",
+						 ""), i + 1);
+				work.modelFile = classifierFile;
+				this.workList.add(work);
+				id++;
 			}
 		}
+		// //start workers
+		int numWorkers = 1;//TODO numberOfThreads > this.workList.size() ? this.workList.size() : numberOfThreads;
+		this.workers = new WekaLearningWorker[numWorkers];
+		for (int i = 0; i < numWorkers; i++) {
+			this.workers[i] = new WekaLearningWorker(this);
+			this.workers[i].start();
+		}
+		synchronized (this) {
+			this.wait();
+		}
 		// Set output
-		this.setOutputAsStringList(modelFiles, this.OUTPUT_PORTS[0]);
+		this.setOutputAsStringList(Arrays.asList(this.modelFiles), this.OUTPUT_PORTS[0]);
 		this.setOutputAsStringList(dataFiles, this.OUTPUT_PORTS[1]);
+	}
+
+	public synchronized WekaLearningWork getWork() {
+		if (!this.workList.isEmpty()) {
+			return this.workList.removeFirst();
+		} else {
+			return null;
+		}
+	}
+	
+	public synchronized void publishResult(WekaLearningWork work, Classifier classifier) throws Exception{
+		SerializationHelper.write(work.modelFile.getPath(), classifier);
+		this.modelFiles[work.id] = work.modelFile.getPath();
+	}
+	
+	/**
+	 * Final point for the workers.
+	 * 
+	 * @param results
+	 *            Described molecules.
+	 */
+	public synchronized void workerDone() {
+		boolean allDone = true;
+		for (WekaLearningWorker worker : this.workers) {
+			if (!worker.isDone()) {
+				allDone = false;
+				break;
+			}
+		}
+		if (allDone) {
+			synchronized (this) {
+				this.notify();
+			}
+		}
 	}
 
 	@Override
@@ -127,6 +185,7 @@ public class WekaLearningActivity extends AbstractCDKActivity {
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
+		properties.put(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, Runtime.getRuntime().availableProcessors());
 		return properties;
 	}
 

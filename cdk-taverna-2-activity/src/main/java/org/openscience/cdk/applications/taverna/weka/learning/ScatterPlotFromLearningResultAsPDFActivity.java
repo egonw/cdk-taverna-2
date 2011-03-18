@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
@@ -45,6 +46,8 @@ import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
+import weka.classifiers.evaluation.ThresholdCurve;
+import weka.core.FastVector;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
 import weka.filters.Filter;
@@ -110,19 +113,26 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 				orgClassMap.put(uuid, Double.valueOf(frag[1]));
 			}
 			List<JFreeChart> rmseCharts = new ArrayList<JFreeChart>();
+			List<Double> trainMeanRMSE = new ArrayList<Double>();
+			List<Double> testMeanRMSE = new ArrayList<Double>();
+			List<Double> cvMeanRMSE = new ArrayList<Double>();
 			while (!modelFiles.isEmpty()) {
 				List<Double> trainRMSE = new ArrayList<Double>();
 				HashSet<Integer> trainSkippedRMSE = new HashSet<Integer>();
 				List<Double> testRMSE = new ArrayList<Double>();
 				HashSet<Integer> testSkippedRMSE = new HashSet<Integer>();
+				List<Double> cvRMSE = new ArrayList<Double>();
+				HashSet<Integer> cvSkippedRMSE = new HashSet<Integer>();
 				List<Double> trainingSetRatios = new ArrayList<Double>();
 				List<JFreeChart> charts = new LinkedList<JFreeChart>();
 				List<String> summary = new LinkedList<String>();
+				File modelFile = null;
+				Classifier classifier = null;
 				for (int j = 0; j < trainDataFiles.size(); j++) {
 					if (modelFiles.isEmpty()) {
 						break;
 					}
-					File modelFile = modelFiles.remove(0);
+					modelFile = modelFiles.remove(0);
 					Instances trainset = (Instances) SerializationHelper.read(trainDataFiles.get(j).getPath());
 					Instances testset = testDatasets.get(j);
 					Instances trainUUIDSet = Filter.useFilter(trainset, tools.getIDGetter(trainset));
@@ -133,7 +143,7 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 					double trainingSetRatio = trainset.numInstances()
 							/ (double) (trainset.numInstances() + testset.numInstances());
 					trainingSetRatios.add(trainingSetRatio);
-					Classifier classifier = (Classifier) SerializationHelper.read(modelFile.getPath());
+					classifier = (Classifier) SerializationHelper.read(modelFile.getPath());
 					// Predict
 					for (int k = 0; k < trainset.numInstances(); k++) {
 						UUID uuid = UUID.fromString(trainUUIDSet.instance(k).stringValue(0));
@@ -148,6 +158,9 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 					trainEval.evaluateModel(classifier, trainset);
 					Evaluation testEval = new Evaluation(testset);
 					testEval.evaluateModel(classifier, testset);
+					Instances fullSet = tools.getFullSet(trainset, testset);
+					Evaluation cvEval = new Evaluation(trainset);
+					cvEval.crossValidateModel(classifier, fullSet, 10, new Random(1));
 					// Create chart
 					DefaultXYDataset xyDataSet = new DefaultXYDataset();
 					String trainSeries = "Training Set (RMSE: "
@@ -171,10 +184,11 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 					}
 					xyDataSet.addSeries(testSeries, series.toArray());
 					charts.add(chartTool.createScatterPlot(xyDataSet, classifier.getClass().getSimpleName()
-							+ "\n Training set ratio: " + String.format("%.2f", trainingSetRatios.get(j)) + "%",
-							"Original values", "Predicted values"));
+							+ "\n Training set ratio: " + String.format("%.2f", trainingSetRatios.get(j)) + "%"
+							+ "\n Model name: " + modelFile.getName(), "Original values", "Predicted values"));
 					// Create summary
-					String sum = "Method: " + classifier.getClass().getSimpleName() + "\n\n";
+					String name = classifier.getClass().getSimpleName();
+					String sum = "Method: " + name + " " + tools.getOptionsFromFile(modelFile, name) + "\n\n";
 					sum += "Training Set:\n";
 					if (trainEval.rootRelativeSquaredError() > 300) {
 						trainSkippedRMSE.add(j);
@@ -187,21 +201,47 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 					}
 					testRMSE.add(testEval.rootMeanSquaredError());
 					sum += testEval.toSummaryString(true);
+					sum += "\n10-fold cross-validation:\n";
+					if (cvEval.rootRelativeSquaredError() > 300) {
+						cvSkippedRMSE.add(j);
+					}
+					cvRMSE.add(cvEval.rootMeanSquaredError());
+					sum += cvEval.toSummaryString(true);
 					summary.add(sum);
 				}
 				// Create RMSE Plot
 				DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
+				double meanRMSE = 0;
 				for (int i = 0; i < trainRMSE.size(); i++) {
 					if (!trainSkippedRMSE.contains(i)) {
 						dataSet.addValue(trainRMSE.get(i), "Training Set",
-								String.format("%.2f", trainingSetRatios.get(i)) + "%");
+								"(" + String.format("%.2f", trainingSetRatios.get(i)) + "%/" + (i + 1) + ")");
 					}
-					if (!testSkippedRMSE.contains(i)) {
-						dataSet.addValue(testRMSE.get(i), "Test Set", String.format("%.2f", trainingSetRatios.get(i))
-								+ "%");
-					}
+					meanRMSE += trainRMSE.get(i);
 				}
-				JFreeChart rmseChart = chartTool.createLineChart("RMSE Plot", "Training set ratio", "RMSE", dataSet);
+				trainMeanRMSE.add(meanRMSE / trainRMSE.size());
+				meanRMSE = 0;
+				for (int i = 0; i < testRMSE.size(); i++) {
+					if (!testSkippedRMSE.contains(i)) {
+						dataSet.addValue(testRMSE.get(i), "Test Set",
+								"(" + String.format("%.2f", trainingSetRatios.get(i)) + "%/" + (i + 1) + ")");
+					}
+					meanRMSE += testRMSE.get(i);
+				}
+				testMeanRMSE.add(meanRMSE / testRMSE.size());
+				meanRMSE = 0;
+				for (int i = 0; i < cvRMSE.size(); i++) {
+					if (!cvSkippedRMSE.contains(i)) {
+						dataSet.addValue(cvRMSE.get(i), "10-fold Cross-validation",
+								"(" + String.format("%.2f", trainingSetRatios.get(i)) + "%/" + (i + 1) + ")");
+					}
+					meanRMSE += cvRMSE.get(i);
+				}
+				cvMeanRMSE.add(meanRMSE / cvRMSE.size());
+				String name = classifier.getClass().getSimpleName();
+				JFreeChart rmseChart = chartTool.createLineChart(
+						"RMSE Plot\n Classifier:" + name + " " + tools.getOptionsFromFile(modelFile, name),
+						"(Training set ratio/Index)", "RMSE", dataSet, false);
 				charts.add(rmseChart);
 				rmseCharts.add(rmseChart);
 				// Write PDF
@@ -209,6 +249,19 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 				chartTool.writeChartAsPDF(file, charts, summary);
 				resultFiles.add(file.getPath());
 			}
+			// Create mean RMSE plot
+			DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
+			for (int i = 0; i < trainMeanRMSE.size(); i++) {
+				dataSet.addValue(trainMeanRMSE.get(i), "Training Set", "" + (i + 1));
+			}
+			for (int i = 0; i < testMeanRMSE.size(); i++) {
+				dataSet.addValue(testMeanRMSE.get(i), "Test Set", "" + (i + 1));
+			}
+			for (int i = 0; i < cvMeanRMSE.size(); i++) {
+				dataSet.addValue(cvMeanRMSE.get(i), "10-fold Cross-validation", "" + (i + 1));
+			}
+			JFreeChart rmseChart = chartTool.createLineChart("RMSE Mean Plot", "Dataset number", "Mean RMSE", dataSet);
+			rmseCharts.add(rmseChart);
 			File file = FileNameGenerator.getNewFile(directory, ".pdf", "RMSE-Sum");
 			chartTool.writeChartAsPDF(file, rmseCharts);
 			resultFiles.add(file.getPath());

@@ -27,6 +27,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.openscience.cdk.Reaction;
 import org.openscience.cdk.geometry.GeometryTools;
@@ -36,7 +37,11 @@ import org.openscience.cdk.tools.manipulator.ReactionManipulator;
 import org.openscience.jchempaint.renderer.BoundsCalculator;
 
 import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -53,27 +58,51 @@ public class DrawPDF {
 	private static int width = 300;
 	private static int height = 300;
 	private static double scale = 0.9;
-	private static int ncol = 2;
+	private static int ncol = 1;
 	private static int nrow = 3;
 
 	public static void drawMoleculesAsPDF(List<IAtomContainer> molecules, File file) throws Exception {
 		Document pdf = new Document();
 		PdfWriter writer = PdfWriter.getInstance(pdf, new FileOutputStream(file));
 		pdf.open();
+		Paragraph para = new Paragraph();
+		Font font = FontFactory.getFont(FontFactory.HELVETICA, 24);
+		para.setFont(font);
+		para.setAlignment(Element.ALIGN_CENTER);
+		para.add("CDK-Taverna 2.0");
+		pdf.add(para);
+		para = new Paragraph();
+		font = FontFactory.getFont(FontFactory.HELVETICA, 12);
+		para.setFont(font);
+		para.setAlignment(Element.ALIGN_CENTER);
+		para.add("The open-source chemo-/bioinformatics workflow solution\n\n\n");
+		pdf.add(para);
 		PdfPTable table = new PdfPTable(ncol);
 		for (IAtomContainer molecule : molecules) {
 			PdfPCell cell = new PdfPCell();
-			BufferedImage image = Draw2DStructure.drawMolecule(molecule, width, height, 0.95);
+			cell.disableBorderSide(PdfPCell.BOTTOM | PdfPCell.LEFT | PdfPCell.RIGHT | PdfPCell.TOP);
+			BufferedImage image = Draw2DStructure.drawMolecule(molecule, (int) pdf.getPageSize().getWidth(), height,
+					0.95);
 			java.awt.Image awtImage = Toolkit.getDefaultToolkit().createImage(image.getSource());
 			cell.addElement(Image.getInstance(awtImage, null));
 			table.addCell(cell);
-		}
-		int cells = molecules.size();
-		while (cells % ncol != 0) {
-			PdfPCell cell = new PdfPCell();
-			cell.disableBorderSide(PdfPCell.BOTTOM | PdfPCell.LEFT | PdfPCell.RIGHT | PdfPCell.TOP);
+			cell = new PdfPCell();
+			cell.disableBorderSide(PdfPCell.LEFT | PdfPCell.RIGHT | PdfPCell.TOP);
+			para = new Paragraph();
+			font = FontFactory.getFont(FontFactory.HELVETICA, 12);
+			para.setFont(font);
+			para.add("\n");
+			for (Entry<Object, Object> entry : molecule.getProperties().entrySet()) {
+				try {
+					String key = String.valueOf(entry.getKey());
+					String value = String.valueOf(entry.getValue());
+					para.add(key + ":\n" + value + "\n\n");
+				} catch (Exception e) {
+					// Not a String entry --> skip
+				}
+			}
+			cell.addElement(para);
 			table.addCell(cell);
-			cells++;
 		}
 		pdf.add(table);
 		pdf.close();

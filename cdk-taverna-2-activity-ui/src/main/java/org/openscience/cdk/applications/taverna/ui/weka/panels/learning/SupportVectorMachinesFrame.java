@@ -2,6 +2,7 @@ package org.openscience.cdk.applications.taverna.ui.weka.panels.learning;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -21,14 +22,18 @@ public class SupportVectorMachinesFrame extends AbstractLearningConfigurationFra
 	private static final String[] KERNEL_TYPES = new String[] { "Linear: u'*v",
 			"Polynomial: (gamma*u'*v + coef0)^degree", "Radial basis function: exp(-gamma*|u-v|^2)",
 			"Sigmoid: tanh(gamma*u'*v + coef0)" };
-	private JTextField degreeTextField;
-	private JTextField gammaTextField;
+	private JTextField degreeLowTextField;
+	private JTextField gammaLowTextField;
 	private JTextField coefTextField;
 	private JTextField startTextField;
 	private JTextField endTextField;
 	private JTextField stepSizeTextField;
 	private JComboBox svmTypeComboBox;
 	private JComboBox kernelComboBox;
+	private JLabel lblNewLabel_8;
+	private JTextField gammaHighTextField;
+	private JLabel lblStepSize;
+	private JTextField gammaStepsizeTextField;
 
 	public SupportVectorMachinesFrame() {
 		setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
@@ -60,29 +65,32 @@ public class SupportVectorMachinesFrame extends AbstractLearningConfigurationFra
 		springLayout.putConstraint(SpringLayout.NORTH, lblNewLabel_1, 3, SpringLayout.NORTH, kernelComboBox);
 		add(kernelComboBox);
 
-		degreeTextField = new JTextField();
-		degreeTextField.setText("3");
-		springLayout.putConstraint(SpringLayout.NORTH, degreeTextField, 6, SpringLayout.SOUTH, kernelComboBox);
-		springLayout.putConstraint(SpringLayout.WEST, degreeTextField, 0, SpringLayout.WEST, svmTypeComboBox);
-		add(degreeTextField);
-		degreeTextField.setColumns(10);
+		degreeLowTextField = new JTextField();
+		springLayout.putConstraint(SpringLayout.NORTH, degreeLowTextField, 16, SpringLayout.SOUTH, kernelComboBox);
+		springLayout.putConstraint(SpringLayout.EAST, degreeLowTextField, 40, SpringLayout.WEST, svmTypeComboBox);
+		degreeLowTextField.setText("3");
+		springLayout.putConstraint(SpringLayout.WEST, degreeLowTextField, 0, SpringLayout.WEST, svmTypeComboBox);
+		add(degreeLowTextField);
+		degreeLowTextField.setColumns(10);
 
-		gammaTextField = new JTextField();
-		gammaTextField.setText("1/k");
-		springLayout.putConstraint(SpringLayout.NORTH, gammaTextField, 6, SpringLayout.SOUTH, degreeTextField);
-		springLayout.putConstraint(SpringLayout.WEST, gammaTextField, 0, SpringLayout.WEST, svmTypeComboBox);
-		add(gammaTextField);
-		gammaTextField.setColumns(10);
+		gammaLowTextField = new JTextField();
+		springLayout.putConstraint(SpringLayout.NORTH, gammaLowTextField, 4, SpringLayout.SOUTH, degreeLowTextField);
+		springLayout.putConstraint(SpringLayout.EAST, gammaLowTextField, 40, SpringLayout.WEST, svmTypeComboBox);
+		gammaLowTextField.setText("1/k");
+		springLayout.putConstraint(SpringLayout.WEST, gammaLowTextField, 0, SpringLayout.WEST, svmTypeComboBox);
+		add(gammaLowTextField);
+		gammaLowTextField.setColumns(10);
 
 		coefTextField = new JTextField();
-		coefTextField.setText("0");
-		springLayout.putConstraint(SpringLayout.NORTH, coefTextField, 6, SpringLayout.SOUTH, gammaTextField);
+		springLayout.putConstraint(SpringLayout.NORTH, coefTextField, 30, SpringLayout.SOUTH, gammaLowTextField);
+		springLayout.putConstraint(SpringLayout.EAST, coefTextField, 40, SpringLayout.WEST, svmTypeComboBox);
+		coefTextField.setText("0.0");
 		springLayout.putConstraint(SpringLayout.WEST, coefTextField, 0, SpringLayout.WEST, svmTypeComboBox);
 		add(coefTextField);
 		coefTextField.setColumns(10);
 
 		startTextField = new JTextField();
-		springLayout.putConstraint(SpringLayout.NORTH, startTextField, 6, SpringLayout.SOUTH, coefTextField);
+		springLayout.putConstraint(SpringLayout.NORTH, startTextField, 4, SpringLayout.SOUTH, coefTextField);
 		springLayout.putConstraint(SpringLayout.EAST, startTextField, 40, SpringLayout.WEST, svmTypeComboBox);
 		startTextField.setText("1");
 		springLayout.putConstraint(SpringLayout.WEST, startTextField, 0, SpringLayout.WEST, svmTypeComboBox);
@@ -90,12 +98,12 @@ public class SupportVectorMachinesFrame extends AbstractLearningConfigurationFra
 		startTextField.setColumns(10);
 
 		JLabel lblNewLabel_2 = new JLabel("Degree:");
-		springLayout.putConstraint(SpringLayout.NORTH, lblNewLabel_2, 3, SpringLayout.NORTH, degreeTextField);
+		springLayout.putConstraint(SpringLayout.NORTH, lblNewLabel_2, 3, SpringLayout.NORTH, degreeLowTextField);
 		springLayout.putConstraint(SpringLayout.WEST, lblNewLabel_2, 0, SpringLayout.WEST, lblNewLabel);
 		add(lblNewLabel_2);
 
 		JLabel lblNewLabel_3 = new JLabel("Gamma:");
-		springLayout.putConstraint(SpringLayout.NORTH, lblNewLabel_3, 3, SpringLayout.NORTH, gammaTextField);
+		springLayout.putConstraint(SpringLayout.NORTH, lblNewLabel_3, 3, SpringLayout.NORTH, gammaLowTextField);
 		springLayout.putConstraint(SpringLayout.WEST, lblNewLabel_3, 0, SpringLayout.WEST, lblNewLabel);
 		add(lblNewLabel_3);
 
@@ -110,9 +118,9 @@ public class SupportVectorMachinesFrame extends AbstractLearningConfigurationFra
 		add(lblCostParameter);
 
 		JLabel lblNewLabel_5 = new JLabel("Default: 1/k otherwise numeric value!");
+		springLayout.putConstraint(SpringLayout.NORTH, lblNewLabel_5, 6, SpringLayout.SOUTH, gammaLowTextField);
+		springLayout.putConstraint(SpringLayout.WEST, lblNewLabel_5, 0, SpringLayout.WEST, svmTypeComboBox);
 		lblNewLabel_5.setEnabled(false);
-		springLayout.putConstraint(SpringLayout.NORTH, lblNewLabel_5, 3, SpringLayout.NORTH, gammaTextField);
-		springLayout.putConstraint(SpringLayout.WEST, lblNewLabel_5, 6, SpringLayout.EAST, gammaTextField);
 		add(lblNewLabel_5);
 
 		JLabel lblNewLabel_6 = new JLabel("-");
@@ -127,23 +135,48 @@ public class SupportVectorMachinesFrame extends AbstractLearningConfigurationFra
 		add(endTextField);
 		endTextField.setColumns(10);
 
-		JLabel lblStepsize = new JLabel("Stepsize:");
+		JLabel lblStepsize = new JLabel("Step size:");
 		springLayout.putConstraint(SpringLayout.NORTH, lblStepsize, 3, SpringLayout.NORTH, startTextField);
 		springLayout.putConstraint(SpringLayout.WEST, lblStepsize, 6, SpringLayout.EAST, endTextField);
 		add(lblStepsize);
 
 		stepSizeTextField = new JTextField();
-		springLayout.putConstraint(SpringLayout.NORTH, stepSizeTextField, 37, SpringLayout.SOUTH, lblNewLabel_5);
-		springLayout.putConstraint(SpringLayout.WEST, stepSizeTextField, 8, SpringLayout.EAST, lblStepsize);
-		springLayout.putConstraint(SpringLayout.EAST, stepSizeTextField, 48, SpringLayout.EAST, lblStepsize);
+		springLayout.putConstraint(SpringLayout.NORTH, stepSizeTextField, 0, SpringLayout.NORTH, startTextField);
+		springLayout.putConstraint(SpringLayout.WEST, stepSizeTextField, 6, SpringLayout.EAST, lblStepsize);
+		springLayout.putConstraint(SpringLayout.EAST, stepSizeTextField, 46, SpringLayout.EAST, lblStepsize);
 		add(stepSizeTextField);
 		stepSizeTextField.setColumns(10);
 
 		JLabel lblNewLabel_7 = new JLabel(" Leave the second field free to perform only one step.");
+		springLayout.putConstraint(SpringLayout.NORTH, lblNewLabel_7, 13, SpringLayout.SOUTH, startTextField);
+		springLayout.putConstraint(SpringLayout.WEST, lblNewLabel_7, 10, SpringLayout.WEST, this);
 		lblNewLabel_7.setEnabled(false);
-		springLayout.putConstraint(SpringLayout.NORTH, lblNewLabel_7, 10, SpringLayout.SOUTH, stepSizeTextField);
-		springLayout.putConstraint(SpringLayout.WEST, lblNewLabel_7, 0, SpringLayout.WEST, lblNewLabel);
 		add(lblNewLabel_7);
+
+		lblNewLabel_8 = new JLabel("-");
+		springLayout.putConstraint(SpringLayout.NORTH, lblNewLabel_8, 3, SpringLayout.NORTH, gammaLowTextField);
+		springLayout.putConstraint(SpringLayout.WEST, lblNewLabel_8, 6, SpringLayout.EAST, gammaLowTextField);
+		add(lblNewLabel_8);
+
+		gammaHighTextField = new JTextField();
+		springLayout.putConstraint(SpringLayout.NORTH, gammaHighTextField, 0, SpringLayout.NORTH, gammaLowTextField);
+		springLayout.putConstraint(SpringLayout.WEST, gammaHighTextField, 0, SpringLayout.WEST, endTextField);
+		springLayout.putConstraint(SpringLayout.EAST, gammaHighTextField, 46, SpringLayout.EAST, lblNewLabel_8);
+		add(gammaHighTextField);
+		gammaHighTextField.setColumns(10);
+
+		lblStepSize = new JLabel("Step size:");
+		springLayout.putConstraint(SpringLayout.NORTH, lblStepSize, 3, SpringLayout.NORTH, gammaLowTextField);
+		springLayout.putConstraint(SpringLayout.WEST, lblStepSize, 0, SpringLayout.WEST, lblStepsize);
+		add(lblStepSize);
+
+		gammaStepsizeTextField = new JTextField();
+		springLayout
+				.putConstraint(SpringLayout.NORTH, gammaStepsizeTextField, 0, SpringLayout.NORTH, gammaLowTextField);
+		springLayout.putConstraint(SpringLayout.WEST, gammaStepsizeTextField, 0, SpringLayout.WEST, stepSizeTextField);
+		springLayout.putConstraint(SpringLayout.EAST, gammaStepsizeTextField, 46, SpringLayout.EAST, lblStepSize);
+		add(gammaStepsizeTextField);
+		gammaStepsizeTextField.setColumns(10);
 	}
 
 	@Override
@@ -166,38 +199,49 @@ public class SupportVectorMachinesFrame extends AbstractLearningConfigurationFra
 		ArrayList<String> tempOpt = new ArrayList<String>();
 		int svmType = this.svmTypeComboBox.getSelectedIndex() + 3;
 		int kernelType = this.kernelComboBox.getSelectedIndex();
-		int degree = Integer.parseInt(this.degreeTextField.getText());
+		int degree = Integer.parseInt(this.degreeLowTextField.getText());
 		double coef = Double.parseDouble(this.coefTextField.getText());
+		// Get gammas
+		LinkedList<String> gammas = new LinkedList<String>();
+		if (this.gammaHighTextField.getText().trim().equals("")
+				|| this.gammaHighTextField.getText().trim().equals("1/k")) {
+			gammas.add("-G " + this.gammaLowTextField.getText() + " ");
+		} else {
+			double stepSize = Double.parseDouble(this.gammaStepsizeTextField.getText());
+			double current = Double.parseDouble(this.gammaLowTextField.getText());
+			double goal = Double.parseDouble(this.gammaHighTextField.getText());
+			do {
+				gammas.add("-G " + current + " ");
+				current += stepSize;
+			} while (current <= goal);
+		}
+		// Get costs
+		LinkedList<String> costs = new LinkedList<String>();
 		if (this.endTextField.getText().trim().equals("")) {
-			String option = "";
-			option += "-S " + svmType + " ";
-			option += "-K " + kernelType + " ";
-			option += "-D " + degree + " ";
-			option += "-R " + coef + " ";
-			option += "-C " + this.startTextField.getText() + " ";
-			if (!this.gammaTextField.getText().equals("1/k")) {
-				double gamma = Double.parseDouble(this.degreeTextField.getText());
-				option += "-G " + gamma + " ";
-			}
-			tempOpt.add(option);
+			costs.add("-C " + this.startTextField.getText() + " ");
 		} else {
 			int stepSize = Integer.parseInt(this.stepSizeTextField.getText());
 			int current = Integer.parseInt(this.startTextField.getText());
 			int goal = Integer.parseInt(this.endTextField.getText());
 			do {
+				costs.add("-C " + current + " ");
+				current += stepSize;
+			} while (current <= goal);
+		}
+		for (int i = 0; i < gammas.size(); i++) {
+			for (int j = 0; j < costs.size(); j++) {
 				String option = "";
 				option += "-S " + svmType + " ";
 				option += "-K " + kernelType + " ";
 				option += "-D " + degree + " ";
 				option += "-R " + coef + " ";
-				option += "-C " + current + " ";
-				if (!this.gammaTextField.getText().equals("1/k")) {
-					double gamma = Double.parseDouble(this.degreeTextField.getText());
-					option += "-G " + gamma + " ";
+				option += "-J -V ";
+				option += costs.get(j);
+				if (!gammas.get(i).equals("-G 1/k ")) {
+					option += gammas.get(i);
 				}
 				tempOpt.add(option);
-				current += stepSize;
-			} while (current <= goal);
+			}
 		}
 		String[] options = new String[tempOpt.size()];
 		return tempOpt.toArray(options);
@@ -205,22 +249,71 @@ public class SupportVectorMachinesFrame extends AbstractLearningConfigurationFra
 
 	@Override
 	public void setOptions(String[] options) {
-		String[] optMin = options[0].split(" ");
-		this.svmTypeComboBox.setSelectedIndex(Integer.parseInt(optMin[1]) - 3);
-		this.kernelComboBox.setSelectedIndex(Integer.parseInt(optMin[3]));
-		this.degreeTextField.setText(optMin[5]);
-		this.coefTextField.setText(optMin[7]);
-		this.startTextField.setText(optMin[9]);
-		if (optMin.length > 10) {
-			this.gammaTextField.setText(optMin[11]);
-		} else {
-			this.gammaTextField.setText("1/k");
+		Integer lowC = null;
+		Integer highC = null;
+		Integer stepSizeC = null;
+		Double lowG = null;
+		Double highG = null;
+		Double stepSizeG = null;
+		Integer svmType = null;
+		Integer kernelType = null;
+		Integer degree = null;
+		Double coef = null;
+		boolean firstDif = false;
+		for (int i = 0; i < options.length; i++) {
+			String[] opt = options[i].split(" ");
+			if (i == 0) {
+				svmType = Integer.parseInt(opt[1]) - 3;
+				kernelType = Integer.parseInt(opt[3]);
+				degree = Integer.parseInt(opt[5]);
+				coef = Double.parseDouble(opt[7]);
+				lowC = Integer.parseInt(opt[11]);
+				highC = Integer.parseInt(opt[11]);
+				if (opt.length > 12 && !opt[13].equals("1/k")) {
+					lowG = Double.parseDouble(opt[13]);
+					highG = Double.parseDouble(opt[13]);
+				}
+			} else {
+				lowC = Math.min(lowC, Integer.parseInt(opt[11]));
+				highC = Math.max(highC, Integer.parseInt(opt[11]));
+				if (opt.length > 12 && !opt[13].equals("1/k")) {
+					lowG = Math.min(lowG, Double.parseDouble(opt[13]));
+					highG = Math.max(highG, Double.parseDouble(opt[13]));
+				}
+			}
+			if (i == 1) {
+				stepSizeC = highC - lowC;
+			}
+			if ( !firstDif && opt.length > 12 && !opt[13].equals("1/k")) {
+				if (!highG.equals(lowG)) {
+					stepSizeG = highG - lowG;
+					firstDif = true;
+				}
+			}
 		}
-		if (options.length > 1) {
-			String[] optMax = options[options.length - 1].split(" ");
-			this.stepSizeTextField.setText(""
-					+ (Integer.parseInt(options[1].split(" ")[9]) - Integer.parseInt(options[0].split(" ")[9])));
-			this.endTextField.setText(optMax[9]);
+		this.svmTypeComboBox.setSelectedIndex(svmType);
+		this.kernelComboBox.setSelectedIndex(kernelType);
+		this.degreeLowTextField.setText("" + degree);
+		this.coefTextField.setText("" + coef);
+		this.startTextField.setText("" + lowC);
+		if (highC != null && stepSizeC != null) {
+			this.endTextField.setText("" + highC);
+			this.stepSizeTextField.setText("" + stepSizeC);
+		} else {
+			this.endTextField.setText("");
+			this.stepSizeTextField.setText("");
+		}
+		if (lowG == null) {
+			this.gammaLowTextField.setText("1/k");
+		} else {
+			this.gammaLowTextField.setText("" + lowG);
+		}
+		if (highG != null && stepSizeG != null) {
+			this.gammaHighTextField.setText("" + highG);
+			this.gammaStepsizeTextField.setText("" + stepSizeG);
+		} else {
+			this.gammaHighTextField.setText("");
+			this.gammaStepsizeTextField.setText("");
 		}
 	}
 
@@ -228,5 +321,7 @@ public class SupportVectorMachinesFrame extends AbstractLearningConfigurationFra
 	public void makeSingleOption() {
 		this.endTextField.setEnabled(false);
 		this.stepSizeTextField.setEnabled(false);
+		this.gammaHighTextField.setEnabled(false);
+		this.gammaStepsizeTextField.setEnabled(false);
 	}
 }

@@ -8,11 +8,16 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.border.EtchedBorder;
+import java.awt.FlowLayout;
+import javax.swing.border.LineBorder;
+import java.awt.Color;
+import javax.swing.JTextField;
 
 public class WekaLearningConfigurationPanelView extends JPanel {
 
 	private static final long serialVersionUID = 6788886457794959717L;
 	private JComboBox learnerComboBox;
+	private JTextField threadsTextField;
 
 	/**
 	 * Create the frame.
@@ -38,9 +43,27 @@ public class WekaLearningConfigurationPanelView extends JPanel {
 		sl_panel.putConstraint(SpringLayout.SOUTH, lblNewLabel, -10, SpringLayout.SOUTH, panel);
 		sl_panel.putConstraint(SpringLayout.WEST, lblNewLabel, 10, SpringLayout.WEST, panel);
 		panel.add(lblNewLabel);
+		
+		JPanel panel_1 = new JPanel();
+		panel_1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		FlowLayout flowLayout = (FlowLayout) panel_1.getLayout();
+		flowLayout.setAlignment(FlowLayout.LEFT);
+	//TODO:	add(panel_1, BorderLayout.SOUTH);
+		
+		JLabel lblNewLabel_1 = new JLabel("Number of Threads:");
+		panel_1.add(lblNewLabel_1);
+		
+		threadsTextField = new JTextField();
+		threadsTextField.setSize(new Dimension(40, 0));
+		threadsTextField.setPreferredSize(new Dimension(40, 20));
+		panel_1.add(threadsTextField);
+		threadsTextField.setColumns(10);
 	}
 
 	public JComboBox getLearnerComboBox() {
 		return learnerComboBox;
+	}
+	public JTextField getThreadsTextField() {
+		return threadsTextField;
 	}
 }

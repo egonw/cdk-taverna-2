@@ -8,15 +8,20 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.BevelBorder;
+import javax.swing.AbstractAction;
+import java.awt.event.ActionEvent;
+import javax.swing.Action;
 
 public class LearningDatasetClassifierFrame extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
+	private final Action action = new SwingAction();
 
 	/**
 	 * Create the dialog.
 	 */
 	public LearningDatasetClassifierFrame() {
+		setTitle("Setup");
 		setModal(true);
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
@@ -30,19 +35,25 @@ public class LearningDatasetClassifierFrame extends JDialog {
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
 				JButton okButton = new JButton("OK");
+				okButton.setAction(action);
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
-			}
-			{
-				JButton cancelButton = new JButton("Cancel");
-				cancelButton.setActionCommand("Cancel");
-				buttonPane.add(cancelButton);
 			}
 		}
 	}
 
 	public JPanel getContentPanel() {
 		return contentPanel;
+	}
+	private class SwingAction extends AbstractAction {
+
+		private static final long serialVersionUID = -3063887830112955283L;
+		public SwingAction() {
+			putValue(NAME, "Close");
+		}
+		public void actionPerformed(ActionEvent e) {
+			dispose();
+		}
 	}
 }

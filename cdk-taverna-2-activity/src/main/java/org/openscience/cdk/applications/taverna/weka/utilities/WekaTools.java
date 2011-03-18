@@ -30,6 +30,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import org.openscience.cdk.applications.art2aclassification.FingerprintItem;
@@ -104,9 +105,33 @@ public class WekaTools {
 	}
 
 	/**
-	 * Method which returns a filter to remove the class attribute from given
-	 * instances. IMPORTANT: The class attribute is the last attribute within the
+	 * Method which returns a filter to remove the identifier from given
+	 * instances. IMPORTANT: The identifier is the first attribute within the
 	 * instances
+	 * 
+	 * @param instances
+	 *            Instances which contains the format of the input instances
+	 * @return Weka remover filter which is configured to remove the identifier
+	 *         from the instance
+	 * @throws Exception
+	 */
+	public Remove getAttributRemover(Instances instances, int attr) throws Exception {
+		if (attr < 1 || attr > instances.numAttributes()) {
+			throw new IllegalArgumentException("Please enter a valid attribute number!");
+		}
+		Remove removeFilter = new Remove();
+		String[] removerOptionArray = new String[2];
+		removerOptionArray[0] = "-R";
+		removerOptionArray[1] = "" + attr;
+		removeFilter.setOptions(removerOptionArray);
+		removeFilter.setInputFormat(instances);
+		return removeFilter;
+	}
+
+	/**
+	 * Method which returns a filter to remove the class attribute from given
+	 * instances. IMPORTANT: The class attribute is the last attribute within
+	 * the instances
 	 * 
 	 * @param instances
 	 *            Instances which contains the format of the input instances
@@ -123,7 +148,7 @@ public class WekaTools {
 		removeFilter.setInputFormat(instances);
 		return removeFilter;
 	}
-	
+
 	/**
 	 * Method which returns a filter to get the identifier from given instances.
 	 * IMPORTANT: The identifier is the first attribute within the instances
@@ -282,15 +307,15 @@ public class WekaTools {
 	 * Extracts the options from given weka result file.
 	 * 
 	 * @param file
-	 * @param clustererName
+	 * @param className
 	 * @return Options string
 	 */
-	public String getOptionsFromFile(File file, String clustererName) {
+	public String getOptionsFromFile(File file, String className) {
 		String name = file.getName();
 		String[] parts = name.split("_");
 		for (String part : parts) {
-			if (part.startsWith(clustererName)) {
-				return part.replaceAll(clustererName, "");
+			if (part.startsWith(className)) {
+				return part.replaceAll(className, "");
 			}
 		}
 		return "";
@@ -311,5 +336,39 @@ public class WekaTools {
 			}
 		}
 		throw new CDKTavernaException("WekaTools", CDKTavernaException.CLUSTER_MODEL_HAS_NO_ID);
+	}
+	
+	public Instances createLearningSet(Instances dataset, HashMap<UUID, Double> classMap) {
+		Instances learningSet = null;
+		FastVector attributes = new FastVector();
+		for (int i = 0; i < dataset.numAttributes(); i++) {
+			attributes.addElement(dataset.attribute(i));
+		}
+		attributes.addElement(new Attribute("Class"));
+		learningSet = new Instances("LearningSet", attributes, dataset.numInstances());
+		learningSet.setClassIndex(learningSet.numAttributes() - 1);
+		for (int i = 0; i < dataset.numInstances(); i++) {
+			Instance instance = dataset.instance(i);
+			UUID uuid = UUID.fromString(instance.stringValue(0));
+			double[] values = new double[learningSet.numAttributes()];
+			values[0] = learningSet.attribute(0).addStringValue(instance.stringValue(0));
+			for (int j = 1; j < instance.numAttributes(); j++) {
+				values[j] = instance.value(j);
+			}
+			Instance inst = new Instance(1.0, values);
+			inst.setDataset(learningSet);
+			inst.setClassValue(classMap.get(uuid));
+			learningSet.add(inst);
+		}
+		learningSet.randomize(new Random());
+		return learningSet;
+	}
+	
+	public Instances getFullSet(Instances trainset, Instances testset) {
+		Instances full = new Instances(trainset);
+		for (int i = 0; i < testset.numInstances(); i++) {
+			full.add(testset.instance(i));
+		}
+		return full;
 	}
 }

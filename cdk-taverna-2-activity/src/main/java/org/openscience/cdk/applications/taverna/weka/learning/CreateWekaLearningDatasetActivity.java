@@ -94,32 +94,12 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 			String[] frag = csv.get(i).split(";");
 			classMap.put(UUID.fromString(frag[0]), Double.valueOf(frag[1]));
 		}
-		Instances learningSet = null;
+
 		List<Instances> trainSets = new ArrayList<Instances>();
 		List<Instances> testSets = new ArrayList<Instances>();
 		try {
 			// Create the whole dataset
-			FastVector attributes = new FastVector();
-			for (int i = 0; i < dataset.numAttributes(); i++) {
-				attributes.addElement(dataset.attribute(i));
-			}
-			attributes.addElement(new Attribute("Class"));
-			learningSet = new Instances("LearningSet", attributes, dataset.numInstances());
-			learningSet.setClassIndex(learningSet.numAttributes() - 1);
-			for (int i = 0; i < dataset.numInstances(); i++) {
-				Instance instance = dataset.instance(i);
-				UUID uuid = UUID.fromString(instance.stringValue(0));
-				double[] values = new double[learningSet.numAttributes()];
-				values[0] = learningSet.attribute(0).addStringValue(instance.stringValue(0));
-				for (int j = 1; j < instance.numAttributes(); j++) {
-					values[j] = instance.value(j);
-				}
-				Instance inst = new Instance(1.0, values);
-				inst.setDataset(learningSet);
-				inst.setClassValue(classMap.get(uuid));
-				learningSet.add(inst);
-			}
-			learningSet.randomize(new Random());
+			Instances learningSet = tools.createLearningSet(dataset, classMap);
 			// Split into train/test set
 			Instances trainset = null;
 			Instances testset = null;
@@ -130,7 +110,7 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 			int steps = Integer.parseInt(options[2]);
 			double stepSize = (higherFraction - lowerFraction) / (double) (steps - 1);
 			for (double fraction = lowerFraction; fraction <= higherFraction; fraction += stepSize) {
-				int numTrain = (int) (learningSet.numInstances() * fraction);
+				int numTrain = (int) Math.round(learningSet.numInstances() * fraction);
 				int numTest = learningSet.numInstances() - numTrain;
 				if (options[3].equals(METHODS[0])) {
 					trainset = new Instances(learningSet, 0, numTrain);
@@ -227,9 +207,8 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 							cleanTestSet = Filter.useFilter(currentTest, tools.getIDRemover(currentTest));
 						}
 						Classifier classifier = (Classifier) classifierClass.newInstance();
-						if (classifier instanceof LibSVM) {
-							classifier.setOptions(new String[] { "-S", "3" });
-						}
+						String[] classOptions = options[5].split(" ");
+						classifier.setOptions(classOptions);
 						classifier.buildClassifier(cleanTrainSet);
 						Evaluation eval = new Evaluation(cleanTrainSet);
 						eval.evaluateModel(classifier, cleanTestSet);
@@ -237,7 +216,7 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 								+ String.format("%.2f", eval.rootMeanSquaredError()));
 						if (isChooseBest) {
 							Evaluation trainEval = new Evaluation(cleanTrainSet);
-							eval.evaluateModel(classifier, cleanTrainSet);
+							eval.evaluateModel(classifier, cleanTestSet);
 							double currentRMSE = eval.rootMeanSquaredError() * (1 - fraction);
 							currentRMSE += trainEval.rootMeanSquaredError() * fraction;
 							if (previousRMSE == null || previousRMSE > currentRMSE) {
@@ -250,9 +229,9 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 							testset = currentTest;
 						}
 					}
-					trainSets.add(trainset);
-					testSets.add(testset);
 				}
+				trainSets.add(trainset);
+				testSets.add(testset);
 			}
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError("Error during learning dataset creation!", this.getActivityName(), e);
@@ -262,14 +241,6 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 		this.setOutputAsObjectList(trainSets, this.OUTPUT_PORTS[0]);
 		this.setOutputAsObjectList(testSets, this.OUTPUT_PORTS[1]);
 	}
-
-	// private Instances getFullSet(Instances trainset, Instances testset) {
-	// Instances full = new Instances(trainset);
-	// for (int i = 0; i < testset.numInstances(); i++) {
-	// full.add(testset.instance(i));
-	// }
-	// return full;
-	// }
 
 	private Instances replaceInstance(Instances instances, Instance newInst, int index) {
 		Instances temp = new Instances(instances);
