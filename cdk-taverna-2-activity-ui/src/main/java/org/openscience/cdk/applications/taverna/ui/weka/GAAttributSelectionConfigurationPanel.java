@@ -13,6 +13,7 @@ import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityCon
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractLearningConfigurationFrame;
@@ -68,34 +69,75 @@ public class GAAttributSelectionConfigurationPanel extends
 		}
 	}
 
+	private String createOptionsString() {
+		String options = "";
+		options += this.view.getAttrRateTextField().getText() + ";";
+		options += this.view.getCoRateTextField().getText() + ";";
+		options += this.view.getNumIndTextField().getText() + ";";
+		options += this.view.getIterationsTextField().getText() + ";";
+		options += this.view.getMinAttrTextField().getText() + " " + this.view.getMaxAttrTextField().getText() + " "
+				+ this.view.getStepSizeTextField().getText() + ";";
+		int idx = this.view.getAlgorithmComboBox().getSelectedIndex();
+		options += this.configFrames.get(idx).getConfiguredClass().getName() + ";";
+		options += this.configFrames.get(idx).getOptions()[0] + ";";
+		return options;
+	}
+
 	@Override
 	public boolean isConfigurationChanged() {
-		// TODO Auto-generated method stub
-		return false;
+		String currentOptions = (String) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_GA_ATTRIBUTE_SELECTION_OPTIONS);
+		if(currentOptions == null) {
+			return true;
+		}
+		String options = this.createOptionsString();
+		return !options.equals(currentOptions);
 	}
 
 	@Override
 	public CDKActivityConfigurationBean getConfiguration() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.configBean;
 	}
 
 	@Override
 	public void noteConfiguration() {
-		// TODO Auto-generated method stub
-		
+		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
+		String newOptions = this.createOptionsString();
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_GA_ATTRIBUTE_SELECTION_OPTIONS, newOptions);
 	}
 
 	@Override
 	public void refreshConfiguration() {
-		// TODO Auto-generated method stub
-		
+		String currentOptions = (String) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_GA_ATTRIBUTE_SELECTION_OPTIONS);
+		if(currentOptions == null) {
+			return;
+		}
+		String[] opt = currentOptions.split(";");
+		this.view.getAttrRateTextField().setText(opt[0]);
+		this.view.getCoRateTextField().setText(opt[1]);
+		this.view.getNumIndTextField().setText(opt[2]);
+		this.view.getIterationsTextField().setText(opt[3]);
+		String[] attrOpt = opt[4].split(" ");
+		if(attrOpt.length < 3) {
+			this.view.getMinAttrTextField().setText("-1");
+			this.view.getMaxAttrTextField().setText("");
+			this.view.getStepSizeTextField().setText("");
+		} else {
+			this.view.getMinAttrTextField().setText(attrOpt[0]);
+			this.view.getMaxAttrTextField().setText(attrOpt[1]);
+			this.view.getStepSizeTextField().setText(attrOpt[2]);
+		}
+		for (int i = 0; i < this.configFrames.size(); i++) {
+			if (opt[5].equals(this.configFrames.get(i).getConfiguredClass().getName())) {
+				this.configFrames.get(i).setOptions(new String[] { opt[6] });
+				this.view.getAlgorithmComboBox().setSelectedIndex(i);
+				break;
+			}
+		}
 	}
 
 	@Override
 	public boolean checkValues() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 }

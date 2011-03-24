@@ -54,10 +54,10 @@ public class AttributeSelectionGenome {
 		this.attrRestriction = attrRestriction;
 	}
 
-	public void mutate() {
+	public void mutate(double rate) {
 		// Mutate used attributes
 		for (int i = 0; i < this.attrIsUsed.length; i++) {
-			if (rand.nextDouble() < GAAttributeSelectionActivity.ATTR_MUTATION_RATE) {
+			if (rand.nextDouble() < rate) {
 				this.attrIsUsed[i] = !this.attrIsUsed[i];
 			}
 		}
@@ -130,9 +130,9 @@ public class AttributeSelectionGenome {
 		WekaTools tools = new WekaTools();
 		Instances testset = Filter.useFilter(this.optDataset, tools.getIDRemover(this.optDataset));
 		Evaluation eval = new Evaluation(testset);
-		 eval.crossValidateModel(classifier, testset, 10, new Random(1));
-	//	classifier.buildClassifier(testset);
-	//	eval.evaluateModel(classifier, testset);
+	//	 eval.crossValidateModel(classifier, testset, 10, new Random(1));
+		classifier.buildClassifier(testset);
+		eval.evaluateModel(classifier, testset);
 		this.rmse = eval.rootMeanSquaredError();
 		this.score = Math.pow(1 / this.rmse, SCORE_POWER);
 	}

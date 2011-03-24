@@ -63,9 +63,9 @@ public class CDKConfigurationPanelFactory {
 			return new WekaLearningConfigurationPanelController(activity);
 		} else if (activity instanceof SplitDatasetIntoTrainTestsetActivity) {
 			return new SplitDatasetIntoTrainTestsetConfigurationPanelController(activity);
-		}else if (activity instanceof ScatterPlotFromLearningResultAsPDFActivity) {
+		} else if (activity instanceof ScatterPlotFromLearningResultAsPDFActivity) {
 			return new ScatternPlotConfigurationPanel(activity);
-		}else if (activity instanceof GAAttributeSelectionActivity) {
+		} else if (activity instanceof GAAttributeSelectionActivity) {
 			return new GAAttributSelectionConfigurationPanel(activity);
 		}
 		return new EmptyConfigurationPanel();

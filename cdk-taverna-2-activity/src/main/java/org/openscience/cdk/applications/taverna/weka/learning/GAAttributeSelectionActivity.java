@@ -29,12 +29,16 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import org.hibernate.cfg.ExtendsQueueEntry;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
+import org.openscience.cdk.applications.taverna.basicutilities.ProgressLogger;
 import org.openscience.cdk.applications.taverna.weka.utilities.AttributeSelectionGenome;
+import org.openscience.cdk.applications.taverna.weka.utilities.GASelectionWorker;
+import org.openscience.cdk.applications.taverna.weka.utilities.WekaLearningWorker;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
 import weka.classifiers.Classifier;
@@ -51,20 +55,24 @@ import weka.core.converters.ConverterUtils.DataSink;
  */
 public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 
-	public static double ATTR_MUTATION_RATE = 0.07;
-	public static double WEIGHTS_MUTATION_RATE = 0.1;
-	public static double CROSS_OVER_RATE = 0.05;
-	public static int NUMBER_OF_FOLDS = 10;
-	private static int NUMBER_OF_INDIVIDUALS = 50;
-	private static int NUMBER_OF_ITERATIONS = 2000;
+	public double ATTR_MUTATION_RATE = 0.07;
+	public double CROSS_OVER_RATE = 0.05;
+	public int NUMBER_OF_FOLDS = 10;
+	private int NUMBER_OF_INDIVIDUALS = 50;
+	private int NUMBER_OF_ITERATIONS = 2000;
 
-	private static int MIN_ATTRIBUTES = 30;
-	private static int MAX_ATTRIBUTES = 30;
-	private static int STEPSIZE = 1;
+	private int MIN_ATTRIBUTES = 30;
+	private int MAX_ATTRIBUTES = 30;
+	private int STEPSIZE = 1;
+
+	private Class<?> classifierClass = null;
+	private String[] classifierOptions = null;
 
 	public static final String CREATE_WEKA_LEARNING_DATASET_ACTIVITY = "GA Attribute Selection";
 
 	private AttributeSelectionGenome[] individuals = null;
+	private int currentWork = 0;
+	private GASelectionWorker[] workers = new GASelectionWorker[4];
 
 	/**
 	 * Creates a new instance.
@@ -90,25 +98,46 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 		Random rand = new Random();
 		// Get input
 		Instances orgDataset = this.getInputAsList(this.INPUT_PORTS[0], Instances.class).get(0);
+		String options = (String) this.getConfiguration().getAdditionalProperty(
+				CDKTavernaConstants.PROPERTY_GA_ATTRIBUTE_SELECTION_OPTIONS);
+		String[] optionArray = options.split(";");
+		ATTR_MUTATION_RATE = Double.parseDouble(optionArray[0]);
+		CROSS_OVER_RATE = Double.parseDouble(optionArray[1]);
+		NUMBER_OF_INDIVIDUALS = Integer.parseInt(optionArray[2]);
+		NUMBER_OF_ITERATIONS = Integer.parseInt(optionArray[3]);
+		String[] attrOpt = optionArray[4].split(" ");
+		if (attrOpt.length < 3) {
+			MIN_ATTRIBUTES = 1;
+			MAX_ATTRIBUTES = 1;
+			STEPSIZE = 1;
+		} else {
+			MIN_ATTRIBUTES = Integer.parseInt(attrOpt[0]);
+			MAX_ATTRIBUTES = Integer.parseInt(attrOpt[1]);
+			STEPSIZE = Integer.parseInt(attrOpt[2]);
+		}
+		this.classifierClass = Class.forName(optionArray[5]);
+		this.classifierOptions = optionArray[6].split(" ");
 		// Do work
 		ArrayList<String> resultSetFiles = new ArrayList<String>();
 		ArrayList<String> resultAttrCSV = new ArrayList<String>();
 		try {
-			PrintWriter writer = new PrintWriter("C:\\Users\\Gott\\Desktop\\GA.txt");
 			this.individuals = new AttributeSelectionGenome[NUMBER_OF_INDIVIDUALS];
 			for (int numAttr = MIN_ATTRIBUTES; numAttr <= MAX_ATTRIBUTES; numAttr += STEPSIZE) {
 				// Initialize individuals
 				for (int i = 0; i < NUMBER_OF_INDIVIDUALS; i++) {
 					this.individuals[i] = new AttributeSelectionGenome(orgDataset);
-					this.individuals[i].setAttrRestriction(-1);//numAttr);
+					if (attrOpt.length == 3) {
+						this.individuals[i].setAttrRestriction(numAttr);
+					}
 				}
 				AttributeSelectionGenome allTimeBest = null;
-				writer.write("Number of Attributes: " + numAttr);
+				ProgressLogger.getInstance().writeProgress(this.getActivityName(),
+						"Number of Attributes: " + numAttr + "\n");
 				for (int i = 0; i < NUMBER_OF_ITERATIONS; i++) {
-					writer.write("Iteration: " + i + "\n");
+					ProgressLogger.getInstance().writeProgress(this.getActivityName(), "Iteration: " + i + "\n");
 					for (int j = 0; j < NUMBER_OF_INDIVIDUALS; j++) {
 						// Mutate
-						this.individuals[j].mutate();
+						this.individuals[j].mutate(ATTR_MUTATION_RATE);
 						// Cross over
 						if (rand.nextDouble() < CROSS_OVER_RATE) {
 							int individual;
@@ -117,18 +146,23 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 							} while (j == individual);
 							this.individuals[j].crossOver(this.individuals[individual]);
 						}
-						// Create individual dataset
-						this.individuals[j].updateDataset();
-						// Calculate score
-						Classifier classifier = new LinearRegression();
-						classifier.setOptions("-C -S 1".split(" "));
-						this.individuals[j].calculateScore(classifier);
-						writer.write("Individual " + (j + 1) + " - RMSE: " + this.individuals[j].getRmse()
-								+ " - Score: " + this.individuals[j].getScore() + "\n");
-
-						// System.out.println("Individual " + (j+1) +":");
-						// System.out.println(this.individuals[j].toString());
 					}
+					// Do scoring
+					this.currentWork = 0;
+					for (int j = 0; j < this.workers.length; j++) {
+						this.workers[j] = new GASelectionWorker(this);
+						this.workers[j].start();
+					}
+					synchronized (this) {
+						this.wait();
+					}
+					// Show progress
+					String progress = "";
+					for (int j = 0; j < this.individuals.length; j++) {
+						progress += "Individual " + (j + 1) + " - RMSE: " + this.individuals[j].getRmse()
+								+ " - Score: " + this.individuals[j].getScore() + "\n";
+					}
+					ProgressLogger.getInstance().writeProgress(this.getActivityName(), progress);
 					// Select individuals
 					double maxScore = 0;
 					double minScore = Double.MAX_VALUE;
@@ -164,11 +198,10 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 						}
 					}
 					// Apply all time best
-					writer.write("AllTimeBest - RMSE: " + allTimeBest.getRmse() + " - Score: " + allTimeBest.getScore()
+					ProgressLogger.getInstance().writeProgress(this.getActivityName(), "AllTimeBest - RMSE: " + allTimeBest.getRmse() + " - Score: " + allTimeBest.getScore()
 							+ "\n");
 					fittestIndividuals[0] = (AttributeSelectionGenome) allTimeBest.clone();
 					this.individuals = fittestIndividuals;
-					writer.flush();
 				}
 				File file = FileNameGenerator.getNewFile(FileNameGenerator.getCacheDir(), ".arff", "Attributes_"
 						+ (allTimeBest.getOptDataset().numAttributes() - 2));
@@ -177,7 +210,6 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 				resultAttrCSV.add(allTimeBest.getAttributeSetupCSV());
 				System.out.println("# Attributes: " + numAttr + " - RMSE: " + allTimeBest.getRmse());
 			}
-			writer.close();
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError("Error during learning dataset creation!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
@@ -185,6 +217,34 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 		// Set output
 		this.setOutputAsStringList(resultSetFiles, this.OUTPUT_PORTS[0]);
 		this.setOutputAsStringList(resultAttrCSV, this.OUTPUT_PORTS[1]);
+	}
+
+	public synchronized AttributeSelectionGenome getWork() {
+		if (this.currentWork < this.individuals.length) {
+			return this.individuals[this.currentWork++];
+		}
+		return null;
+	}
+
+	public synchronized Classifier getClassifier() throws Exception, IllegalAccessException {
+		Classifier classifier = (Classifier) this.classifierClass.newInstance();
+		classifier.setOptions(this.classifierOptions);
+		return classifier;
+	}
+	
+	public void workerDone() {
+		boolean allDone = true;
+		for (GASelectionWorker worker : this.workers) {
+			if (!worker.isDone()) {
+				allDone = false;
+				break;
+			}
+		}
+		if (allDone) {
+			synchronized (this) {
+				this.notify();
+			}
+		}
 	}
 
 	@Override
