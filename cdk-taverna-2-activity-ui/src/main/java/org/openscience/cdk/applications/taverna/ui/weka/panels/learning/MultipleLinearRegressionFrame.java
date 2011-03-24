@@ -83,8 +83,8 @@ public class MultipleLinearRegressionFrame extends AbstractLearningConfiguration
 	@Override
 	public String[] getOptions() {
 		String option = "-S " + this.comboBox.getSelectedIndex() + " ";
-		option += "-R " + ridgeParameterTextField.getText();
-		if (eliminateCheckBox.isSelected()) {
+		option += "-R " + ridgeParameterTextField.getText() + " ";
+		if (!eliminateCheckBox.isSelected()) {
 			option += "-C ";
 		}
 		return new String[] { option };
@@ -96,9 +96,9 @@ public class MultipleLinearRegressionFrame extends AbstractLearningConfiguration
 		this.comboBox.setSelectedIndex(Integer.parseInt(optMin[1]));
 		this.ridgeParameterTextField.setText(optMin[3]);
 		if (optMin.length > 4) {
-			this.eliminateCheckBox.setSelected(true);
-		} else {
 			this.eliminateCheckBox.setSelected(false);
+		} else {
+			this.eliminateCheckBox.setSelected(true);
 		}
 	}
 	

@@ -23,6 +23,7 @@ package org.openscience.cdk.applications.taverna;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -368,22 +369,35 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRONG_INPUT_PORT_TYPE);
 			}
 			if (isDataCompression) {
-				data =(List<T>) CacheController.getInstance().decompressDataList((List<byte[]>)data);
+				data = (List<T>) CacheController.getInstance().decompressDataList((List<byte[]>) data);
 			}
 			return data;
 		} else {
 			boolean isDataCaching = SetupController.getInstance().isDataCaching();
 			List<T> dataList = null;
 			if (isDataCaching) {
-				List<byte[]> uuidDataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(port),
-						byte[].class, this.callback.getContext());
-				UUID uuid = (UUID) CDKObjectHandler.getObject(uuidDataArray.get(0));
+				T2Reference inputRef = this.inputs.get(port);
+				UUID uuid;
+				if (inputRef.getDepth() == 0) {
+					byte[] uuidData = (byte[]) referenceService.renderIdentifier(inputRef, byte[].class,
+							this.callback.getContext());
+					uuid = (UUID) CDKObjectHandler.getObject(uuidData);
+				} else {
+					List<byte[]> uuidDataArray = (List<byte[]>) referenceService.renderIdentifier(inputRef,
+							byte[].class, this.callback.getContext());
+					uuid = (UUID) CDKObjectHandler.getObject(uuidDataArray.get(0));
+				}
 				byte[] data = CacheController.getInstance().uncacheByteStream(uuid);
 				if (isDataCompression) {
 					data = CacheController.getInstance().decompressData(data);
 				}
 				try {
-					dataList = (List<T>) CDKObjectHandler.getObject(data);
+					Object obj = CDKObjectHandler.getObject(data);
+					if (obj instanceof List) {
+						dataList = (List<T>) obj;
+					} else {
+						dataList = Collections.singletonList((T) obj);
+					}
 				} catch (Exception e) {
 					ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR,
 							this.getActivityName(), e);

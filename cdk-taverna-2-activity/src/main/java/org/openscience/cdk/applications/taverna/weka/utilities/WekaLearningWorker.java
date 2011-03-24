@@ -1,10 +1,14 @@
 package org.openscience.cdk.applications.taverna.weka.utilities;
 
+import java.io.File;
+import java.io.PrintWriter;
+
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.weka.learning.WekaLearningActivity;
 
 import weka.classifiers.Classifier;
+import weka.classifiers.functions.LinearRegression;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
 import weka.filters.Filter;

@@ -44,87 +44,71 @@ import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.filters.Filter;
-import weka.filters.unsupervised.attribute.Remove;
 
 /**
- * Class which represents the dataset attribut selection activity.
+ * Class which represents the create Weka learning dataset activity.
  * 
  * @author Andreas Truzskowski
  * 
  */
-public class DatasetAttributSelectionActivity extends AbstractCDKActivity {
+public class CreateWekaLearningSetActivity extends AbstractCDKActivity {
 
-	// public static final String[] METHODS = new String[] { "Random",
-	// "ClusterRepresentatives", "SimpleGlobalMax" };
-	public static final String DATASET_ATTRIBUT_SELECTION_ACTIVITY = "Dataset Attribut Selection";
+	public static final String[] METHODS = new String[] { "Random", "ClusterRepresentatives", "SimpleGlobalMax" };
+	public static final String CREATE_WEKA_LEARNING_DATASET_ACTIVITY = "Create Weka Learning Dataset";
 
 	/**
 	 * Creates a new instance.
 	 */
-	public DatasetAttributSelectionActivity() {
-		this.INPUT_PORTS = new String[] { "Weka Train Datasets", "Weka Test Datasets" };
-		this.OUTPUT_PORTS = new String[] { "Weka Train Datasets", "Weka Test Datasets", "Attribut Info" };
+	public CreateWekaLearningSetActivity() {
+		this.INPUT_PORTS = new String[] { "Weka Dataset", "ID Class CSV" };
+		this.OUTPUT_PORTS = new String[] { "Weka Learning Dataset" };
 	}
 
 	@Override
 	protected void addInputPorts() {
 		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
-		addInput(this.INPUT_PORTS[1], 1, true, null, byte[].class);
+		addInput(this.INPUT_PORTS[1], 1, true, null, String.class);
 	}
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.OUTPUT_PORTS[0], 1);
-		addOutput(this.OUTPUT_PORTS[1], 1);
-		addOutput(this.OUTPUT_PORTS[2], 1);
+		addOutput(this.OUTPUT_PORTS[0], 0);
 	}
 
 	@Override
 	public void work() throws Exception {
 		WekaTools tools = new WekaTools();
 		// Get input
-		List<Instances> trainsets = this.getInputAsList(this.INPUT_PORTS[0], Instances.class);
-		List<Instances> testsets = this.getInputAsList(this.INPUT_PORTS[1], Instances.class);
+		List<Instances> dataset = this.getInputAsList(this.INPUT_PORTS[0], Instances.class);
+		List<String> csv = this.getInputAsList(this.INPUT_PORTS[1], String.class);
 		// Do work
-		ArrayList<Instances> newTrainSets = new ArrayList<Instances>();
-		ArrayList<Instances> newTestSets = new ArrayList<Instances>();
-		Instances trainset = trainsets.get(0);
-		Instances testset = testsets.get(0);
-		ArrayList<String> attrInfos = new ArrayList<String>();
-		String info = "Set 1 - Removed Attribut: --------";
-		newTrainSets.add(trainset);
-		newTestSets.add(testset);
-		attrInfos.add(info);
-		// Delete all attributes with the same name before "." because they are
-		// from the same descriptor
-		HashSet<String> nameSet = new HashSet<String>();
-		for (int i = 2; i < trainset.numAttributes() - 1; i++) {
-			String[] names = trainset.attribute(i).name().split("\\.");
-			nameSet.add(names[0]);
-		}
-		Object[] names = nameSet.toArray();
-		for (int i = 0; i < names.length; i++) {
-			String name = (String) names[i];
-			LinkedList<Integer> attributesToDelete = new LinkedList<Integer>();
-			for (int j = 2; j < trainset.numAttributes() - 1; j++) {
-				if (trainset.attribute(j).name().startsWith(name)) {
-					attributesToDelete.add(j);
-				}
+		Instances learningSet = null;
+		try {
+			HashMap<UUID, Double> classMap = new HashMap<UUID, Double>();
+			for (int i = 1; i < csv.size(); i++) {
+				String[] frag = csv.get(i).split(";");
+				classMap.put(UUID.fromString(frag[0]), Double.valueOf(frag[1]));
 			}
-			info = "Set " + (i + 2) + " - Removed Attribut: " + name;
-			newTrainSets.add(Filter.useFilter(trainset, tools.getAttributRemover(trainset, attributesToDelete)));
-			newTestSets.add(Filter.useFilter(testset, tools.getAttributRemover(testset, attributesToDelete)));
-			attrInfos.add(info);
+			// Create the whole dataset
+			if (dataset.get(0).classIndex() < 0) {
+				learningSet = tools.createLearningSet(dataset.get(0), classMap);
+			} else {
+				learningSet = dataset.get(0);
+			}
+			if(learningSet == null) {
+				throw new CDKTavernaException(this.getActivityName(), "Dataset could not be created!");
+			}
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError("Error during learning dataset creation!", this.getActivityName(), e);
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		// Set output
-		this.setOutputAsObjectList(newTrainSets, this.OUTPUT_PORTS[0]);
-		this.setOutputAsObjectList(newTestSets, this.OUTPUT_PORTS[1]);
-		this.setOutputAsStringList(attrInfos, this.OUTPUT_PORTS[2]);
+		this.setOutputAsObject(learningSet, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override
 	public String getActivityName() {
-		return DatasetAttributSelectionActivity.DATASET_ATTRIBUT_SELECTION_ACTIVITY;
+		return CreateWekaLearningSetActivity.CREATE_WEKA_LEARNING_DATASET_ACTIVITY;
 	}
 
 	@Override
@@ -135,7 +119,7 @@ public class DatasetAttributSelectionActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getDescription() {
-		return "Description: " + DatasetAttributSelectionActivity.DATASET_ATTRIBUT_SELECTION_ACTIVITY;
+		return "Description: " + CreateWekaLearningSetActivity.CREATE_WEKA_LEARNING_DATASET_ACTIVITY;
 	}
 
 	@Override

@@ -129,7 +129,7 @@ public class WekaLearningActivity extends AbstractCDKActivity {
 			}
 		}
 		// //start workers
-		int numWorkers = 1;//TODO numberOfThreads > this.workList.size() ? this.workList.size() : numberOfThreads;
+		int numWorkers = 1	;//TODO numberOfThreads > this.workList.size() ? this.workList.size() : numberOfThreads;
 		this.workers = new WekaLearningWorker[numWorkers];
 		for (int i = 0; i < numWorkers; i++) {
 			this.workers[i] = new WekaLearningWorker(this);

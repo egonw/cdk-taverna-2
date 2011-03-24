@@ -24,11 +24,15 @@ import org.openscience.cdk.applications.taverna.ui.miscellaneous.PortNumberConfi
 import org.openscience.cdk.applications.taverna.ui.qsar.CurateQSARVectorConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.qsar.QSARDescriptorConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.reactionenumerator.ReactionEnumeratorConfigurationPanel;
-import org.openscience.cdk.applications.taverna.ui.weka.CreateLearningDatasetConfigurationPanelController;
+import org.openscience.cdk.applications.taverna.ui.weka.GAAttributSelectionConfigurationPanel;
+import org.openscience.cdk.applications.taverna.ui.weka.ScatternPlotConfigurationPanel;
+import org.openscience.cdk.applications.taverna.ui.weka.SplitDatasetIntoTrainTestsetConfigurationPanelController;
 import org.openscience.cdk.applications.taverna.ui.weka.WekaClusteringConfigurationPanelController;
 import org.openscience.cdk.applications.taverna.ui.weka.WekaLearningConfigurationPanelController;
 import org.openscience.cdk.applications.taverna.weka.clustering.WekaClusteringActivity;
-import org.openscience.cdk.applications.taverna.weka.learning.CreateWekaLearningDatasetActivity;
+import org.openscience.cdk.applications.taverna.weka.learning.GAAttributeSelectionActivity;
+import org.openscience.cdk.applications.taverna.weka.learning.ScatterPlotFromLearningResultAsPDFActivity;
+import org.openscience.cdk.applications.taverna.weka.learning.SplitDatasetIntoTrainTestsetActivity;
 import org.openscience.cdk.applications.taverna.weka.learning.WekaLearningActivity;
 
 public class CDKConfigurationPanelFactory {
@@ -57,10 +61,13 @@ public class CDKConfigurationPanelFactory {
 			return new WekaClusteringConfigurationPanelController(activity);
 		} else if (activity instanceof WekaLearningActivity) {
 			return new WekaLearningConfigurationPanelController(activity);
-		} else if (activity instanceof CreateWekaLearningDatasetActivity) {
-			return new CreateLearningDatasetConfigurationPanelController(activity);
+		} else if (activity instanceof SplitDatasetIntoTrainTestsetActivity) {
+			return new SplitDatasetIntoTrainTestsetConfigurationPanelController(activity);
+		}else if (activity instanceof ScatterPlotFromLearningResultAsPDFActivity) {
+			return new ScatternPlotConfigurationPanel(activity);
+		}else if (activity instanceof GAAttributeSelectionActivity) {
+			return new GAAttributSelectionConfigurationPanel(activity);
 		}
-
 		return new EmptyConfigurationPanel();
 	}
 

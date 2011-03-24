@@ -75,7 +75,8 @@ public class CDKTavernaConstants {
 	public static final String PROPERTY_LEARNER_NAME = "LEARNER NAME";
 	public static final String PROPERTY_LEARNER_OPTIONS = "LEARNER OPTIONS";
 	public static final String PROPERTY_CREATE_SET_OPTIONS = "CREATE SET OPTIONS";
-
+	public static final String PROPERTY_SCATTER_PLOT_OPTIONS = "SCATTER PLOT OPTIONS";
+	
 	// --------------------Miscellaneous-------------------------------------
 	public static final String MOLECULEID = "MOLECULEID";
     public static final String FRAGMENT_SCORE = "SCORE";

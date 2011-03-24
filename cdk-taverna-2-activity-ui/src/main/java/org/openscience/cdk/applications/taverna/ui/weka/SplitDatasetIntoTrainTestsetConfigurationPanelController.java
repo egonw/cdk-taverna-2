@@ -19,9 +19,9 @@ import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.ui.UITools;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractLearningConfigurationFrame;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.LearningDatasetClassifierFrame;
-import org.openscience.cdk.applications.taverna.weka.learning.CreateWekaLearningDatasetActivity;
+import org.openscience.cdk.applications.taverna.weka.learning.SplitDatasetIntoTrainTestsetActivity;
 
-public class CreateLearningDatasetConfigurationPanelController extends
+public class SplitDatasetIntoTrainTestsetConfigurationPanelController extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
 
 	private static final long serialVersionUID = 4885493705007067285L;
@@ -33,7 +33,7 @@ public class CreateLearningDatasetConfigurationPanelController extends
 
 	private AbstractCDKActivity activity;
 	private CDKActivityConfigurationBean configBean;
-	private CreateLearningDatasetConfigurationPanelView view = new CreateLearningDatasetConfigurationPanelView();
+	private SplitDatasetIntoTrainTestsetConfigurationPanelView view = new SplitDatasetIntoTrainTestsetConfigurationPanelView();
 
 	private ActionListener configureClassifierAction = new ActionListener() {
 
@@ -46,7 +46,7 @@ public class CreateLearningDatasetConfigurationPanelController extends
 		}
 	};
 
-	public CreateLearningDatasetConfigurationPanelController(AbstractCDKActivity activity) {
+	public SplitDatasetIntoTrainTestsetConfigurationPanelController(AbstractCDKActivity activity) {
 		try {
 			this.activity = activity;
 			this.configBean = this.activity.getConfiguration();
@@ -78,11 +78,11 @@ public class CreateLearningDatasetConfigurationPanelController extends
 		options += this.view.getHigherRatioTextField().getText() + ";";
 		options += this.view.getStepsTextField().getText() + ";";
 		if (this.view.getRandomRadioButton().isSelected()) {
-			options += CreateWekaLearningDatasetActivity.METHODS[0] + ";";
+			options += SplitDatasetIntoTrainTestsetActivity.METHODS[0] + ";";
 		} else if (this.view.getClusterRadioButton().isSelected()) {
-			options += CreateWekaLearningDatasetActivity.METHODS[1] + ";";
+			options += SplitDatasetIntoTrainTestsetActivity.METHODS[1] + ";";
 		} else if (this.view.getSingleGlobalMaxRadioButton().isSelected()) {
-			options += CreateWekaLearningDatasetActivity.METHODS[2] + ";";
+			options += SplitDatasetIntoTrainTestsetActivity.METHODS[2] + ";";
 			int idx = this.view.getClassifierComboBox().getSelectedIndex();
 			options += this.configFrames.get(idx).getConfiguredClass().getName() + ";";
 			options += this.configFrames.get(idx).getOptions()[0] + ";";
@@ -104,7 +104,7 @@ public class CreateLearningDatasetConfigurationPanelController extends
 				.checkTextFieldValueDouble(this, "Lower fraction limit", this.view.getLowerRatioTextField(), 1, 100)
 				|| !UITools.checkTextFieldValueDouble(this, "Higher fraction limit",
 						this.view.getHigherRatioTextField(), 1, 100)
-				|| !UITools.checkTextFieldValueInt(this, "Number of steps", this.view.getStepsTextField(), 1,
+				|| !UITools.checkTextFieldValueInt(this, "Number of steps", this.view.getStepsTextField(), 2,
 						Integer.MAX_VALUE)) {
 			return false;
 		}
@@ -139,7 +139,6 @@ public class CreateLearningDatasetConfigurationPanelController extends
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
 		String newOptions = this.generateOptionsString();
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CREATE_SET_OPTIONS, newOptions);
-
 	}
 
 	@Override
@@ -153,21 +152,21 @@ public class CreateLearningDatasetConfigurationPanelController extends
 		this.view.getLowerRatioTextField().setText(options[0]);
 		this.view.getHigherRatioTextField().setText(options[1]);
 		this.view.getStepsTextField().setText(options[2]);
-		if (options[3].equals(CreateWekaLearningDatasetActivity.METHODS[0])) {
+		if (options[3].equals(SplitDatasetIntoTrainTestsetActivity.METHODS[0])) {
 			this.view.getRandomRadioButton().setSelected(true);
 			this.view.getIterationsTextField().setEnabled(false);
 			this.view.getClassifierComboBox().setEnabled(false);
 			this.view.getUseBlacklistingCheckBox().setEnabled(false);
 			this.view.getChooseBestCheckBox().setEnabled(false);
 			this.view.getBtnConfigure().setEnabled(false);
-		} else if (options[3].equals(CreateWekaLearningDatasetActivity.METHODS[1])) {
+		} else if (options[3].equals(SplitDatasetIntoTrainTestsetActivity.METHODS[1])) {
 			this.view.getClusterRadioButton().setSelected(true);
 			this.view.getIterationsTextField().setEnabled(false);
 			this.view.getClassifierComboBox().setEnabled(false);
 			this.view.getUseBlacklistingCheckBox().setEnabled(false);
 			this.view.getChooseBestCheckBox().setEnabled(false);
 			this.view.getBtnConfigure().setEnabled(false);
-		} else if (options[3].equals(CreateWekaLearningDatasetActivity.METHODS[2])) {
+		} else if (options[3].equals(SplitDatasetIntoTrainTestsetActivity.METHODS[2])) {
 			this.view.getSingleGlobalMaxRadioButton().setSelected(true);
 			for (int i = 0; i < this.configFrames.size(); i++) {
 				if (options[4].equals(this.configFrames.get(i).getConfiguredClass().getName())) {

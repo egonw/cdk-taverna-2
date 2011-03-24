@@ -16,7 +16,7 @@ import javax.swing.SpringLayout;
 import javax.swing.border.BevelBorder;
 import javax.swing.JButton;
 
-public class CreateLearningDatasetConfigurationPanelView extends JPanel {
+public class SplitDatasetIntoTrainTestsetConfigurationPanelView extends JPanel {
 
 	private static final long serialVersionUID = -6560279042248681080L;
 	private JTextField iterationsTextField;
@@ -37,7 +37,7 @@ public class CreateLearningDatasetConfigurationPanelView extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public CreateLearningDatasetConfigurationPanelView() {
+	public SplitDatasetIntoTrainTestsetConfigurationPanelView() {
 		setPreferredSize(new Dimension(425, 245));
 		setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		SpringLayout springLayout = new SpringLayout();

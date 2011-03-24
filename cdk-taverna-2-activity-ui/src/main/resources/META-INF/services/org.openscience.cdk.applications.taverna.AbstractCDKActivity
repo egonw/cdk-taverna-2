@@ -12,6 +12,8 @@ org.openscience.cdk.applications.taverna.io.SMILESFileWriterActivity
 org.openscience.cdk.applications.taverna.io.TextFileWriterActivity
 org.openscience.cdk.applications.taverna.io.CSVFileReaderActivity
 org.openscience.cdk.applications.taverna.io.CSVFileWriterActivity
+org.openscience.cdk.applications.taverna.io.ARFFFileWriterActivity
+org.openscience.cdk.applications.taverna.io.ARFFFileReaderActivity
 org.openscience.cdk.applications.taverna.isomorphism.IsomorphismTesterActivity
 org.openscience.cdk.applications.taverna.isomorphism.SubgraphIsomorphismFilterActivity
 org.openscience.cdk.applications.taverna.iterativeio.IterativeMultiRXNFileReaderActivity
@@ -169,8 +171,10 @@ org.openscience.cdk.applications.taverna.weka.clustering.GenerateSilhouettePlotF
 org.openscience.cdk.applications.taverna.weka.clustering.SplitMoleculesIntoClustersActivity
 org.openscience.cdk.applications.taverna.weka.learning.WekaLearningActivity
 org.openscience.cdk.applications.taverna.weka.learning.ScatterPlotFromLearningResultAsPDFActivity
-org.openscience.cdk.applications.taverna.weka.learning.CreateWekaLearningDatasetActivity
+org.openscience.cdk.applications.taverna.weka.learning.CreateWekaLearningSetActivity
 org.openscience.cdk.applications.taverna.weka.learning.DatasetAttributSelectionActivity
+org.openscience.cdk.applications.taverna.weka.learning.GAAttributeSelectionActivity
+org.openscience.cdk.applications.taverna.weka.learning.SplitDatasetIntoTrainTestsetActivity
 org.openscience.cdk.applications.taverna.modelling.CoordinatesGenerator2DAcitivity
 org.openscience.cdk.applications.taverna.modelling.MM2_3DCoordinatesGeneratorActivity
 org.openscience.cdk.applications.taverna.modelling.MMFF94_3DCoordinatesGeneratorActivity

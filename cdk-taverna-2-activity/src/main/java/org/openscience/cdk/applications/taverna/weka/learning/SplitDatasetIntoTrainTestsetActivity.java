@@ -51,23 +51,22 @@ import weka.filters.Filter;
  * @author Andreas Truzskowski
  * 
  */
-public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
+public class SplitDatasetIntoTrainTestsetActivity extends AbstractCDKActivity {
 
 	public static final String[] METHODS = new String[] { "Random", "ClusterRepresentatives", "SimpleGlobalMax" };
-	public static final String CREATE_WEKA_LEARNING_DATASET_ACTIVITY = "Create Weka Learning Dataset";
+	public static final String CREATE_WEKA_LEARNING_DATASET_ACTIVITY = "Split Dataset Into Test-/Trainingset";
 
 	/**
 	 * Creates a new instance.
 	 */
-	public CreateWekaLearningDatasetActivity() {
-		this.INPUT_PORTS = new String[] { "Weka Dataset", "ID Class CSV" };
+	public SplitDatasetIntoTrainTestsetActivity() {
+		this.INPUT_PORTS = new String[] { "Weka Learning Dataset" };
 		this.OUTPUT_PORTS = new String[] { "Weka Train Datasets", "Weka Test Datasets" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		addInput(this.INPUT_PORTS[0], 0, true, null, byte[].class);
-		addInput(this.INPUT_PORTS[1], 1, true, null, String.class);
+		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
 	}
 
 	@Override
@@ -80,8 +79,7 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 	public void work() throws Exception {
 		WekaTools tools = new WekaTools();
 		// Get input
-		Instances dataset = this.getInputAsObject(this.INPUT_PORTS[0], Instances.class);
-		List<String> csv = this.getInputAsList(this.INPUT_PORTS[1], String.class);
+		List<Instances> dataset = this.getInputAsList(this.INPUT_PORTS[0], Instances.class);
 		if (this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_CREATE_SET_OPTIONS) == null) {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PLEASE_CONFIGURE_ACTIVITY);
 		}
@@ -89,26 +87,26 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 				CDKTavernaConstants.PROPERTY_CREATE_SET_OPTIONS);
 		String[] options = optionsString.split(";");
 		// Do work
-		HashMap<UUID, Double> classMap = new HashMap<UUID, Double>();
-		for (int i = 1; i < csv.size(); i++) {
-			String[] frag = csv.get(i).split(";");
-			classMap.put(UUID.fromString(frag[0]), Double.valueOf(frag[1]));
-		}
-
 		List<Instances> trainSets = new ArrayList<Instances>();
 		List<Instances> testSets = new ArrayList<Instances>();
 		try {
-			// Create the whole dataset
-			Instances learningSet = tools.createLearningSet(dataset, classMap);
+			Instances learningSet = dataset.get(0);
 			// Split into train/test set
 			Instances trainset = null;
 			Instances testset = null;
 			HashMap<Integer, Integer> trainClusterMap = new HashMap<Integer, Integer>();
 			HashMap<Integer, Integer> testClusterMap = new HashMap<Integer, Integer>();
 			double lowerFraction = Double.parseDouble(options[0]) / 100D;
-			double higherFraction = Double.parseDouble(options[1]) / 100D;
 			int steps = Integer.parseInt(options[2]);
-			double stepSize = (higherFraction - lowerFraction) / (double) (steps - 1);
+			double higherFraction;
+			double stepSize;
+			if (steps == 1) {
+				higherFraction = lowerFraction;
+				stepSize = 1;
+			} else {
+				higherFraction = Double.parseDouble(options[1]) / 100D;
+				stepSize = (higherFraction - lowerFraction) / (double) (steps - 1);
+			}
 			for (double fraction = lowerFraction; fraction <= higherFraction; fraction += stepSize) {
 				int numTrain = (int) Math.round(learningSet.numInstances() * fraction);
 				int numTest = learningSet.numInstances() - numTrain;
@@ -257,7 +255,7 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getActivityName() {
-		return CreateWekaLearningDatasetActivity.CREATE_WEKA_LEARNING_DATASET_ACTIVITY;
+		return SplitDatasetIntoTrainTestsetActivity.CREATE_WEKA_LEARNING_DATASET_ACTIVITY;
 	}
 
 	@Override
@@ -268,7 +266,7 @@ public class CreateWekaLearningDatasetActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getDescription() {
-		return "Description: " + CreateWekaLearningDatasetActivity.CREATE_WEKA_LEARNING_DATASET_ACTIVITY;
+		return "Description: " + SplitDatasetIntoTrainTestsetActivity.CREATE_WEKA_LEARNING_DATASET_ACTIVITY;
 	}
 
 	@Override

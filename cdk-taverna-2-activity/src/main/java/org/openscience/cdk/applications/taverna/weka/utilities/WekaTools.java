@@ -129,6 +129,34 @@ public class WekaTools {
 	}
 
 	/**
+	 * Method which returns a filter to remove the identifier from given
+	 * instances. IMPORTANT: Range from 1...n!
+	 * 
+	 * @param instances
+	 *            Instances which contains the format of the input instances
+	 * @return Weka remover filter which is configured to remove the identifier
+	 *         from the instance
+	 * @throws Exception
+	 */
+	public Remove getAttributRemover(Instances instances, List<Integer> attrs) throws Exception {
+
+		String attrString = "";
+		for (int n : attrs) {
+			if (n < 1 || n > instances.numAttributes()) {
+				throw new IllegalArgumentException("Please enter a valid attribute number!");
+			}
+			attrString += n + ",";
+		}
+		Remove removeFilter = new Remove();
+		String[] removerOptionArray = new String[2];
+		removerOptionArray[0] = "-R";
+		removerOptionArray[1] = "" + attrString;
+		removeFilter.setOptions(removerOptionArray);
+		removeFilter.setInputFormat(instances);
+		return removeFilter;
+	}
+
+	/**
 	 * Method which returns a filter to remove the class attribute from given
 	 * instances. IMPORTANT: The class attribute is the last attribute within
 	 * the instances
@@ -337,7 +365,7 @@ public class WekaTools {
 		}
 		throw new CDKTavernaException("WekaTools", CDKTavernaException.CLUSTER_MODEL_HAS_NO_ID);
 	}
-	
+
 	public Instances createLearningSet(Instances dataset, HashMap<UUID, Double> classMap) {
 		Instances learningSet = null;
 		FastVector attributes = new FastVector();
@@ -363,7 +391,7 @@ public class WekaTools {
 		learningSet.randomize(new Random());
 		return learningSet;
 	}
-	
+
 	public Instances getFullSet(Instances trainset, Instances testset) {
 		Instances full = new Instances(trainset);
 		for (int i = 0; i < testset.numInstances(); i++) {
