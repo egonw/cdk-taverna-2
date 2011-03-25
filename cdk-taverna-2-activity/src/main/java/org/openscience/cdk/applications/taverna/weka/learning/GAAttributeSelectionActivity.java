@@ -66,13 +66,13 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 	private int STEPSIZE = 1;
 
 	private Class<?> classifierClass = null;
-	private String[] classifierOptions = null;
+	private String classifierOptions = null;
 
 	public static final String CREATE_WEKA_LEARNING_DATASET_ACTIVITY = "GA Attribute Selection";
 
 	private AttributeSelectionGenome[] individuals = null;
 	private int currentWork = 0;
-	private GASelectionWorker[] workers = new GASelectionWorker[4];
+	private GASelectionWorker[] workers = null;
 
 	/**
 	 * Creates a new instance.
@@ -116,7 +116,9 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 			STEPSIZE = Integer.parseInt(attrOpt[2]);
 		}
 		this.classifierClass = Class.forName(optionArray[5]);
-		this.classifierOptions = optionArray[6].split(" ");
+		this.classifierOptions = optionArray[6];
+		int threads = (Integer)this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS);
+		workers = new GASelectionWorker[threads];
 		// Do work
 		ArrayList<String> resultSetFiles = new ArrayList<String>();
 		ArrayList<String> resultAttrCSV = new ArrayList<String>();
@@ -131,8 +133,13 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 					}
 				}
 				AttributeSelectionGenome allTimeBest = null;
+				if (attrOpt.length == 3) {
 				ProgressLogger.getInstance().writeProgress(this.getActivityName(),
 						"Number of Attributes: " + numAttr + "\n");
+				} else {
+					ProgressLogger.getInstance().writeProgress(this.getActivityName(),
+							"Number of Attributes: free\n");
+				}
 				for (int i = 0; i < NUMBER_OF_ITERATIONS; i++) {
 					ProgressLogger.getInstance().writeProgress(this.getActivityName(), "Iteration: " + i + "\n");
 					for (int j = 0; j < NUMBER_OF_INDIVIDUALS; j++) {
@@ -228,7 +235,7 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 
 	public synchronized Classifier getClassifier() throws Exception, IllegalAccessException {
 		Classifier classifier = (Classifier) this.classifierClass.newInstance();
-		classifier.setOptions(this.classifierOptions);
+		classifier.setOptions(this.classifierOptions.split(" "));
 		return classifier;
 	}
 	
@@ -255,6 +262,7 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> properties = new HashMap<String, Object>();
+		properties.put(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, Runtime.getRuntime().availableProcessors());
 		return properties;
 	}
 

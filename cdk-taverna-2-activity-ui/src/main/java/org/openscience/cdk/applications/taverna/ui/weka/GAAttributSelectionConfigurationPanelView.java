@@ -8,6 +8,7 @@ import javax.swing.JComboBox;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
+import javax.swing.JSeparator;
 
 public class GAAttributSelectionConfigurationPanelView extends JPanel {
 	private JLabel lblSelectAlgorithm;
@@ -27,9 +28,11 @@ public class GAAttributSelectionConfigurationPanelView extends JPanel {
 	private JTextField maxAttrTextField;
 	private JLabel lblStepSize;
 	private JTextField stepSizeTextField;
+	private JLabel lblNumberOfThreads;
+	private JTextField threadsTextField;
 	public GAAttributSelectionConfigurationPanelView() {
 		setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		setPreferredSize(new Dimension(445, 128));
+		setPreferredSize(new Dimension(445, 160));
 		SpringLayout springLayout = new SpringLayout();
 		setLayout(springLayout);
 		
@@ -137,6 +140,18 @@ public class GAAttributSelectionConfigurationPanelView extends JPanel {
 		springLayout.putConstraint(SpringLayout.EAST, stepSizeTextField, 56, SpringLayout.EAST, lblStepSize);
 		add(stepSizeTextField);
 		stepSizeTextField.setColumns(10);
+		
+		lblNumberOfThreads = new JLabel("Number of threads:");
+		springLayout.putConstraint(SpringLayout.WEST, lblNumberOfThreads, 0, SpringLayout.WEST, lblSelectAlgorithm);
+		springLayout.putConstraint(SpringLayout.SOUTH, lblNumberOfThreads, -11, SpringLayout.SOUTH, this);
+		add(lblNumberOfThreads);
+		
+		threadsTextField = new JTextField();
+		springLayout.putConstraint(SpringLayout.NORTH, threadsTextField, -3, SpringLayout.NORTH, lblNumberOfThreads);
+		springLayout.putConstraint(SpringLayout.WEST, threadsTextField, 6, SpringLayout.EAST, lblNumberOfThreads);
+		springLayout.putConstraint(SpringLayout.EAST, threadsTextField, 0, SpringLayout.EAST, minAttrTextField);
+		add(threadsTextField);
+		threadsTextField.setColumns(10);
 	}
 	public JComboBox getAlgorithmComboBox() {
 		return algorithmComboBox;
@@ -164,5 +179,8 @@ public class GAAttributSelectionConfigurationPanelView extends JPanel {
 	}
 	public JTextField getMinAttrTextField() {
 		return minAttrTextField;
+	}
+	public JTextField getThreadsTextField() {
+		return threadsTextField;
 	}
 }

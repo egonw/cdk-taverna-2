@@ -32,11 +32,18 @@ public class ProgressLogger {
 				file = new File(FileNameGenerator.getLogDir() + File.separator + activityName + ".log");
 				this.activityFileMap.put(activityName, file);
 				writer = new PrintWriter(new FileOutputStream(file, false));
+				writer.append(tmpDate.toString() + ": **" + activityName.replaceAll(".", "*") + "**\n");
+				writer.append(tmpDate.toString() + ": * " + activityName + " *\n");
+				writer.append(tmpDate.toString() + ": **" + activityName.replaceAll(".", "*") + "**\n");
+				writer.append("\n");
 			} else {
 				writer = new PrintWriter(new FileOutputStream(file, true));
 			}
 			writer = new PrintWriter(new FileOutputStream(file, true));
-			writer.append(tmpDate.toString() + ": " + progress);
+			String[] strings = progress.split("\\n");
+			for(String s : strings) {
+			writer.append(tmpDate.toString() + ": " + s + "\n");
+			}
 			writer.close();
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError("Could not write progress!", "ProgressLogger", e);

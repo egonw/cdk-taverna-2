@@ -85,8 +85,9 @@ public class GAAttributSelectionConfigurationPanel extends
 
 	@Override
 	public boolean isConfigurationChanged() {
-		String currentOptions = (String) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_GA_ATTRIBUTE_SELECTION_OPTIONS);
-		if(currentOptions == null) {
+		String currentOptions = (String) this.configBean
+				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_GA_ATTRIBUTE_SELECTION_OPTIONS);
+		if (currentOptions == null) {
 			return true;
 		}
 		String options = this.createOptionsString();
@@ -103,12 +104,18 @@ public class GAAttributSelectionConfigurationPanel extends
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
 		String newOptions = this.createOptionsString();
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_GA_ATTRIBUTE_SELECTION_OPTIONS, newOptions);
+		int threads = Integer.parseInt(this.view.getThreadsTextField().getText());
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, threads);
 	}
 
 	@Override
 	public void refreshConfiguration() {
-		String currentOptions = (String) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_GA_ATTRIBUTE_SELECTION_OPTIONS);
-		if(currentOptions == null) {
+		int threads = (Integer) this.configBean
+				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS);
+		this.view.getThreadsTextField().setText("" + threads);
+		String currentOptions = (String) this.configBean
+				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_GA_ATTRIBUTE_SELECTION_OPTIONS);
+		if (currentOptions == null) {
 			return;
 		}
 		String[] opt = currentOptions.split(";");
@@ -117,7 +124,7 @@ public class GAAttributSelectionConfigurationPanel extends
 		this.view.getNumIndTextField().setText(opt[2]);
 		this.view.getIterationsTextField().setText(opt[3]);
 		String[] attrOpt = opt[4].split(" ");
-		if(attrOpt.length < 3) {
+		if (attrOpt.length < 3) {
 			this.view.getMinAttrTextField().setText("-1");
 			this.view.getMaxAttrTextField().setText("");
 			this.view.getStepSizeTextField().setText("");
@@ -133,6 +140,7 @@ public class GAAttributSelectionConfigurationPanel extends
 				break;
 			}
 		}
+
 	}
 
 	@Override
