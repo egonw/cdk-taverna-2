@@ -46,6 +46,13 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelController extends
 		}
 	};
 
+	private ActionListener algorithmComboBoxListener = new ActionListener() {
+
+		public void actionPerformed(ActionEvent e) {
+			setThreadingParam();
+		}
+	};
+
 	public SplitDatasetIntoTrainTestsetConfigurationPanelController(AbstractCDKActivity activity) {
 		try {
 			this.activity = activity;
@@ -59,8 +66,12 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelController extends
 					this.configFrames.add(configFrame);
 				}
 			}
+			this.view.getRandomRadioButton().addActionListener(this.algorithmComboBoxListener);
+			this.view.getClusterRadioButton().addActionListener(this.algorithmComboBoxListener);
+			this.view.getSingleGlobalMaxRadioButton().addActionListener(this.algorithmComboBoxListener);
 			DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel(learnerNames.toArray());
 			this.view.getClassifierComboBox().setModel(comboBoxModel);
+			this.view.getClassifierComboBox().addActionListener(this.algorithmComboBoxListener);
 			this.view.getBtnConfigure().addActionListener(this.configureClassifierAction);
 			this.add(this.view);
 			this.refreshConfiguration();
@@ -89,6 +100,7 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelController extends
 			options += this.view.getIterationsTextField().getText() + ";";
 			options += this.view.getUseBlacklistingCheckBox().isSelected() + ";";
 			options += this.view.getChooseBestCheckBox().isSelected() + ";";
+			options += this.view.getBlLengthTextField().getText() + ";";
 		}
 		return options;
 	}
@@ -139,10 +151,26 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelController extends
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
 		String newOptions = this.generateOptionsString();
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CREATE_SET_OPTIONS, newOptions);
+		int threads = Integer.parseInt(this.view.getThreadsTextField().getText());
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, threads);
+	}
+
+	private void setThreadingParam() {
+		int threads = 1;
+		int idx = this.view.getClassifierComboBox().getSelectedIndex();
+		if (!this.configFrames.get(idx).useThreading() && this.view.getSingleGlobalMaxRadioButton().isSelected()) {
+			this.view.getThreadsTextField().setEnabled(false);
+		} else {
+			threads = (Integer) this.configBean
+					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS);
+			this.view.getThreadsTextField().setEnabled(true);
+		}
+		this.view.getThreadsTextField().setText("" + threads);
 	}
 
 	@Override
 	public void refreshConfiguration() {
+		this.setThreadingParam();
 		if (this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_CREATE_SET_OPTIONS) == null) {
 			return;
 		}

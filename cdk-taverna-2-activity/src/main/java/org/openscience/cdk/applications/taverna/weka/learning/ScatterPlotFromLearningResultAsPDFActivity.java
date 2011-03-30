@@ -71,7 +71,7 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 	 * Creates a new instance.
 	 */
 	public ScatterPlotFromLearningResultAsPDFActivity() {
-		this.INPUT_PORTS = new String[] { "Model Files", "Train Data Files", "Test Datasets", "ID Class CSV" };
+		this.INPUT_PORTS = new String[] { "Model Files", "Train Datasets", "Test Datasets", "ID Class CSV" };
 		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
@@ -83,16 +83,13 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 		expectedReferences.add(FileReference.class);
 		expectedReferences.add(InlineStringReference.class);
 		addInput(this.INPUT_PORTS[0], 1, false, expectedReferences, null);
-		expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
-		expectedReferences.add(FileReference.class);
-		expectedReferences.add(InlineStringReference.class);
 		if (options[0].equals("" + TEST_TRAININGSET_PORT)) {
-			this.INPUT_PORTS[1] = "Train Data Files";
+			this.INPUT_PORTS[1] = "Train Datasets";
 			addInput(this.INPUT_PORTS[2], 1, true, null, byte[].class);
 		} else {
-			this.INPUT_PORTS[1] = "Dataset Files";
+			this.INPUT_PORTS[1] = "Weka Learning Datasets";
 		}
-		addInput(this.INPUT_PORTS[1], 1, false, expectedReferences, null);
+		addInput(this.INPUT_PORTS[1], 1, false, null, byte[].class);
 		addInput(this.INPUT_PORTS[3], 1, true, null, String.class);
 	}
 
@@ -107,7 +104,7 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 		String[] options = ((String) this.getConfiguration().getAdditionalProperty(
 				CDKTavernaConstants.PROPERTY_SCATTER_PLOT_OPTIONS)).split(";");
 		List<File> modelFiles = this.getInputAsFileList(this.INPUT_PORTS[0]);
-		List<File> trainDataFiles = this.getInputAsFileList(this.INPUT_PORTS[1]);
+		List<Instances> trainDatasets = this.getInputAsList(this.INPUT_PORTS[1], Instances.class);
 		List<Instances> testDatasets = null;
 		if (options[0].equals("" + TEST_TRAININGSET_PORT)) {
 			testDatasets = this.getInputAsList(this.INPUT_PORTS[2], Instances.class);
@@ -135,8 +132,8 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 			List<Double> trainMeanRMSE = new ArrayList<Double>();
 			List<Double> testMeanRMSE = new ArrayList<Double>();
 			List<Double> cvMeanRMSE = new ArrayList<Double>();
-			DefaultCategoryDataset[] ratioRMSESet = new DefaultCategoryDataset[trainDataFiles.size()];
-			for (int i = 0; i < trainDataFiles.size(); i++) {
+			DefaultCategoryDataset[] ratioRMSESet = new DefaultCategoryDataset[trainDatasets.size()];
+			for (int i = 0; i < trainDatasets.size(); i++) {
 				ratioRMSESet[i] = new DefaultCategoryDataset();
 			}
 			List<Double> trainingSetRatios = null;
@@ -153,7 +150,7 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 				File modelFile = null;
 				Classifier classifier = null;
 				String name = "";
-				for (int j = 0; j < trainDataFiles.size(); j++) {
+				for (int j = 0; j < trainDatasets.size(); j++) {
 					LinkedList<Double> predictedValues = new LinkedList<Double>();
 					LinkedList<Double> orgValues = new LinkedList<Double>();
 					LinkedList<Double[]> yResidueValues = new LinkedList<Double[]>();
@@ -171,7 +168,7 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 					name = classifier.getClass().getSimpleName();
 					String sum = "Method: " + name + " " + tools.getOptionsFromFile(modelFile, name) + "\n\n";
 					// Produce training set data
-					Instances trainset = (Instances) SerializationHelper.read(trainDataFiles.get(j).getPath());
+					Instances trainset = trainDatasets.get(j);
 					Instances trainUUIDSet = Filter.useFilter(trainset, tools.getIDGetter(trainset));
 					trainset = Filter.useFilter(trainset, tools.getIDRemover(trainset));
 					double trainingSetRatio = 100.0;

@@ -97,6 +97,7 @@ public class AttributeEvaluationActivity extends AbstractCDKActivity {
 			this.rmses = new double[currentSet.numAttributes() - 1];
 			// Calculate RMSEs
 			this.currentIndex = 0;
+			ProgressLogger.getInstance().writeProgress(this.getActivityName(), "Starting workers");
 			this.workers = new AttributeEvaluationWorker[threads];
 			for(int j = 0; j < this.workers.length; j++) {
 				this.workers[j] = new AttributeEvaluationWorker(this);

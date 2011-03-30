@@ -50,8 +50,8 @@ public class SplitDatasetIntoTrainTestsetWorker extends Thread {
 					clusterSet = Filter.useFilter(clusterSet, tools.getClassRemover(clusterSet));
 					clusterSet.setClassIndex(-1);
 					SimpleKMeans clusterer = new SimpleKMeans();
-//					EM clusterer = new EM();
-					clusterer.setOptions(new String[] { "-N", "" + numTrain});
+					// EM clusterer = new EM();
+					clusterer.setOptions(new String[] { "-N", "" + numTrain });
 					clusterer.buildClusterer(clusterSet);
 					Instances currentTrain = new Instances(learningSet);
 					currentTrain.delete();
@@ -75,11 +75,13 @@ public class SplitDatasetIntoTrainTestsetWorker extends Thread {
 						int iterations = Integer.parseInt(options[6]);
 						boolean isBlacklisting = Boolean.parseBoolean(options[7]);
 						boolean isChooseBest = Boolean.parseBoolean(options[8]);
+						int blLength = Integer.parseInt(options[9]);
 						progress += "Set: " + fraction + "\n";
 						LinkedList<Integer> blacklist = new LinkedList<Integer>();
 						Double previousRMSE = null;
 						Instances cleanTrainSet = Filter.useFilter(currentTrain, tools.getIDRemover(currentTrain));
 						Instances cleanTestSet = Filter.useFilter(currentTest, tools.getIDRemover(currentTest));
+						blLength = blLength >= currentTest.numInstances() ? currentTest.numInstances() - 1 : blLength;
 						for (int i = 0; i < iterations; i++) {
 							Classifier classifier = (Classifier) classifierClass.newInstance();
 							String[] classOptions = options[5].split(" ");
@@ -87,7 +89,7 @@ public class SplitDatasetIntoTrainTestsetWorker extends Thread {
 							classifier.buildClassifier(cleanTrainSet);
 							Double biggestError = null;
 							int biggestErrorInst = 0;
-							if (blacklist.size() > 5) {
+							if (blacklist.size() > blLength) {
 								blacklist.remove();
 							}
 							for (int j = 0; j < currentTest.numInstances(); j++) {
@@ -102,17 +104,18 @@ public class SplitDatasetIntoTrainTestsetWorker extends Thread {
 								if (biggestError == null || biggestError < error) {
 									biggestError = error;
 									biggestErrorInst = j;
-									blacklist.add(c);
+
 								}
 							}
 							if (biggestError == null) {
-								System.out.println("Stopped!");
 								break;
+							} else {
+								blacklist.add(testClusterMap.get(biggestErrorInst));
 							}
 							Evaluation eval = new Evaluation(cleanTrainSet);
 							eval.evaluateModel(classifier, cleanTestSet);
-							progress += "RMSE Step " + i + ": "
-									+ String.format("%.2f", eval.rootMeanSquaredError()) +"\n";
+							progress += "RMSE Step " + i + ": " + String.format("%.2f", eval.rootMeanSquaredError())
+									+ "\n";
 							if (isChooseBest) {
 								double currentRMSE = eval.rootMeanSquaredError();
 								if (previousRMSE == null || previousRMSE > currentRMSE) {

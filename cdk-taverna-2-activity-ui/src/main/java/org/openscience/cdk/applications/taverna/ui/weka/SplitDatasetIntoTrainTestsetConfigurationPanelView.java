@@ -33,12 +33,15 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelView extends JPanel {
 	private JTextField stepsTextField;
 	private JCheckBox chooseBestCheckBox;
 	private JButton btnConfigure;
+	private JTextField threadsTextField;
+	private JLabel lblNumberOfThreads;
+	private JTextField blLengthTextField;
 
 	/**
 	 * Create the panel.
 	 */
 	public SplitDatasetIntoTrainTestsetConfigurationPanelView() {
-		setPreferredSize(new Dimension(425, 245));
+		setPreferredSize(new Dimension(425, 278));
 		setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		SpringLayout springLayout = new SpringLayout();
 		setLayout(springLayout);
@@ -93,10 +96,9 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelView extends JPanel {
 		springLayout.putConstraint(SpringLayout.WEST, iterationsTextField, 13, SpringLayout.EAST, lblIterations);
 		add(lblIterations);
 
-		useBlacklistingCheckBox = new JCheckBox("Use Blacklisting");
-		springLayout.putConstraint(SpringLayout.NORTH, useBlacklistingCheckBox, 4, SpringLayout.SOUTH,
-				iterationsTextField);
-		springLayout.putConstraint(SpringLayout.WEST, useBlacklistingCheckBox, 34, SpringLayout.WEST, this);
+		useBlacklistingCheckBox = new JCheckBox("Use Blacklisting. Length:");
+		springLayout.putConstraint(SpringLayout.NORTH, useBlacklistingCheckBox, 6, SpringLayout.SOUTH, iterationsTextField);
+		springLayout.putConstraint(SpringLayout.WEST, useBlacklistingCheckBox, 0, SpringLayout.WEST, lblNewLabel);
 		useBlacklistingCheckBox.setEnabled(false);
 		useBlacklistingCheckBox.setSelected(true);
 		add(useBlacklistingCheckBox);
@@ -136,10 +138,9 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelView extends JPanel {
 		stepsTextField.setColumns(10);
 
 		chooseBestCheckBox = new JCheckBox("Choose best");
+		springLayout.putConstraint(SpringLayout.NORTH, chooseBestCheckBox, 2, SpringLayout.SOUTH, useBlacklistingCheckBox);
 		springLayout.putConstraint(SpringLayout.WEST, chooseBestCheckBox, 34, SpringLayout.WEST, this);
 		chooseBestCheckBox.setEnabled(false);
-		springLayout.putConstraint(SpringLayout.NORTH, chooseBestCheckBox, 4, SpringLayout.SOUTH,
-				useBlacklistingCheckBox);
 		springLayout.putConstraint(SpringLayout.NORTH, lblNewLabel_2, 9, SpringLayout.SOUTH, chooseBestCheckBox);
 		springLayout.putConstraint(SpringLayout.NORTH, lblOfsteps, 9, SpringLayout.SOUTH, chooseBestCheckBox);
 		springLayout.putConstraint(SpringLayout.NORTH, lblNewLabel_1, 9, SpringLayout.SOUTH, chooseBestCheckBox);
@@ -156,6 +157,24 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelView extends JPanel {
 		springLayout.putConstraint(SpringLayout.SOUTH, btnConfigure, -83, SpringLayout.NORTH, stepsTextField);
 		springLayout.putConstraint(SpringLayout.EAST, btnConfigure, -12, SpringLayout.EAST, this);
 		add(btnConfigure);
+		
+		threadsTextField = new JTextField();
+		springLayout.putConstraint(SpringLayout.NORTH, threadsTextField, 16, SpringLayout.SOUTH, lowerRatioTextField);
+		add(threadsTextField);
+		threadsTextField.setColumns(10);
+		
+		lblNumberOfThreads = new JLabel("Number of threads:");
+		springLayout.putConstraint(SpringLayout.WEST, threadsTextField, 6, SpringLayout.EAST, lblNumberOfThreads);
+		springLayout.putConstraint(SpringLayout.NORTH, lblNumberOfThreads, 3, SpringLayout.NORTH, threadsTextField);
+		springLayout.putConstraint(SpringLayout.WEST, lblNumberOfThreads, 0, SpringLayout.WEST, rdbtnNewRadioButton);
+		add(lblNumberOfThreads);
+		
+		blLengthTextField = new JTextField();
+		blLengthTextField.setText("5");
+		springLayout.putConstraint(SpringLayout.NORTH, blLengthTextField, 1, SpringLayout.NORTH, useBlacklistingCheckBox);
+		springLayout.putConstraint(SpringLayout.WEST, blLengthTextField, 6, SpringLayout.EAST, useBlacklistingCheckBox);
+		add(blLengthTextField);
+		blLengthTextField.setColumns(10);
 
 	}
 
@@ -251,5 +270,11 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelView extends JPanel {
 	}
 	public JButton getBtnConfigure() {
 		return btnConfigure;
+	}
+	public JTextField getThreadsTextField() {
+		return threadsTextField;
+	}
+	public JTextField getBlLengthTextField() {
+		return blLengthTextField;
 	}
 }

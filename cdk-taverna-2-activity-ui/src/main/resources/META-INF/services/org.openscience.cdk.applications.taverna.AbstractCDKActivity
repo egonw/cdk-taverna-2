@@ -14,6 +14,8 @@ org.openscience.cdk.applications.taverna.io.CSVFileReaderActivity
 org.openscience.cdk.applications.taverna.io.CSVFileWriterActivity
 org.openscience.cdk.applications.taverna.io.ARFFFileWriterActivity
 org.openscience.cdk.applications.taverna.io.ARFFFileReaderActivity
+org.openscience.cdk.applications.taverna.io.XRFFFileWriterActivity
+org.openscience.cdk.applications.taverna.io.XRFFFileReaderActivity
 org.openscience.cdk.applications.taverna.isomorphism.IsomorphismTesterActivity
 org.openscience.cdk.applications.taverna.isomorphism.SubgraphIsomorphismFilterActivity
 org.openscience.cdk.applications.taverna.iterativeio.IterativeMultiRXNFileReaderActivity
@@ -176,5 +178,3 @@ org.openscience.cdk.applications.taverna.weka.learning.AttributeEvaluationActivi
 org.openscience.cdk.applications.taverna.weka.learning.GAAttributeEvaluationActivity
 org.openscience.cdk.applications.taverna.weka.learning.SplitDatasetIntoTrainTestsetActivity
 org.openscience.cdk.applications.taverna.modelling.CoordinatesGenerator2DAcitivity
-org.openscience.cdk.applications.taverna.modelling.MM2_3DCoordinatesGeneratorActivity
-org.openscience.cdk.applications.taverna.modelling.MMFF94_3DCoordinatesGeneratorActivity

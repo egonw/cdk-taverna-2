@@ -63,7 +63,7 @@ public class WekaLearningActivity extends AbstractCDKActivity {
 	 */
 	public WekaLearningActivity() {
 		this.INPUT_PORTS = new String[] { "Weka Train Datasets", "File" };
-		this.OUTPUT_PORTS = new String[] { "Models Files", "Train Data Files" };
+		this.OUTPUT_PORTS = new String[] { "Model Files", "Weka Train Datasets" };
 	}
 
 	@Override
@@ -100,14 +100,6 @@ public class WekaLearningActivity extends AbstractCDKActivity {
 		String optString = (String) this.getConfiguration().getAdditionalProperty(
 				CDKTavernaConstants.PROPERTY_LEARNER_OPTIONS);
 		String[] options = optString.split(";");
-		// Save data
-		ArrayList<String> dataFiles = new ArrayList<String>();
-		for (int j = 0; j < dataset.size(); j++) {
-			Instances trainset = dataset.get(j);
-			File dataFile = FileNameGenerator.getNewFile(directory, ".data", name + "_set");
-			SerializationHelper.write(dataFile.getPath(), trainset);
-			dataFiles.add(dataFile.getPath());
-		}
 		// Create job list
 		int id = 0;
 		WekaTools tools = new WekaTools();
@@ -138,7 +130,7 @@ public class WekaLearningActivity extends AbstractCDKActivity {
 		}
 		// Set output
 		this.setOutputAsStringList(Arrays.asList(this.modelFiles), this.OUTPUT_PORTS[0]);
-		this.setOutputAsStringList(dataFiles, this.OUTPUT_PORTS[1]);
+		this.setOutputAsObjectList(dataset, this.OUTPUT_PORTS[1]);
 	}
 
 	public synchronized WekaLearningWork getWork() {
