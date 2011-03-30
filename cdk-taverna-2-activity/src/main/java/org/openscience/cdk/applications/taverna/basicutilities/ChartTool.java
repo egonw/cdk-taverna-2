@@ -21,14 +21,18 @@
  */
 package org.openscience.cdk.applications.taverna.basicutilities;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -36,6 +40,7 @@ import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -44,8 +49,11 @@ import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
+import org.xmlcml.cml.element.CMLBasisSet.Basis;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -111,8 +119,49 @@ public class ChartTool {
 		plot.setNoDataMessage("NO DATA");
 		plot.setDomainZeroBaselineVisible(true);
 		plot.setRangeZeroBaselineVisible(true);
-		XYLineAnnotation annotation = new XYLineAnnotation(-100, -100, 100, 100);
+		XYLineAnnotation annotation = new XYLineAnnotation(-1000000, -1000000, 1000000, 1000000);
 		plot.addAnnotation(annotation);
+		XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
+		renderer.setSeriesOutlinePaint(0, Color.black);
+		renderer.setUseOutlinePaint(true);
+		NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
+		domainAxis.setAutoRangeIncludesZero(false);
+		domainAxis.setTickMarkInsideLength(2.0f);
+		domainAxis.setTickMarkOutsideLength(0.0f);
+
+		NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+		rangeAxis.setTickMarkInsideLength(2.0f);
+		rangeAxis.setTickMarkOutsideLength(0.0f);
+
+		return chart;
+	}
+
+	public JFreeChart createResiduePlot(List<Double[]> yValues, String header, String xAxis, String yAxis,
+			List<String> seriesNames) {
+		LinkedList<XYLineAnnotation> lines = new LinkedList<XYLineAnnotation>();
+		DefaultXYDataset xyDataSet = new DefaultXYDataset();
+		for (int j = 0; j < yValues.size(); j++) {
+			XYSeries series = new XYSeries(seriesNames.get(j));
+			for (int i = 0; i < yValues.get(j).length; i++) {
+				series.add(i + 1, yValues.get(j)[i]);
+				float dash[] = { 10.0f };
+				BasicStroke stroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash,
+						0.0f);
+				XYLineAnnotation annotation = new XYLineAnnotation(i + 1, 0, i + 1, yValues.get(j)[i], stroke,
+						Color.BLUE);
+				lines.add(annotation);
+			}
+			xyDataSet.addSeries(seriesNames.get(j), series.toArray());
+		}
+		JFreeChart chart = ChartFactory.createScatterPlot(header, xAxis, yAxis, xyDataSet, PlotOrientation.VERTICAL,
+				true, false, false);
+		XYPlot plot = (XYPlot) chart.getPlot();
+		plot.setNoDataMessage("NO DATA");
+		plot.setDomainZeroBaselineVisible(true);
+		plot.setRangeZeroBaselineVisible(true);
+		for (int i = 0; i < lines.size(); i++) {
+			plot.addAnnotation(lines.get(i));
+		}
 		XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
 		renderer.setSeriesOutlinePaint(0, Color.black);
 		renderer.setUseOutlinePaint(true);
@@ -173,7 +222,7 @@ public class ChartTool {
 	 */
 	public JFreeChart createLineChart(String title, String categoryAxisLabel, String valueAxisLabel,
 			CategoryDataset dataset) {
-		return this.createLineChart(title, categoryAxisLabel, valueAxisLabel, dataset, true);
+		return this.createLineChart(title, categoryAxisLabel, valueAxisLabel, dataset, true, true);
 	}
 
 	/**
@@ -190,7 +239,7 @@ public class ChartTool {
 	 * @return JfreeChart instance.
 	 */
 	public JFreeChart createLineChart(String title, String categoryAxisLabel, String valueAxisLabel,
-			CategoryDataset dataset, boolean includeZero) {
+			CategoryDataset dataset, boolean includeZero, boolean drawShapes) {
 		JFreeChart chart = ChartFactory.createLineChart(title, categoryAxisLabel, valueAxisLabel, dataset,
 				this.orientation, this.drawLegend, false, false);
 		// set the background color for the chart...
@@ -211,20 +260,48 @@ public class ChartTool {
 		renderer.setSeriesPaint(4, Color.yellow);
 		renderer.setDrawOutlines(true);
 		renderer.setUseFillPaint(true);
-		renderer.setBaseShapesVisible(true);
+		renderer.setBaseShapesVisible(drawShapes);
 		renderer.setBaseShapesFilled(true);
 		return chart;
 	}
-
+	
 	/**
-	 * Writes given charts into target PDF file.
+	 * Creates a line chart.
 	 * 
-	 * @param file
-	 * @param charts
-	 * @throws IOException
+	 * @param title
+	 * @param categoryAxisLabel
+	 *            (X-Axis label)
+	 * @param valueAxisLabel
+	 *            (Y-Axis label)
+	 * @param dataset
+	 * @param includeZero
+	 *            True when zero shall be included to the axis range.
+	 * @return JfreeChart instance.
 	 */
-	public synchronized void writeChartAsPDF(File file, List<JFreeChart> charts) throws IOException {
-		this.writeChartAsPDF(file, charts, null);
+	public JFreeChart createXYLineChart(String title, String categoryAxisLabel, String valueAxisLabel,
+			XYDataset dataset, boolean includeZero, boolean drawShapes) {
+		JFreeChart chart = ChartFactory.createXYLineChart(title, categoryAxisLabel, valueAxisLabel, dataset,
+				this.orientation, this.drawLegend, false, false);
+		// set the background color for the chart...
+		chart.setBackgroundPaint(Color.white);
+		chart.setAntiAlias(true);
+		XYPlot plot = chart.getXYPlot();
+		ValueAxis domainAxis = plot.getDomainAxis();
+		domainAxis.setLowerMargin(0.025);
+		domainAxis.setUpperMargin(0.025);
+		NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+		rangeAxis.setAutoRangeIncludesZero(includeZero);
+		XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
+		renderer.setSeriesPaint(0, Color.blue);
+		renderer.setSeriesPaint(1, Color.red);
+		renderer.setSeriesPaint(2, Color.green);
+		renderer.setSeriesPaint(3, Color.darkGray);
+		renderer.setSeriesPaint(4, Color.yellow);
+		renderer.setDrawOutlines(true);
+		renderer.setUseFillPaint(true);
+		renderer.setBaseShapesVisible(drawShapes);
+		renderer.setBaseShapesFilled(true);
+		return chart;
 	}
 
 	/**
@@ -235,8 +312,7 @@ public class ChartTool {
 	 * @param annotations
 	 * @throws IOException
 	 */
-	public synchronized void writeChartAsPDF(File file, List<JFreeChart> charts, List<String> annotations)
-			throws IOException {
+	public synchronized void writeChartAsPDF(File file, List<Object> chartObjects) throws IOException {
 		Rectangle pagesize = new Rectangle(this.width, this.height);
 		Document document = new Document(pagesize, 50, 50, 50, 50);
 		try {
@@ -244,14 +320,16 @@ public class ChartTool {
 			document.addAuthor("CDK-Taverna 2.0");
 			document.open();
 			PdfContentByte cb = writer.getDirectContent();
-			for (int i = 0; i < charts.size(); i++) {
-				JFreeChart chart = charts.get(i);
-				this.addChartPageToPDF(chart, cb);
-				document.newPage();
-				if (annotations != null && annotations.size() >= i + 1) {
-					this.addAnnotationToPDF(annotations.get(i), document);
-					document.newPage();
+			for (int i = 0; i < chartObjects.size(); i++) {
+				Object obj = chartObjects.get(i);
+				if (obj instanceof JFreeChart) {
+					JFreeChart chart = (JFreeChart) obj;
+					this.addChartPageToPDF(chart, cb);
+				} else if (obj instanceof String) {
+					String annotation = (String) obj;
+					this.addAnnotationToPDF(annotation, document);
 				}
+				document.newPage();
 			}
 		} catch (DocumentException e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.CANT_CREATE_PDF_FILE + file.getPath(),

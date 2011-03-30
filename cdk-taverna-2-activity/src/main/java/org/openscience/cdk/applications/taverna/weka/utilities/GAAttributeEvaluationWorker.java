@@ -1,23 +1,22 @@
 package org.openscience.cdk.applications.taverna.weka.utilities;
 
-import org.openscience.cdk.applications.taverna.weka.learning.GAAttributeSelectionActivity;
+import org.openscience.cdk.applications.taverna.weka.learning.GAAttributeEvaluationActivity;
 
 import weka.classifiers.Classifier;
-import weka.classifiers.functions.LinearRegression;
 
-public class GASelectionWorker extends Thread {
+public class GAAttributeEvaluationWorker extends Thread {
 
-	private GAAttributeSelectionActivity owner = null;
+	private GAAttributeEvaluationActivity owner = null;
 	private boolean isDone = false;
 
-	public GASelectionWorker(GAAttributeSelectionActivity owner) {
+	public GAAttributeEvaluationWorker(GAAttributeEvaluationActivity owner) {
 		this.owner = owner;
 	}
 
 	@Override
 	public void run() {
 		try {
-			AttributeSelectionGenome individual;
+			GAAttributeEvaluationGenome individual;
 			while ((individual = owner.getWork()) != null) {
 				// Create individual dataset
 				individual.updateDataset();

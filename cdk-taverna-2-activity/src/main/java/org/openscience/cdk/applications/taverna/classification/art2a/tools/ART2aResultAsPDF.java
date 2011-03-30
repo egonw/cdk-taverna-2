@@ -83,7 +83,7 @@ public class ART2aResultAsPDF extends AbstractCDKActivity {
 			ChartTool chartTool = new ChartTool();
 			int classNumberWithMaxOfVectors = 0;
 			int maxVectorsInClass = 0;
-			ArrayList<JFreeChart> charts = new ArrayList<JFreeChart>();
+			ArrayList<Object> charts = new ArrayList<Object>();
 			TreeMap<Double, Integer> treeMap = new TreeMap<Double, Integer>();
 			Map.Entry<Double, Integer> entry;
 			DefaultCategoryDataset dataSet;

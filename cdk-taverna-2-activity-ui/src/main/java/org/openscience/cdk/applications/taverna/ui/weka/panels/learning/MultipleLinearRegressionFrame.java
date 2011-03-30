@@ -106,4 +106,9 @@ public class MultipleLinearRegressionFrame extends AbstractLearningConfiguration
 	public void makeSingleOption() {
 		// Nothing
 	}
+	
+	@Override
+	public boolean useThreading() {
+		return true;
+	}
 }

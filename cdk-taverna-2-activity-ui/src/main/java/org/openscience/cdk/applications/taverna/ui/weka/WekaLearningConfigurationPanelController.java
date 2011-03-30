@@ -45,6 +45,13 @@ public class WekaLearningConfigurationPanelController extends
 			view.repaint();
 		}
 	};
+	
+	private ActionListener algorithmComboBoxListener = new ActionListener() {
+
+		public void actionPerformed(ActionEvent e) {
+			setThreadingParam();
+		}
+	};
 
 	public WekaLearningConfigurationPanelController(AbstractCDKActivity activity) {
 		try {
@@ -72,6 +79,7 @@ public class WekaLearningConfigurationPanelController extends
 		DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel(learnerNames.toArray());
 		this.view.getLearnerComboBox().setModel(comboBoxModel);
 		this.view.getLearnerComboBox().addActionListener(this.comboBoxListener);
+		this.view.getLearnerComboBox().addActionListener(this.algorithmComboBoxListener);
 		int numberOfThreads = (Integer) this.configBean
 				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS);
 		this.view.getThreadsTextField().setText("" + numberOfThreads);
@@ -123,9 +131,23 @@ public class WekaLearningConfigurationPanelController extends
 		}
 		return opts;
 	}
+	
+	private void setThreadingParam() {
+		int threads = 1;
+		int idx = this.view.getLearnerComboBox().getSelectedIndex();
+		if (this.configFrames.get(idx).useThreading()) {
+			threads = (Integer) this.configBean
+					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS);
+			this.view.getThreadsTextField().setEnabled(true);
+		} else {
+			this.view.getThreadsTextField().setEnabled(false);
+		}
+		this.view.getThreadsTextField().setText("" + threads);
+	}
 
 	@Override
 	public void refreshConfiguration() {
+		this.setThreadingParam();
 		if (this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_LEARNER_NAME) != null) {
 			for (int i = 0; i < this.configFrames.size(); i++) {
 				String name = (String) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_LEARNER_NAME);

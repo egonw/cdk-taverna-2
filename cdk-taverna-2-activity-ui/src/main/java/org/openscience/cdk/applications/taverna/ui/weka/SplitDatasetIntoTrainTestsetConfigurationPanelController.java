@@ -104,7 +104,7 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelController extends
 				.checkTextFieldValueDouble(this, "Lower fraction limit", this.view.getLowerRatioTextField(), 1, 100)
 				|| !UITools.checkTextFieldValueDouble(this, "Higher fraction limit",
 						this.view.getHigherRatioTextField(), 1, 100)
-				|| !UITools.checkTextFieldValueInt(this, "Number of steps", this.view.getStepsTextField(), 2,
+				|| !UITools.checkTextFieldValueInt(this, "Number of steps", this.view.getStepsTextField(), 1,
 						Integer.MAX_VALUE)) {
 			return false;
 		}

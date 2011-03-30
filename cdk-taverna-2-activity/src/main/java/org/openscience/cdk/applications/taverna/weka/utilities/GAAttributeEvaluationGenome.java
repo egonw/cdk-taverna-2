@@ -5,14 +5,12 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
 
-import org.openscience.cdk.applications.taverna.weka.learning.GAAttributeSelectionActivity;
-
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
 import weka.filters.Filter;
 
-public class AttributeSelectionGenome {
+public class GAAttributeEvaluationGenome {
 
 	private static int SCORE_POWER = 2;
 	
@@ -26,7 +24,7 @@ public class AttributeSelectionGenome {
 	private String[] attrNames = null;
 	private boolean[] attrIsUsed = null;
 
-	public AttributeSelectionGenome(Instances dataset) throws Exception {
+	public GAAttributeEvaluationGenome(Instances dataset) throws Exception {
 		this.dataset = dataset;
 		HashSet<String> nameSet = new HashSet<String>();
 		for (int i = 1; i < dataset.numAttributes() - 1; i++) {
@@ -44,7 +42,7 @@ public class AttributeSelectionGenome {
 		}
 	}
 
-	private AttributeSelectionGenome(Instances dataset, String[] attrNames, boolean[] attrIsUsed, double rmse,
+	private GAAttributeEvaluationGenome(Instances dataset, String[] attrNames, boolean[] attrIsUsed, double rmse,
 			int attrRestriction) {// ,
 		this.dataset = dataset;
 		this.attrNames = attrNames;
@@ -67,7 +65,7 @@ public class AttributeSelectionGenome {
 		}
 	}
 
-	public void crossOver(AttributeSelectionGenome genome) {
+	public void crossOver(GAAttributeEvaluationGenome genome) {
 		int start = this.rand.nextInt(this.attrNames.length);
 		int end = this.rand.nextInt(this.attrNames.length - (start - 1)) + start;
 		// Cross attributes
@@ -148,8 +146,8 @@ public class AttributeSelectionGenome {
 	}
 
 	public Object clone() {
-		AttributeSelectionGenome clone = null;
-		clone = new AttributeSelectionGenome(this.dataset, this.attrNames.clone(), this.attrIsUsed.clone(), this.rmse,
+		GAAttributeEvaluationGenome clone = null;
+		clone = new GAAttributeEvaluationGenome(this.dataset, this.attrNames.clone(), this.attrIsUsed.clone(), this.rmse,
 				this.attrRestriction);
 		return clone;
 	}

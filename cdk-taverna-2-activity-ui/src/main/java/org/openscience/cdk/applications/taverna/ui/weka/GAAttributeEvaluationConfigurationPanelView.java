@@ -10,7 +10,7 @@ import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 import javax.swing.JSeparator;
 
-public class GAAttributSelectionConfigurationPanelView extends JPanel {
+public class GAAttributeEvaluationConfigurationPanelView extends JPanel {
 	private JLabel lblSelectAlgorithm;
 	private JComboBox algorithmComboBox;
 	private JButton btnConfigure;
@@ -30,7 +30,7 @@ public class GAAttributSelectionConfigurationPanelView extends JPanel {
 	private JTextField stepSizeTextField;
 	private JLabel lblNumberOfThreads;
 	private JTextField threadsTextField;
-	public GAAttributSelectionConfigurationPanelView() {
+	public GAAttributeEvaluationConfigurationPanelView() {
 		setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		setPreferredSize(new Dimension(445, 160));
 		SpringLayout springLayout = new SpringLayout();

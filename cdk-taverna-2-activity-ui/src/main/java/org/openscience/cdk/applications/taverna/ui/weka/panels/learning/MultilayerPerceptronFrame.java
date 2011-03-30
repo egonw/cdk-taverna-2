@@ -247,4 +247,9 @@ public class MultilayerPerceptronFrame extends AbstractLearningConfigurationFram
 		this.endTextField.setEnabled(false);
 		this.stepSizeTextField.setEnabled(false);
 	}
+
+	@Override
+	public boolean useThreading() {
+		return true;
+	}
 }

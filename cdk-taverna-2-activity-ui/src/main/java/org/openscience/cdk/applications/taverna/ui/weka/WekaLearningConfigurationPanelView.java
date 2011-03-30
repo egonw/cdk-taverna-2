@@ -48,7 +48,7 @@ public class WekaLearningConfigurationPanelView extends JPanel {
 		panel_1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		FlowLayout flowLayout = (FlowLayout) panel_1.getLayout();
 		flowLayout.setAlignment(FlowLayout.LEFT);
-	//TODO:	add(panel_1, BorderLayout.SOUTH);
+		add(panel_1, BorderLayout.SOUTH);
 		
 		JLabel lblNewLabel_1 = new JLabel("Number of Threads:");
 		panel_1.add(lblNewLabel_1);

@@ -32,8 +32,6 @@ import java.util.UUID;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-import org.openscience.cdk.applications.taverna.setup.SetupController;
-
 /**
  * Class which controls the caching process.
  * 

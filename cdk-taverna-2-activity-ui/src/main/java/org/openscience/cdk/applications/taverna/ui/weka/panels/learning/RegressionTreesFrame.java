@@ -183,4 +183,9 @@ public class RegressionTreesFrame extends AbstractLearningConfigurationFrame {
 		this.higherLimitTextField.setEnabled(false);
 		this.stepSizeTextField.setEnabled(false);
 	}
+	
+	@Override
+	public boolean useThreading() {
+		return true;
+	}
 }

@@ -46,6 +46,7 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.CacheController;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.applications.taverna.basicutilities.ProgressLogger;
 import org.openscience.cdk.applications.taverna.setup.SetupController;
 
 /**
@@ -121,6 +122,7 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 	public void executeAsynch(final Map<String, T2Reference> inputs, final AsynchronousActivityCallback callback) {
 		this.inputs = inputs;
 		this.callback = callback;
+		ProgressLogger.getInstance().newFile(this.getActivityName());
 		// Don't execute service directly now, request to be run ask to be run
 		// from thread pool and return asynchronously
 		callback.requestRun(new Runnable() {

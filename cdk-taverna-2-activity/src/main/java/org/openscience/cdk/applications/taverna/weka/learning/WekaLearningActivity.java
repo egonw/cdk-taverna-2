@@ -114,22 +114,20 @@ public class WekaLearningActivity extends AbstractCDKActivity {
 		this.modelFiles = new String[options.length * dataset.size()];
 		for (int i = 0; i < options.length; i++) {
 			for (int j = 0; j < dataset.size(); j++) {
-				 
 				WekaLearningWork work = new WekaLearningWork();
 				work.classifierClass = (Class<? extends Classifier>) Class.forName(className);
 				work.option = options[i];
 				work.trainingSet = Filter.useFilter(dataset.get(j), tools.getIDRemover(dataset.get(j)));
-				work.id = id;File classifierFile = FileNameGenerator.getNewFile(directory,
-						 ".model", name + "_"
-						 + work.classifierClass.getSimpleName() + options[i].replaceAll(" ",
-						 ""), i + 1);
+				work.id = id;
+				File classifierFile = FileNameGenerator.getNewFile(directory, ".model", name + "_"
+						+ work.classifierClass.getSimpleName() + options[i].replaceAll(" ", ""), i + 1);
 				work.modelFile = classifierFile;
 				this.workList.add(work);
 				id++;
 			}
 		}
 		// //start workers
-		int numWorkers = 1	;//TODO numberOfThreads > this.workList.size() ? this.workList.size() : numberOfThreads;
+		int numWorkers = numberOfThreads > this.workList.size() ? this.workList.size() : numberOfThreads;
 		this.workers = new WekaLearningWorker[numWorkers];
 		for (int i = 0; i < numWorkers; i++) {
 			this.workers[i] = new WekaLearningWorker(this);
@@ -150,12 +148,12 @@ public class WekaLearningActivity extends AbstractCDKActivity {
 			return null;
 		}
 	}
-	
-	public synchronized void publishResult(WekaLearningWork work, Classifier classifier) throws Exception{
+
+	public synchronized void publishResult(WekaLearningWork work, Classifier classifier) throws Exception {
 		SerializationHelper.write(work.modelFile.getPath(), classifier);
 		this.modelFiles[work.id] = work.modelFile.getPath();
 	}
-	
+
 	/**
 	 * Final point for the workers.
 	 * 

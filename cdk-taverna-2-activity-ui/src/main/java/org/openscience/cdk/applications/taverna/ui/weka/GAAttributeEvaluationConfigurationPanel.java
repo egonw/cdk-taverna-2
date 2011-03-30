@@ -19,7 +19,7 @@ import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractLearningConfigurationFrame;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.LearningDatasetClassifierFrame;
 
-public class GAAttributSelectionConfigurationPanel extends
+public class GAAttributeEvaluationConfigurationPanel extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
 	private static final long serialVersionUID = 4885493705007067285L;
 	private static final String CONFIG_PACKAGE = "org.openscience.cdk.applications.taverna.ui.weka.panels.learning";
@@ -30,7 +30,7 @@ public class GAAttributSelectionConfigurationPanel extends
 
 	private AbstractCDKActivity activity;
 	private CDKActivityConfigurationBean configBean;
-	private GAAttributSelectionConfigurationPanelView view = new GAAttributSelectionConfigurationPanelView();
+	private GAAttributeEvaluationConfigurationPanelView view = new GAAttributeEvaluationConfigurationPanelView();
 
 	private ActionListener configureClassifierAction = new ActionListener() {
 
@@ -42,8 +42,15 @@ public class GAAttributSelectionConfigurationPanel extends
 			dialog.setVisible(true);
 		}
 	};
+	
+	private ActionListener algorithmComboBoxListener = new ActionListener() {
 
-	public GAAttributSelectionConfigurationPanel(AbstractCDKActivity activity) {
+		public void actionPerformed(ActionEvent e) {
+			setThreadingParam();
+		}
+	};
+
+	public GAAttributeEvaluationConfigurationPanel(AbstractCDKActivity activity) {
 		try {
 			this.activity = activity;
 			this.configBean = this.activity.getConfiguration();
@@ -58,6 +65,7 @@ public class GAAttributSelectionConfigurationPanel extends
 			}
 			DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel(learnerNames.toArray());
 			this.view.getAlgorithmComboBox().setModel(comboBoxModel);
+			this.view.getAlgorithmComboBox().addActionListener(this.algorithmComboBoxListener);
 			this.view.getBtnConfigure().addActionListener(this.configureClassifierAction);
 			this.add(this.view);
 			this.refreshConfiguration();
@@ -108,11 +116,23 @@ public class GAAttributSelectionConfigurationPanel extends
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, threads);
 	}
 
+	private void setThreadingParam() {
+		int threads = 1;
+		int idx = this.view.getAlgorithmComboBox().getSelectedIndex();
+		if (this.configFrames.get(idx).useThreading()) {
+			threads = (Integer) this.configBean
+					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS);
+			this.view.getThreadsTextField().setEnabled(true);
+		} else {
+			this.view.getThreadsTextField().setEnabled(false);
+		}
+		this.view.getThreadsTextField().setText("" + threads);
+	}
+
+	
 	@Override
 	public void refreshConfiguration() {
-		int threads = (Integer) this.configBean
-				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS);
-		this.view.getThreadsTextField().setText("" + threads);
+		this.setThreadingParam();
 		String currentOptions = (String) this.configBean
 				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_GA_ATTRIBUTE_SELECTION_OPTIONS);
 		if (currentOptions == null) {

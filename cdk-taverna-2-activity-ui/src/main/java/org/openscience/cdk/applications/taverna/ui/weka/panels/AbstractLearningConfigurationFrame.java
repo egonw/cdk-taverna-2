@@ -25,4 +25,6 @@ public abstract class AbstractLearningConfigurationFrame extends JPanel {
 	public abstract void setOptions(String[] options);
 	
 	public abstract void makeSingleOption();
+	
+	public abstract boolean useThreading();
 }

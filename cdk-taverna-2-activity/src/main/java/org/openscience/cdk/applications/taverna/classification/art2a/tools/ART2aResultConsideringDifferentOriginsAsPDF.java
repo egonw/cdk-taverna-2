@@ -107,7 +107,7 @@ public class ART2aResultConsideringDifferentOriginsAsPDF extends AbstractCDKActi
 			Art2aClassificator classificator;
 			XMLFileIO xmlFileIO = new XMLFileIO();
 			ChartTool chartTool = new ChartTool();
-			ArrayList<JFreeChart> charts = new ArrayList<JFreeChart>();
+			ArrayList<Object> charts = new ArrayList<Object>();
 			for (String fileName : files) {
 				try {
 					xmlReader = xmlFileIO.getXMLStreamReaderWithCompression(fileName);

@@ -22,7 +22,6 @@
 package org.openscience.cdk.applications.taverna.io;
 
 import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -35,10 +34,7 @@ import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.CMLChemFile;
-import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.io.MDLReader;
 
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;

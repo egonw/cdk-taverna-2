@@ -22,8 +22,6 @@
 package org.openscience.cdk.applications.taverna.io;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +36,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.basicutilities.Tools;
-import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileWriter;
 
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSink;

@@ -81,10 +81,10 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 		Instances dataset = null;
 		Clusterer clusterer = null;
 		ChartTool chartTool = new ChartTool();
-		ArrayList<JFreeChart> charts = null;
+		ArrayList<Object> charts = null;
 		WekaTools tools = new WekaTools();
 		for (int i = 2; i < files.size(); i++) { // The first two file are data files
-			charts = new ArrayList<JFreeChart>();
+			charts = new ArrayList<Object>();
 			try {
 				// Load clusterer
 				clusterer = (Clusterer) SerializationHelper.read(files.get(i));

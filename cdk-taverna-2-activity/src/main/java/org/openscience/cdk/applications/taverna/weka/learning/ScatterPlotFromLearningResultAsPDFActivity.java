@@ -23,6 +23,7 @@ package org.openscience.cdk.applications.taverna.weka.learning;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -37,18 +38,19 @@ import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.DefaultXYDataset;
+import org.jfree.data.xy.IntervalXYDataset;
 import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.YIntervalSeries;
+import org.jfree.data.xy.YIntervalSeriesCollection;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.basicutilities.ChartTool;
+import org.openscience.cdk.applications.taverna.basicutilities.CollectionUtilities;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
-import weka.classifiers.evaluation.NominalPrediction;
-import weka.classifiers.evaluation.ThresholdCurve;
-import weka.core.FastVector;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
 import weka.filters.Filter;
@@ -129,7 +131,7 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 				uuids.add(uuid);
 				orgClassMap.put(uuid, Double.valueOf(frag[1]));
 			}
-			List<JFreeChart> rmseCharts = new ArrayList<JFreeChart>();
+			List<Object> rmseCharts = new ArrayList<Object>();
 			List<Double> trainMeanRMSE = new ArrayList<Double>();
 			List<Double> testMeanRMSE = new ArrayList<Double>();
 			List<Double> cvMeanRMSE = new ArrayList<Double>();
@@ -147,12 +149,15 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 				HashSet<Integer> testSkippedRMSE = new HashSet<Integer>();
 				List<Double> cvRMSE = new ArrayList<Double>();
 				HashSet<Integer> cvSkippedRMSE = new HashSet<Integer>();
-				List<JFreeChart> charts = new LinkedList<JFreeChart>();
-				List<String> summary = new LinkedList<String>();
+				List<Object> chartsObjects = new LinkedList<Object>();
 				File modelFile = null;
 				Classifier classifier = null;
 				String name = "";
 				for (int j = 0; j < trainDataFiles.size(); j++) {
+					LinkedList<Double> predictedValues = new LinkedList<Double>();
+					LinkedList<Double> orgValues = new LinkedList<Double>();
+					LinkedList<Double[]> yResidueValues = new LinkedList<Double[]>();
+					LinkedList<String> yResidueNames = new LinkedList<String>();
 					if (modelFiles.isEmpty()) {
 						break;
 					}
@@ -169,12 +174,12 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 					Instances trainset = (Instances) SerializationHelper.read(trainDataFiles.get(j).getPath());
 					Instances trainUUIDSet = Filter.useFilter(trainset, tools.getIDGetter(trainset));
 					trainset = Filter.useFilter(trainset, tools.getIDRemover(trainset));
-					double trainingSetRatio = 1.0;
+					double trainingSetRatio = 100.0;
 					if (testset != null) {
 						trainingSetRatio = trainset.numInstances()
 								/ (double) (trainset.numInstances() + testset.numInstances());
 					}
-					trainingSetRatios.add(trainingSetRatio);
+					trainingSetRatios.add(trainingSetRatio * 100);
 					// Predict
 					for (int k = 0; k < trainset.numInstances(); k++) {
 						UUID uuid = UUID.fromString(trainUUIDSet.instance(k).stringValue(0));
@@ -188,13 +193,23 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 					String trainSeries = "Training Set (RMSE: "
 							+ String.format("%.2f", trainEval.rootMeanSquaredError()) + ")";
 					XYSeries series = new XYSeries(trainSeries);
+					Double[] yTrainResidues = new Double[trainUUIDSet.numInstances()];
+					Double[] orgTrain = new Double[trainUUIDSet.numInstances()];
+					Double[] calc = new Double[trainUUIDSet.numInstances()];
 					for (int k = 0; k < trainUUIDSet.numInstances(); k++) {
 						UUID uuid = UUID.fromString(trainUUIDSet.instance(k).stringValue(0));
-						double org = orgClassMap.get(uuid);
-						double calc = calcClassMap.get(uuid);
-						series.add(org, calc);
+						orgTrain[k] = orgClassMap.get(uuid);
+						calc[k] = calcClassMap.get(uuid);
+						series.add(orgTrain[k].doubleValue(), calc[k]);
+						yTrainResidues[k] = calc[k].doubleValue() - orgTrain[k].doubleValue();
 					}
+					orgValues.addAll(Arrays.asList(orgTrain));
+					predictedValues.addAll(Arrays.asList(calc));
+					CollectionUtilities.sortTwoArrays(orgTrain, yTrainResidues);
+					yResidueValues.add(yTrainResidues);
+					yResidueNames.add(trainSeries);
 					xyDataSet.addSeries(trainSeries, series.toArray());
+
 					// Summary
 					sum += "Training Set:\n";
 					if (trainEval.rootRelativeSquaredError() > 300) {
@@ -218,12 +233,21 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 						String testSeries = "Test Set (RMSE: " + String.format("%.2f", testEval.rootMeanSquaredError())
 								+ ")";
 						series = new XYSeries(testSeries);
+						Double[] yTestResidues = new Double[testUUIDSet.numInstances()];
+						Double[] orgTest = new Double[testUUIDSet.numInstances()];
+						calc = new Double[testUUIDSet.numInstances()];
 						for (int k = 0; k < testUUIDSet.numInstances(); k++) {
 							UUID uuid = UUID.fromString(testUUIDSet.instance(k).stringValue(0));
-							double org = orgClassMap.get(uuid);
-							double calc = calcClassMap.get(uuid);
-							series.add(org, calc);
+							orgTest[k] = orgClassMap.get(uuid);
+							calc[k] = calcClassMap.get(uuid);
+							series.add(orgTest[k].doubleValue(), calc[k].doubleValue());
+							yTestResidues[k] = calc[k].doubleValue() - orgTest[k].doubleValue();
 						}
+						orgValues.addAll(Arrays.asList(orgTest));
+						predictedValues.addAll(Arrays.asList(calc));
+						CollectionUtilities.sortTwoArrays(orgTest, yTestResidues);
+						yResidueValues.add(yTestResidues);
+						yResidueNames.add(testSeries);
 						xyDataSet.addSeries(testSeries, series.toArray());
 						// Create summary
 						sum += "\nTest Set:\n";
@@ -249,11 +273,36 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 						cvRMSE.add(cvEval.rootMeanSquaredError());
 						sum += cvEval.toSummaryString(true);
 					}
-					summary.add(sum);
+
 					// Create scatter plot
-					charts.add(chartTool.createScatterPlot(xyDataSet, classifier.getClass().getSimpleName()
-							+ "\n Training set ratio: " + String.format("%.2f", trainingSetRatios.get(j)) + "%"
-							+ "\n Model name: " + modelFile.getName(), "Original values", "Predicted values"));
+					String header = classifier.getClass().getSimpleName() + "\n Training set ratio: "
+							+ String.format("%.2f", trainingSetRatios.get(j)) + "%" + "\n Model name: "
+							+ modelFile.getName();
+					chartsObjects.add(chartTool.createScatterPlot(xyDataSet, header, "Original values",
+							"Predicted values"));
+					// Create residue plot
+					chartsObjects.add(chartTool.createResiduePlot(yResidueValues, header, "Index",
+							"(Predicted - Original)", yResidueNames));
+					// Create curve
+					Double[] tmpOrg = new Double[orgValues.size()];
+					tmpOrg = orgValues.toArray(tmpOrg);
+					Double[] tmpPred = new Double[predictedValues.size()];
+					tmpPred = predictedValues.toArray(tmpPred);
+					CollectionUtilities.sortTwoArrays(tmpOrg, tmpPred);
+					DefaultXYDataset dataSet = new DefaultXYDataset();
+					String orgName = "Original";
+					XYSeries orgSeries = new XYSeries(orgName);
+					String predName = "Predicted";
+					XYSeries predSeries = new XYSeries(predName);
+					for (int k = 0; k < tmpOrg.length; k++) {
+						orgSeries.add((k + 1), tmpOrg[k]);
+						predSeries.add((k + 1), tmpPred[k]);
+					}
+					dataSet.addSeries(orgName, orgSeries.toArray());
+					dataSet.addSeries(predName, predSeries.toArray());
+					chartsObjects.add(chartTool.createXYLineChart(header, "Index", "Value", dataSet, true, false));
+					// Add summary
+					chartsObjects.add(sum);
 				}
 				// Create RMSE Plot
 				DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
@@ -299,12 +348,12 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 				}
 				JFreeChart rmseChart = chartTool.createLineChart(
 						"RMSE Plot\n Classifier:" + name + " " + tools.getOptionsFromFile(modelFile, name),
-						"(Training set ratio/Set Index/File index)", "RMSE", dataSet, false);
-				charts.add(rmseChart);
+						"(Training set ratio/Set Index/File index)", "RMSE", dataSet, false, true);
+				chartsObjects.add(rmseChart);
 				rmseCharts.add(rmseChart);
 				// Write PDF
 				File file = FileNameGenerator.getNewFile(directory, ".pdf", "ScatterPlot");
-				chartTool.writeChartAsPDF(file, charts, summary);
+				chartTool.writeChartAsPDF(file, chartsObjects);
 				resultFiles.add(file.getPath());
 				fileIDX++;
 			}
@@ -312,7 +361,7 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 			for (int i = 0; i < ratioRMSESet.length; i++) {
 				JFreeChart rmseChart = chartTool.createLineChart(
 						"Set RMSE plot\n" + "(" + String.format("%.2f", trainingSetRatios.get(i)) + "%/" + (i + 1)
-								+ ")", "(Training set ratio/Index)", "RMSE", ratioRMSESet[i], false);
+								+ ")", "(Training set ratio/Index)", "RMSE", ratioRMSESet[i], false, true);
 				rmseCharts.add(rmseChart);
 			}
 			// Create mean RMSE plot

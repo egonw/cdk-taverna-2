@@ -15,6 +15,27 @@ import java.util.Map.Entry;
  */
 public class CollectionUtilities {
 
+	public synchronized static void sortTwoArrays(Double[] queryList, Double[] secondList) {
+		if (queryList.length != secondList.length) {
+			throw new IllegalArgumentException("The lists have to be of equal size!");
+		}
+		int n = queryList.length;
+		for (int i = 0; i < n; i++) {
+			for (int j = n - 1; j > i; j--) {
+				double one = queryList[j - 1].doubleValue();
+				double two = queryList[j].doubleValue();
+				if (one > two) {
+					queryList[j - 1] = two;
+					queryList[j] = one;
+
+					Double temp = secondList[j - 1];
+					secondList[j - 1] = secondList[j];
+					secondList[j] = temp;
+				}
+			}
+		}
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public synchronized static void sortTwoLists(List<Integer> queryList, List secondList) {
 		if (queryList.size() != secondList.size()) {
@@ -36,7 +57,7 @@ public class CollectionUtilities {
 			}
 		}
 	}
-
+	
 	/**
 	 * Returns a sorted entry set of given map.
 	 * 

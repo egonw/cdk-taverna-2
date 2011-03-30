@@ -22,28 +22,20 @@
 package org.openscience.cdk.applications.taverna.weka.learning;
 
 import java.io.File;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 
-import org.hibernate.cfg.ExtendsQueueEntry;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.basicutilities.ProgressLogger;
-import org.openscience.cdk.applications.taverna.weka.utilities.AttributeSelectionGenome;
-import org.openscience.cdk.applications.taverna.weka.utilities.GASelectionWorker;
-import org.openscience.cdk.applications.taverna.weka.utilities.WekaLearningWorker;
-import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
+import org.openscience.cdk.applications.taverna.weka.utilities.GAAttributeEvaluationGenome;
+import org.openscience.cdk.applications.taverna.weka.utilities.GAAttributeEvaluationWorker;
 
 import weka.classifiers.Classifier;
-import weka.classifiers.functions.LibSVM;
-import weka.classifiers.functions.LinearRegression;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSink;
 
@@ -53,7 +45,7 @@ import weka.core.converters.ConverterUtils.DataSink;
  * @author Andreas Truzskowski
  * 
  */
-public class GAAttributeSelectionActivity extends AbstractCDKActivity {
+public class GAAttributeEvaluationActivity extends AbstractCDKActivity {
 
 	public double ATTR_MUTATION_RATE = 0.07;
 	public double CROSS_OVER_RATE = 0.05;
@@ -70,14 +62,14 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 
 	public static final String CREATE_WEKA_LEARNING_DATASET_ACTIVITY = "GA Attribute Selection";
 
-	private AttributeSelectionGenome[] individuals = null;
+	private GAAttributeEvaluationGenome[] individuals = null;
 	private int currentWork = 0;
-	private GASelectionWorker[] workers = null;
+	private GAAttributeEvaluationWorker[] workers = null;
 
 	/**
 	 * Creates a new instance.
 	 */
-	public GAAttributeSelectionActivity() {
+	public GAAttributeEvaluationActivity() {
 		this.INPUT_PORTS = new String[] { "Weka Learning Dataset" };
 		this.OUTPUT_PORTS = new String[] { "Optimized Dataset", "Attribut Setup CSV" };
 	}
@@ -118,21 +110,21 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 		this.classifierClass = Class.forName(optionArray[5]);
 		this.classifierOptions = optionArray[6];
 		int threads = (Integer)this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS);
-		workers = new GASelectionWorker[threads];
+		workers = new GAAttributeEvaluationWorker[threads];
 		// Do work
 		ArrayList<String> resultSetFiles = new ArrayList<String>();
 		ArrayList<String> resultAttrCSV = new ArrayList<String>();
 		try {
-			this.individuals = new AttributeSelectionGenome[NUMBER_OF_INDIVIDUALS];
+			this.individuals = new GAAttributeEvaluationGenome[NUMBER_OF_INDIVIDUALS];
 			for (int numAttr = MIN_ATTRIBUTES; numAttr <= MAX_ATTRIBUTES; numAttr += STEPSIZE) {
 				// Initialize individuals
 				for (int i = 0; i < NUMBER_OF_INDIVIDUALS; i++) {
-					this.individuals[i] = new AttributeSelectionGenome(orgDataset);
+					this.individuals[i] = new GAAttributeEvaluationGenome(orgDataset);
 					if (attrOpt.length == 3) {
 						this.individuals[i].setAttrRestriction(numAttr);
 					}
 				}
-				AttributeSelectionGenome allTimeBest = null;
+				GAAttributeEvaluationGenome allTimeBest = null;
 				if (attrOpt.length == 3) {
 				ProgressLogger.getInstance().writeProgress(this.getActivityName(),
 						"Number of Attributes: " + numAttr + "\n");
@@ -157,7 +149,7 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 					// Do scoring
 					this.currentWork = 0;
 					for (int j = 0; j < this.workers.length; j++) {
-						this.workers[j] = new GASelectionWorker(this);
+						this.workers[j] = new GAAttributeEvaluationWorker(this);
 						this.workers[j].start();
 					}
 					synchronized (this) {
@@ -177,10 +169,10 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 						maxScore = Math.max(maxScore, this.individuals[j].getScore());
 						minScore = Math.min(minScore, this.individuals[j].getScore());
 						if (allTimeBest == null) {
-							allTimeBest = (AttributeSelectionGenome) this.individuals[j].clone();
+							allTimeBest = (GAAttributeEvaluationGenome) this.individuals[j].clone();
 						} else {
 							if (allTimeBest.getScore() < this.individuals[j].getScore()) {
-								allTimeBest = (AttributeSelectionGenome) this.individuals[j].clone();
+								allTimeBest = (GAAttributeEvaluationGenome) this.individuals[j].clone();
 							}
 						}
 					}
@@ -188,7 +180,7 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 					for (int j = 0; j < this.individuals.length; j++) {
 						normSum += this.individuals[j].getScore() - minScore;
 					}
-					AttributeSelectionGenome[] fittestIndividuals = new AttributeSelectionGenome[NUMBER_OF_INDIVIDUALS];
+					GAAttributeEvaluationGenome[] fittestIndividuals = new GAAttributeEvaluationGenome[NUMBER_OF_INDIVIDUALS];
 					for (int j = 1; j < NUMBER_OF_INDIVIDUALS; j++) {
 						double r = rand.nextDouble();
 						double sum = 0;
@@ -198,7 +190,7 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 								fittestIndividuals[j] = this.individuals[k];
 							} else {
 								if (r < sum) {
-									fittestIndividuals[j] = (AttributeSelectionGenome) this.individuals[k].clone();
+									fittestIndividuals[j] = (GAAttributeEvaluationGenome) this.individuals[k].clone();
 									break;
 								}
 							}
@@ -207,7 +199,7 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 					// Apply all time best
 					ProgressLogger.getInstance().writeProgress(this.getActivityName(), "AllTimeBest - RMSE: " + allTimeBest.getRmse() + " - Score: " + allTimeBest.getScore()
 							+ "\n");
-					fittestIndividuals[0] = (AttributeSelectionGenome) allTimeBest.clone();
+					fittestIndividuals[0] = (GAAttributeEvaluationGenome) allTimeBest.clone();
 					this.individuals = fittestIndividuals;
 				}
 				File file = FileNameGenerator.getNewFile(FileNameGenerator.getCacheDir(), ".arff", "Attributes_"
@@ -215,7 +207,6 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 				DataSink.write(file.getPath(), allTimeBest.getOptDataset());
 				resultSetFiles.add(file.getPath());
 				resultAttrCSV.add(allTimeBest.getAttributeSetupCSV());
-				System.out.println("# Attributes: " + numAttr + " - RMSE: " + allTimeBest.getRmse());
 			}
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError("Error during learning dataset creation!", this.getActivityName(), e);
@@ -226,7 +217,7 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 		this.setOutputAsStringList(resultAttrCSV, this.OUTPUT_PORTS[1]);
 	}
 
-	public synchronized AttributeSelectionGenome getWork() {
+	public synchronized GAAttributeEvaluationGenome getWork() {
 		if (this.currentWork < this.individuals.length) {
 			return this.individuals[this.currentWork++];
 		}
@@ -239,9 +230,9 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 		return classifier;
 	}
 	
-	public void workerDone() {
+	public synchronized void workerDone() {
 		boolean allDone = true;
-		for (GASelectionWorker worker : this.workers) {
+		for (GAAttributeEvaluationWorker worker : this.workers) {
 			if (!worker.isDone()) {
 				allDone = false;
 				break;
@@ -256,7 +247,7 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getActivityName() {
-		return GAAttributeSelectionActivity.CREATE_WEKA_LEARNING_DATASET_ACTIVITY;
+		return GAAttributeEvaluationActivity.CREATE_WEKA_LEARNING_DATASET_ACTIVITY;
 	}
 
 	@Override
@@ -268,7 +259,7 @@ public class GAAttributeSelectionActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getDescription() {
-		return "Description: " + GAAttributeSelectionActivity.CREATE_WEKA_LEARNING_DATASET_ACTIVITY;
+		return "Description: " + GAAttributeEvaluationActivity.CREATE_WEKA_LEARNING_DATASET_ACTIVITY;
 	}
 
 	@Override

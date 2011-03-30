@@ -77,6 +77,7 @@ public class CDKTavernaConstants {
 	public static final String PROPERTY_CREATE_SET_OPTIONS = "CREATE SET OPTIONS";
 	public static final String PROPERTY_SCATTER_PLOT_OPTIONS = "SCATTER PLOT OPTIONS";
 	public static final String PROPERTY_GA_ATTRIBUTE_SELECTION_OPTIONS = "GA ATTRIBUTE SELECTION OPTIONS";
+	public static final String PROPERTY_ATTRIBUTE_SELECTION_OPTIONS = "ATTRIBUTE SELECTION OPTIONS";
 	
 	// --------------------Miscellaneous-------------------------------------
 	public static final String MOLECULEID = "MOLECULEID";

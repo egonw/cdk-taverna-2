@@ -172,8 +172,8 @@ org.openscience.cdk.applications.taverna.weka.clustering.SplitMoleculesIntoClust
 org.openscience.cdk.applications.taverna.weka.learning.WekaLearningActivity
 org.openscience.cdk.applications.taverna.weka.learning.ScatterPlotFromLearningResultAsPDFActivity
 org.openscience.cdk.applications.taverna.weka.learning.CreateWekaLearningSetActivity
-org.openscience.cdk.applications.taverna.weka.learning.DatasetAttributSelectionActivity
-org.openscience.cdk.applications.taverna.weka.learning.GAAttributeSelectionActivity
+org.openscience.cdk.applications.taverna.weka.learning.AttributeEvaluationActivity
+org.openscience.cdk.applications.taverna.weka.learning.GAAttributeEvaluationActivity
 org.openscience.cdk.applications.taverna.weka.learning.SplitDatasetIntoTrainTestsetActivity
 org.openscience.cdk.applications.taverna.modelling.CoordinatesGenerator2DAcitivity
 org.openscience.cdk.applications.taverna.modelling.MM2_3DCoordinatesGeneratorActivity

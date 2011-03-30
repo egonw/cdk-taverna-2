@@ -324,4 +324,9 @@ public class SupportVectorMachinesFrame extends AbstractLearningConfigurationFra
 		this.gammaHighTextField.setEnabled(false);
 		this.gammaStepsizeTextField.setEnabled(false);
 	}
+	
+	@Override
+	public boolean useThreading() {
+		return false;
+	}
 }

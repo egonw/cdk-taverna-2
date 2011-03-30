@@ -88,7 +88,7 @@ public class GenerateSilhouettePlotFromClusteringResultAsPDFActivity extends Abs
 		HashMap<Integer, LinkedList<Integer>> meanClustersMap = new HashMap<Integer, LinkedList<Integer>>();
 		HashMap<Integer, String> idNameMap = new HashMap<Integer, String>();
 		File parent = null;
-		List<JFreeChart> charts = new LinkedList<JFreeChart>();
+		List<Object> charts = new LinkedList<Object>();
 		for (int i = 2; i < files.size(); i++) { // The first two file are data files
 			WekaTools tools = new WekaTools();
 			charts.clear();

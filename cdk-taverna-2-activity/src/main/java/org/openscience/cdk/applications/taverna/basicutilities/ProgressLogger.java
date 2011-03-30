@@ -28,8 +28,9 @@ public class ProgressLogger {
 		File file = this.activityFileMap.get(activityName);
 		PrintWriter writer;
 		try {
-			if (file == null) {
-				file = new File(FileNameGenerator.getLogDir() + File.separator + activityName + ".log");
+			if (file == null || !file.exists()) {
+				String name = activityName.replaceAll("/", "").replaceAll(" ", "").replaceAll("-", "");
+				file = FileNameGenerator.getNewFile(FileNameGenerator.getLogDir(), ".log", name);
 				this.activityFileMap.put(activityName, file);
 				writer = new PrintWriter(new FileOutputStream(file, false));
 				writer.append(tmpDate.toString() + ": **" + activityName.replaceAll(".", "*") + "**\n");
@@ -39,14 +40,17 @@ public class ProgressLogger {
 			} else {
 				writer = new PrintWriter(new FileOutputStream(file, true));
 			}
-			writer = new PrintWriter(new FileOutputStream(file, true));
 			String[] strings = progress.split("\\n");
-			for(String s : strings) {
-			writer.append(tmpDate.toString() + ": " + s + "\n");
+			for (String s : strings) {
+				writer.append(tmpDate.toString() + ": " + s + "\n");
 			}
 			writer.close();
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError("Could not write progress!", "ProgressLogger", e);
 		}
+	}
+
+	public void newFile(String activityName) {
+		this.activityFileMap.remove(activityName);
 	}
 }

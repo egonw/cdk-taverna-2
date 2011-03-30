@@ -21,12 +21,8 @@
  */
 package org.openscience.cdk.applications.taverna.weka.learning;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
@@ -35,15 +31,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
-import weka.classifiers.Classifier;
-import weka.classifiers.Evaluation;
-import weka.classifiers.functions.LibSVM;
-import weka.clusterers.EM;
-import weka.core.Attribute;
-import weka.core.FastVector;
-import weka.core.Instance;
 import weka.core.Instances;
-import weka.filters.Filter;
 
 /**
  * Class which represents the create Weka learning dataset activity.

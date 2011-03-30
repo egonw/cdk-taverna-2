@@ -113,9 +113,9 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 		Clusterer clusterer = null;
 		ChartTool chartTool = new ChartTool();
 		ArrayList<File> tempFileList = new ArrayList<File>();
-		ArrayList<JFreeChart> charts = null;
+		ArrayList<Object> charts = null;
 		for (int i = 2; i < files.size(); i++) { // The first two file are data files
-			charts = new ArrayList<JFreeChart>();
+			charts = new ArrayList<Object>();
 			tempFileList.clear();
 			WekaTools tools = new WekaTools();
 			try {
