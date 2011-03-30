@@ -91,13 +91,14 @@ public class AttributeEvaluationActivity extends AbstractCDKActivity {
 		LinkedList<Integer> removedAttributes = new LinkedList<Integer>();
 		this.currentSet = dataset;
 		ArrayList<String> attrInfo = new ArrayList<String>();
+		ProgressLogger.getInstance().writeProgress(this.getActivityName(), "Starting work");
 		for (int i = 0; i < dataset.numAttributes() - 3; i++) {
 			// remove ID
 			this.currentSet = Filter.useFilter(this.currentSet, tools.getIDRemover(this.currentSet));
 			this.rmses = new double[currentSet.numAttributes() - 1];
 			// Calculate RMSEs
 			this.currentIndex = 0;
-			ProgressLogger.getInstance().writeProgress(this.getActivityName(), "Starting workers");
+			
 			this.workers = new AttributeEvaluationWorker[threads];
 			for(int j = 0; j < this.workers.length; j++) {
 				this.workers[j] = new AttributeEvaluationWorker(this);
