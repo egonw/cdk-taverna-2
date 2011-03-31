@@ -74,7 +74,7 @@ public class GAAttributeEvaluationActivity extends AbstractCDKActivity {
 	 */
 	public GAAttributeEvaluationActivity() {
 		this.INPUT_PORTS = new String[] { "Weka Learning Dataset" };
-		this.OUTPUT_PORTS = new String[] { "Optimized Dataset", "Attribut Setup CSV" };
+		this.OUTPUT_PORTS = new String[] { "Optimized Datasets", "Attribut Setup CSV" };
 	}
 
 	@Override
@@ -117,7 +117,7 @@ public class GAAttributeEvaluationActivity extends AbstractCDKActivity {
 		int threads = (Integer)this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS);
 		workers = new GAAttributeEvaluationWorker[threads];
 		// Do work
-		ArrayList<String> resultSetFiles = new ArrayList<String>();
+		ArrayList<Instances> resultSets = new ArrayList<Instances>();
 		ArrayList<String> resultAttrCSV = new ArrayList<String>();
 		try {
 			this.individuals = new GAAttributeEvaluationGenome[NUMBER_OF_INDIVIDUALS];
@@ -207,10 +207,7 @@ public class GAAttributeEvaluationActivity extends AbstractCDKActivity {
 					fittestIndividuals[0] = (GAAttributeEvaluationGenome) allTimeBest.clone();
 					this.individuals = fittestIndividuals;
 				}
-				File file = FileNameGenerator.getNewFile(FileNameGenerator.getCacheDir(), ".arff", "Attributes_"
-						+ (allTimeBest.getOptDataset().numAttributes() - 2));
-				DataSink.write(file.getPath(), allTimeBest.getOptDataset());
-				resultSetFiles.add(file.getPath());
+				resultSets.add(allTimeBest.getOptDataset());
 				resultAttrCSV.add(allTimeBest.getAttributeSetupCSV());
 			}
 		} catch (Exception e) {
@@ -218,7 +215,7 @@ public class GAAttributeEvaluationActivity extends AbstractCDKActivity {
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		// Set output
-		this.setOutputAsStringList(resultSetFiles, this.OUTPUT_PORTS[0]);
+		this.setOutputAsObjectList(resultSets, this.OUTPUT_PORTS[0]);
 		this.setOutputAsStringList(resultAttrCSV, this.OUTPUT_PORTS[1]);
 	}
 
