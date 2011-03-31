@@ -9,6 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 import javax.swing.JSeparator;
+import javax.swing.JCheckBox;
 
 public class AttributeEvaluationConfigurationPanelView extends JPanel {
 	private JLabel lblSelectAlgorithm;
@@ -16,9 +17,11 @@ public class AttributeEvaluationConfigurationPanelView extends JPanel {
 	private JButton btnConfigure;
 	private JLabel lblNumberOfThreads;
 	private JTextField threadsTextField;
+	private JCheckBox cvCheckBox;
+	private JTextField cvTextField;
 	public AttributeEvaluationConfigurationPanelView() {
 		setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		setPreferredSize(new Dimension(445, 85));
+		setPreferredSize(new Dimension(445, 120));
 		SpringLayout springLayout = new SpringLayout();
 		setLayout(springLayout);
 		
@@ -49,6 +52,19 @@ public class AttributeEvaluationConfigurationPanelView extends JPanel {
 		springLayout.putConstraint(SpringLayout.EAST, threadsTextField, -281, SpringLayout.EAST, this);
 		add(threadsTextField);
 		threadsTextField.setColumns(10);
+		
+		cvCheckBox = new JCheckBox("Use Cross-Validation. Number of folds:");
+		springLayout.putConstraint(SpringLayout.NORTH, cvCheckBox, 16, SpringLayout.SOUTH, algorithmComboBox);
+		springLayout.putConstraint(SpringLayout.WEST, cvCheckBox, 10, SpringLayout.WEST, this);
+		add(cvCheckBox);
+		
+		cvTextField = new JTextField();
+		springLayout.putConstraint(SpringLayout.NORTH, cvTextField, 1, SpringLayout.NORTH, cvCheckBox);
+		springLayout.putConstraint(SpringLayout.WEST, cvTextField, 6, SpringLayout.EAST, cvCheckBox);
+		springLayout.putConstraint(SpringLayout.EAST, cvTextField, 56, SpringLayout.EAST, cvCheckBox);
+		cvTextField.setText("10");
+		add(cvTextField);
+		cvTextField.setColumns(10);
 	}
 	
 	public JComboBox getAlgorithmComboBox() {
@@ -61,5 +77,11 @@ public class AttributeEvaluationConfigurationPanelView extends JPanel {
 
 	public JTextField getThreadsTextField() {
 		return threadsTextField;
+	}
+	public JCheckBox getCvCheckBox() {
+		return cvCheckBox;
+	}
+	public JTextField getCvTextField() {
+		return cvTextField;
 	}
 }

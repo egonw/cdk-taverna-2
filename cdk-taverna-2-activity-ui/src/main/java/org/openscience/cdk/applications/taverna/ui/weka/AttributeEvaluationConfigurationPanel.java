@@ -82,6 +82,8 @@ public class AttributeEvaluationConfigurationPanel extends
 		int idx = this.view.getAlgorithmComboBox().getSelectedIndex();
 		options += this.configFrames.get(idx).getConfiguredClass().getName() + ";";
 		options += this.configFrames.get(idx).getOptions()[0] + ";";
+		options += this.view.getCvCheckBox().isSelected() + ";";
+		options += this.view.getCvTextField().getText() + ";";
 		return options;
 	}
 
@@ -139,7 +141,8 @@ public class AttributeEvaluationConfigurationPanel extends
 				break;
 			}
 		}
-
+		this.view.getCvCheckBox().setSelected(Boolean.parseBoolean(opt[2]));
+		this.view.getCvTextField().setText(opt[3]);
 	}
 
 	@Override

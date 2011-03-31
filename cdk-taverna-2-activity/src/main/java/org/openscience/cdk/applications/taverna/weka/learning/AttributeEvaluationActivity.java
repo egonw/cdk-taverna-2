@@ -49,6 +49,9 @@ public class AttributeEvaluationActivity extends AbstractCDKActivity {
 
 	private AttributeEvaluationWorker[] workers = null;
 
+	public boolean USE_CV = false;
+	public int FOLDS = 10;
+	
 	private Class<?> classifierClass = null;
 	private String classifierOptions = null;
 	private Instances currentSet = null;
@@ -84,6 +87,8 @@ public class AttributeEvaluationActivity extends AbstractCDKActivity {
 		String[] optionArray = options.split(";");
 		this.classifierClass = Class.forName(optionArray[0]);
 		this.classifierOptions = optionArray[1];
+		USE_CV = Boolean.parseBoolean(optionArray[2]);
+		FOLDS = Integer.parseInt(optionArray[3]);
 		int threads = (Integer) this.getConfiguration().getAdditionalProperty(
 				CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS);
 		// Do work
@@ -195,6 +200,14 @@ public class AttributeEvaluationActivity extends AbstractCDKActivity {
 	@Override
 	public String getFolderName() {
 		return CDKTavernaConstants.WEKA_LEARNING_FOLDER_NAME;
+	}
+
+	public boolean isUSE_CV() {
+		return USE_CV;
+	}
+
+	public int getFOLDS() {
+		return FOLDS;
 	}
 
 }

@@ -1,5 +1,7 @@
 package org.openscience.cdk.applications.taverna.weka.utilities;
 
+import java.util.Random;
+
 import org.openscience.cdk.applications.taverna.weka.learning.AttributeEvaluationActivity;
 import org.openscience.cdk.applications.taverna.weka.learning.GAAttributeEvaluationActivity;
 
@@ -27,9 +29,13 @@ public class AttributeEvaluationWorker extends Thread {
 				// Calculate score
 				Instances work = Filter.useFilter(currentSet, tools.getAttributRemover(currentSet, idx + 1));
 				Classifier classifier = this.owner.getClassifier();
-				classifier.buildClassifier(work);
 				Evaluation eval = new Evaluation(work);
-				eval.evaluateModel(classifier, work);
+				if (this.owner.isUSE_CV()) {
+					eval.crossValidateModel(classifier, work, this.owner.getFOLDS(), new Random(1));
+				} else {
+					classifier.buildClassifier(work);
+					eval.evaluateModel(classifier, work);
+				}
 				double rmse = eval.rootMeanSquaredError();
 				this.owner.publishResult(rmse, idx);
 			}
