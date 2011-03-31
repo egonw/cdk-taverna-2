@@ -120,6 +120,8 @@ public class WekaLearningConfigurationPanelController extends
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_LEARNER_NAME, name);
 		String opts = this.getConfString();
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_LEARNER_OPTIONS, opts);
+		int threads = Integer.parseInt(this.view.getThreadsTextField().getText());
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, threads);
 	}
 
 	private String getConfString() {

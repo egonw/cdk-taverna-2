@@ -206,6 +206,7 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelController extends
 			this.view.getIterationsTextField().setText(options[6]);
 			this.view.getUseBlacklistingCheckBox().setSelected(Boolean.parseBoolean(options[7]));
 			this.view.getChooseBestCheckBox().setSelected(Boolean.parseBoolean(options[8]));
+			this.view.getBlLengthTextField().setText(options[9]);
 			this.view.getIterationsTextField().setEnabled(true);
 			this.view.getClassifierComboBox().setEnabled(true);
 			this.view.getUseBlacklistingCheckBox().setEnabled(true);

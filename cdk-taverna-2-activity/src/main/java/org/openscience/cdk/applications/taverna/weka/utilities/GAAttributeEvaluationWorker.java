@@ -22,7 +22,7 @@ public class GAAttributeEvaluationWorker extends Thread {
 				individual.updateDataset();
 				// Calculate score
 				Classifier classifier = this.owner.getClassifier();
-				individual.calculateScore(classifier);
+				individual.calculateScore(classifier, this.owner.isUSE_CV(), this.owner.getFOLDS());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -96,7 +96,7 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelView extends JPanel {
 		springLayout.putConstraint(SpringLayout.WEST, iterationsTextField, 13, SpringLayout.EAST, lblIterations);
 		add(lblIterations);
 
-		useBlacklistingCheckBox = new JCheckBox("Use Blacklisting. Length:");
+		useBlacklistingCheckBox = new JCheckBox("Use Blacklisting. Length (in % of set size):");
 		springLayout.putConstraint(SpringLayout.NORTH, useBlacklistingCheckBox, 6, SpringLayout.SOUTH, iterationsTextField);
 		springLayout.putConstraint(SpringLayout.WEST, useBlacklistingCheckBox, 0, SpringLayout.WEST, lblNewLabel);
 		useBlacklistingCheckBox.setEnabled(false);
@@ -170,7 +170,7 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelView extends JPanel {
 		add(lblNumberOfThreads);
 		
 		blLengthTextField = new JTextField();
-		blLengthTextField.setText("5");
+		blLengthTextField.setText("25.0");
 		springLayout.putConstraint(SpringLayout.NORTH, blLengthTextField, 1, SpringLayout.NORTH, useBlacklistingCheckBox);
 		springLayout.putConstraint(SpringLayout.WEST, blLengthTextField, 6, SpringLayout.EAST, useBlacklistingCheckBox);
 		add(blLengthTextField);

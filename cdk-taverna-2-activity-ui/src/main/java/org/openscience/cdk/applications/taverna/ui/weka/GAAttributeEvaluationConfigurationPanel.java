@@ -42,7 +42,7 @@ public class GAAttributeEvaluationConfigurationPanel extends
 			dialog.setVisible(true);
 		}
 	};
-	
+
 	private ActionListener algorithmComboBoxListener = new ActionListener() {
 
 		public void actionPerformed(ActionEvent e) {
@@ -88,6 +88,8 @@ public class GAAttributeEvaluationConfigurationPanel extends
 		int idx = this.view.getAlgorithmComboBox().getSelectedIndex();
 		options += this.configFrames.get(idx).getConfiguredClass().getName() + ";";
 		options += this.configFrames.get(idx).getOptions()[0] + ";";
+		options += this.view.getCvCheckBox().isSelected() + ";";
+		options += this.view.getCvTextField().getText() + ";";
 		return options;
 	}
 
@@ -129,7 +131,6 @@ public class GAAttributeEvaluationConfigurationPanel extends
 		this.view.getThreadsTextField().setText("" + threads);
 	}
 
-	
 	@Override
 	public void refreshConfiguration() {
 		this.setThreadingParam();
@@ -160,7 +161,8 @@ public class GAAttributeEvaluationConfigurationPanel extends
 				break;
 			}
 		}
-
+		this.view.getCvCheckBox().setSelected(Boolean.parseBoolean(opt[7]));
+		this.view.getCvTextField().setText(opt[8]);
 	}
 
 	@Override

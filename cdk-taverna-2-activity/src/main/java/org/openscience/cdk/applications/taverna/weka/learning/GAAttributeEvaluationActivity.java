@@ -50,6 +50,9 @@ public class GAAttributeEvaluationActivity extends AbstractCDKActivity {
 	public double ATTR_MUTATION_RATE = 0.07;
 	public double CROSS_OVER_RATE = 0.05;
 	public int NUMBER_OF_FOLDS = 10;
+	public boolean USE_CV = false;
+	public int FOLDS = 10;
+	
 	private int NUMBER_OF_INDIVIDUALS = 50;
 	private int NUMBER_OF_ITERATIONS = 2000;
 
@@ -109,6 +112,8 @@ public class GAAttributeEvaluationActivity extends AbstractCDKActivity {
 		}
 		this.classifierClass = Class.forName(optionArray[5]);
 		this.classifierOptions = optionArray[6];
+		USE_CV = Boolean.parseBoolean(optionArray[7]);
+		FOLDS = Integer.parseInt(optionArray[8]);
 		int threads = (Integer)this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS);
 		workers = new GAAttributeEvaluationWorker[threads];
 		// Do work
@@ -265,6 +270,14 @@ public class GAAttributeEvaluationActivity extends AbstractCDKActivity {
 	@Override
 	public String getFolderName() {
 		return CDKTavernaConstants.WEKA_LEARNING_FOLDER_NAME;
+	}
+	
+	public boolean isUSE_CV() {
+		return USE_CV;
+	}
+
+	public int getFOLDS() {
+		return FOLDS;
 	}
 
 }

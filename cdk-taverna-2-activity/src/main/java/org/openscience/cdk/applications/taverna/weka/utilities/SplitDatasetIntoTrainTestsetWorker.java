@@ -75,13 +75,13 @@ public class SplitDatasetIntoTrainTestsetWorker extends Thread {
 						int iterations = Integer.parseInt(options[6]);
 						boolean isBlacklisting = Boolean.parseBoolean(options[7]);
 						boolean isChooseBest = Boolean.parseBoolean(options[8]);
-						int blLength = Integer.parseInt(options[9]);
+						double blLengthRatio = Double.parseDouble(options[9]) / 100;
 						progress += "Set: " + fraction + "\n";
 						LinkedList<Integer> blacklist = new LinkedList<Integer>();
 						Double previousRMSE = null;
 						Instances cleanTrainSet = Filter.useFilter(currentTrain, tools.getIDRemover(currentTrain));
 						Instances cleanTestSet = Filter.useFilter(currentTest, tools.getIDRemover(currentTest));
-						blLength = blLength >= currentTest.numInstances() ? currentTest.numInstances() - 1 : blLength;
+						int blLength = (int) Math.round(numTrain * blLengthRatio);
 						for (int i = 0; i < iterations; i++) {
 							Classifier classifier = (Classifier) classifierClass.newInstance();
 							String[] classOptions = options[5].split(" ");

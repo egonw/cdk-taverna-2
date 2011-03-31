@@ -13,7 +13,7 @@ import weka.filters.Filter;
 public class GAAttributeEvaluationGenome {
 
 	private static int SCORE_POWER = 2;
-	
+
 	private Random rand = new Random();
 	private double score = Double.MAX_VALUE;
 	private double rmse = 0;
@@ -124,13 +124,16 @@ public class GAAttributeEvaluationGenome {
 		this.optDataset = Filter.useFilter(this.dataset, tools.getAttributRemover(this.dataset, attributesToDelete));
 	}
 
-	public void calculateScore(Classifier classifier) throws Exception {
+	public void calculateScore(Classifier classifier, boolean useCV, int folds) throws Exception {
 		WekaTools tools = new WekaTools();
 		Instances testset = Filter.useFilter(this.optDataset, tools.getIDRemover(this.optDataset));
 		Evaluation eval = new Evaluation(testset);
-	//	 eval.crossValidateModel(classifier, testset, 10, new Random(1));
-		classifier.buildClassifier(testset);
-		eval.evaluateModel(classifier, testset);
+		if (useCV) {
+			eval.crossValidateModel(classifier, testset, folds, new Random(1));
+		} else {
+			classifier.buildClassifier(testset);
+			eval.evaluateModel(classifier, testset);
+		}
 		this.rmse = eval.rootMeanSquaredError();
 		this.score = Math.pow(1 / this.rmse, SCORE_POWER);
 	}
@@ -147,8 +150,8 @@ public class GAAttributeEvaluationGenome {
 
 	public Object clone() {
 		GAAttributeEvaluationGenome clone = null;
-		clone = new GAAttributeEvaluationGenome(this.dataset, this.attrNames.clone(), this.attrIsUsed.clone(), this.rmse,
-				this.attrRestriction);
+		clone = new GAAttributeEvaluationGenome(this.dataset, this.attrNames.clone(), this.attrIsUsed.clone(),
+				this.rmse, this.attrRestriction);
 		return clone;
 	}
 

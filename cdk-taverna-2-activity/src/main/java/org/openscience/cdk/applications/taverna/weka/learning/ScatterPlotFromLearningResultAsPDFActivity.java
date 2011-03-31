@@ -171,7 +171,7 @@ public class ScatterPlotFromLearningResultAsPDFActivity extends AbstractCDKActiv
 					Instances trainset = trainDatasets.get(j);
 					Instances trainUUIDSet = Filter.useFilter(trainset, tools.getIDGetter(trainset));
 					trainset = Filter.useFilter(trainset, tools.getIDRemover(trainset));
-					double trainingSetRatio = 100.0;
+					double trainingSetRatio = 1.0;
 					if (testset != null) {
 						trainingSetRatio = trainset.numInstances()
 								/ (double) (trainset.numInstances() + testset.numInstances());
