@@ -29,7 +29,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import org.jfree.chart.JFreeChart;
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
+
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
@@ -61,14 +64,18 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 	 * Creates a new instance.
 	 */
 	public ClusteringResultConsideringDifferentOriginsAsPDF() {
-		this.INPUT_PORTS = new String[] { "Weka Clustering Files", "Relations Table" };
+		this.INPUT_PORTS = new String[] { "Clustering Model Files", " Weka Dataset", "Relations Table" };
 		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		addInput(this.INPUT_PORTS[0], 1, true, null, String.class);
-		addInput(this.INPUT_PORTS[1], 1, true, null, String.class);
+		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+		expectedReferences.add(FileReference.class);
+		expectedReferences.add(InlineStringReference.class);
+		addInput(this.INPUT_PORTS[0], 1, false, expectedReferences, null);
+		addInput(this.INPUT_PORTS[1], 0, true, null, byte[].class);
+		addInput(this.INPUT_PORTS[2], 1, true, null, String.class);
 	}
 
 	@Override
@@ -79,8 +86,9 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 	@Override
 	public void work() throws Exception {
 		// Get input
-		List<String> files = this.getInputAsList(this.INPUT_PORTS[0], String.class);
-		List<String> relationTable = this.getInputAsList(this.INPUT_PORTS[1], String.class);
+		List<File> files = this.getInputAsFileList(this.INPUT_PORTS[0]);
+		Instances dataset = this.getInputAsObject(this.INPUT_PORTS[1], Instances.class);
+		List<String> relationTable = this.getInputAsList(this.INPUT_PORTS[2], String.class);
 		// Do work
 		List<String> resultFileNames = new ArrayList<String>();
 		List<String> pdfTitle = new ArrayList<String>();
@@ -108,23 +116,19 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 				numberOfSubjectsInTable.put(currentName, value);
 			}
 		}
-		Instances dataset = null;
 		Instances uuids = null;
 		Clusterer clusterer = null;
 		ChartTool chartTool = new ChartTool();
 		ArrayList<File> tempFileList = new ArrayList<File>();
 		ArrayList<Object> charts = null;
-		for (int i = 2; i < files.size(); i++) { // The first two file are data files
+		for (int i = 0; i < files.size(); i++) { 
 			charts = new ArrayList<Object>();
 			tempFileList.clear();
 			WekaTools tools = new WekaTools();
 			try {
 				// Load clusterer
-				clusterer = (Clusterer) SerializationHelper.read(files.get(i));
-				// load data
-				BufferedReader buffReader = new BufferedReader(new FileReader(files.get(0)));
-				dataset = new Instances(buffReader);
-				buffReader.close();
+				clusterer = (Clusterer) SerializationHelper.read(files.get(i).getPath());
+				// Prepare data
 				uuids = Filter.useFilter(dataset, tools.getIDGetter(dataset));
 				dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			} catch (Exception e) {
@@ -133,7 +137,7 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR);
 			}
 			try {
-				DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
+				DefaultCategoryDataset chartDataSet = new DefaultCategoryDataset();
 				int numberOfClasses = clusterer.numberOfClusters();
 				int[] numberOfItems = new int[numberOfClasses];
 				HashMap<Integer, HashMap<String, Integer>> distributionTable = new HashMap<Integer, HashMap<String, Integer>>();
@@ -174,33 +178,32 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 							proportion = value / (double) numberOfSubjectsInTable.get(name) * 100.0;
 						}
 						String xAxisHeader = "(" + (j + 1) + "/" + numberOfItems[j] + ")";
-						dataSet.addValue(proportion, name, xAxisHeader);
+						chartDataSet.addValue(proportion, name, xAxisHeader);
 					}
 				}
 				String name = clusterer.getClass().getSimpleName();
-				String options = tools.getOptionsFromFile(new File(files.get(i)), name);
+				String options = tools.getOptionsFromFile(files.get(i), name);
 				int jobID = tools.getIDFromOptions(options);
 				String header = name + " - JobID: " + jobID;
 				charts.add(chartTool.createBarChart(header, "(Class number/Number of Vectors)", "Ratio in percent",
-						dataSet));
+						chartDataSet));
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(
 						"Error during evaluation of clustering results in file: " + files.get(i),
 						this.getActivityName(), e);
 			}
 			try {
-				File file = new File(files.get(0));
+				File file = files.get(0);
 				String optionString = "";
 				for (String o : ((OptionHandler) clusterer).getOptions()) {
 					optionString += o;
 				}
 				String name = clusterer.getClass().getSimpleName();
 				file = FileNameGenerator.getNewFile(file.getParent(), ".pdf",
-						name + tools.getOptionsFromFile(new File(files.get(i)), name) + "-ClassificationResult");
+						name + tools.getOptionsFromFile(files.get(i), name) + "-ClassificationResult");
 				pdfTitle.add("(Clusterer name/Number of detected classes)");
 				chartTool.writeChartAsPDF(file, charts);
 				resultFileNames.add(file.getAbsolutePath());
-
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR,
 						this.getActivityName(), e);

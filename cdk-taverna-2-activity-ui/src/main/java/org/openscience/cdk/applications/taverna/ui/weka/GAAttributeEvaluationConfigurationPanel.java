@@ -16,6 +16,7 @@ import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.applications.taverna.ui.UITools;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractLearningConfigurationFrame;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.LearningDatasetClassifierFrame;
 
@@ -167,6 +168,16 @@ public class GAAttributeEvaluationConfigurationPanel extends
 
 	@Override
 	public boolean checkValues() {
+		int idx = view.getAlgorithmComboBox().getSelectedIndex();
+		if (!this.configFrames.get(idx).checkValues()) {
+			return false;
+		}
+		if (!UITools.checkTextFieldValueInt(this, "Number of Threads", this.view.getThreadsTextField(), 1,
+				Integer.MAX_VALUE)
+				|| !UITools.checkTextFieldValueInt(this, "Number of Folds", this.view.getCvTextField(), 2,
+						Integer.MAX_VALUE)) {
+			return false;
+		}
 		return true;
 	}
 

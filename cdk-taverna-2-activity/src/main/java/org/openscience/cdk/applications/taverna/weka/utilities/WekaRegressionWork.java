@@ -21,56 +21,21 @@
  */
 package org.openscience.cdk.applications.taverna.weka.utilities;
 
-import java.util.ArrayList;
+import java.io.File;
 
-import org.openscience.cdk.applications.taverna.CDKTavernaException;
+import weka.classifiers.Classifier;
+import weka.core.Instances;
 
 /**
- * Vector for double values.
+ * Work class for the weka regression activity.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class Vector {
-
-	public ArrayList<Double> vector = new ArrayList<Double>();
-
-	/**
-	 * @param value
-	 *            Value to add to the vector.
-	 */
-	public void addValue(double value) {
-		vector.add(value);
-	}
-
-	/**
-	 * Subtracts another vector from this vector.
-	 * 
-	 * @param The
-	 *            vector subtract from this vector.
-	 * @return The resulting vector.
-	 * @throws CDKTavernaException
-	 */
-	public Vector subtraction(Vector b) throws CDKTavernaException {
-		Vector result = new Vector();
-		if (this.vector.size() != b.vector.size()) {
-			throw new CDKTavernaException(this.getClass().getSimpleName(), "Size of vectors differ!");
-		}
-		for (int i = 0; i < vector.size(); i++) {
-			result.vector.add(vector.get(i) - b.vector.get(i));
-		}
-		return result;
-	}
-
-	/**
-	 * @return The length of the vector.
-	 */
-	public double length() {
-		double sqrSum = 0;
-		for (double value : vector) {
-			sqrSum += Math.pow(value, 2);
-		}
-		return Math.sqrt(sqrSum);
-	}
-
+public class WekaRegressionWork {
+	public Class<? extends Classifier> classifierClass;
+	public String option;
+	public Instances trainingSet;
+	public int id;
+	public File modelFile;
 }

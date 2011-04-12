@@ -19,7 +19,7 @@ import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.ui.UITools;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractLearningConfigurationFrame;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.LearningDatasetClassifierFrame;
-import org.openscience.cdk.applications.taverna.weka.learning.SplitDatasetIntoTrainTestsetActivity;
+import org.openscience.cdk.applications.taverna.weka.regression.SplitDatasetIntoTrainTestsetActivity;
 
 public class SplitDatasetIntoTrainTestsetConfigurationPanelController extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {

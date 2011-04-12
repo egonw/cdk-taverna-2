@@ -16,7 +16,7 @@ import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.weka.learning.ScatterPlotFromLearningResultAsPDFActivity;
+import org.openscience.cdk.applications.taverna.weka.regression.EvaluateRegressionResultsAsPDFActivity;
 
 public class ScatternPlotConfigurationPanel extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
@@ -61,9 +61,9 @@ public class ScatternPlotConfigurationPanel extends
 	private String createOptionString() {
 		String opt = "";
 		if (this.testTrainingSetButton.isSelected()) {
-			opt += ScatterPlotFromLearningResultAsPDFActivity.TEST_TRAININGSET_PORT + ";";
+			opt += EvaluateRegressionResultsAsPDFActivity.TEST_TRAININGSET_PORT + ";";
 		} else {
-			opt += ScatterPlotFromLearningResultAsPDFActivity.SINGLE_DATASET_PORT + ";";
+			opt += EvaluateRegressionResultsAsPDFActivity.SINGLE_DATASET_PORT + ";";
 		}
 		opt += this.useCVCheckBox.isSelected() + ";";
 		return opt;
@@ -97,7 +97,7 @@ public class ScatternPlotConfigurationPanel extends
 				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_SCATTER_PLOT_OPTIONS);
 		if (options != null) {
 			String[] tmp = options.split(";");
-			if (tmp[0].equals("" + ScatterPlotFromLearningResultAsPDFActivity.TEST_TRAININGSET_PORT)) {
+			if (tmp[0].equals("" + EvaluateRegressionResultsAsPDFActivity.TEST_TRAININGSET_PORT)) {
 				this.testTrainingSetButton.setSelected(true);
 			} else {
 				this.singleSetButton.setSelected(true);

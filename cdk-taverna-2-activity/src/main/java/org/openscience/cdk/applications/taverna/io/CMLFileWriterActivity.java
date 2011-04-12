@@ -52,7 +52,7 @@ public class CMLFileWriterActivity extends AbstractCDKActivity {
 	public static final String CML_FILE_WRITER_ACTIVITY = "CML File Writer";
 
 	public CMLFileWriterActivity() {
-		this.INPUT_PORTS = new String[] { "Structures", "Files" };
+		this.INPUT_PORTS = new String[] { "Structures", "File" };
 		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 

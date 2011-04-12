@@ -114,6 +114,7 @@ public class SplitMoleculesIntoClustersActivity extends AbstractCDKActivity {
 					}
 					UUID uuid = UUID.fromString((String) container.getProperty(CDKTavernaConstants.MOLECULEID));
 					Integer cluster = this.uuidClusterMap.get(uuid);
+					container.setProperty("Cluster ID", cluster);
 					if (cluster == null) {
 						ErrorLogger.getInstance().writeError(CDKTavernaException.NO_CLUSTER_INFORMATION_AVAILABLE,
 								this.getActivityName());

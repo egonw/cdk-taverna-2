@@ -36,6 +36,7 @@ import net.sf.taverna.t2.reference.IdentifiedList;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceSet;
 import net.sf.taverna.t2.reference.T2Reference;
+import net.sf.taverna.t2.reference.T2ReferenceType;
 import net.sf.taverna.t2.reference.impl.external.file.FileReference;
 import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
@@ -354,56 +355,51 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 	protected <T> List<T> getInputAsList(String port, Class<T> type) throws Exception {
 		boolean isDataCompression = SetupController.getInstance().isDataCompression();
 		ReferenceService referenceService = this.callback.getContext().getReferenceService();
-		if (type == String.class) {
-			List<T> strings = (List<T>) referenceService.renderIdentifier(inputs.get(port), String.class,
-					this.callback.getContext());
-			if (strings == null || strings.isEmpty()) {
-				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRONG_INPUT_PORT_TYPE);
-			}
-			return strings;
-		}
-		if (type == byte[].class) {
-			List<T> data;
-			try {
-				data = (List<T>) referenceService.renderIdentifier(inputs.get(port), byte[].class,
-						this.callback.getContext());
-			} catch (Exception e) {
-				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRONG_INPUT_PORT_TYPE);
-			}
-			if (isDataCompression) {
-				data = (List<T>) CacheController.getInstance().decompressDataList((List<byte[]>) data);
-			}
-			return data;
+		if (this.inputs.get(port).getDepth() == 0) {
+			ArrayList<T> dataList = new ArrayList<T>();
+			dataList.add(this.getInputAsObject(port, type));
+			return dataList;
 		} else {
-			boolean isDataCaching = SetupController.getInstance().isDataCaching();
-			List<T> dataList = null;
-			if (isDataCaching) {
-				T2Reference inputRef = this.inputs.get(port);
-				UUID uuid;
-				if (inputRef.getDepth() == 0) {
-					byte[] uuidData = (byte[]) referenceService.renderIdentifier(inputRef, byte[].class,
-							this.callback.getContext());
-					uuid = (UUID) CDKObjectHandler.getObject(uuidData);
-				} else {
-					List<byte[]> uuidDataArray = (List<byte[]>) referenceService.renderIdentifier(inputRef,
-							byte[].class, this.callback.getContext());
-					uuid = (UUID) CDKObjectHandler.getObject(uuidDataArray.get(0));
+			if (type == String.class) {
+				List<T> strings = (List<T>) referenceService.renderIdentifier(inputs.get(port), String.class,
+						this.callback.getContext());
+				if (strings == null || strings.isEmpty()) {
+					throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRONG_INPUT_PORT_TYPE);
 				}
-				byte[] data = CacheController.getInstance().uncacheByteStream(uuid);
-				if (isDataCompression) {
-					data = CacheController.getInstance().decompressData(data);
-				}
+				return strings;
+			}
+			if (type == byte[].class) {
+				List<T> data;
 				try {
-					Object obj = CDKObjectHandler.getObject(data);
-					if (obj instanceof List) {
-						dataList = (List<T>) obj;
-					} else {
-						dataList = Collections.singletonList((T) obj);
-					}
+					data = (List<T>) referenceService.renderIdentifier(inputs.get(port), byte[].class,
+							this.callback.getContext());
 				} catch (Exception e) {
-					ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR,
-							this.getActivityName(), e);
-					throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
+					throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRONG_INPUT_PORT_TYPE);
+				}
+				if (isDataCompression) {
+					data = (List<T>) CacheController.getInstance().decompressDataList((List<byte[]>) data);
+				}
+				return data;
+			}
+			boolean isDataCaching = SetupController.getInstance().isDataCaching();
+			List<T> dataList = new ArrayList<T>();
+			if (isDataCaching) {
+				List<byte[]> uuidDataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(port),
+						byte[].class, this.callback.getContext());
+				for (int i = 0; i < uuidDataArray.size(); i++) {
+					UUID uuid = (UUID) CDKObjectHandler.getObject(uuidDataArray.get(i));
+					byte[] data = CacheController.getInstance().uncacheByteStream(uuid);
+					if (isDataCompression) {
+						data = CacheController.getInstance().decompressData(data);
+					}
+					try {
+						Object obj = CDKObjectHandler.getObject(data);
+						dataList.add((T) obj);
+					} catch (Exception e) {
+						ErrorLogger.getInstance().writeError(CDKTavernaException.OBJECT_DESERIALIZATION_ERROR,
+								this.getActivityName(), e);
+						throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
+					}
 				}
 			} else {
 				List<byte[]> dataArray = (List<byte[]>) referenceService.renderIdentifier(inputs.get(port),
@@ -442,13 +438,15 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 		try {
 			T2Reference containerRef;
 			if (isDataCaching) {
-				byte[] data = CDKObjectHandler.getBytes(objectList);
-				if (isDataCompression) {
-					data = CacheController.getInstance().compressData(data);
-				}
-				UUID uuid = CacheController.getInstance().cacheByteStream(data);
 				List<byte[]> uuidDataList = new ArrayList<byte[]>();
-				uuidDataList.add(CDKObjectHandler.getBytes(uuid));
+				for (int i = 0; i < objectList.size(); i++) {
+					byte[] data = CDKObjectHandler.getBytes(objectList.get(i));
+					if (isDataCompression) {
+						data = CacheController.getInstance().compressData(data);
+					}
+					UUID uuid = CacheController.getInstance().cacheByteStream(data);
+					uuidDataList.add(CDKObjectHandler.getBytes(uuid));
+				}
 				containerRef = referenceService.register(uuidDataList, 1, true, this.callback.getContext());
 			} else {
 				List<byte[]> dataList = CDKObjectHandler.getBytesList(objectList);
@@ -576,13 +574,15 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 		try {
 			boolean isDataCaching = SetupController.getInstance().isDataCaching();
 			if (isDataCaching) {
-				byte[] data = CDKObjectHandler.getBytes(objectList);
-				if (isDataCompression) {
-					data = CacheController.getInstance().compressData(data);
-				}
-				UUID uuid = CacheController.getInstance().cacheByteStream(data);
 				List<byte[]> uuidDataList = new ArrayList<byte[]>();
-				uuidDataList.add(CDKObjectHandler.getBytes(uuid));
+				for (int i = 0; i < objectList.size(); i++) {
+					byte[] data = CDKObjectHandler.getBytes(objectList.get(i));
+					if (isDataCompression) {
+						data = CacheController.getInstance().compressData(data);
+					}
+					UUID uuid = CacheController.getInstance().cacheByteStream(data);
+					uuidDataList.add(CDKObjectHandler.getBytes(uuid));
+				}
 				containerRef = referenceService.register(uuidDataList, 1, true, this.callback.getContext());
 			} else {
 				List<byte[]> dataList = CDKObjectHandler.getBytesList(objectList);

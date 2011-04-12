@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 by Andreas Truszkowski <ATruszkowski@gmx.de>
+ erm we* Copyright (C) 2010 by Andreas Truszkowski <ATruszkowski@gmx.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -19,12 +19,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna.weka;
+package org.openscience.cdk.applications.taverna.weka.clustering;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.LineNumberReader;
-import java.util.ArrayList;
+import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,87 +40,110 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
+import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.qsar.CSVToQSARVectorActivity;
 import org.openscience.cdk.applications.taverna.setup.SetupController;
-import org.openscience.cdk.applications.taverna.weka.clustering.ClusteringResultConsideringDifferentOriginsAsPDF;
+import org.openscience.cdk.applications.taverna.weka.CreateWekaDatasetFromQSARVectorActivity;
 import org.openscience.cdk.applications.taverna.weka.clustering.WekaClusteringActivity;
+import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
+
+import weka.clusterers.Clusterer;
+import weka.core.Instances;
+import weka.filters.Filter;
 
 /**
- * Test class for the create extract clustering result as PDF activity.
+ * Test class for the weka regression activity.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class ClusteringResultConsideringDifferentOriginsAsPDFActivityTest extends CDKTavernaTestCases {
+public class WekaClusteringActivityTest extends CDKTavernaTestCases {
 
 	private CDKActivityConfigurationBean configBean;
 	private CDKActivityConfigurationBean clusteringConfigBean;
 
-	private AbstractCDKActivity wekaActivity = new ClusteringResultConsideringDifferentOriginsAsPDF();
-	private File dir = null;
-	private ArrayList<String> relationTable = new ArrayList<String>();
-	private AbstractCDKActivity wekaClusteringActivity = new WekaClusteringActivity();
 	private AbstractCDKActivity loadActivity = new CSVToQSARVectorActivity();
 	private AbstractCDKActivity wekaDatasetActivity = new CreateWekaDatasetFromQSARVectorActivity();
+	private AbstractCDKActivity wekaClusteringActivity = new WekaClusteringActivity();
+	private File dir = null;
 
-	public ClusteringResultConsideringDifferentOriginsAsPDFActivityTest() {
-		super(
-				ClusteringResultConsideringDifferentOriginsAsPDF.CLUSTERING_RESULT_CONSIDERING_DIFFERENT_ORIGINS_AS_PDF_ACTIVITY);
+	public WekaClusteringActivityTest() {
+		super(CreateWekaDatasetFromQSARVectorActivity.CREATE_WEKA_DATASET_FROM_QSAR_VECTOR_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		this.configBean.setActivityName(this.wekaActivity.getActivityName());
 		this.dir = new File(SetupController.getInstance().getWorkingDir());
-		File relationFile = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-				+ "data" + File.separator + "weka" + File.separator + "relationtable.txt");
-		LineNumberReader reader = new LineNumberReader(new FileReader(relationFile));
-		String line;
-		while ((line = reader.readLine()) != null) {
-			relationTable.add(line);
-		}
-		reader.close();
+		configBean.setActivityName(CSVToQSARVectorActivity.CSV_TO_QSAR_VECTOR_ACTIVITY);
 		clusteringConfigBean = new CDKActivityConfigurationBean();
-		clusteringConfigBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.dir);
-		String jobData = "weka.clusterers.EM;-N;5;-I;100;-M;0.00001;-ID;1;";
+		String jobData = "weka.clusterers.EM;-N;5;-I;100;-M;0.00001;-ID;1;weka.clusterers.FarthestFirst;-N;5;-ID;5;weka.clusterers.HierarchicalClusterer;-N;5;-L;SINGLE;-ID;2;weka.clusterers.SimpleKMeans;-N;5;-I;100;-ID;3;weka.clusterers.XMeans;-I;1;-M;1000;-J;1000;-L;2;-H;4;-ID;4";
 		clusteringConfigBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CLUSTERING_JOB_DATA, jobData);
 		clusteringConfigBean.setActivityName(WekaClusteringActivity.WEKA_CLUSTERING_ACTIVITY);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
-		wekaActivity.configure(configBean);
 		wekaDatasetActivity.configure(configBean);
 		loadActivity.configure(configBean);
 		wekaClusteringActivity.configure(clusteringConfigBean);
 		// load QSAR vectors
 		Map<String, Object> inputs = new HashMap<String, Object>();
+		File csvFile = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
+				+ "data" + File.separator + "qsar" + File.separator + "curatedQSARbig.csv");
+		inputs.put(loadActivity.INPUT_PORTS[0], csvFile);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(loadActivity.OUTPUT_PORTS[0], byte[].class);
 		expectedOutputTypes.put(loadActivity.OUTPUT_PORTS[1], byte[].class);
-		File csvFile = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-				+ "data" + File.separator + "weka" + File.separator + "qsardata.csv");
-		inputs.put(loadActivity.INPUT_PORTS[0], csvFile);
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(loadActivity, inputs, expectedOutputTypes);
 		inputs = outputs;
 		expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(wekaDatasetActivity.OUTPUT_PORTS[0], byte[].class);
 		outputs = ActivityInvoker.invokeAsyncActivity(wekaDatasetActivity, inputs, expectedOutputTypes);
+		byte[] datasetData = (byte[]) outputs.get(wekaDatasetActivity.OUTPUT_PORTS[0]);
+		Instances dataset = CDKObjectHandler.getInstancesObject(datasetData);
 		inputs = outputs;
 		// Cluster
+		inputs.put(wekaClusteringActivity.INPUT_PORTS[1], this.dir);
 		expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(wekaClusteringActivity.OUTPUT_PORTS[0], String.class);
-		inputs.put(wekaClusteringActivity.INPUT_PORTS[1], this.dir);
 		outputs = ActivityInvoker.invokeAsyncActivity(wekaClusteringActivity, inputs, expectedOutputTypes);
 		List<String> files = (List<String>) outputs.get(wekaClusteringActivity.OUTPUT_PORTS[0]);
-		inputs = new HashMap<String, Object>();
-		inputs.put(wekaActivity.INPUT_PORTS[0], files);
-		inputs.put(wekaActivity.INPUT_PORTS[1], relationTable);
-		expectedOutputTypes = new HashMap<String, Class<?>>();
-		outputs = ActivityInvoker.invokeAsyncActivity(wekaActivity, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs", 0, outputs.size());
-		// Only check for exceptions
+		// Test results
+		HashMap<String, Integer[]> resultMap = new HashMap<String, Integer[]>();
+		resultMap.put("XMeans", new Integer[] { 47, 178, 175, 300 });
+		resultMap.put("FarthestFirst", new Integer[] { 670, 1, 2, 2, 25 });
+		resultMap.put("SimpleKMeans", new Integer[] { 278, 206, 46, 146, 24 });
+		resultMap.put("EM", new Integer[] { 68, 172, 200, 64, 196 });
+		resultMap.put("HierarchicalClusterer", new Integer[] { 695, 2, 1, 1, 1 });
+		Assert.assertEquals(7, files.size());
+		WekaTools tool = new WekaTools();
+		for (int i = 0; i < 5; i++) {
+			// Load clusterer
+			ObjectInputStream reader = new ObjectInputStream(new BufferedInputStream(new FileInputStream(
+					files.get(2 + i))));
+			Clusterer clusterer = (Clusterer) reader.readObject();
+			reader.close();
+			// load data
+			BufferedReader buffReader = new BufferedReader(new FileReader(files.get(0)));
+			dataset = new Instances(buffReader);
+			buffReader.close();
+			// Instances ids = Filter.useFilter(dataset, WekaTools.getIDGetter(dataset));
+			dataset = Filter.useFilter(dataset, tool.getIDRemover(dataset));
+			// Test clusterer
+			int[] numberOfVectorsInClass = new int[clusterer.numberOfClusters()];
+			for (int j = 0; j < dataset.numInstances(); j++) {
+				numberOfVectorsInClass[clusterer.clusterInstance(dataset.instance(j))]++;
+			}
+			Integer[] expectedValues = resultMap.get(clusterer.getClass().getSimpleName());
+			Assert.assertEquals(expectedValues.length, clusterer.numberOfClusters());
+			for (int j = 0; j < clusterer.numberOfClusters(); j++) {
+				Assert.assertEquals(expectedValues[j].intValue(), numberOfVectorsInClass[j]);
+			}
+		}
 	}
 
 	@Override
@@ -144,7 +169,7 @@ public class ClusteringResultConsideringDifferentOriginsAsPDFActivityTest extend
 	 * @return TestSuite
 	 */
 	public static Test suite() {
-		return new TestSuite(ClusteringResultConsideringDifferentOriginsAsPDFActivityTest.class);
+		return new TestSuite(WekaClusteringActivityTest.class);
 	}
 
 }

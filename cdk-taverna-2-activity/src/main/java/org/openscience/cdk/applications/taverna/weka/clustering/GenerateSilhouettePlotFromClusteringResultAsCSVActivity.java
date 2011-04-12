@@ -32,6 +32,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
+
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
@@ -59,13 +63,17 @@ public class GenerateSilhouettePlotFromClusteringResultAsCSVActivity extends Abs
 	 * Creates a new instance.
 	 */
 	public GenerateSilhouettePlotFromClusteringResultAsCSVActivity() {
-		this.INPUT_PORTS = new String[] { "Weka Clustering Files" };
+		this.INPUT_PORTS = new String[] { "Clustering Model Files", " Weka Dataset" };
 		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
+		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+		expectedReferences.add(FileReference.class);
+		expectedReferences.add(InlineStringReference.class);
+		addInput(this.INPUT_PORTS[0], 1, false, expectedReferences, null);
+		addInput(this.INPUT_PORTS[1], 0, true, null, byte[].class);
 	}
 
 	@Override
@@ -76,21 +84,18 @@ public class GenerateSilhouettePlotFromClusteringResultAsCSVActivity extends Abs
 	@Override
 	public void work() throws Exception {
 		// Get input
-		List<String> files = this.getInputAsList(this.INPUT_PORTS[0], String.class);
+		List<File> files = this.getInputAsFileList(this.INPUT_PORTS[0]);
+		Instances dataset = this.getInputAsObject(this.INPUT_PORTS[1], Instances.class);
 		// Do work
 		ArrayList<String> resultFiles = new ArrayList<String>();
-		Instances dataset = null;
 		Clusterer clusterer = null;
 		WekaTools tools = new WekaTools();
 		HashMap<Integer, LinkedList<String>> meanTable = new HashMap<Integer, LinkedList<String>>();
-		for (int i = 2; i < files.size(); i++) { // The first two file are data files
+		for (int i = 0; i < files.size(); i++) {
 			try {
 				// Load clusterer
-				clusterer = (Clusterer) SerializationHelper.read(files.get(i));
-				// load data
-				BufferedReader buffReader = new BufferedReader(new FileReader(files.get(0)));
-				dataset = new Instances(buffReader);
-				buffReader.close();
+				clusterer = (Clusterer) SerializationHelper.read(files.get(i).getPath());
+				// Prepare data
 				dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR,
@@ -100,9 +105,9 @@ public class GenerateSilhouettePlotFromClusteringResultAsCSVActivity extends Abs
 			try {
 				double[][] s = tools.generateSilhouettePlot(dataset, clusterer);
 				// Generate csv
-				File file = new File(files.get(0));
+				File file = files.get(0);
 				String name = clusterer.getClass().getSimpleName();
-				String options = tools.getOptionsFromFile(new File(files.get(i)), name);
+				String options = tools.getOptionsFromFile(files.get(i), name);
 				int jobID = tools.getIDFromOptions(options);
 				file = FileNameGenerator.getNewFile(file.getParent(), ".csv", name + options + "-Silhouette");
 				String line = "";

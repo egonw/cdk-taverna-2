@@ -33,9 +33,10 @@ public class GAAttributeEvaluationConfigurationPanelView extends JPanel {
 	private JTextField threadsTextField;
 	private JCheckBox cvCheckBox;
 	private JTextField cvTextField;
+	private JLabel lblForFree;
 	public GAAttributeEvaluationConfigurationPanelView() {
 		setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		setPreferredSize(new Dimension(445, 184));
+		setPreferredSize(new Dimension(445, 195));
 		SpringLayout springLayout = new SpringLayout();
 		setLayout(springLayout);
 		
@@ -157,7 +158,6 @@ public class GAAttributeEvaluationConfigurationPanelView extends JPanel {
 		threadsTextField.setColumns(10);
 		
 		cvCheckBox = new JCheckBox("Use Cross-Validation. Number of folds:");
-		springLayout.putConstraint(SpringLayout.NORTH, cvCheckBox, 13, SpringLayout.SOUTH, minAttrTextField);
 		springLayout.putConstraint(SpringLayout.WEST, cvCheckBox, 0, SpringLayout.WEST, lblSelectAlgorithm);
 		add(cvCheckBox);
 		
@@ -168,6 +168,13 @@ public class GAAttributeEvaluationConfigurationPanelView extends JPanel {
 		cvTextField.setText("10");
 		add(cvTextField);
 		cvTextField.setColumns(10);
+		
+		lblForFree = new JLabel("-1 for free attribute selection.");
+		springLayout.putConstraint(SpringLayout.NORTH, cvCheckBox, 6, SpringLayout.SOUTH, lblForFree);
+		lblForFree.setEnabled(false);
+		springLayout.putConstraint(SpringLayout.NORTH, lblForFree, 6, SpringLayout.SOUTH, lblMinOf);
+		springLayout.putConstraint(SpringLayout.WEST, lblForFree, 0, SpringLayout.WEST, lblSelectAlgorithm);
+		add(lblForFree);
 	}
 	public JComboBox getAlgorithmComboBox() {
 		return algorithmComboBox;

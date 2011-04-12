@@ -25,14 +25,12 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Paint;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -47,13 +45,14 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.AreaRenderer;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.xy.DefaultXYDataset;
+import org.jfree.data.xy.IntervalXYDataset;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.xmlcml.cml.element.CMLBasisSet.Basis;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -111,6 +110,15 @@ public class ChartTool {
 		return chart;
 	}
 
+	/**
+	 * Creates a scatter plot.
+	 * 
+	 * @param dataset
+	 * @param header
+	 * @param xAxis
+	 * @param yAxis
+	 * @return
+	 */
 	public JFreeChart createScatterPlot(XYDataset dataset, String header, String xAxis, String yAxis) {
 		JFreeChart chart = ChartFactory.createScatterPlot(header, xAxis, yAxis, dataset, PlotOrientation.VERTICAL,
 				true, false, false);
@@ -136,6 +144,16 @@ public class ChartTool {
 		return chart;
 	}
 
+	/**
+	 * Creates a residue plot.
+	 * 
+	 * @param yValues
+	 * @param header
+	 * @param xAxis
+	 * @param yAxis
+	 * @param seriesNames
+	 * @return
+	 */
 	public JFreeChart createResiduePlot(List<Double[]> yValues, String header, String xAxis, String yAxis,
 			List<String> seriesNames) {
 		LinkedList<XYLineAnnotation> lines = new LinkedList<XYLineAnnotation>();
@@ -264,7 +282,7 @@ public class ChartTool {
 		renderer.setBaseShapesFilled(true);
 		return chart;
 	}
-	
+
 	/**
 	 * Creates a line chart.
 	 * 
@@ -305,6 +323,41 @@ public class ChartTool {
 	}
 
 	/**
+	 * Creates a XY bar chart.
+	 * 
+	 * @param title
+	 * @param categoryAxisLabel
+	 * @param valueAxisLabel
+	 * @param dataset
+	 * @param includeZero
+	 * @param shadow
+	 * @return
+	 */
+	public JFreeChart createXYBarChart(String title, String categoryAxisLabel, String valueAxisLabel,
+			IntervalXYDataset dataset, boolean includeZero, boolean shadow) {
+		JFreeChart chart = ChartFactory.createXYBarChart(title, categoryAxisLabel, false, valueAxisLabel, dataset,
+				this.orientation, this.drawLegend, false, false);
+		// set the background color for the chart...
+		chart.setBackgroundPaint(Color.white);
+		chart.setAntiAlias(true);
+		XYPlot plot = chart.getXYPlot();
+		ValueAxis domainAxis = plot.getDomainAxis();
+		domainAxis.setLowerMargin(0.025);
+		domainAxis.setUpperMargin(0.025);
+		NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+		rangeAxis.setAutoRangeIncludesZero(includeZero);
+		XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();
+		renderer.setDrawBarOutline(false);
+		renderer.setShadowVisible(shadow);
+		renderer.setSeriesPaint(0, Color.blue);
+		renderer.setSeriesPaint(1, Color.red);
+		renderer.setSeriesPaint(2, Color.green);
+		renderer.setSeriesPaint(3, Color.darkGray);
+		renderer.setSeriesPaint(4, Color.yellow);
+		return chart;
+	}
+
+	/**
 	 * Writes given charts into target PDF file.
 	 * 
 	 * @param file
@@ -338,6 +391,12 @@ public class ChartTool {
 		document.close();
 	}
 
+	/**
+	 * Adds a chart to the pdf file.
+	 * 
+	 * @param chart
+	 * @param cb
+	 */
 	private void addChartPageToPDF(JFreeChart chart, PdfContentByte cb) {
 		PdfTemplate tp = cb.createTemplate(this.width, this.height);
 		Graphics2D g2 = tp.createGraphics(this.width, this.height, new DefaultFontMapper());
@@ -347,6 +406,13 @@ public class ChartTool {
 		cb.addTemplate(tp, 0, 0);
 	}
 
+	/**
+	 * Writes an annotation into the pdf file.
+	 * 
+	 * @param annotation
+	 * @param document
+	 * @throws DocumentException
+	 */
 	private void addAnnotationToPDF(String annotation, Document document) throws DocumentException {
 		Paragraph para = new Paragraph();
 		Font font = FontFactory.getFont(FontFactory.HELVETICA, 12);

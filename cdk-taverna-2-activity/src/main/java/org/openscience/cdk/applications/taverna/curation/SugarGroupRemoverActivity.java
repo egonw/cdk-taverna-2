@@ -59,7 +59,7 @@ import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
  */
 public class SugarGroupRemoverActivity extends AbstractCDKActivity {
 
-	public static final String REMOVE_SUGAR_GROUPS_ACTIVITY = "Remove Sugar groups";
+	public static final String REMOVE_SUGAR_GROUPS_ACTIVITY = "Remove Sugar Groups";
 
 	public SugarGroupRemoverActivity() {
 		this.INPUT_PORTS = new String[] { "Structures" };

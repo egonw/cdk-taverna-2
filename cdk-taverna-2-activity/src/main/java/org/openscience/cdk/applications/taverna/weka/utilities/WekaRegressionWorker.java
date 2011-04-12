@@ -21,56 +21,51 @@
  */
 package org.openscience.cdk.applications.taverna.weka.utilities;
 
-import java.util.ArrayList;
-
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.applications.taverna.weka.regression.WekaRegressionActivity;
+
+import weka.classifiers.Classifier;
+import weka.core.Instances;
 
 /**
- * Vector for double values.
+ * Worker for the weka regression activity.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class Vector {
+public class WekaRegressionWorker extends Thread {
 
-	public ArrayList<Double> vector = new ArrayList<Double>();
+	private WekaRegressionActivity owner;
+	private boolean isDone = false;
 
-	/**
-	 * @param value
-	 *            Value to add to the vector.
-	 */
-	public void addValue(double value) {
-		vector.add(value);
+	public WekaRegressionWorker(WekaRegressionActivity owner) {
+		this.owner = owner;
+	}
+
+	@Override
+	public void run() {
+		WekaRegressionWork work = null;
+		while ((work = this.owner.getWork()) != null) {
+			try {
+				Instances trainset = work.trainingSet;
+				Classifier classifier = work.classifierClass.newInstance();
+				classifier.setOptions(work.option.split(" "));
+				classifier.buildClassifier(trainset);
+				this.owner.publishResult(work, classifier);
+			} catch (Exception e) {
+				ErrorLogger.getInstance().writeError(CDKTavernaException.CLUSTERING_ERROR,
+						this.getClass().getSimpleName(), e);
+			}
+		}
+		this.isDone = true;
+		this.owner.workerDone();
 	}
 
 	/**
-	 * Subtracts another vector from this vector.
-	 * 
-	 * @param The
-	 *            vector subtract from this vector.
-	 * @return The resulting vector.
-	 * @throws CDKTavernaException
+	 * @return True when the worker is done.
 	 */
-	public Vector subtraction(Vector b) throws CDKTavernaException {
-		Vector result = new Vector();
-		if (this.vector.size() != b.vector.size()) {
-			throw new CDKTavernaException(this.getClass().getSimpleName(), "Size of vectors differ!");
-		}
-		for (int i = 0; i < vector.size(); i++) {
-			result.vector.add(vector.get(i) - b.vector.get(i));
-		}
-		return result;
+	public boolean isDone() {
+		return isDone;
 	}
-
-	/**
-	 * @return The length of the vector.
-	 */
-	public double length() {
-		double sqrSum = 0;
-		for (double value : vector) {
-			sqrSum += Math.pow(value, 2);
-		}
-		return Math.sqrt(sqrSum);
-	}
-
 }

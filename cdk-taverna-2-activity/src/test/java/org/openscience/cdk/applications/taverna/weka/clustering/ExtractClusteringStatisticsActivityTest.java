@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna.weka;
+package org.openscience.cdk.applications.taverna.weka.clustering;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,26 +36,24 @@ import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.setup.SetupController;
-import org.openscience.cdk.applications.taverna.weka.clustering.GenerateSilhouettePlotFromClusteringResultAsPDFActivity;
+import org.openscience.cdk.applications.taverna.weka.clustering.ExtractClusteringResultAsCSVActivity;
 
 /**
- * Test class for the generate silhouette plot from clustering result as CSV
- * activity.
+ * Test class for the create extract clustering result as CSV activity.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class GenerateSilhouettePlotFromClusteringResultAsPDFActivityTest extends CDKTavernaTestCases {
+public class ExtractClusteringStatisticsActivityTest extends CDKTavernaTestCases {
 
 	private CDKActivityConfigurationBean configBean;
 
-	private AbstractCDKActivity wekaActivity = new GenerateSilhouettePlotFromClusteringResultAsPDFActivity();
+	private AbstractCDKActivity wekaActivity = new ExtractClusteringResultAsCSVActivity();
 	private ArrayList<String> files = new ArrayList<String>();
 	private File dir = null;
 
-	public GenerateSilhouettePlotFromClusteringResultAsPDFActivityTest() {
-		super(
-				GenerateSilhouettePlotFromClusteringResultAsPDFActivity.GENERATE_SILHOUETTE_PLOT_FROM_CLUSTERING_RESULT_AS_PDF_ACTIVITY);
+	public ExtractClusteringStatisticsActivityTest() {
+		super(ExtractClusteringResultAsCSVActivity.EXTRACT_CLUSTERING_RESULT_AS_CSV_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
@@ -108,7 +106,7 @@ public class GenerateSilhouettePlotFromClusteringResultAsPDFActivityTest extends
 	 * @return TestSuite
 	 */
 	public static Test suite() {
-		return new TestSuite(GenerateSilhouettePlotFromClusteringResultAsPDFActivityTest.class);
+		return new TestSuite(ExtractClusteringStatisticsActivityTest.class);
 	}
 
 }

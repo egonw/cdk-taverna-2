@@ -46,7 +46,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
-import org.openscience.cdk.applications.taverna.classification.art2a.ART2aClassificationActivity;
+import org.openscience.cdk.applications.taverna.clustering.art2a.ART2aClustererActivity;
 import org.openscience.cdk.applications.taverna.io.XMLFileIO;
 import org.openscience.cdk.applications.taverna.setup.SetupController;
 
@@ -80,15 +80,15 @@ public class ART2aClassificationActivityTest extends CDKTavernaTestCases {
 
 	private File dir = null;
 	private CDKActivityConfigurationBean configBean;
-	private AbstractCDKActivity activity = new ART2aClassificationActivity();
+	private AbstractCDKActivity activity = new ART2aClustererActivity();
 
 	public ART2aClassificationActivityTest() {
-		super(ART2aClassificationActivity.ART2A_CLASSIFICATOR_ACTIVITY);
+		super(ART2aClustererActivity.ART2A_CLUSTERER_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		configBean.setActivityName(ART2aClassificationActivity.ART2A_CLASSIFICATOR_ACTIVITY);
+		configBean.setActivityName(ART2aClustererActivity.ART2A_CLUSTERER_ACTIVITY);
 		this.dir = new File(SetupController.getInstance().getWorkingDir());
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION, ".art2a");
 		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_CLASSIFICATIONS,

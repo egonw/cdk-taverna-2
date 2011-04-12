@@ -81,6 +81,7 @@ public abstract class AbstractDescriptorTestCase extends CDKTavernaTestCases {
 	protected boolean testDataWithAtomTypePerception = false;
 
 	public AbstractDescriptorTestCase(Class<? extends AbstractCDKActivity> activityClass) {
+		super();
 		try {
 			this.activity = activityClass.newInstance();
 		} catch (InstantiationException e) {

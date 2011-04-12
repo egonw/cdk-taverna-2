@@ -48,7 +48,7 @@ import org.openscience.cdk.io.MDLV2000Reader;
 
 public class MDLSDFileReaderActivity extends AbstractCDKActivity {
 
-	public static final String SD_FILE_READER_ACTIVITY = "SDfile Reader";
+	public static final String SD_FILE_READER_ACTIVITY = "SDFile Reader";
 
 	/**
 	 * Creates a new instance.

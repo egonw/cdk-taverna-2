@@ -51,7 +51,7 @@ import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
  */
 public class MDLMolFileWriterActivity extends AbstractCDKActivity {
 
-	public static final String MOL_FILE_WRITER_ACTIVITY = "Mol file Writer";
+	public static final String MOL_FILE_WRITER_ACTIVITY = "Mol File Writer";
 
 	/**
 	 * Creates a new instance.

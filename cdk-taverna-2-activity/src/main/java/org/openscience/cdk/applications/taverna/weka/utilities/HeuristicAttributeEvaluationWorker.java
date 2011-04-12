@@ -21,38 +21,52 @@
  */
 package org.openscience.cdk.applications.taverna.weka.utilities;
 
-import org.openscience.cdk.applications.taverna.weka.regression.GAAttributeSelectionActivity;
+import java.util.Random;
+
+import org.openscience.cdk.applications.taverna.weka.regression.HeuristicAttributeSelectionActivity;
 
 import weka.classifiers.Classifier;
+import weka.classifiers.Evaluation;
+import weka.core.Instances;
+import weka.filters.Filter;
 
 /**
- * Represents the worker for the GA attribute selection activity.
+ * Worker class for the heuristic attribute evaluation activity.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class GAAttributeEvaluationWorker extends Thread {
+public class HeuristicAttributeEvaluationWorker extends Thread {
 
-	private GAAttributeSelectionActivity owner = null;
+	private HeuristicAttributeSelectionActivity owner = null;
 	private boolean isDone = false;
 
 	/**
 	 * Creates a new instance.
 	 */
-	public GAAttributeEvaluationWorker(GAAttributeSelectionActivity owner) {
+	public HeuristicAttributeEvaluationWorker(HeuristicAttributeSelectionActivity owner) {
 		this.owner = owner;
 	}
 
 	@Override
 	public void run() {
+		WekaTools tools = new WekaTools();
 		try {
-			GAAttributeEvaluationGenome individual;
-			while ((individual = owner.getWork()) != null) {
-				// Create individual dataset
-				individual.updateDataset();
+			Integer idx;
+			while ((idx = owner.getWork()) != null) {
+				Instances currentSet = this.owner.getCurrentSet();
 				// Calculate score
+				Instances work = Filter.useFilter(currentSet, tools.getAttributRemover(currentSet, idx + 1));
 				Classifier classifier = this.owner.getClassifier();
-				individual.calculateScore(classifier, this.owner.isUSE_CV(), this.owner.getFOLDS());
+				Evaluation eval = new Evaluation(work);
+				if (this.owner.isUSE_CV()) {
+					eval.crossValidateModel(classifier, work, this.owner.getFOLDS(), new Random(1));
+				} else {
+					classifier.buildClassifier(work);
+					eval.evaluateModel(classifier, work);
+				}
+				double rmse = eval.rootMeanSquaredError();
+				this.owner.publishResult(rmse, idx);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -62,7 +76,7 @@ public class GAAttributeEvaluationWorker extends Thread {
 	}
 
 	/**
-	 * @return True if worker has finished.
+	 * @return True if worker is ready.
 	 */
 	public boolean isDone() {
 		return isDone;

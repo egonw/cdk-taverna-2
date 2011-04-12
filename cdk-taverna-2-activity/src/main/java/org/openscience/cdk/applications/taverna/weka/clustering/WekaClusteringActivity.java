@@ -64,7 +64,7 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 	 */
 	public WekaClusteringActivity() {
 		this.INPUT_PORTS = new String[] { "Weka Dataset", "File" };
-		this.OUTPUT_PORTS = new String[] { "Weka Clustering Files" };
+		this.OUTPUT_PORTS = new String[] { "Clustering Model Files" };
 	}
 
 	@Override

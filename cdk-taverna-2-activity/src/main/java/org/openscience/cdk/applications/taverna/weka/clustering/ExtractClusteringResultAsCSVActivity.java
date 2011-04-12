@@ -29,6 +29,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
+
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
@@ -57,13 +61,17 @@ public class ExtractClusteringResultAsCSVActivity extends AbstractCDKActivity {
 	 * Creates a new instance.
 	 */
 	public ExtractClusteringResultAsCSVActivity() {
-		this.INPUT_PORTS = new String[] { "Weka Clustering Files" };
+		this.INPUT_PORTS = new String[] { "Clustering Model File", " Weka Dataset" };
 		this.OUTPUT_PORTS = new String[] { "Result Files" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
+		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+		expectedReferences.add(FileReference.class);
+		expectedReferences.add(InlineStringReference.class);
+		addInput(this.INPUT_PORTS[0], 1, false, expectedReferences, null);
+		addInput(this.INPUT_PORTS[1], 0, true, null, byte[].class);
 	}
 
 	@Override
@@ -74,21 +82,18 @@ public class ExtractClusteringResultAsCSVActivity extends AbstractCDKActivity {
 	@Override
 	public void work() throws Exception {
 		// Get input
-		List<String> files = this.getInputAsList(this.INPUT_PORTS[0], String.class);
+		List<File> files = this.getInputAsFileList(this.INPUT_PORTS[0]);
+		Instances dataset = this.getInputAsObject(this.INPUT_PORTS[1], Instances.class);
 		// Do work
 		ArrayList<String> resultFiles = new ArrayList<String>();
-		Instances dataset = null;
 		Instances uuids = null;
 		Clusterer clusterer = null;
 		WekaTools tools = new WekaTools();
-		for (int i = 2; i < files.size(); i++) { // The first two files are data files
+		for (int i = 0; i < files.size(); i++) {
 			try {
 				// Load clusterer
-				clusterer = (Clusterer) SerializationHelper.read(files.get(i));
-				// load data
-				BufferedReader buffReader = new BufferedReader(new FileReader(files.get(0)));
-				dataset = new Instances(buffReader);
-				buffReader.close();
+				clusterer = (Clusterer) SerializationHelper.read(files.get(i).getPath());
+				// Prepare data
 				uuids = Filter.useFilter(dataset, tools.getIDGetter(dataset));
 				dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			} catch (Exception e) {
@@ -101,17 +106,17 @@ public class ExtractClusteringResultAsCSVActivity extends AbstractCDKActivity {
 				ClusterEvaluation eval = new ClusterEvaluation();
 				eval.setClusterer(clusterer);
 				eval.evaluateClusterer(dataset);
-				String path = new File(files.get(0)).getParent();
+				String path = files.get(0).getParent();
 				String name = clusterer.getClass().getSimpleName();
 				File resultFile = FileNameGenerator.getNewFile(path, ".txt",
-						name + tools.getOptionsFromFile(new File(files.get(i)), name) + "_ClusteringStats");
+						name + tools.getOptionsFromFile(files.get(i), name) + "_ClusteringStats");
 				PrintWriter writer = new PrintWriter(resultFile);
 				resultFiles.add(resultFile.getPath());
 				writer.write(eval.clusterResultsToString());
 				writer.close();
 				// Write UUID-Cluster CSV file
 				resultFile = FileNameGenerator.getNewFile(path, ".csv",
-						name + tools.getOptionsFromFile(new File(files.get(i)), name) + "_UUIDCluster");
+						name + tools.getOptionsFromFile(files.get(i), name) + "_UUIDCluster");
 				writer = new PrintWriter(resultFile);
 				resultFiles.add(resultFile.getPath());
 				writer.write("UUID;Cluster_Number;\n");

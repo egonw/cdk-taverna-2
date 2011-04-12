@@ -48,7 +48,7 @@ import org.openscience.cdk.io.MDLReader;
  */
 public class MDLMolFileReaderActivity extends AbstractCDKActivity {
 
-	public static final String MOL_FILE_READER_ACTIVITY = "Mol file Reader";
+	public static final String MOL_FILE_READER_ACTIVITY = "Mol File Reader";
 
 	/**
 	 * Creates a new instance.

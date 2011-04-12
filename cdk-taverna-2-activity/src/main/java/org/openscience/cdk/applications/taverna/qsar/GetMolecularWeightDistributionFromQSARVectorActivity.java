@@ -21,17 +21,29 @@
  */
 package org.openscience.cdk.applications.taverna.qsar;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
+
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
+import org.openscience.cdk.applications.taverna.basicutilities.ChartTool;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
+import org.openscience.cdk.applications.taverna.basicutilities.Tools;
 import org.openscience.cdk.applications.taverna.qsar.utilities.QSARVectorUtility;
 
 /**
@@ -49,13 +61,17 @@ public class GetMolecularWeightDistributionFromQSARVectorActivity extends Abstra
 	 * Creates a new instance.
 	 */
 	public GetMolecularWeightDistributionFromQSARVectorActivity() {
-		this.INPUT_PORTS = new String[] { "Descriptor Vector" };
+		this.INPUT_PORTS = new String[] { "Descriptor Vector", "File" };
 		this.OUTPUT_PORTS = new String[] { "MW Distribution CSV", "MW Molecule IDS CSV" };
 	}
 
 	@Override
 	protected void addInputPorts() {
 		addInput(this.INPUT_PORTS[0], 0, true, null, byte[].class);
+		List<Class<? extends ExternalReferenceSPI>> expectedReferences = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+		expectedReferences.add(FileReference.class);
+		expectedReferences.add(InlineStringReference.class);
+		addInput(this.INPUT_PORTS[1], 0, false, expectedReferences, null);
 	}
 
 	@Override
@@ -75,7 +91,11 @@ public class GetMolecularWeightDistributionFromQSARVectorActivity extends Abstra
 			ErrorLogger.getInstance().writeError(CDKTavernaException.WRONG_INPUT_PORT_TYPE, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
+		File targetFile = this.getInputAsFile(this.INPUT_PORTS[1]);
+		String directory = Tools.getDirectory(targetFile);
+		String name = Tools.getFileName(targetFile);
 		// Do work
+		ChartTool chartTool = new ChartTool();
 		ArrayList<String> molIdSWeightCSV = new ArrayList<String>();
 		ArrayList<String> weightDistributionCSV = new ArrayList<String>();
 		try {
@@ -106,6 +126,16 @@ public class GetMolecularWeightDistributionFromQSARVectorActivity extends Abstra
 			for (int i = 1; i < weightDistribution.length; i++) {
 				weightDistributionCSV.add(i + ";" + weightDistribution[i] + ";");
 			}
+			// Create chart
+			XYSeries series = new XYSeries("Weight");
+			for (int i = 0; i < weightDistribution.length; i++) {
+				series.add(i, weightDistribution[i]);
+			}
+			XYSeriesCollection dataset = new XYSeriesCollection(series);
+			JFreeChart chart = chartTool.createXYBarChart("Weight Distribution", "Weight (g/mol)",
+					"Number of Compounds", dataset, true, false);
+			File file = FileNameGenerator.getNewFile(directory, ".pdf", name);
+			chartTool.writeChartAsPDF(file, Collections.singletonList((Object) chart));
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError("Error during extraction of molecular weight from QSAR vector!",
 					this.getActivityName(), e);

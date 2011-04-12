@@ -100,7 +100,7 @@ public class CacheController {
 		filename += ".cache";
 		return new File(filename);
 	}
-	
+
 	/**
 	 * Method used for data decompression
 	 * 
@@ -116,7 +116,6 @@ public class CacheController {
 		}
 		return temp;
 	}
-
 
 	/**
 	 * Method used for data compression.
@@ -233,4 +232,5 @@ public class CacheController {
 		raf.close();
 		return data;
 	}
+
 }

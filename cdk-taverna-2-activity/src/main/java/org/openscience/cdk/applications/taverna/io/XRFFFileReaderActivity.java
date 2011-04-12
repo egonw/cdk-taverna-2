@@ -48,7 +48,7 @@ import weka.core.converters.XRFFLoader;
  */
 public class XRFFFileReaderActivity extends AbstractCDKActivity {
 
-	public static final String XRFF_FILE_READER_ACTIVITY = "XRFF file Reader";
+	public static final String XRFF_FILE_READER_ACTIVITY = "XRFF File Reader";
 
 	/**
 	 * Creates a new instance.

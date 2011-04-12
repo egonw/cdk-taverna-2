@@ -24,13 +24,13 @@ package org.openscience.cdk.applications.taverna.basicutilities;
 import java.util.UUID;
 
 /**
- * Helper class to store cache informations.
+ * Helper class for storing cache informations.
  * 
  * @author Andreas
  *
  */
 public class CacheObject {
-	long offset;
-	int size;
-	UUID fileID;
+	public long offset;
+	public int size;
+	public UUID fileID;
 }

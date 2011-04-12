@@ -7,10 +7,12 @@ import java.util.LinkedList;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.border.BevelBorder;
 
+import org.openscience.cdk.applications.taverna.ui.UITools;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractLearningConfigurationFrame;
 
 import weka.classifiers.functions.LibSVM;
@@ -191,6 +193,56 @@ public class SupportVectorMachinesFrame extends AbstractLearningConfigurationFra
 
 	@Override
 	public boolean checkValues() {
+		if (!UITools.checkTextFieldValueInt(this, "Degree", this.degreeLowTextField, 1, Integer.MAX_VALUE)) {
+			return false;
+		}
+		if (!this.gammaLowTextField.getText().equals("1/k")) {
+			if (UITools.checkTextFieldValueDouble(this, "Gamma lower limit", this.gammaLowTextField, 0,
+					Double.MAX_VALUE)) {
+				if (!this.gammaHighTextField.getText().trim().equals("")) {
+					if (!UITools.checkTextFieldValueDouble(this, "Gamma higher limit", this.gammaHighTextField, 0,
+							Double.MAX_VALUE)
+							|| !UITools.checkTextFieldValueDouble(this, "Gamma step size", this.gammaStepsizeTextField,
+									0, Double.MAX_VALUE)) {
+						return false;
+					}
+				}
+			} else {
+				return false;
+			}
+		}
+		if (!this.gammaLowTextField.getText().equals("1/k") && !this.gammaHighTextField.getText().trim().equals("")) {
+			double a = Double.parseDouble(this.gammaLowTextField.getText()) ;
+			double b = Double.parseDouble(this.gammaHighTextField.getText()) ;
+			if(a >= b) {
+				JOptionPane.showMessageDialog(this, "The higher gamma limit has to be greater than the lower limit!",
+						"Illegal Argument", JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+		}
+		if (UITools.checkTextFieldValueInt(this, "Cost lower limit", this.startTextField, 1, Integer.MAX_VALUE)) {
+			if (!this.endTextField.getText().trim().equals("")) {
+				if (!UITools.checkTextFieldValueInt(this, "Cost higher limit", this.endTextField, 1, Integer.MAX_VALUE)
+						|| !UITools.checkTextFieldValueInt(this, "Cost step size", this.stepSizeTextField, 1,
+								Integer.MAX_VALUE)) {
+					return false;
+				}
+			}
+		} else {
+			return false;
+		}
+		if (!this.endTextField.getText().trim().equals("")) {
+			double a = Double.parseDouble(this.startTextField.getText()) ;
+			double b = Double.parseDouble(this.endTextField.getText()) ;
+			if(a >= b) {
+				JOptionPane.showMessageDialog(this, "The higher cost limit has to be greater than the lower limit!",
+						"Illegal Argument", JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+		}
+		if (!UITools.checkTextFieldValueDouble(this, "Coef", this.coefTextField, -Double.MAX_VALUE, Double.MAX_VALUE)) {
+			return false;
+		}
 		return true;
 	}
 
@@ -284,7 +336,7 @@ public class SupportVectorMachinesFrame extends AbstractLearningConfigurationFra
 			if (i == 1) {
 				stepSizeC = highC - lowC;
 			}
-			if ( !firstDif && opt.length > 12 && !opt[13].equals("1/k")) {
+			if (!firstDif && opt.length > 12 && !opt[13].equals("1/k")) {
 				if (!highG.equals(lowG)) {
 					stepSizeG = highG - lowG;
 					firstDif = true;
@@ -324,7 +376,7 @@ public class SupportVectorMachinesFrame extends AbstractLearningConfigurationFra
 		this.gammaHighTextField.setEnabled(false);
 		this.gammaStepsizeTextField.setEnabled(false);
 	}
-	
+
 	@Override
 	public boolean useThreading() {
 		return false;

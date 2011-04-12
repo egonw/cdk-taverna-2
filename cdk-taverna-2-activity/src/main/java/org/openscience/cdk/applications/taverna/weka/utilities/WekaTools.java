@@ -29,6 +29,8 @@ package org.openscience.cdk.applications.taverna.weka.utilities;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -366,7 +368,16 @@ public class WekaTools {
 		throw new CDKTavernaException("WekaTools", CDKTavernaException.CLUSTER_MODEL_HAS_NO_ID);
 	}
 
-	public Instances createLearningSet(Instances dataset, HashMap<UUID, Double> classMap) {
+	/**
+	 * Adds a numeric class attribute to a normal weka dataset.
+	 * 
+	 * @param dataset
+	 *            Weka dataset.
+	 * @param classMap
+	 *            Class map containing the IDs and the class values.
+	 * @return
+	 */
+	public Instances createRegressionSet(Instances dataset, HashMap<UUID, Double> classMap) {
 		Instances learningSet = null;
 		FastVector attributes = new FastVector();
 		for (int i = 0; i < dataset.numAttributes(); i++) {
@@ -391,7 +402,57 @@ public class WekaTools {
 		learningSet.randomize(new Random());
 		return learningSet;
 	}
+	
+	/**
+	 * Adds a nominal class attribute to a normal weka dataset.
+	 * 
+	 * @param dataset
+	 *            Weka dataset.
+	 * @param classMap
+	 *            Class map containing the IDs and the class values.
+	 * @return
+	 */
+	public Instances createClassificationSet(Instances dataset, HashMap<UUID, String> classMap, HashSet<String> labels) {
+		Instances learningSet = null;
+		FastVector attributes = new FastVector();
+		for (int i = 0; i < dataset.numAttributes(); i++) {
+			attributes.addElement(dataset.attribute(i));
+		}
+		FastVector labelNames = new FastVector();
+		Iterator<String> iter = labels.iterator();
+		while(iter.hasNext()) {
+			labelNames.addElement(iter.next());
+		}
+		attributes.addElement(new Attribute("Class", labelNames));
+		learningSet = new Instances("LearningSet", attributes, dataset.numInstances());
+		learningSet.setClassIndex(learningSet.numAttributes() - 1);
+		for (int i = 0; i < dataset.numInstances(); i++) {
+			Instance instance = dataset.instance(i);
+			UUID uuid = UUID.fromString(instance.stringValue(0));
+			double[] values = new double[learningSet.numAttributes()];
+			values[0] = learningSet.attribute(0).addStringValue(instance.stringValue(0));
+			for (int j = 1; j < instance.numAttributes(); j++) {
+				values[j] = instance.value(j);
+			}
+			Instance inst = new Instance(1.0, values);
+			inst.setDataset(learningSet);
+			int classValueIndex = learningSet.classAttribute().indexOfValue(classMap.get(uuid));
+			inst.setClassValue(classValueIndex);
+			learningSet.add(inst);
+		}
+		learningSet.randomize(new Random());
+		return learningSet;
+	}
 
+	/**
+	 * Concatenates the two given sets.
+	 * 
+	 * @param trainset
+	 *            Set one.
+	 * @param testset
+	 *            Set two.
+	 * @return Concatenated set.
+	 */
 	public Instances getFullSet(Instances trainset, Instances testset) {
 		Instances full = new Instances(trainset);
 		for (int i = 0; i < testset.numInstances(); i++) {

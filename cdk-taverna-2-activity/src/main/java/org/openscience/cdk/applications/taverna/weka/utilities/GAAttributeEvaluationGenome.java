@@ -1,3 +1,24 @@
+/*
+ * Copyright (C) 2010 - 2011 by Andreas Truszkowski <ATruszkowski@gmx.de>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1
+ * of the License, or (at your option) any later version.
+ * All we ask is that proper credit is given for our work, which includes
+ * - but is not limited to - adding the above copyright notice to the beginning
+ * of your source code files, and to any copyright notice that you may distribute
+ * with programs based on this work.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ */
 package org.openscience.cdk.applications.taverna.weka.utilities;
 
 import java.util.Arrays;
@@ -10,6 +31,12 @@ import weka.classifiers.Evaluation;
 import weka.core.Instances;
 import weka.filters.Filter;
 
+/**
+ * Represents a genome for the GA attribute selection activity.
+ * 
+ * @author Andreas Truszkowski
+ * 
+ */
 public class GAAttributeEvaluationGenome {
 
 	private static int SCORE_POWER = 2;
@@ -24,6 +51,9 @@ public class GAAttributeEvaluationGenome {
 	private String[] attrNames = null;
 	private boolean[] attrIsUsed = null;
 
+	/**
+	 * Creates a new instance.
+	 */
 	public GAAttributeEvaluationGenome(Instances dataset) throws Exception {
 		this.dataset = dataset;
 		HashSet<String> nameSet = new HashSet<String>();
@@ -34,14 +64,13 @@ public class GAAttributeEvaluationGenome {
 		this.attrNames = nameSet.toArray(this.attrNames);
 		this.attrIsUsed = new boolean[this.attrNames.length];
 		for (int i = 0; i < this.attrIsUsed.length; i++) {
-			if (this.rand.nextDouble() < 0.75) {
-				this.attrIsUsed[i] = true;
-			} else {
-				this.attrIsUsed[i] = false;
-			}
+			this.attrIsUsed[i] = this.rand.nextBoolean();
 		}
 	}
 
+	/**
+	 * Creates a new instance.
+	 */
 	private GAAttributeEvaluationGenome(Instances dataset, String[] attrNames, boolean[] attrIsUsed, double rmse,
 			int attrRestriction) {// ,
 		this.dataset = dataset;
@@ -52,6 +81,12 @@ public class GAAttributeEvaluationGenome {
 		this.attrRestriction = attrRestriction;
 	}
 
+	/**
+	 * Mutates the genome.
+	 * 
+	 * @param rate
+	 *            Rate of muating attributes.
+	 */
 	public void mutate(double rate) {
 		// Mutate used attributes
 		for (int i = 0; i < this.attrIsUsed.length; i++) {
@@ -65,6 +100,12 @@ public class GAAttributeEvaluationGenome {
 		}
 	}
 
+	/**
+	 * Performs a cross-over with given second genome.
+	 * 
+	 * @param genome
+	 *            Second genome for performing the cross-over.
+	 */
 	public void crossOver(GAAttributeEvaluationGenome genome) {
 		int start = this.rand.nextInt(this.attrNames.length);
 		int end = this.rand.nextInt(this.attrNames.length - (start - 1)) + start;
@@ -81,6 +122,9 @@ public class GAAttributeEvaluationGenome {
 		}
 	}
 
+	/**
+	 * Restricts the number of chosen attributes.
+	 */
 	public void applyAttrRestriction() {
 		// count active descriptors
 		LinkedList<Integer> activeDescriptors = new LinkedList<Integer>();
@@ -108,6 +152,9 @@ public class GAAttributeEvaluationGenome {
 		}
 	}
 
+	/**
+	 * Creates a dataset depending on which attributes are activated.
+	 */
 	public void updateDataset() throws Exception {
 		WekaTools tools = new WekaTools();
 		LinkedList<Integer> attributesToDelete = new LinkedList<Integer>();
@@ -124,6 +171,17 @@ public class GAAttributeEvaluationGenome {
 		this.optDataset = Filter.useFilter(this.dataset, tools.getAttributRemover(this.dataset, attributesToDelete));
 	}
 
+	/**
+	 * Calculates the score of current genome.
+	 * 
+	 * @param classifier
+	 *            Classifier to perform the classification with.
+	 * @param useCV
+	 *            True when Cross Validation shall be used.
+	 * @param folds
+	 *            Number of folds.
+	 * @throws Exception
+	 */
 	public void calculateScore(Classifier classifier, boolean useCV, int folds) throws Exception {
 		WekaTools tools = new WekaTools();
 		Instances testset = Filter.useFilter(this.optDataset, tools.getIDRemover(this.optDataset));
@@ -138,6 +196,7 @@ public class GAAttributeEvaluationGenome {
 		this.score = Math.pow(1 / this.rmse, SCORE_POWER);
 	}
 
+	@Override
 	public String toString() {
 		String s = "Attribute;isUsed;Weight\n";
 		for (int i = 0; i < this.attrNames.length; i++) {
@@ -148,6 +207,7 @@ public class GAAttributeEvaluationGenome {
 		return s;
 	}
 
+	@Override
 	public Object clone() {
 		GAAttributeEvaluationGenome clone = null;
 		clone = new GAAttributeEvaluationGenome(this.dataset, this.attrNames.clone(), this.attrIsUsed.clone(),
@@ -155,6 +215,9 @@ public class GAAttributeEvaluationGenome {
 		return clone;
 	}
 
+	/**
+	 * @return The current configuration in CSV representation.
+	 */
 	public String getAttributeSetupCSV() {
 		String csv = "Attribute;Selected;\n";
 		for (int i = 0; i < this.attrNames.length; i++) {
@@ -163,35 +226,56 @@ public class GAAttributeEvaluationGenome {
 		return csv;
 	}
 
+	/**
+	 * @return The score.
+	 */
 	public double getScore() {
 		return score;
 	}
 
+	/**
+	 * @return Boolean array which contains the activation state for each
+	 *         attribute.
+	 */
 	public boolean[] getAttrIsUsed() {
 		return attrIsUsed;
 	}
 
+	/**
+	 * @return The attribute names.
+	 */
 	public String[] getAttrNames() {
 		return attrNames;
 	}
 
+	/**
+	 * @param attrNames
+	 *            The attribute names.
+	 */
 	public void setAttrNames(String[] attrNames) {
 		this.attrNames = attrNames;
 	}
 
-	public void setAttrIsUsed(boolean[] attrIsUsed) {
-		this.attrIsUsed = attrIsUsed;
-	}
-
+	/**
+	 * @return RMSE value.
+	 */
 	public double getRmse() {
 		return rmse;
 	}
 
+	/**
+	 * @return The optimized dataset.
+	 * @throws Exception
+	 */
 	public Instances getOptDataset() throws Exception {
 		this.updateDataset();
 		return optDataset;
 	}
 
+	/**
+	 * @param attrRestriction
+	 *            Number of activated attributes. -1 for free selection.FO
+	 */
 	public void setAttrRestriction(int attrRestriction) {
 		this.attrRestriction = attrRestriction;
 	}

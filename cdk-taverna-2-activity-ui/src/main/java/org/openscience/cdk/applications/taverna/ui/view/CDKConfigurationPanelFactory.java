@@ -4,7 +4,7 @@ import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ActivityCon
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
-import org.openscience.cdk.applications.taverna.classification.art2a.ART2aClassificationActivity;
+import org.openscience.cdk.applications.taverna.clustering.art2a.ART2aClustererActivity;
 import org.openscience.cdk.applications.taverna.curation.MoleculeConnectivityCheckerActivity;
 import org.openscience.cdk.applications.taverna.interfaces.IIterativeFileWriter;
 import org.openscience.cdk.applications.taverna.interfaces.IPortNumber;
@@ -31,11 +31,11 @@ import org.openscience.cdk.applications.taverna.ui.weka.SplitDatasetIntoTrainTes
 import org.openscience.cdk.applications.taverna.ui.weka.WekaClusteringConfigurationPanelController;
 import org.openscience.cdk.applications.taverna.ui.weka.WekaLearningConfigurationPanelController;
 import org.openscience.cdk.applications.taverna.weka.clustering.WekaClusteringActivity;
-import org.openscience.cdk.applications.taverna.weka.learning.AttributeEvaluationActivity;
-import org.openscience.cdk.applications.taverna.weka.learning.GAAttributeEvaluationActivity;
-import org.openscience.cdk.applications.taverna.weka.learning.ScatterPlotFromLearningResultAsPDFActivity;
-import org.openscience.cdk.applications.taverna.weka.learning.SplitDatasetIntoTrainTestsetActivity;
-import org.openscience.cdk.applications.taverna.weka.learning.WekaLearningActivity;
+import org.openscience.cdk.applications.taverna.weka.regression.HeuristicAttributeSelectionActivity;
+import org.openscience.cdk.applications.taverna.weka.regression.GAAttributeSelectionActivity;
+import org.openscience.cdk.applications.taverna.weka.regression.EvaluateRegressionResultsAsPDFActivity;
+import org.openscience.cdk.applications.taverna.weka.regression.SplitDatasetIntoTrainTestsetActivity;
+import org.openscience.cdk.applications.taverna.weka.regression.WekaRegressionActivity;
 
 public class CDKConfigurationPanelFactory {
 
@@ -55,21 +55,21 @@ public class CDKConfigurationPanelFactory {
 			return new CuratorConfigurationPanel(activity);
 		} else if (activity instanceof ReactionEnumeratorActivity) {
 			return new ReactionEnumeratorConfigurationPanel(activity);
-		} else if (activity instanceof ART2aClassificationActivity) {
+		} else if (activity instanceof ART2aClustererActivity) {
 			return new ART2aClassificationConfigurationPanel(activity);
 		} else if (activity instanceof CurateQSARVectorActivity) {
 			return new CurateQSARVectorConfigurationPanel(activity);
 		} else if (activity instanceof WekaClusteringActivity) {
 			return new WekaClusteringConfigurationPanelController(activity);
-		} else if (activity instanceof WekaLearningActivity) {
+		} else if (activity instanceof WekaRegressionActivity) {
 			return new WekaLearningConfigurationPanelController(activity);
 		} else if (activity instanceof SplitDatasetIntoTrainTestsetActivity) {
 			return new SplitDatasetIntoTrainTestsetConfigurationPanelController(activity);
-		} else if (activity instanceof ScatterPlotFromLearningResultAsPDFActivity) {
+		} else if (activity instanceof EvaluateRegressionResultsAsPDFActivity) {
 			return new ScatternPlotConfigurationPanel(activity);
-		} else if (activity instanceof GAAttributeEvaluationActivity) {
+		} else if (activity instanceof GAAttributeSelectionActivity) {
 			return new GAAttributeEvaluationConfigurationPanel(activity);
-		} else if (activity instanceof AttributeEvaluationActivity) {
+		} else if (activity instanceof HeuristicAttributeSelectionActivity) {
 			return new AttributeEvaluationConfigurationPanel(activity);
 		}
 		return new EmptyConfigurationPanel();

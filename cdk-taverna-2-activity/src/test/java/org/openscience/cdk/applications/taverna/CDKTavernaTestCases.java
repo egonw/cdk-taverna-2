@@ -47,12 +47,11 @@ public abstract class CDKTavernaTestCases extends TestCase {
 	}
 
 	public CDKTavernaTestCases() {
-		super();
 		SetupController.getInstance().loadTestConfiguration();
 	}
 
 	public CDKTavernaTestCases(String name) {
-		super(name);
+		SetupController.getInstance().loadTestConfiguration();
 	}
 
 	/**
@@ -62,7 +61,6 @@ public abstract class CDKTavernaTestCases extends TestCase {
 	 * @throws Exception
 	 */
 	public void test_TestCase() throws CDKException, Exception {
-		
 		ErrorLogger.getInstance().setErrorOccured(false);
 		ActivityInvoker.TIMEOUT = 600;
 		executeTest();

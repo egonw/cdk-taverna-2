@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna.weka;
+package org.openscience.cdk.applications.taverna.weka.clustering;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,24 +36,26 @@ import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.setup.SetupController;
-import org.openscience.cdk.applications.taverna.weka.clustering.ExtractClusteringResultAsCSVActivity;
+import org.openscience.cdk.applications.taverna.weka.clustering.GenerateSilhouettePlotFromClusteringResultAsCSVActivity;
 
 /**
- * Test class for the create extract clustering result as CSV activity.
+ * Test class for the generate silhouette plot from clustering result as CSV
+ * activity.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class ExtractClusteringStatisticsActivityTest extends CDKTavernaTestCases {
+public class GenerateSilhouettePlotFromClusteringResultAsCSVActivityTest extends CDKTavernaTestCases {
 
 	private CDKActivityConfigurationBean configBean;
 
-	private AbstractCDKActivity wekaActivity = new ExtractClusteringResultAsCSVActivity();
+	private AbstractCDKActivity wekaActivity = new GenerateSilhouettePlotFromClusteringResultAsCSVActivity();
 	private ArrayList<String> files = new ArrayList<String>();
 	private File dir = null;
 
-	public ExtractClusteringStatisticsActivityTest() {
-		super(ExtractClusteringResultAsCSVActivity.EXTRACT_CLUSTERING_RESULT_AS_CSV_ACTIVITY);
+	public GenerateSilhouettePlotFromClusteringResultAsCSVActivityTest() {
+		super(
+				GenerateSilhouettePlotFromClusteringResultAsCSVActivity.GENERATE_SILHOUETTE_PLOT_FROM_CLUSTERING_RESULT_AS_CSV_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
@@ -106,7 +108,7 @@ public class ExtractClusteringStatisticsActivityTest extends CDKTavernaTestCases
 	 * @return TestSuite
 	 */
 	public static Test suite() {
-		return new TestSuite(ExtractClusteringStatisticsActivityTest.class);
+		return new TestSuite(GenerateSilhouettePlotFromClusteringResultAsCSVActivityTest.class);
 	}
 
 }

@@ -49,7 +49,7 @@ import org.openscience.cdk.io.SDFWriter;
  */
 public class MDLSDFileWriterActivity extends AbstractCDKActivity implements IIterativeFileWriter {
 
-	public static final String SD_FILE_WRITER_ACTIVITY = "SDfile Writer";
+	public static final String SD_FILE_WRITER_ACTIVITY = "SDFile Writer";
 	private File file = null;
 
 	/**

@@ -42,13 +42,14 @@ public class CDKTavernaConstants {
 	public static final String FILTER_FOLDER_NAME = "Filter";
 	public static final String CURATION_FOLDER_NAME = "Molecule Curation";
 	public static final String DATABASE_FOLDER_NAME = "Database";
-	public static final String ART2A_FOLDER_NAME = "ART-2a Classification";
+	public static final String ART2A_FOLDER_NAME = "ART-2a Clustering";
 	public static final String WEKA_FOLDER_NAME = "Weka";
 	public static final String WEKA_CLUSTERING_FOLDER_NAME = "Weka\\Clustering";
-	public static final String WEKA_LEARNING_FOLDER_NAME = "Weka\\Learning";
+	public static final String WEKA_REGRESSION_FOLDER_NAME = "Weka\\Regression";
+	public static final String WEKA_CLASSIFICATION_FOLDER_NAME = "Weka\\Classification";
 	public static final String MODELLING_FOLDER_NAME = "Modelling";
 	public static final String SIGNATURE_SCORING_FOLDER_NAME = "Signature Scoring";
-	
+
 	// --------------------Properties-------------------------------------
 	public static final String PROPERTY_FILE = "FILE";
 	public static final String PROPERTY_FILE_EXTENSION = "FILE EXTENSION";
@@ -78,9 +79,9 @@ public class CDKTavernaConstants {
 	public static final String PROPERTY_SCATTER_PLOT_OPTIONS = "SCATTER PLOT OPTIONS";
 	public static final String PROPERTY_GA_ATTRIBUTE_SELECTION_OPTIONS = "GA ATTRIBUTE SELECTION OPTIONS";
 	public static final String PROPERTY_ATTRIBUTE_SELECTION_OPTIONS = "ATTRIBUTE SELECTION OPTIONS";
-	
+
 	// --------------------Miscellaneous-------------------------------------
 	public static final String MOLECULEID = "MOLECULEID";
-    public static final String FRAGMENT_SCORE = "SCORE";
-    public static final String SIGNATURE = "SIGNATURE";
+	public static final String FRAGMENT_SCORE = "SCORE";
+	public static final String SIGNATURE = "SIGNATURE";
 }

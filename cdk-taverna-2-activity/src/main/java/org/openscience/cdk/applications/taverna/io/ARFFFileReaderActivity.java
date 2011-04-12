@@ -47,7 +47,7 @@ import weka.core.converters.ConverterUtils.DataSource;
  */
 public class ARFFFileReaderActivity extends AbstractCDKActivity {
 
-	public static final String ARFF_FILE_READER_ACTIVITY = "ARFF file Reader";
+	public static final String ARFF_FILE_READER_ACTIVITY = "ARFF File Reader";
 
 	/**
 	 * Creates a new instance.
