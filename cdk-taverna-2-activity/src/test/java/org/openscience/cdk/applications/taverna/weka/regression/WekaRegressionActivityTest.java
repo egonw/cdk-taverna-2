@@ -107,7 +107,6 @@ public class WekaRegressionActivityTest extends CDKTavernaTestCases {
 			inputs.put(this.wekaRegressionActivity.INPUT_PORTS[0], data);
 			inputs.put(this.wekaRegressionActivity.INPUT_PORTS[1], this.dir);
 			expectedOutputTypes.put(this.wekaRegressionActivity.OUTPUT_PORTS[0], String.class);
-			expectedOutputTypes.put(this.wekaRegressionActivity.OUTPUT_PORTS[1], byte[].class);
 			Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(this.wekaRegressionActivity, inputs, expectedOutputTypes);
 			List<String> resultFiles = (List<String>) outputs.get(this.wekaRegressionActivity.OUTPUT_PORTS[0]);
 			Assert.assertEquals(1, resultFiles.size());

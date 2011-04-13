@@ -119,24 +119,20 @@ public class WekaClusteringActivityTest extends CDKTavernaTestCases {
 		resultMap.put("SimpleKMeans", new Integer[] { 278, 206, 46, 146, 24 });
 		resultMap.put("EM", new Integer[] { 68, 172, 200, 64, 196 });
 		resultMap.put("HierarchicalClusterer", new Integer[] { 695, 2, 1, 1, 1 });
-		Assert.assertEquals(7, files.size());
+		Assert.assertEquals(5, files.size());
 		WekaTools tool = new WekaTools();
 		for (int i = 0; i < 5; i++) {
 			// Load clusterer
 			ObjectInputStream reader = new ObjectInputStream(new BufferedInputStream(new FileInputStream(
-					files.get(2 + i))));
+					files.get(i))));
 			Clusterer clusterer = (Clusterer) reader.readObject();
 			reader.close();
-			// load data
-			BufferedReader buffReader = new BufferedReader(new FileReader(files.get(0)));
-			dataset = new Instances(buffReader);
-			buffReader.close();
 			// Instances ids = Filter.useFilter(dataset, WekaTools.getIDGetter(dataset));
-			dataset = Filter.useFilter(dataset, tool.getIDRemover(dataset));
+			Instances cleanDataset = Filter.useFilter(dataset, tool.getIDRemover(dataset));
 			// Test clusterer
 			int[] numberOfVectorsInClass = new int[clusterer.numberOfClusters()];
-			for (int j = 0; j < dataset.numInstances(); j++) {
-				numberOfVectorsInClass[clusterer.clusterInstance(dataset.instance(j))]++;
+			for (int j = 0; j < cleanDataset.numInstances(); j++) {
+				numberOfVectorsInClass[clusterer.clusterInstance(cleanDataset.instance(j))]++;
 			}
 			Integer[] expectedValues = resultMap.get(clusterer.getClass().getSimpleName());
 			Assert.assertEquals(expectedValues.length, clusterer.numberOfClusters());

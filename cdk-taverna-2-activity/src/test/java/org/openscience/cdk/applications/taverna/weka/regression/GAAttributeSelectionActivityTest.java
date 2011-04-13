@@ -96,7 +96,7 @@ public class GAAttributeSelectionActivityTest extends CDKTavernaTestCases {
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		Map<String, Object> inputs = new HashMap<String, Object>();
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_GA_ATTRIBUTE_SELECTION_OPTIONS, options);
-		List<byte[]> data = CDKObjectHandler.getBytesList(Collections.singletonList(instances));
+		byte[] data = CDKObjectHandler.getBytes(instances);
 		inputs.put(this.gaSelectionActivity.INPUT_PORTS[0], data);
 		expectedOutputTypes.put(this.gaSelectionActivity.OUTPUT_PORTS[0], byte[].class);
 		expectedOutputTypes.put(this.gaSelectionActivity.OUTPUT_PORTS[1], String.class);

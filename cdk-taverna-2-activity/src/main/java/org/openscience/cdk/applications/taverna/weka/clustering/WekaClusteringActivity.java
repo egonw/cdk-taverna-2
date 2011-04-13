@@ -114,26 +114,6 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 				tempOption.clear();
 			}
 		}
-		// Save data as arff
-		File arffFile = null;
-		try {
-			arffFile = FileNameGenerator.getNewFile(this.directory, ".arff", name + "_ClusteringData");
-			DataSink.write(arffFile.getPath(), dataset);
-			this.resultFiles.add(arffFile.getPath());
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + arffFile.getPath(),
-					this.getActivityName(), e);
-		}
-		// save as CSV
-		File csvFile = null;
-		try {
-			csvFile = FileNameGenerator.getNewFile(this.directory, ".csv", name + "_ClusteringData");
-			DataSink.write(csvFile.getPath(), dataset);
-			this.resultFiles.add(csvFile.getPath());
-		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + csvFile.getPath(),
-					this.getActivityName(), e);
-		}
 		try {
 			WekaTools tools = new WekaTools();
 			dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));

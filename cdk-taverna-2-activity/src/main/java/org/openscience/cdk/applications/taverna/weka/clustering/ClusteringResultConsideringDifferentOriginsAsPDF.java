@@ -64,7 +64,7 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 	 * Creates a new instance.
 	 */
 	public ClusteringResultConsideringDifferentOriginsAsPDF() {
-		this.INPUT_PORTS = new String[] { "Clustering Model Files", " Weka Dataset", "Relations Table" };
+		this.INPUT_PORTS = new String[] { "Clustering Model Files", "Weka Dataset", "Relations Table" };
 		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 

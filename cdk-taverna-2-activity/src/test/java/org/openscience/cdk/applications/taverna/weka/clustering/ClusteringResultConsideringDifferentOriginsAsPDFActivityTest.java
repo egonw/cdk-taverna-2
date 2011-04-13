@@ -106,7 +106,9 @@ public class ClusteringResultConsideringDifferentOriginsAsPDFActivityTest extend
 		expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(wekaDatasetActivity.OUTPUT_PORTS[0], byte[].class);
 		outputs = ActivityInvoker.invokeAsyncActivity(wekaDatasetActivity, inputs, expectedOutputTypes);
-		inputs = outputs;
+		Object obj = outputs.get(wekaDatasetActivity.OUTPUT_PORTS[0]);
+		inputs = new HashMap<String, Object>();
+		inputs.put(wekaClusteringActivity.INPUT_PORTS[0], obj);
 		// Cluster
 		expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(wekaClusteringActivity.OUTPUT_PORTS[0], String.class);
@@ -115,7 +117,8 @@ public class ClusteringResultConsideringDifferentOriginsAsPDFActivityTest extend
 		List<String> files = (List<String>) outputs.get(wekaClusteringActivity.OUTPUT_PORTS[0]);
 		inputs = new HashMap<String, Object>();
 		inputs.put(wekaActivity.INPUT_PORTS[0], files);
-		inputs.put(wekaActivity.INPUT_PORTS[1], relationTable);
+		inputs.put(wekaActivity.INPUT_PORTS[1], obj);
+		inputs.put(wekaActivity.INPUT_PORTS[2], relationTable);
 		expectedOutputTypes = new HashMap<String, Class<?>>();
 		outputs = ActivityInvoker.invokeAsyncActivity(wekaActivity, inputs, expectedOutputTypes);
 		Assert.assertEquals("Unexpected outputs", 0, outputs.size());
