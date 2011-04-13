@@ -63,19 +63,19 @@ import weka.filters.Filter;
  * @author Andreas Truszkowski
  * 
  */
-public class AttributeEvaluationActivityTest extends CDKTavernaTestCases {
+public class LeaveOneOutAttributeSelectionActivityTest extends CDKTavernaTestCases {
 
 	private CDKActivityConfigurationBean configBean;
 
-	private AbstractCDKActivity evaluationActivity = new HeuristicAttributeSelectionActivity();
+	private AbstractCDKActivity evaluationActivity = new LeaveOneOutAttributeSelectionActivity();
 
-	public AttributeEvaluationActivityTest() {
-		super(HeuristicAttributeSelectionActivity.HEURISTIC_ATTRIBUTE_SELECTION_ACTIVITY);
+	public LeaveOneOutAttributeSelectionActivityTest() {
+		super(LeaveOneOutAttributeSelectionActivity.HEURISTIC_ATTRIBUTE_SELECTION_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		configBean.setActivityName(HeuristicAttributeSelectionActivity.HEURISTIC_ATTRIBUTE_SELECTION_ACTIVITY);
+		configBean.setActivityName(LeaveOneOutAttributeSelectionActivity.HEURISTIC_ATTRIBUTE_SELECTION_ACTIVITY);
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class AttributeEvaluationActivityTest extends CDKTavernaTestCases {
 	 * @return TestSuite
 	 */
 	public static Test suite() {
-		return new TestSuite(AttributeEvaluationActivityTest.class);
+		return new TestSuite(LeaveOneOutAttributeSelectionActivityTest.class);
 	}
 
 }

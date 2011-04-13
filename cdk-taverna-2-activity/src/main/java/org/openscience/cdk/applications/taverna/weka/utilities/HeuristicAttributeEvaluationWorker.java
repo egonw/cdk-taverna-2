@@ -23,7 +23,7 @@ package org.openscience.cdk.applications.taverna.weka.utilities;
 
 import java.util.Random;
 
-import org.openscience.cdk.applications.taverna.weka.regression.HeuristicAttributeSelectionActivity;
+import org.openscience.cdk.applications.taverna.weka.regression.LeaveOneOutAttributeSelectionActivity;
 
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
@@ -38,13 +38,13 @@ import weka.filters.Filter;
  */
 public class HeuristicAttributeEvaluationWorker extends Thread {
 
-	private HeuristicAttributeSelectionActivity owner = null;
+	private LeaveOneOutAttributeSelectionActivity owner = null;
 	private boolean isDone = false;
 
 	/**
 	 * Creates a new instance.
 	 */
-	public HeuristicAttributeEvaluationWorker(HeuristicAttributeSelectionActivity owner) {
+	public HeuristicAttributeEvaluationWorker(LeaveOneOutAttributeSelectionActivity owner) {
 		this.owner = owner;
 	}
 

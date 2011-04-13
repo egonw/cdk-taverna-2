@@ -63,13 +63,13 @@ import weka.filters.Filter;
  * @author Andreas Truszkowski
  * 
  */
-public class GAAttributeEvaluationActivityTest extends CDKTavernaTestCases {
+public class GAAttributeSelectionActivityTest extends CDKTavernaTestCases {
 
 	private CDKActivityConfigurationBean configBean;
 
 	private AbstractCDKActivity gaSelectionActivity = new GAAttributeSelectionActivity();
 
-	public GAAttributeEvaluationActivityTest() {
+	public GAAttributeSelectionActivityTest() {
 		super(GAAttributeSelectionActivity.GA_ATTRIBUTE_SELECTION_ACTIVITY);
 	}
 
@@ -130,7 +130,7 @@ public class GAAttributeEvaluationActivityTest extends CDKTavernaTestCases {
 	 * @return TestSuite
 	 */
 	public static Test suite() {
-		return new TestSuite(GAAttributeEvaluationActivityTest.class);
+		return new TestSuite(GAAttributeSelectionActivityTest.class);
 	}
 
 }

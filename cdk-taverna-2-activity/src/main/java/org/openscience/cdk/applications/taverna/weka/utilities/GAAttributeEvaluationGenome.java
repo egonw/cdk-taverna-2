@@ -85,7 +85,7 @@ public class GAAttributeEvaluationGenome {
 	 * Mutates the genome.
 	 * 
 	 * @param rate
-	 *            Rate of muating attributes.
+	 *            Rate of mutating attributes.
 	 */
 	public void mutate(double rate) {
 		// Mutate used attributes

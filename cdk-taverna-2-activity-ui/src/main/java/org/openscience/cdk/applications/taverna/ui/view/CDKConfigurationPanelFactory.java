@@ -31,7 +31,7 @@ import org.openscience.cdk.applications.taverna.ui.weka.SplitDatasetIntoTrainTes
 import org.openscience.cdk.applications.taverna.ui.weka.WekaClusteringConfigurationPanelController;
 import org.openscience.cdk.applications.taverna.ui.weka.WekaLearningConfigurationPanelController;
 import org.openscience.cdk.applications.taverna.weka.clustering.WekaClusteringActivity;
-import org.openscience.cdk.applications.taverna.weka.regression.HeuristicAttributeSelectionActivity;
+import org.openscience.cdk.applications.taverna.weka.regression.LeaveOneOutAttributeSelectionActivity;
 import org.openscience.cdk.applications.taverna.weka.regression.GAAttributeSelectionActivity;
 import org.openscience.cdk.applications.taverna.weka.regression.EvaluateRegressionResultsAsPDFActivity;
 import org.openscience.cdk.applications.taverna.weka.regression.SplitDatasetIntoTrainTestsetActivity;
@@ -69,7 +69,7 @@ public class CDKConfigurationPanelFactory {
 			return new ScatternPlotConfigurationPanel(activity);
 		} else if (activity instanceof GAAttributeSelectionActivity) {
 			return new GAAttributeEvaluationConfigurationPanel(activity);
-		} else if (activity instanceof HeuristicAttributeSelectionActivity) {
+		} else if (activity instanceof LeaveOneOutAttributeSelectionActivity) {
 			return new AttributeEvaluationConfigurationPanel(activity);
 		}
 		return new EmptyConfigurationPanel();
