@@ -2,7 +2,7 @@ package org.openscience.cdk.applications.taverna.ui.weka.panels;
 
 import javax.swing.JPanel;
 
-public abstract class AbstractLearningConfigurationFrame extends JPanel {
+public abstract class AbstractClassificationConfigurationFrame extends JPanel {
 
 	private static final long serialVersionUID = -7206928107825263602L;
 

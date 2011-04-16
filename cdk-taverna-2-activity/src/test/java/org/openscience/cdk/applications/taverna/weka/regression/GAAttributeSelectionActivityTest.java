@@ -67,15 +67,15 @@ public class GAAttributeSelectionActivityTest extends CDKTavernaTestCases {
 
 	private CDKActivityConfigurationBean configBean;
 
-	private AbstractCDKActivity gaSelectionActivity = new GAAttributeSelectionActivity();
+	private AbstractCDKActivity gaSelectionActivity = new GARAttributeSelectionActivity();
 
 	public GAAttributeSelectionActivityTest() {
-		super(GAAttributeSelectionActivity.GA_ATTRIBUTE_SELECTION_ACTIVITY);
+		super(GARAttributeSelectionActivity.GA_ATTRIBUTE_SELECTION_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		configBean.setActivityName(GAAttributeSelectionActivity.GA_ATTRIBUTE_SELECTION_ACTIVITY);
+		configBean.setActivityName(GARAttributeSelectionActivity.GA_ATTRIBUTE_SELECTION_ACTIVITY);
 	}
 
 	/**

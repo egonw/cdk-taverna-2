@@ -19,23 +19,36 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna.weka.utilities;
+package org.openscience.cdk.applications.taverna.weka.classification;
 
-import java.io.File;
-
-import weka.classifiers.Classifier;
-import weka.core.Instances;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
+import org.openscience.cdk.applications.taverna.weka.utilities.AbstractWekaLearningActivity;
 
 /**
- * Work class for the weka regression activity.
+ * Class which represents the Weka classification activity.
  * 
- * @author Andreas Truszkowski
+ * @author Andreas Truzskowski
  * 
  */
-public class WekaRegressionWork {
-	public Class<? extends Classifier> classifierClass;
-	public String option;
-	public Instances trainingSet;
-	public int id;
-	public File modelFile;
+public class WekaClassificationActivity extends AbstractWekaLearningActivity {
+
+	public static final String WEKA_LEARNING_ACTIVITY = "Weka Classification";
+
+	/**
+	 * Creates a new instance.
+	 */
+	public WekaClassificationActivity() {
+		this.INPUT_PORTS = new String[] { "Classification Train Datasets", "File" };
+		this.OUTPUT_PORTS = new String[] { "Classification Model Files" };
+	}
+	@Override
+	public String getActivityName() {
+		return WekaClassificationActivity.WEKA_LEARNING_ACTIVITY;
+	}
+
+	@Override
+	public String getFolderName() {
+		return CDKTavernaConstants.WEKA_CLASSIFICATION_FOLDER_NAME;
+	}
+
 }

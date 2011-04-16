@@ -25,13 +25,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import org.openscience.cdk.applications.taverna.weka.regression.SplitDatasetIntoTrainTestsetActivity;
+import org.openscience.cdk.applications.taverna.weka.classification.SplitClassificationTrainTestsetActivity;
+import org.openscience.cdk.applications.taverna.weka.regression.SplitRegressionTrainTestsetActivity;
 
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.clusterers.SimpleKMeans;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.Utils;
 import weka.filters.Filter;
 
 /**
@@ -40,15 +42,15 @@ import weka.filters.Filter;
  * @author Andreas Truszkowski
  * 
  */
-public class SplitDatasetIntoTrainTestsetWorker extends Thread {
+public class SplitLearningTrainTestsetWorker extends Thread {
 
-	private SplitDatasetIntoTrainTestsetActivity owner = null;
+	private AbstractSplitTrainTestsetActivity owner = null;
 	private boolean isDone = false;
 
 	/**
 	 * Creates a new instance.
 	 */
-	public SplitDatasetIntoTrainTestsetWorker(SplitDatasetIntoTrainTestsetActivity owner) {
+	public SplitLearningTrainTestsetWorker(AbstractSplitTrainTestsetActivity owner) {
 		this.owner = owner;
 	}
 
@@ -68,11 +70,11 @@ public class SplitDatasetIntoTrainTestsetWorker extends Thread {
 				HashMap<Integer, Integer> testClusterMap = new HashMap<Integer, Integer>();
 				int numTrain = (int) Math.round(learningSet.numInstances() * fraction);
 				int numTest = learningSet.numInstances() - numTrain;
-				if (options[3].equals(SplitDatasetIntoTrainTestsetActivity.METHODS[0])) {
+				if (options[3].equals(SplitRegressionTrainTestsetActivity.METHODS[0])) {
 					trainset = new Instances(learningSet, 0, numTrain);
 					testset = new Instances(learningSet, numTrain, numTest);
-				} else if (options[3].equals(SplitDatasetIntoTrainTestsetActivity.METHODS[1])
-						|| options[3].equals(SplitDatasetIntoTrainTestsetActivity.METHODS[2])) {
+				} else if (options[3].equals(SplitRegressionTrainTestsetActivity.METHODS[1])
+						|| options[3].equals(SplitRegressionTrainTestsetActivity.METHODS[2])) {
 					Instances clusterSet = Filter.useFilter(learningSet, tools.getIDRemover(learningSet));
 					clusterSet = Filter.useFilter(clusterSet, tools.getClassRemover(clusterSet));
 					clusterSet.setClassIndex(-1);
@@ -97,7 +99,7 @@ public class SplitDatasetIntoTrainTestsetWorker extends Thread {
 							currentTrain.add(instance);
 						}
 					}
-					if (options[3].equals(SplitDatasetIntoTrainTestsetActivity.METHODS[2])) {
+					if (options[3].equals(SplitRegressionTrainTestsetActivity.METHODS[2])) {
 						Class<?> classifierClass = Class.forName(options[4]);
 						int iterations = Integer.parseInt(options[6]);
 						boolean isBlacklisting = Boolean.parseBoolean(options[7]);
@@ -121,9 +123,16 @@ public class SplitDatasetIntoTrainTestsetWorker extends Thread {
 							}
 							for (int j = 0; j < currentTest.numInstances(); j++) {
 								Instance instance = currentTest.instance(j);
-								double rt = instance.value(currentTest.classIndex());
-								double predrt = classifier.classifyInstance(cleanTestSet.instance(j));
-								double error = Math.abs(rt - predrt);
+								double error = 0;
+								if (this.owner instanceof SplitRegressionTrainTestsetActivity) {
+									double rt = instance.value(currentTest.classIndex());
+									double predrt = classifier.classifyInstance(cleanTestSet.instance(j));
+									error = Math.abs(rt - predrt);
+								} else if (this.owner instanceof SplitClassificationTrainTestsetActivity) {
+									double[] dist = classifier.distributionForInstance(cleanTestSet.instance(j));
+									int pred = Utils.maxIndex(dist);
+									error = 1 - dist[pred];
+								}
 								int c = testClusterMap.get(j);
 								if (blacklist.contains(c) && isBlacklisting) {
 									continue;
@@ -131,7 +140,6 @@ public class SplitDatasetIntoTrainTestsetWorker extends Thread {
 								if (biggestError == null || biggestError < error) {
 									biggestError = error;
 									biggestErrorInst = j;
-
 								}
 							}
 							if (biggestError == null) {
@@ -186,6 +194,9 @@ public class SplitDatasetIntoTrainTestsetWorker extends Thread {
 							trainset = currentTrain;
 							testset = currentTest;
 						}
+					} else {
+						trainset = currentTrain;
+						testset = currentTest;
 					}
 				}
 				this.owner.publishTrainset(trainset, idx);

@@ -38,7 +38,6 @@ import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator
 import org.openscience.cdk.applications.taverna.basicutilities.Tools;
 
 import weka.core.Instances;
-import weka.core.converters.ConverterUtils.DataSink;
 import weka.core.converters.XRFFSaver;
 
 /**

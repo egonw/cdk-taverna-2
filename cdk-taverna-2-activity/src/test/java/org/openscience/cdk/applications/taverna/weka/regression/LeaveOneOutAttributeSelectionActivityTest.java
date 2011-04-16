@@ -67,15 +67,15 @@ public class LeaveOneOutAttributeSelectionActivityTest extends CDKTavernaTestCas
 
 	private CDKActivityConfigurationBean configBean;
 
-	private AbstractCDKActivity evaluationActivity = new LeaveOneOutAttributeSelectionActivity();
+	private AbstractCDKActivity evaluationActivity = new LeaveOneOutRAttributeSelectionActivity();
 
 	public LeaveOneOutAttributeSelectionActivityTest() {
-		super(LeaveOneOutAttributeSelectionActivity.HEURISTIC_ATTRIBUTE_SELECTION_ACTIVITY);
+		super(LeaveOneOutRAttributeSelectionActivity.LEAVEONEOUT_ATTRIBUTE_SELECTION_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		configBean.setActivityName(LeaveOneOutAttributeSelectionActivity.HEURISTIC_ATTRIBUTE_SELECTION_ACTIVITY);
+		configBean.setActivityName(LeaveOneOutRAttributeSelectionActivity.LEAVEONEOUT_ATTRIBUTE_SELECTION_ACTIVITY);
 	}
 
 	/**

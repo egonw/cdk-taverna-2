@@ -19,51 +19,29 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.openscience.cdk.applications.taverna.weka.utilities;
+package org.openscience.cdk.applications.taverna.weka.classification;
 
-import weka.classifiers.Classifier;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
+import org.openscience.cdk.applications.taverna.weka.utilities.AbstractLeaveOneOutAttributeSelectionActivity;
 
 /**
- * Represents the worker for the GA attribute selection activity.
+ * Class which represents the heuristic attribute evaluation activity.
  * 
- * @author Andreas Truszkowski
+ * @author Andreas Truzskowski
  * 
  */
-public class GAAttributeEvaluationWorker extends Thread {
-
-	private AbstractGAAttributeSelectionActivity owner = null;
-	private boolean isDone = false;
+public class LeaveOneOutCAttributeSelectionActivity extends AbstractLeaveOneOutAttributeSelectionActivity {
 
 	/**
 	 * Creates a new instance.
 	 */
-	public GAAttributeEvaluationWorker(AbstractGAAttributeSelectionActivity owner) {
-		this.owner = owner;
+	public LeaveOneOutCAttributeSelectionActivity() {
+		this.INPUT_PORTS = new String[] { "Weka Classification Dataset" };
+		this.OUTPUT_PORTS = new String[] { "Weka Classification Datasets", "Attribute Info CSV" };
 	}
 
 	@Override
-	public void run() {
-		try {
-			GAAttributeEvaluationGenome individual;
-			while ((individual = owner.getWork()) != null) {
-				// Create individual dataset
-				individual.updateDataset();
-				// Calculate score
-				Classifier classifier = this.owner.getClassifier();
-				individual.calculateScore(classifier, this.owner.isUSE_CV(), this.owner.getFOLDS());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		isDone = true;
-		this.owner.workerDone();
+	public String getFolderName() {
+		return CDKTavernaConstants.WEKA_CLASSIFICATION_FOLDER_NAME;
 	}
-
-	/**
-	 * @return True if worker has finished.
-	 */
-	public boolean isDone() {
-		return isDone;
-	}
-
 }

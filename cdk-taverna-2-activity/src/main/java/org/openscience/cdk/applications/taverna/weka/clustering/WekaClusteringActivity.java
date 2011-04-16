@@ -42,7 +42,6 @@ import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 import weka.clusterers.Clusterer;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
-import weka.core.converters.ConverterUtils.DataSink;
 import weka.filters.Filter;
 
 /**

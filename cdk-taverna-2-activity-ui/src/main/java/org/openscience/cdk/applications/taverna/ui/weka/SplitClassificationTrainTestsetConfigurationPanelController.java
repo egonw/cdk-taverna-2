@@ -17,19 +17,20 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.ui.UITools;
-import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractLearningConfigurationFrame;
+import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClassificationConfigurationFrame;
+import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractRegressionConfigurationFrame;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.LearningDatasetClassifierFrame;
-import org.openscience.cdk.applications.taverna.weka.regression.SplitDatasetIntoTrainTestsetActivity;
+import org.openscience.cdk.applications.taverna.weka.regression.SplitRegressionTrainTestsetActivity;
 
-public class SplitDatasetIntoTrainTestsetConfigurationPanelController extends
+public class SplitClassificationTrainTestsetConfigurationPanelController extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
 
 	private static final long serialVersionUID = 4885493705007067285L;
-	private static final String CONFIG_PACKAGE = "org.openscience.cdk.applications.taverna.ui.weka.panels.learning";
+	private static final String CONFIG_PACKAGE = "org.openscience.cdk.applications.taverna.ui.weka.panels.classification";
 
-	private SPIRegistry<AbstractLearningConfigurationFrame> cdkLearningConfigFramesRegistry = new SPIRegistry<AbstractLearningConfigurationFrame>(
-			AbstractLearningConfigurationFrame.class);
-	private List<AbstractLearningConfigurationFrame> configFrames = null;
+	private SPIRegistry<AbstractClassificationConfigurationFrame> cdkLearningConfigFramesRegistry = new SPIRegistry<AbstractClassificationConfigurationFrame>(
+			AbstractClassificationConfigurationFrame.class);
+	private List<AbstractClassificationConfigurationFrame> configFrames = null;
 
 	private AbstractCDKActivity activity;
 	private CDKActivityConfigurationBean configBean;
@@ -53,13 +54,13 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelController extends
 		}
 	};
 
-	public SplitDatasetIntoTrainTestsetConfigurationPanelController(AbstractCDKActivity activity) {
+	public SplitClassificationTrainTestsetConfigurationPanelController(AbstractCDKActivity activity) {
 		try {
 			this.activity = activity;
 			this.configBean = this.activity.getConfiguration();
-			this.configFrames = new ArrayList<AbstractLearningConfigurationFrame>();
+			this.configFrames = new ArrayList<AbstractClassificationConfigurationFrame>();
 			List<String> learnerNames = new ArrayList<String>();
-			for (AbstractLearningConfigurationFrame configFrame : this.cdkLearningConfigFramesRegistry.getInstances()) {
+			for (AbstractClassificationConfigurationFrame configFrame : this.cdkLearningConfigFramesRegistry.getInstances()) {
 				if (configFrame.getClass().getName().startsWith(CONFIG_PACKAGE)) {
 					learnerNames.add(configFrame.getName());
 					configFrame.makeSingleOption();
@@ -89,11 +90,11 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelController extends
 		options += this.view.getHigherRatioTextField().getText() + ";";
 		options += this.view.getStepsTextField().getText() + ";";
 		if (this.view.getRandomRadioButton().isSelected()) {
-			options += SplitDatasetIntoTrainTestsetActivity.METHODS[0] + ";";
+			options += SplitRegressionTrainTestsetActivity.METHODS[0] + ";";
 		} else if (this.view.getClusterRadioButton().isSelected()) {
-			options += SplitDatasetIntoTrainTestsetActivity.METHODS[1] + ";";
+			options += SplitRegressionTrainTestsetActivity.METHODS[1] + ";";
 		} else if (this.view.getSingleGlobalMaxRadioButton().isSelected()) {
-			options += SplitDatasetIntoTrainTestsetActivity.METHODS[2] + ";";
+			options += SplitRegressionTrainTestsetActivity.METHODS[2] + ";";
 			int idx = this.view.getClassifierComboBox().getSelectedIndex();
 			options += this.configFrames.get(idx).getConfiguredClass().getName() + ";";
 			options += this.configFrames.get(idx).getOptions()[0] + ";";
@@ -180,21 +181,21 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelController extends
 		this.view.getLowerRatioTextField().setText(options[0]);
 		this.view.getHigherRatioTextField().setText(options[1]);
 		this.view.getStepsTextField().setText(options[2]);
-		if (options[3].equals(SplitDatasetIntoTrainTestsetActivity.METHODS[0])) {
+		if (options[3].equals(SplitRegressionTrainTestsetActivity.METHODS[0])) {
 			this.view.getRandomRadioButton().setSelected(true);
 			this.view.getIterationsTextField().setEnabled(false);
 			this.view.getClassifierComboBox().setEnabled(false);
 			this.view.getUseBlacklistingCheckBox().setEnabled(false);
 			this.view.getChooseBestCheckBox().setEnabled(false);
 			this.view.getBtnConfigure().setEnabled(false);
-		} else if (options[3].equals(SplitDatasetIntoTrainTestsetActivity.METHODS[1])) {
+		} else if (options[3].equals(SplitRegressionTrainTestsetActivity.METHODS[1])) {
 			this.view.getClusterRadioButton().setSelected(true);
 			this.view.getIterationsTextField().setEnabled(false);
 			this.view.getClassifierComboBox().setEnabled(false);
 			this.view.getUseBlacklistingCheckBox().setEnabled(false);
 			this.view.getChooseBestCheckBox().setEnabled(false);
 			this.view.getBtnConfigure().setEnabled(false);
-		} else if (options[3].equals(SplitDatasetIntoTrainTestsetActivity.METHODS[2])) {
+		} else if (options[3].equals(SplitRegressionTrainTestsetActivity.METHODS[2])) {
 			this.view.getSingleGlobalMaxRadioButton().setSelected(true);
 			for (int i = 0; i < this.configFrames.size(); i++) {
 				if (options[4].equals(this.configFrames.get(i).getConfiguredClass().getName())) {

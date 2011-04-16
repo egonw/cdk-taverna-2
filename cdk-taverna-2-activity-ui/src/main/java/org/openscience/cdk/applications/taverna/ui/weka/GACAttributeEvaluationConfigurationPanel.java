@@ -17,21 +17,22 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.ui.UITools;
+import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClassificationConfigurationFrame;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractRegressionConfigurationFrame;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.LearningDatasetClassifierFrame;
 
-public class AttributeEvaluationConfigurationPanel extends
+public class GACAttributeEvaluationConfigurationPanel extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
 	private static final long serialVersionUID = 4885493705007067285L;
-	private static final String CONFIG_PACKAGE = "org.openscience.cdk.applications.taverna.ui.weka.panels.learning";
+	private static final String CONFIG_PACKAGE = "org.openscience.cdk.applications.taverna.ui.weka.panels.classification";
 
-	private SPIRegistry<AbstractRegressionConfigurationFrame> cdkLearningConfigFramesRegistry = new SPIRegistry<AbstractRegressionConfigurationFrame>(
-			AbstractRegressionConfigurationFrame.class);
-	private List<AbstractRegressionConfigurationFrame> configFrames = null;
+	private SPIRegistry<AbstractClassificationConfigurationFrame> cdkLearningConfigFramesRegistry = new SPIRegistry<AbstractClassificationConfigurationFrame>(
+			AbstractClassificationConfigurationFrame.class);
+	private List<AbstractClassificationConfigurationFrame> configFrames = null;
 
 	private AbstractCDKActivity activity;
 	private CDKActivityConfigurationBean configBean;
-	private AttributeEvaluationConfigurationPanelView view = new AttributeEvaluationConfigurationPanelView();
+	private GAAttributeEvaluationConfigurationPanelView view = new GAAttributeEvaluationConfigurationPanelView();
 
 	private ActionListener configureClassifierAction = new ActionListener() {
 
@@ -51,13 +52,13 @@ public class AttributeEvaluationConfigurationPanel extends
 		}
 	};
 
-	public AttributeEvaluationConfigurationPanel(AbstractCDKActivity activity) {
+	public GACAttributeEvaluationConfigurationPanel(AbstractCDKActivity activity) {
 		try {
 			this.activity = activity;
 			this.configBean = this.activity.getConfiguration();
-			this.configFrames = new ArrayList<AbstractRegressionConfigurationFrame>();
+			this.configFrames = new ArrayList<AbstractClassificationConfigurationFrame>();
 			List<String> learnerNames = new ArrayList<String>();
-			for (AbstractRegressionConfigurationFrame configFrame : this.cdkLearningConfigFramesRegistry.getInstances()) {
+			for (AbstractClassificationConfigurationFrame configFrame : this.cdkLearningConfigFramesRegistry.getInstances()) {
 				if (configFrame.getClass().getName().startsWith(CONFIG_PACKAGE)) {
 					learnerNames.add(configFrame.getName());
 					configFrame.makeSingleOption();
@@ -80,6 +81,12 @@ public class AttributeEvaluationConfigurationPanel extends
 
 	private String createOptionsString() {
 		String options = "";
+		options += this.view.getAttrRateTextField().getText() + ";";
+		options += this.view.getCoRateTextField().getText() + ";";
+		options += this.view.getNumIndTextField().getText() + ";";
+		options += this.view.getIterationsTextField().getText() + ";";
+		options += this.view.getMinAttrTextField().getText() + " " + this.view.getMaxAttrTextField().getText() + " "
+				+ this.view.getStepSizeTextField().getText() + ";";
 		int idx = this.view.getAlgorithmComboBox().getSelectedIndex();
 		options += this.configFrames.get(idx).getConfiguredClass().getName() + ";";
 		options += this.configFrames.get(idx).getOptions()[0] + ";";
@@ -91,7 +98,7 @@ public class AttributeEvaluationConfigurationPanel extends
 	@Override
 	public boolean isConfigurationChanged() {
 		String currentOptions = (String) this.configBean
-				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_ATTRIBUTE_SELECTION_OPTIONS);
+				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_GA_ATTRIBUTE_SELECTION_OPTIONS);
 		if (currentOptions == null) {
 			return true;
 		}
@@ -108,7 +115,7 @@ public class AttributeEvaluationConfigurationPanel extends
 	public void noteConfiguration() {
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
 		String newOptions = this.createOptionsString();
-		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_ATTRIBUTE_SELECTION_OPTIONS, newOptions);
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_GA_ATTRIBUTE_SELECTION_OPTIONS, newOptions);
 		int threads = Integer.parseInt(this.view.getThreadsTextField().getText());
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, threads);
 	}
@@ -130,20 +137,34 @@ public class AttributeEvaluationConfigurationPanel extends
 	public void refreshConfiguration() {
 		this.setThreadingParam();
 		String currentOptions = (String) this.configBean
-				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_ATTRIBUTE_SELECTION_OPTIONS);
+				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_GA_ATTRIBUTE_SELECTION_OPTIONS);
 		if (currentOptions == null) {
 			return;
 		}
 		String[] opt = currentOptions.split(";");
+		this.view.getAttrRateTextField().setText(opt[0]);
+		this.view.getCoRateTextField().setText(opt[1]);
+		this.view.getNumIndTextField().setText(opt[2]);
+		this.view.getIterationsTextField().setText(opt[3]);
+		String[] attrOpt = opt[4].split(" ");
+		if (attrOpt.length < 3) {
+			this.view.getMinAttrTextField().setText("-1");
+			this.view.getMaxAttrTextField().setText("");
+			this.view.getStepSizeTextField().setText("");
+		} else {
+			this.view.getMinAttrTextField().setText(attrOpt[0]);
+			this.view.getMaxAttrTextField().setText(attrOpt[1]);
+			this.view.getStepSizeTextField().setText(attrOpt[2]);
+		}
 		for (int i = 0; i < this.configFrames.size(); i++) {
-			if (opt[0].equals(this.configFrames.get(i).getConfiguredClass().getName())) {
-				this.configFrames.get(i).setOptions(new String[] { opt[1] });
+			if (opt[5].equals(this.configFrames.get(i).getConfiguredClass().getName())) {
+				this.configFrames.get(i).setOptions(new String[] { opt[6] });
 				this.view.getAlgorithmComboBox().setSelectedIndex(i);
 				break;
 			}
 		}
-		this.view.getCvCheckBox().setSelected(Boolean.parseBoolean(opt[2]));
-		this.view.getCvTextField().setText(opt[3]);
+		this.view.getCvCheckBox().setSelected(Boolean.parseBoolean(opt[7]));
+		this.view.getCvTextField().setText(opt[8]);
 	}
 
 	@Override

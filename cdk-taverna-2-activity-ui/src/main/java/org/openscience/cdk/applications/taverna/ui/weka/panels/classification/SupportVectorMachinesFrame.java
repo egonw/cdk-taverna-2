@@ -1,4 +1,4 @@
-package org.openscience.cdk.applications.taverna.ui.weka.panels.learning;
+package org.openscience.cdk.applications.taverna.ui.weka.panels.classification;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -13,14 +13,15 @@ import javax.swing.SpringLayout;
 import javax.swing.border.BevelBorder;
 
 import org.openscience.cdk.applications.taverna.ui.UITools;
-import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractLearningConfigurationFrame;
+import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClassificationConfigurationFrame;
+import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractRegressionConfigurationFrame;
 
 import weka.classifiers.functions.LibSVM;
 
-public class SupportVectorMachinesFrame extends AbstractLearningConfigurationFrame {
+public class SupportVectorMachinesFrame extends AbstractClassificationConfigurationFrame {
 
 	private static final long serialVersionUID = 5685630159412977072L;
-	private static final String[] SVM_TYPES = new String[] { "epsilon-SVR", "nu-SVR" };
+	private static final String[] SVM_TYPES = new String[] { "C-SVC", "nu-SVC", "one-class SVM" };
 	private static final String[] KERNEL_TYPES = new String[] { "Linear: u'*v",
 			"Polynomial: (gamma*u'*v + coef0)^degree", "Radial basis function: exp(-gamma*|u-v|^2)",
 			"Sigmoid: tanh(gamma*u'*v + coef0)" };
@@ -212,9 +213,9 @@ public class SupportVectorMachinesFrame extends AbstractLearningConfigurationFra
 			}
 		}
 		if (!this.gammaLowTextField.getText().equals("1/k") && !this.gammaHighTextField.getText().trim().equals("")) {
-			double a = Double.parseDouble(this.gammaLowTextField.getText()) ;
-			double b = Double.parseDouble(this.gammaHighTextField.getText()) ;
-			if(a >= b) {
+			double a = Double.parseDouble(this.gammaLowTextField.getText());
+			double b = Double.parseDouble(this.gammaHighTextField.getText());
+			if (a >= b) {
 				JOptionPane.showMessageDialog(this, "The higher gamma limit has to be greater than the lower limit!",
 						"Illegal Argument", JOptionPane.ERROR_MESSAGE);
 				return false;
@@ -232,9 +233,9 @@ public class SupportVectorMachinesFrame extends AbstractLearningConfigurationFra
 			return false;
 		}
 		if (!this.endTextField.getText().trim().equals("")) {
-			double a = Double.parseDouble(this.startTextField.getText()) ;
-			double b = Double.parseDouble(this.endTextField.getText()) ;
-			if(a >= b) {
+			double a = Double.parseDouble(this.startTextField.getText());
+			double b = Double.parseDouble(this.endTextField.getText());
+			if (a >= b) {
 				JOptionPane.showMessageDialog(this, "The higher cost limit has to be greater than the lower limit!",
 						"Illegal Argument", JOptionPane.ERROR_MESSAGE);
 				return false;
@@ -249,7 +250,7 @@ public class SupportVectorMachinesFrame extends AbstractLearningConfigurationFra
 	@Override
 	public String[] getOptions() {
 		ArrayList<String> tempOpt = new ArrayList<String>();
-		int svmType = this.svmTypeComboBox.getSelectedIndex() + 3;
+		int svmType = this.svmTypeComboBox.getSelectedIndex();
 		int kernelType = this.kernelComboBox.getSelectedIndex();
 		int degree = Integer.parseInt(this.degreeLowTextField.getText());
 		double coef = Double.parseDouble(this.coefTextField.getText());
@@ -315,7 +316,7 @@ public class SupportVectorMachinesFrame extends AbstractLearningConfigurationFra
 		for (int i = 0; i < options.length; i++) {
 			String[] opt = options[i].split(" ");
 			if (i == 0) {
-				svmType = Integer.parseInt(opt[1]) - 3;
+				svmType = Integer.parseInt(opt[1]);
 				kernelType = Integer.parseInt(opt[3]);
 				degree = Integer.parseInt(opt[5]);
 				coef = Double.parseDouble(opt[7]);

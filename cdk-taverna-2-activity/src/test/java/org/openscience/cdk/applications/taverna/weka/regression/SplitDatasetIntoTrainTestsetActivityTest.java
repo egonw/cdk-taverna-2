@@ -67,15 +67,15 @@ public class SplitDatasetIntoTrainTestsetActivityTest extends CDKTavernaTestCase
 
 	private CDKActivityConfigurationBean configBean;
 
-	private AbstractCDKActivity splitActivity = new SplitDatasetIntoTrainTestsetActivity();
+	private AbstractCDKActivity splitActivity = new SplitRegressionTrainTestsetActivity();
 
 	public SplitDatasetIntoTrainTestsetActivityTest() {
-		super(SplitDatasetIntoTrainTestsetActivity.CREATE_WEKA_LEARNING_DATASET_ACTIVITY);
+		super(SplitRegressionTrainTestsetActivity.CREATE_WEKA_LEARNING_DATASET_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		configBean.setActivityName(SplitDatasetIntoTrainTestsetActivity.CREATE_WEKA_LEARNING_DATASET_ACTIVITY);
+		configBean.setActivityName(SplitRegressionTrainTestsetActivity.CREATE_WEKA_LEARNING_DATASET_ACTIVITY);
 	}
 
 	/**

@@ -21,49 +21,21 @@
  */
 package org.openscience.cdk.applications.taverna.weka.utilities;
 
+import java.io.File;
+
 import weka.classifiers.Classifier;
+import weka.core.Instances;
 
 /**
- * Represents the worker for the GA attribute selection activity.
+ * Work class for the weka regression activity.
  * 
  * @author Andreas Truszkowski
  * 
  */
-public class GAAttributeEvaluationWorker extends Thread {
-
-	private AbstractGAAttributeSelectionActivity owner = null;
-	private boolean isDone = false;
-
-	/**
-	 * Creates a new instance.
-	 */
-	public GAAttributeEvaluationWorker(AbstractGAAttributeSelectionActivity owner) {
-		this.owner = owner;
-	}
-
-	@Override
-	public void run() {
-		try {
-			GAAttributeEvaluationGenome individual;
-			while ((individual = owner.getWork()) != null) {
-				// Create individual dataset
-				individual.updateDataset();
-				// Calculate score
-				Classifier classifier = this.owner.getClassifier();
-				individual.calculateScore(classifier, this.owner.isUSE_CV(), this.owner.getFOLDS());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		isDone = true;
-		this.owner.workerDone();
-	}
-
-	/**
-	 * @return True if worker has finished.
-	 */
-	public boolean isDone() {
-		return isDone;
-	}
-
+public class WekaLearningWork {
+	public Class<? extends Classifier> classifierClass;
+	public String option;
+	public Instances trainingSet;
+	public int id;
+	public File modelFile;
 }

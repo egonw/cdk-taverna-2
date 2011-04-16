@@ -37,7 +37,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 
 import weka.core.Instances;
-import weka.core.converters.ConverterUtils.DataSource;
 import weka.core.converters.XRFFLoader;
 
 /**

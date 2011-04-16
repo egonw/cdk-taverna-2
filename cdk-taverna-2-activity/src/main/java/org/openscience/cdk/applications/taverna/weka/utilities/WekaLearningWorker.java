@@ -23,7 +23,6 @@ package org.openscience.cdk.applications.taverna.weka.utilities;
 
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.weka.regression.WekaRegressionActivity;
 
 import weka.classifiers.Classifier;
 import weka.core.Instances;
@@ -34,18 +33,18 @@ import weka.core.Instances;
  * @author Andreas Truszkowski
  * 
  */
-public class WekaRegressionWorker extends Thread {
+public class WekaLearningWorker extends Thread {
 
-	private WekaRegressionActivity owner;
+	private AbstractWekaLearningActivity owner;
 	private boolean isDone = false;
 
-	public WekaRegressionWorker(WekaRegressionActivity owner) {
+	public WekaLearningWorker(AbstractWekaLearningActivity owner) {
 		this.owner = owner;
 	}
 
 	@Override
 	public void run() {
-		WekaRegressionWork work = null;
+		WekaLearningWork work = null;
 		while ((work = this.owner.getWork()) != null) {
 			try {
 				Instances trainset = work.trainingSet;

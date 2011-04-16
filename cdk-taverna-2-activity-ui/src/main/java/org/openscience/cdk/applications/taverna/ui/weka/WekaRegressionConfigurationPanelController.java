@@ -17,21 +17,21 @@ import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractLearningConfigurationFrame;
+import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractRegressionConfigurationFrame;
 
-public class WekaLearningConfigurationPanelController extends
+public class WekaRegressionConfigurationPanelController extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
 
 	private static final long serialVersionUID = 1159635990433702962L;
 
-	private static final String CONFIG_PACKAGE = "org.openscience.cdk.applications.taverna.ui.weka.panels.learning";
+	private static final String CONFIG_PACKAGE = "org.openscience.cdk.applications.taverna.ui.weka.panels.regression";
 
 	private AbstractCDKActivity activity;
 	private WekaLearningConfigurationPanelView view = null;
 	private CDKActivityConfigurationBean configBean;
-	private SPIRegistry<AbstractLearningConfigurationFrame> cdkLearningConfigFramesRegistry = new SPIRegistry<AbstractLearningConfigurationFrame>(
-			AbstractLearningConfigurationFrame.class);
-	private List<AbstractLearningConfigurationFrame> configFrames = null;
+	private SPIRegistry<AbstractRegressionConfigurationFrame> cdkLearningConfigFramesRegistry = new SPIRegistry<AbstractRegressionConfigurationFrame>(
+			AbstractRegressionConfigurationFrame.class);
+	private List<AbstractRegressionConfigurationFrame> configFrames = null;
 	private int currentSelection;
 
 	private ActionListener comboBoxListener = new ActionListener() {
@@ -53,7 +53,7 @@ public class WekaLearningConfigurationPanelController extends
 		}
 	};
 
-	public WekaLearningConfigurationPanelController(AbstractCDKActivity activity) {
+	public WekaRegressionConfigurationPanelController(AbstractCDKActivity activity) {
 		try {
 			this.activity = activity;
 			this.configBean = this.activity.getConfiguration();
@@ -68,9 +68,9 @@ public class WekaLearningConfigurationPanelController extends
 
 	private void initGUI() {
 		this.view = new WekaLearningConfigurationPanelView();
-		this.configFrames = new ArrayList<AbstractLearningConfigurationFrame>();
+		this.configFrames = new ArrayList<AbstractRegressionConfigurationFrame>();
 		List<String> learnerNames = new ArrayList<String>();
-		for (AbstractLearningConfigurationFrame configFrame : this.cdkLearningConfigFramesRegistry.getInstances()) {
+		for (AbstractRegressionConfigurationFrame configFrame : this.cdkLearningConfigFramesRegistry.getInstances()) {
 			if (configFrame.getClass().getName().startsWith(CONFIG_PACKAGE)) {
 				learnerNames.add(configFrame.getName());
 				this.configFrames.add(configFrame);

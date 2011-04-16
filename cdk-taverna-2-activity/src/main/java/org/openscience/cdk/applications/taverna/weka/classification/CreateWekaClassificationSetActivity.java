@@ -35,7 +35,7 @@ import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 import weka.core.Instances;
 
 /**
- * Class which represents the create Weka regression dataset activity.
+ * Class which represents the create Weka classification dataset activity.
  * 
  * @author Andreas Truzskowski
  * 
