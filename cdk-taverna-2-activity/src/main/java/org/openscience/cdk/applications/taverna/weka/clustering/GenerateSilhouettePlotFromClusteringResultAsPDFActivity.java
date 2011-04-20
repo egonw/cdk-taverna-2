@@ -94,14 +94,14 @@ public class GenerateSilhouettePlotFromClusteringResultAsPDFActivity extends Abs
 		HashMap<Integer, String> idNameMap = new HashMap<Integer, String>();
 		File parent = null;
 		List<Object> charts = new LinkedList<Object>();
+		WekaTools tools = new WekaTools();
+		// Prepare data
+		dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 		for (int i = 0; i < files.size(); i++) {
-			WekaTools tools = new WekaTools();
 			charts.clear();
 			try {
 				// Load clusterer
 				clusterer = (Clusterer) SerializationHelper.read(files.get(i).getPath());
-				// Prepare data
-				dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR,
 						this.getActivityName(), e);

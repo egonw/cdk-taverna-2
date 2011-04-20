@@ -138,8 +138,8 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 	public synchronized void workerDone(Clusterer clusterer, String options) {
 		File emModelFile = null;
 		try {
-			emModelFile = FileNameGenerator.getNewFile(directory, ".model", clusterer.getClass()
-					.getSimpleName() + options);
+			emModelFile = FileNameGenerator.getNewFile(directory, ".model", clusterer.getClass().getSimpleName()
+					+ options);
 			SerializationHelper.write(emModelFile.getPath(), clusterer);
 			resultFiles.add(emModelFile.getPath());
 

@@ -164,6 +164,10 @@ org.openscience.cdk.applications.taverna.signaturescoring.AtomSignatureActivity
 org.openscience.cdk.applications.taverna.signaturescoring.QueryFragmentScorerActivity
 org.openscience.cdk.applications.taverna.signaturescoring.FragmentDistributionCalculatorActivity
 org.openscience.cdk.applications.taverna.weka.CreateWekaDatasetFromQSARVectorActivity
+org.openscience.cdk.applications.taverna.weka.ConvertWekaDatasetActivity
+org.openscience.cdk.applications.taverna.weka.WekaPredictionActivity
+org.openscience.cdk.applications.taverna.weka.CreateWekaDatasetFromCSV
+org.openscience.cdk.applications.taverna.weka.MergeWekaDattasetsActivity
 org.openscience.cdk.applications.taverna.weka.clustering.ExtractClusteringResultAsPDFActivity
 org.openscience.cdk.applications.taverna.weka.clustering.WekaClusteringActivity
 org.openscience.cdk.applications.taverna.weka.clustering.ClusteringResultConsideringDifferentOriginsAsPDF
@@ -177,8 +181,6 @@ org.openscience.cdk.applications.taverna.weka.regression.CreateWekaRegressionSet
 org.openscience.cdk.applications.taverna.weka.regression.LeaveOneOutRAttributeSelectionActivity
 org.openscience.cdk.applications.taverna.weka.regression.GARAttributeSelectionActivity
 org.openscience.cdk.applications.taverna.weka.regression.SplitRegressionTrainTestsetActivity
-org.openscience.cdk.applications.taverna.weka.regression.CreateWekaPredictionSetActivity
-org.openscience.cdk.applications.taverna.weka.regression.WekaRegressionPredictionActivity
 org.openscience.cdk.applications.taverna.weka.classification.CreateWekaClassificationSetActivity
 org.openscience.cdk.applications.taverna.weka.classification.WekaClassificationActivity
 org.openscience.cdk.applications.taverna.weka.classification.EvaluateClassificationResultsAsPDFActivity

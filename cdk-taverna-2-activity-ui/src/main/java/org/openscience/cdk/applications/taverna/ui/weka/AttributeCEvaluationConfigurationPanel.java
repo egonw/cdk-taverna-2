@@ -17,17 +17,18 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.ui.UITools;
+import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClassificationConfigurationFrame;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractRegressionConfigurationFrame;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.LearningDatasetClassifierFrame;
 
-public class AttributeEvaluationConfigurationPanel extends
+public class AttributeCEvaluationConfigurationPanel extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
 	private static final long serialVersionUID = 4885493705007067285L;
-	private static final String CONFIG_PACKAGE = "org.openscience.cdk.applications.taverna.ui.weka.panels.learning";
+	private static final String CONFIG_PACKAGE = "org.openscience.cdk.applications.taverna.ui.weka.panels.classification";
 
-	private SPIRegistry<AbstractRegressionConfigurationFrame> cdkLearningConfigFramesRegistry = new SPIRegistry<AbstractRegressionConfigurationFrame>(
-			AbstractRegressionConfigurationFrame.class);
-	private List<AbstractRegressionConfigurationFrame> configFrames = null;
+	private SPIRegistry<AbstractClassificationConfigurationFrame> cdkLearningConfigFramesRegistry = new SPIRegistry<AbstractClassificationConfigurationFrame>(
+			AbstractClassificationConfigurationFrame.class);
+	private List<AbstractClassificationConfigurationFrame> configFrames = null;
 
 	private AbstractCDKActivity activity;
 	private CDKActivityConfigurationBean configBean;
@@ -51,13 +52,13 @@ public class AttributeEvaluationConfigurationPanel extends
 		}
 	};
 
-	public AttributeEvaluationConfigurationPanel(AbstractCDKActivity activity) {
+	public AttributeCEvaluationConfigurationPanel(AbstractCDKActivity activity) {
 		try {
 			this.activity = activity;
 			this.configBean = this.activity.getConfiguration();
-			this.configFrames = new ArrayList<AbstractRegressionConfigurationFrame>();
+			this.configFrames = new ArrayList<AbstractClassificationConfigurationFrame>();
 			List<String> learnerNames = new ArrayList<String>();
-			for (AbstractRegressionConfigurationFrame configFrame : this.cdkLearningConfigFramesRegistry.getInstances()) {
+			for (AbstractClassificationConfigurationFrame configFrame : this.cdkLearningConfigFramesRegistry.getInstances()) {
 				if (configFrame.getClass().getName().startsWith(CONFIG_PACKAGE)) {
 					learnerNames.add(configFrame.getName());
 					configFrame.makeSingleOption();

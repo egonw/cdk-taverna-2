@@ -34,6 +34,7 @@ import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
+import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.basicutilities.Tools;
 
@@ -92,6 +93,9 @@ public abstract class AbstractWekaLearningActivity extends AbstractCDKActivity {
 				CDKTavernaConstants.PROPERTY_LEARNER_NAME);
 		String optString = (String) this.getConfiguration().getAdditionalProperty(
 				CDKTavernaConstants.PROPERTY_LEARNER_OPTIONS);
+		if(optString == null) {
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PLEASE_CONFIGURE_ACTIVITY);
+		}
 		String[] options = optString.split(";");
 		if (options.length == 0) {
 			options = new String[] { "" };

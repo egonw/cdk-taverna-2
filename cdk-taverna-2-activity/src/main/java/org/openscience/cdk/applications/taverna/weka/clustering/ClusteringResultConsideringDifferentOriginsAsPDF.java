@@ -118,17 +118,16 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 		Clusterer clusterer = null;
 		ChartTool chartTool = new ChartTool();
 		ArrayList<File> tempFileList = new ArrayList<File>();
-		ArrayList<Object> charts = null;
-		for (int i = 0; i < files.size(); i++) { 
-			charts = new ArrayList<Object>();
+		ArrayList<Object> charts = new ArrayList<Object>();
+		WekaTools tools = new WekaTools();
+		// Prepare data
+		uuids = Filter.useFilter(dataset, tools.getIDGetter(dataset));
+		dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
+		for (int i = 0; i < files.size(); i++) {
 			tempFileList.clear();
-			WekaTools tools = new WekaTools();
 			try {
 				// Load clusterer
 				clusterer = (Clusterer) SerializationHelper.read(files.get(i).getPath());
-				// Prepare data
-				uuids = Filter.useFilter(dataset, tools.getIDGetter(dataset));
-				dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR,
 						this.getActivityName(), e);
@@ -182,7 +181,11 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 				String name = clusterer.getClass().getSimpleName();
 				String options = tools.getOptionsFromFile(files.get(i), name);
 				int jobID = tools.getIDFromOptions(options);
-				String header = name + " - JobID: " + jobID;
+				String optionString = "";
+				for (String o : ((OptionHandler) clusterer).getOptions()) {
+					optionString += o;
+				}
+				String header = name + " - JobID: " + jobID + "\n" + "Options: " + optionString;
 				charts.add(chartTool.createBarChart(header, "(Class number/Number of Vectors)", "Ratio in percent",
 						chartDataSet));
 			} catch (Exception e) {
@@ -190,23 +193,17 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 						"Error during evaluation of clustering results in file: " + files.get(i),
 						this.getActivityName(), e);
 			}
-			try {
-				File file = files.get(0);
-				String optionString = "";
-				for (String o : ((OptionHandler) clusterer).getOptions()) {
-					optionString += o;
-				}
-				String name = clusterer.getClass().getSimpleName();
-				file = FileNameGenerator.getNewFile(file.getParent(), ".pdf",
-						name + tools.getOptionsFromFile(files.get(i), name) + "-ClassificationResult");
-				pdfTitle.add("(Clusterer name/Number of detected classes)");
-				chartTool.writeChartAsPDF(file, charts);
-				resultFileNames.add(file.getAbsolutePath());
-			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR,
-						this.getActivityName(), e);
-				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
-			}
+		}
+		try {
+			File file = files.get(0);
+			file = FileNameGenerator.getNewFile(file.getParent(), ".pdf", "ClassificationResult");
+			pdfTitle.add("(Clusterer name/Number of detected classes)");
+			chartTool.writeChartAsPDF(file, charts);
+			resultFileNames.add(file.getAbsolutePath());
+		} catch (Exception e) {
+			ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(),
+					e);
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
 		}
 		this.setOutputAsStringList(resultFileNames, this.OUTPUT_PORTS[0]);
 	}

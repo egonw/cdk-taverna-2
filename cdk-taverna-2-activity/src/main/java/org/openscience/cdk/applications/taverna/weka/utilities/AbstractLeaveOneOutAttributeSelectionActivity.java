@@ -127,9 +127,9 @@ public abstract class AbstractLeaveOneOutAttributeSelectionActivity extends Abst
 		Instances set;
 		attrInfo.add("Index;RemovedAttribute;");
 		for (int i = 0; i < removedAttributes.size(); i++) {
-			String info = (i + 1) + ";" + dataset.attribute(removedAttributes.get(i)).name() + ";";
+			String info = (i + 1) + ";" + dataset.attribute(removedAttributes.get(i) - 1).name() + ";";
 			attrInfo.add(info);
-			set = Filter.useFilter(dataset, tools.getAttributRemover(dataset, removedAttributes.subList(0, i)));
+			set = Filter.useFilter(dataset, tools.getAttributRemover(dataset, removedAttributes.subList(0, i + 1)));
 			newDatasets.add(set);
 		}
 		// Set output

@@ -343,8 +343,12 @@ public class WekaTools {
 	public String getOptionsFromFile(File file, String className) {
 		String name = file.getName();
 		String[] parts = name.split("_");
-		for (String part : parts) {
+		for (int i = 0; i < parts.length; i++) {
+			String part = parts[i];
 			if (part.startsWith(className)) {
+				if (parts.length == 4) {
+					part += parts[i + 1];
+				}
 				return part.replaceAll(className, "");
 			}
 		}
@@ -402,7 +406,7 @@ public class WekaTools {
 		learningSet.randomize(new Random());
 		return learningSet;
 	}
-	
+
 	/**
 	 * Adds a nominal class attribute to a normal weka dataset.
 	 * 
@@ -420,7 +424,7 @@ public class WekaTools {
 		}
 		FastVector labelNames = new FastVector();
 		Iterator<String> iter = labels.iterator();
-		while(iter.hasNext()) {
+		while (iter.hasNext()) {
 			labelNames.addElement(iter.next());
 		}
 		attributes.addElement(new Attribute("Class", labelNames));

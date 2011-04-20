@@ -58,7 +58,7 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 	 * Creates a new instance.
 	 */
 	public ExtractClusteringResultAsPDFActivity() {
-		this.INPUT_PORTS = new String[] {"Clustering Model Files", " Weka Dataset"};
+		this.INPUT_PORTS = new String[] { "Clustering Model Files", " Weka Dataset" };
 		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
@@ -88,13 +88,13 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 		ChartTool chartTool = new ChartTool();
 		ArrayList<Object> charts = null;
 		WekaTools tools = new WekaTools();
-		for (int i = 0; i < files.size(); i++) { 
+		// Prepare data
+		dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
+		for (int i = 0; i < files.size(); i++) {
 			charts = new ArrayList<Object>();
 			try {
 				// Load clusterer
 				clusterer = (Clusterer) SerializationHelper.read(files.get(i).getPath());
-				// Prepare data
-				dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR,
 						this.getActivityName(), e);

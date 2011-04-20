@@ -1,3 +1,4 @@
 org.openscience.cdk.applications.taverna.ui.weka.panels.classification.J48Frame
+org.openscience.cdk.applications.taverna.ui.weka.panels.classification.MultilayerPerceptronFrame
 org.openscience.cdk.applications.taverna.ui.weka.panels.classification.NaiveBayesFrame
 org.openscience.cdk.applications.taverna.ui.weka.panels.classification.SupportVectorMachinesFrame

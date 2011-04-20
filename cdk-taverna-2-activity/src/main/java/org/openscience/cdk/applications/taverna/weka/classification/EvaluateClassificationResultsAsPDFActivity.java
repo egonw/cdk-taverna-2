@@ -23,6 +23,7 @@ package org.openscience.cdk.applications.taverna.weka.classification;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,6 +34,7 @@ import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.reference.impl.external.file.FileReference;
 import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 
+import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
@@ -106,7 +108,10 @@ public class EvaluateClassificationResultsAsPDFActivity extends AbstractCDKActiv
 		WekaTools tools = new WekaTools();
 		ArrayList<String> resultFiles = new ArrayList<String>();
 		try {
+			DefaultCategoryDataset meanClassificationChartset = new DefaultCategoryDataset();
+			int fileIndex = 0;
 			while (!modelFiles.isEmpty()) {
+				fileIndex++;
 				List<Object> chartsObjects = new LinkedList<Object>();
 				LinkedList<Double> trainPercentage = new LinkedList<Double>();
 				LinkedList<Double> testPercentage = new LinkedList<Double>();
@@ -116,41 +121,61 @@ public class EvaluateClassificationResultsAsPDFActivity extends AbstractCDKActiv
 					DefaultCategoryDataset chartDataset = new DefaultCategoryDataset();
 					String summary = "";
 					Instances trainset = trainDatasets.get(j);
-
-					this.createDataset(trainset, classifier, chartDataset, trainPercentage, "Training set");
-					trainset = Filter.useFilter(trainset, tools.getIDRemover(trainset));
-					Evaluation trainsetEval = new Evaluation(trainset);
-					trainsetEval.evaluateModel(classifier, trainset);
+					Instances tempset = Filter.useFilter(trainset, tools.getIDRemover(trainset));
+					Evaluation trainsetEval = new Evaluation(tempset);
+					trainsetEval.evaluateModel(classifier, tempset);
+					String setname = "Training set (" + String.format("%.2f",trainsetEval.pctCorrect()) + "%)";
+					this.createDataset(trainset, classifier, chartDataset, trainPercentage, setname);
 					summary += "Training set:\n\n";
 					summary += trainsetEval.toSummaryString(true);
+					double ratio = 100;
 					if (testDatasets != null) {
 						Instances testset = testDatasets.get(j);
-						this.createDataset(testset, classifier, chartDataset, testPercentage, "Test set");
-						testset = Filter.useFilter(testset, tools.getIDRemover(testset));
+						tempset = Filter.useFilter(testset, tools.getIDRemover(testset));
 						Evaluation testEval = new Evaluation(trainset);
-						testEval.evaluateModel(classifier, testset);
+						testEval.evaluateModel(classifier, tempset);
+						setname = "Test set (" + String.format("%.2f",testEval.pctCorrect()) + "%)";
+						this.createDataset(testset, classifier, chartDataset, testPercentage,setname);
 						summary += "\nTest set:\n\n";
 						summary += testEval.toSummaryString(true);
+						ratio = trainset.numInstances() / (double) (trainset.numInstances() + testset.numInstances())
+								* 100;
 					}
-					String header = classifier.getClass().getSimpleName() + "\n Training set ratio: \n"
-							+ modelFile.getName();
+					String header = classifier.getClass().getSimpleName() + "\n Training set ratio: "
+							+ String.format("%.2f", ratio) + "\n" + modelFile.getName();
 					chartsObjects
 							.add(chartTool.createBarChart(header, "Class", "Correct classified (%)", chartDataset));
 					chartsObjects.add(summary);
 				}
 				DefaultCategoryDataset percentageChartSet = new DefaultCategoryDataset();
+
+				double mean = 0;
 				for (int i = 0; i < trainPercentage.size(); i++) {
 					percentageChartSet.addValue(trainPercentage.get(i), "Training Set", "" + (i + 1));
+					mean += trainPercentage.get(i);
 				}
+				mean /= trainPercentage.size();
+				meanClassificationChartset.addValue(mean, "Training Set", ""
+						+ fileIndex);
+				mean = 0;
 				for (int i = 0; i < testPercentage.size(); i++) {
 					percentageChartSet.addValue(testPercentage.get(i), "Test Set", "" + (i + 1));
+					mean += testPercentage.get(i);
 				}
+				mean /= testPercentage.size();
+				meanClassificationChartset.addValue(mean, "Test Set", ""
+						+ fileIndex);
 				chartsObjects.add(chartTool.createLineChart("Overall Percentages", "Index", "Correct Classified (%)",
 						percentageChartSet, false, true));
 				File file = FileNameGenerator.getNewFile(directory, ".pdf", "ScatterPlot");
 				chartTool.writeChartAsPDF(file, chartsObjects);
 				resultFiles.add(file.getPath());
 			}
+			JFreeChart meanChart = chartTool.createLineChart("Overall Percentages", "Model Index",
+					"Correct Classified (%)", meanClassificationChartset, false, true);
+			File file = FileNameGenerator.getNewFile(directory, ".pdf", "ScatterPlot");
+			chartTool.writeChartAsPDF(file, Collections.singletonList((Object) meanChart));
+			resultFiles.add(file.getPath());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

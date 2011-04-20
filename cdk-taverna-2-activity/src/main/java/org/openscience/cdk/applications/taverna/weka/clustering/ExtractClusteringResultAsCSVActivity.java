@@ -87,13 +87,13 @@ public class ExtractClusteringResultAsCSVActivity extends AbstractCDKActivity {
 		Instances uuids = null;
 		Clusterer clusterer = null;
 		WekaTools tools = new WekaTools();
+		// Prepare data
+		uuids = Filter.useFilter(dataset, tools.getIDGetter(dataset));
+		dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 		for (int i = 0; i < files.size(); i++) {
 			try {
 				// Load clusterer
 				clusterer = (Clusterer) SerializationHelper.read(files.get(i).getPath());
-				// Prepare data
-				uuids = Filter.useFilter(dataset, tools.getIDGetter(dataset));
-				dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR,
 						this.getActivityName(), e);

@@ -24,7 +24,8 @@ import org.openscience.cdk.applications.taverna.ui.miscellaneous.PortNumberConfi
 import org.openscience.cdk.applications.taverna.ui.qsar.CurateQSARVectorConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.qsar.QSARDescriptorConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.reactionenumerator.ReactionEnumeratorConfigurationPanel;
-import org.openscience.cdk.applications.taverna.ui.weka.AttributeEvaluationConfigurationPanel;
+import org.openscience.cdk.applications.taverna.ui.weka.AttributeCEvaluationConfigurationPanel;
+import org.openscience.cdk.applications.taverna.ui.weka.AttributeREvaluationConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.weka.GACAttributeEvaluationConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.weka.GARAttributeEvaluationConfigurationPanel;
 import org.openscience.cdk.applications.taverna.ui.weka.ScatternPlotConfigurationPanel;
@@ -35,6 +36,7 @@ import org.openscience.cdk.applications.taverna.ui.weka.WekaClusteringConfigurat
 import org.openscience.cdk.applications.taverna.ui.weka.WekaRegressionConfigurationPanelController;
 import org.openscience.cdk.applications.taverna.weka.classification.EvaluateClassificationResultsAsPDFActivity;
 import org.openscience.cdk.applications.taverna.weka.classification.GACAttributeSelectionActivity;
+import org.openscience.cdk.applications.taverna.weka.classification.LeaveOneOutCAttributeSelectionActivity;
 import org.openscience.cdk.applications.taverna.weka.classification.SplitClassificationTrainTestsetActivity;
 import org.openscience.cdk.applications.taverna.weka.classification.WekaClassificationActivity;
 import org.openscience.cdk.applications.taverna.weka.clustering.WekaClusteringActivity;
@@ -78,13 +80,15 @@ public class CDKConfigurationPanelFactory {
 		} else if (activity instanceof GARAttributeSelectionActivity) {
 			return new GARAttributeEvaluationConfigurationPanel(activity);
 		} else if (activity instanceof LeaveOneOutRAttributeSelectionActivity) {
-			return new AttributeEvaluationConfigurationPanel(activity);
+			return new AttributeREvaluationConfigurationPanel(activity);
 		} else if (activity instanceof SplitClassificationTrainTestsetActivity) {
 			return new SplitClassificationTrainTestsetConfigurationPanelController(activity);
 		} else if (activity instanceof GACAttributeSelectionActivity) {
 			return new GACAttributeEvaluationConfigurationPanel(activity);
 		}else if (activity instanceof WekaClassificationActivity) {
 			return new WekaClassificationConfigurationPanelController(activity);
+		} else if (activity instanceof LeaveOneOutCAttributeSelectionActivity) {
+			return new AttributeCEvaluationConfigurationPanel(activity);
 		}
 		return new EmptyConfigurationPanel();
 	}

@@ -89,12 +89,12 @@ public class GenerateSilhouettePlotFromClusteringResultAsCSVActivity extends Abs
 		Clusterer clusterer = null;
 		WekaTools tools = new WekaTools();
 		HashMap<Integer, LinkedList<String>> meanTable = new HashMap<Integer, LinkedList<String>>();
+		// Prepare data
+		dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 		for (int i = 0; i < files.size(); i++) {
 			try {
 				// Load clusterer
 				clusterer = (Clusterer) SerializationHelper.read(files.get(i).getPath());
-				// Prepare data
-				dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR,
 						this.getActivityName(), e);

@@ -214,13 +214,15 @@ public class EMFrame extends AbstractClusteringConfigurationFrame {
 						this.standardDeviationTextField, 0, Integer.MAX_VALUE)) {
 			return false;
 		}
-		int min = Integer.parseInt(this.minNumberOfClustersTextField.getText());
-		int max = Integer.parseInt(this.maxNumberOfClustersTextField.getText());
-		if (max < min) {
-			JOptionPane.showMessageDialog(this,
-					"Max number of clusters has to be greater or equal than the min number!", "Illegal Argument",
-					JOptionPane.ERROR_MESSAGE);
-			return false;
+		if (!this.minNumberOfClustersTextField.getText().equals("-1")) {
+			int min = Integer.parseInt(this.minNumberOfClustersTextField.getText());
+			int max = Integer.parseInt(this.maxNumberOfClustersTextField.getText());
+			if (max < min) {
+				JOptionPane.showMessageDialog(this,
+						"Max number of clusters has to be greater or equal than the min number!", "Illegal Argument",
+						JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
 		}
 		return true;
 	}
