@@ -107,12 +107,14 @@ public class SetupController {
 		this.loaded = true;
 		String workingDirFilename = FileNameGenerator.getTempDir() + File.separator + "Test";
 		this.properties.setProperty(WORKING_DIRECTORY, workingDirFilename);
-		Boolean isDataCaching = false; // Most unit tests are not working with the caching
+		Boolean isDataCaching = false; // Most unit tests are not working with
+										// the caching
 		this.properties.setProperty(IS_DATA_CACHING, "" + isDataCaching);
-		Boolean isDataCompression = false; // Most unit tests are not working with the caching
+		Boolean isDataCompression = false; // Most unit tests are not working
+											// with the caching
 		this.properties.setProperty(IS_DATA_COMPRESSION, "" + isDataCompression);
 	}
-	
+
 	/**
 	 * Load the unit test properties.
 	 */
@@ -123,9 +125,11 @@ public class SetupController {
 		this.loaded = true;
 		String workingDirFilename = FileNameGenerator.getTempDir() + File.separator + "Test";
 		this.properties.setProperty(WORKING_DIRECTORY, workingDirFilename);
-		Boolean isDataCaching = false; // Most unit tests are not working with the caching
+		Boolean isDataCaching = false; // Most unit tests are not working with
+										// the caching
 		this.properties.setProperty(IS_DATA_CACHING, "" + isDataCaching);
-		Boolean isDataCompression = true; // Most unit tests are not working with the caching
+		Boolean isDataCompression = true; // Most unit tests are not working
+											// with the caching
 		this.properties.setProperty(IS_DATA_COMPRESSION, "" + isDataCompression);
 	}
 
@@ -138,8 +142,9 @@ public class SetupController {
 			return;
 		}
 		this.loaded = true;
-		// Under windows restricted access to the application dir -> use temp dir
-		String appDir = FileNameGenerator.getTempDir(); //FileNameGenerator.getApplicationDir();
+		// Under windows restricted access to the application dir -> use temp
+		// dir
+		String appDir = FileNameGenerator.getTempDir(); // FileNameGenerator.getApplicationDir();
 		File configFile = new File(appDir + File.separator + "cdktaverna2.config");
 		if (!configFile.exists()) {
 			this.showConfigurationDialog();
@@ -200,7 +205,7 @@ public class SetupController {
 	 * Saves properties into file.
 	 */
 	private void setConfiguration() {
-		String appDir = FileNameGenerator.getTempDir();//FileNameGenerator.getApplicationDir();
+		String appDir = FileNameGenerator.getTempDir();// FileNameGenerator.getApplicationDir();
 		File configFile = new File(appDir + File.separator + "cdktaverna2.config");
 		try {
 			String workingDirFilename = this.view.getWorkingDirectoryTextField().getText();
@@ -223,7 +228,7 @@ public class SetupController {
 	 * @return The working directory path.
 	 */
 	public String getWorkingDir() {
-		if(!this.loaded) {
+		if (!this.loaded) {
 			this.loadFailsafeConfiguration();
 		}
 		String path = this.properties.getProperty(WORKING_DIRECTORY);
@@ -238,7 +243,7 @@ public class SetupController {
 	 * @return True - CDK-Taverna 2.0 caches the data instead of Taverna itself.
 	 */
 	public boolean isDataCaching() {
-		if(!this.loaded) {
+		if (!this.loaded) {
 			this.loadFailsafeConfiguration();
 		}
 		Boolean isDataCaching = Boolean.parseBoolean(this.properties.getProperty(IS_DATA_CACHING));
@@ -249,7 +254,7 @@ public class SetupController {
 	 * @return True - CDK-Taverna 2.0 caches the data instead of Taverna itself.
 	 */
 	public boolean isDataCompression() {
-		if(!this.loaded) {
+		if (!this.loaded) {
 			this.loadFailsafeConfiguration();
 		}
 		Boolean isDataCompression = Boolean.parseBoolean(this.properties.getProperty(IS_DATA_COMPRESSION));

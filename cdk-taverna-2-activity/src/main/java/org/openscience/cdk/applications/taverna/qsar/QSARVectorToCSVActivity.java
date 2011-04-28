@@ -173,4 +173,3 @@ public class QSARVectorToCSVActivity extends AbstractCDKActivity {
 		return CDKTavernaConstants.QSAR_FOLDER_NAME;
 	}
 }
-

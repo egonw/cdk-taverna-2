@@ -130,9 +130,8 @@ public class CSVToQSARVectorActivity extends AbstractCDKActivity {
 	 * @return Items
 	 */
 	private String[] getItems(String line) {
-		String[] items = line.split("\";\"");
-		items[0] = items[0].replaceAll("\"", "");
-		items[items.length - 1] = items[items.length - 1].replaceAll("\";", "");
+		line = line.replaceAll("\"", "");
+		String[] items = line.split(";");
 		return items;
 	}
 

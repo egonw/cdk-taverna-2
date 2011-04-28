@@ -48,7 +48,8 @@ import org.openscience.jchempaint.JChemPaintPanel;
  * @author Andreas Truszkowski
  * 
  */
-public class JChemPaintConfigurationPanel extends ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
+public class JChemPaintConfigurationPanel extends
+		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
 
 	private static final long serialVersionUID = 8171127307831390262L;
 
@@ -68,7 +69,8 @@ public class JChemPaintConfigurationPanel extends ActivityConfigurationPanel<Abs
 			this.removeAll();
 			this.setLayout(new GridLayout());
 			this.setPreferredSize(new Dimension(800, 600));
-			byte[] chemFileData = (byte[]) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_CMLCHEMFILE_DATA);
+			byte[] chemFileData = (byte[]) configBean
+					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_CMLCHEMFILE_DATA);
 			IChemModel model = null;
 			if (chemFileData == null) {
 				Molecule container = new Molecule();
@@ -113,13 +115,14 @@ public class JChemPaintConfigurationPanel extends ActivityConfigurationPanel<Abs
 	@Override
 	public void noteConfiguration() {
 		try {
-		ChemSequence sequence = new ChemSequence();
-		sequence.addChemModel(this.jcpPanel.getChemModel());
-		CMLChemFile chemFile = new CMLChemFile();
-		chemFile.addChemSequence(sequence);
-		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
-		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CMLCHEMFILE_DATA, CDKObjectHandler.getBytes(chemFile));
-		this.jcpPanel.setModified(false);
+			ChemSequence sequence = new ChemSequence();
+			sequence.addChemModel(this.jcpPanel.getChemModel());
+			CMLChemFile chemFile = new CMLChemFile();
+			chemFile.addChemSequence(sequence);
+			this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
+			this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CMLCHEMFILE_DATA,
+					CDKObjectHandler.getBytes(chemFile));
+			this.jcpPanel.setModified(false);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_DURING_ACTIVITY_CONFIGURATION,
 					this.getClass().getSimpleName(), e);

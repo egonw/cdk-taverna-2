@@ -52,7 +52,8 @@ import org.openscience.cdk.applications.taverna.iterativeio.DataStreamController
  * @author Andreas Truszkowski
  * 
  */
-public class FileWriterConfigurationPanel extends ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
+public class FileWriterConfigurationPanel extends
+		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
 
 	private static final long serialVersionUID = -1161055144757128604L;
 
@@ -67,7 +68,8 @@ public class FileWriterConfigurationPanel extends ActivityConfigurationPanel<Abs
 		private static final long serialVersionUID = 2594222854083984583L;
 
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser openDialog = new JFileChooser(new File(DataStreamController.getInstance().getCurrentDirectory()));
+			JFileChooser openDialog = new JFileChooser(new File(DataStreamController.getInstance()
+					.getCurrentDirectory()));
 			openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			if (openDialog.showOpenDialog(FileWriterConfigurationPanel.this) == JFileChooser.APPROVE_OPTION) {
 				DataStreamController.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
@@ -124,7 +126,8 @@ public class FileWriterConfigurationPanel extends ActivityConfigurationPanel<Abs
 		if (this.file != null && this.file.exists()) {
 			return true;
 		}
-		JOptionPane.showMessageDialog(this, "Chosen directory is not valid!", "Invalid directory", JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(this, "Chosen directory is not valid!", "Invalid directory",
+				JOptionPane.ERROR_MESSAGE);
 		// Not valid, return false
 		return false;
 	}

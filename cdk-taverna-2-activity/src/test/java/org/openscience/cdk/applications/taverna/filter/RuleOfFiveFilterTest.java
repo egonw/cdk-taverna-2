@@ -49,7 +49,8 @@ import org.openscience.cdk.exception.CDKException;
  * 
  */
 public class RuleOfFiveFilterTest extends CDKTavernaTestCases {
-	// CMLChemFile which contains the original data for the calculaton of the descriptors
+	// CMLChemFile which contains the original data for the calculaton of the
+	// descriptors
 	private CMLChemFile[] originalData = null;
 	// inputList which contains a list of the input data for the local workers
 	private List<CMLChemFile> inputList = null;

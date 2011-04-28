@@ -70,7 +70,8 @@ public class IterativeFileReaderConfigurationPanel extends
 		private static final long serialVersionUID = 5977560838089160808L;
 
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser openDialog = new JFileChooser(new File(DataStreamController.getInstance().getCurrentDirectory()));
+			JFileChooser openDialog = new JFileChooser(new File(DataStreamController.getInstance()
+					.getCurrentDirectory()));
 			if (IterativeFileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
 					CDKTavernaConstants.PROPERTY_SUPPORT_MULTI_FILE) != null) {
 				openDialog.setMultiSelectionEnabled(true);
@@ -157,11 +158,12 @@ public class IterativeFileReaderConfigurationPanel extends
 
 	@Override
 	public boolean checkValues() {
-		String extension = (String) IterativeFileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
-				CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
+		String extension = (String) IterativeFileReaderConfigurationPanel.this.activity.getConfiguration()
+				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 		for (File file : files) {
 			if (file == null || !file.exists() || !file.getPath().endsWith(extension)) {
-				JOptionPane.showMessageDialog(this, "Chosen file is not valid!", "Invalid File", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, "Chosen file is not valid!", "Invalid File",
+						JOptionPane.ERROR_MESSAGE);
 				// Not valid, return false
 				return false;
 			}
@@ -194,8 +196,8 @@ public class IterativeFileReaderConfigurationPanel extends
 	public void noteConfiguration() {
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.files);
-		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE, Integer
-				.parseInt(this.numberOfElementsField.getText()));
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_ITERATIVE_READ_SIZE,
+				Integer.parseInt(this.numberOfElementsField.getText()));
 		String paths = "";
 		for (File file : files) {
 			paths += file.getPath();

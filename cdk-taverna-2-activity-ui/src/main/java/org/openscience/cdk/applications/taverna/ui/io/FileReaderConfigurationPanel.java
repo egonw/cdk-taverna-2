@@ -53,7 +53,8 @@ import org.openscience.cdk.applications.taverna.iterativeio.DataStreamController
  * @author Andreas Truszkowski
  * 
  */
-public class FileReaderConfigurationPanel extends ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
+public class FileReaderConfigurationPanel extends
+		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
 
 	private static final long serialVersionUID = 8171127307831390262L;
 
@@ -68,15 +69,16 @@ public class FileReaderConfigurationPanel extends ActivityConfigurationPanel<Abs
 		private static final long serialVersionUID = 5977560838089160808L;
 
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser openDialog = new JFileChooser(new File(DataStreamController.getInstance().getCurrentDirectory()));
+			JFileChooser openDialog = new JFileChooser(new File(DataStreamController.getInstance()
+					.getCurrentDirectory()));
 			if (FileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
 					CDKTavernaConstants.PROPERTY_SUPPORT_MULTI_FILE) != null) {
 				openDialog.setMultiSelectionEnabled(true);
 			}
-			String extension = (String) FileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
-					CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
-			String description = (String) FileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
-					CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION);
+			String extension = (String) FileReaderConfigurationPanel.this.activity.getConfiguration()
+					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
+			String description = (String) FileReaderConfigurationPanel.this.activity.getConfiguration()
+					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION);
 			openDialog.addChoosableFileFilter(new CDKFileFilter(description, extension));
 			if (openDialog.showOpenDialog(FileReaderConfigurationPanel.this) == JFileChooser.APPROVE_OPTION) {
 				DataStreamController.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
@@ -102,8 +104,8 @@ public class FileReaderConfigurationPanel extends ActivityConfigurationPanel<Abs
 		try {
 			this.removeAll();
 			this.setLayout(new GridLayout(2, 0, 1, 1));
-			String description = (String) FileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
-					CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION);
+			String description = (String) FileReaderConfigurationPanel.this.activity.getConfiguration()
+					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION_DESCRIPTION);
 			JLabel label = new JLabel(description + ":");
 			this.add(label);
 			JPanel filePanel = new JPanel();
@@ -146,11 +148,12 @@ public class FileReaderConfigurationPanel extends ActivityConfigurationPanel<Abs
 
 	@Override
 	public boolean checkValues() {
-		String extension = (String) FileReaderConfigurationPanel.this.activity.getConfiguration().getAdditionalProperty(
-				CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
+		String extension = (String) FileReaderConfigurationPanel.this.activity.getConfiguration()
+				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE_EXTENSION);
 		for (File file : files) {
 			if (file == null || !file.exists() || !file.getPath().endsWith(extension)) {
-				JOptionPane.showMessageDialog(this, "Chosen file is not valid!", "Invalid File", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, "Chosen file is not valid!", "Invalid File",
+						JOptionPane.ERROR_MESSAGE);
 				// Not valid, return false
 				return false;
 			}

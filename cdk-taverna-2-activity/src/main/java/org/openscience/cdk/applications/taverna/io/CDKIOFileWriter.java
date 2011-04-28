@@ -107,7 +107,8 @@ public class CDKIOFileWriter {
 			// Splits the filename because it could contain directories
 			// FIXME Check for linux!!!
 			String[] fileNameArray = fileName.split("\\\\");
-			// Loop not over the whole array => the last array position contains the file name
+			// Loop not over the whole array => the last array position contains
+			// the file name
 			// The rest will be added to the path!
 			for (int i = 0; i < fileNameArray.length - 1; i++) {
 				path += File.separator + fileNameArray[i];

@@ -91,7 +91,8 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 	@Override
 	public HashMap<String, Object> getAdditionalProperties() {
 		HashMap<String, Object> additionalProperties = new HashMap<String, Object>();
-		additionalProperties.put(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, Runtime.getRuntime().availableProcessors());
+		additionalProperties.put(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, Runtime.getRuntime()
+				.availableProcessors());
 		additionalProperties.put(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS, true);
 		return additionalProperties;
 	}
@@ -130,7 +131,8 @@ public class QSARDescriptorThreadedActivity extends AbstractCDKActivity {
 				molecules.addAll(ChemFileManipulator.getAllAtomContainers(chemFile));
 			}
 			if (molecules.isEmpty()) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.DATA_CONTAINS_NO_MOLECULE, this.getActivityName());
+				ErrorLogger.getInstance().writeError(CDKTavernaException.DATA_CONTAINS_NO_MOLECULE,
+						this.getActivityName());
 				return; // FIXME Is it good to return only a empty list?
 			}
 			// Check for ID

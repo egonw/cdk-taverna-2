@@ -61,7 +61,7 @@ public class DataCollectorAcceptorActivity extends AbstractCDKActivity {
 
 	@Override
 	public void work() throws Exception {
-		//Get input
+		// Get input
 		List<byte[]> dataArray = this.getInputAsList(this.INPUT_PORTS[0], byte[].class);
 		UUID id = UUID.fromString(this.getInputAsObject(this.INPUT_PORTS[1], String.class));
 		if (id == null) {

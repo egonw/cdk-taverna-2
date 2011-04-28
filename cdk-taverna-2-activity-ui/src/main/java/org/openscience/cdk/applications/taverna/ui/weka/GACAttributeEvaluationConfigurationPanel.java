@@ -18,7 +18,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.ui.UITools;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClassificationConfigurationFrame;
-import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractRegressionConfigurationFrame;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.LearningDatasetClassifierFrame;
 
 public class GACAttributeEvaluationConfigurationPanel extends
@@ -58,7 +57,8 @@ public class GACAttributeEvaluationConfigurationPanel extends
 			this.configBean = this.activity.getConfiguration();
 			this.configFrames = new ArrayList<AbstractClassificationConfigurationFrame>();
 			List<String> learnerNames = new ArrayList<String>();
-			for (AbstractClassificationConfigurationFrame configFrame : this.cdkLearningConfigFramesRegistry.getInstances()) {
+			for (AbstractClassificationConfigurationFrame configFrame : this.cdkLearningConfigFramesRegistry
+					.getInstances()) {
 				if (configFrame.getClass().getName().startsWith(CONFIG_PACKAGE)) {
 					learnerNames.add(configFrame.getName());
 					configFrame.makeSingleOption();

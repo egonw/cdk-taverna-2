@@ -88,7 +88,7 @@ public class IterativeSDFileReaderActivity extends AbstractCDKActivity {
 									SDFilePart.getBytes()));
 							tmpMDLReader.read(cmlChemFile);
 							tmpMDLReader.close();
-							resultList.add(cmlChemFile);	
+							resultList.add(cmlChemFile);
 						} catch (Exception e) {
 							ErrorLogger.getInstance().writeError("Error reading molecule in SD file:",
 									this.getActivityName(), e);

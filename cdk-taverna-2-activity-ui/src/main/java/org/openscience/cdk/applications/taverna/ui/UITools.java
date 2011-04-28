@@ -17,7 +17,8 @@ public class UITools {
 	 * @param maxValue
 	 * @return True whether the input is correct.
 	 */
-	public static boolean checkTextFieldValueInt(Component comp, String name, JTextField textField, int minValue, int maxValue) {
+	public static boolean checkTextFieldValueInt(Component comp, String name, JTextField textField, int minValue,
+			int maxValue) {
 		try {
 			int value = Integer.parseInt(textField.getText());
 			if (value < minValue || value > maxValue) {
@@ -44,7 +45,8 @@ public class UITools {
 	 * @param maxValue
 	 * @return True whether the input is correct.
 	 */
-	public static boolean checkTextFieldValueDouble(Component comp, String name, JTextField textField, double minValue, double maxValue) {
+	public static boolean checkTextFieldValueDouble(Component comp, String name, JTextField textField, double minValue,
+			double maxValue) {
 		try {
 			double value = Double.parseDouble(textField.getText());
 			if (value < minValue || value > maxValue) {

@@ -22,8 +22,8 @@
 package org.openscience.cdk.applications.taverna.basicutilities;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -232,13 +232,29 @@ public class FileNameGenerator {
 	 * @throws IOException
 	 */
 	public synchronized static void copyFile(File inputFile, File outputFile) throws IOException {
-		FileReader in = new FileReader(inputFile);
-		FileWriter out = new FileWriter(outputFile);
-		int c;
-		while ((c = in.read()) != -1)
-			out.write(c);
-		in.close();
-		out.close();
+		FileInputStream from = null;
+		FileOutputStream to = null;
+		try {
+			from = new FileInputStream(inputFile);
+			to = new FileOutputStream(outputFile);
+			byte[] buffer = new byte[4096];
+			int bytesRead;
+			while ((bytesRead = from.read(buffer)) != -1)
+				to.write(buffer, 0, bytesRead); // write
+		} finally {
+			if (from != null)
+				try {
+					from.close();
+				} catch (IOException e) {
+					;
+				}
+			if (to != null)
+				try {
+					to.close();
+				} catch (IOException e) {
+					;
+				}
+		}
 	}
 
 }

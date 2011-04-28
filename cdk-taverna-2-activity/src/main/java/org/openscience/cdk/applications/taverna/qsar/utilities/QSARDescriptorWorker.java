@@ -93,7 +93,8 @@ public class QSARDescriptorWorker extends Thread {
 								.getDescriptor();
 						try {
 							for (int j = 0; j < molecule.getAtomCount(); j++) {
-								// Calculates only the value if the atom has the symbol H
+								// Calculates only the value if the atom has the
+								// symbol H
 								if (molecule.getAtom(j).getSymbol().equals("H")) {
 									DescriptorValue value = descriptor.calculate(molecule.getAtom(j), molecule);
 									molecule.getAtom(j).setProperty(value.getSpecification(), value);

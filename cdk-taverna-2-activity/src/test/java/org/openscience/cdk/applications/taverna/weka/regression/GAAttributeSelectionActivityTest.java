@@ -21,13 +21,7 @@
  */
 package org.openscience.cdk.applications.taverna.weka.regression;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.ObjectInputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,27 +29,16 @@ import java.util.Map;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
-import net.sf.taverna.t2.workflowmodel.serialization.DeserializationException;
 
-import org.jfree.chart.plot.RainbowPalette;
 import org.junit.Assert;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
-import org.openscience.cdk.applications.taverna.qsar.CSVToQSARVectorActivity;
-import org.openscience.cdk.applications.taverna.setup.SetupController;
-import org.openscience.cdk.applications.taverna.weka.CreateWekaDatasetFromQSARVectorActivity;
-import org.openscience.cdk.applications.taverna.weka.clustering.WekaClusteringActivity;
-import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
-import weka.clusterers.Clusterer;
 import weka.core.Instances;
-import weka.core.SerializationHelper;
 import weka.core.converters.XRFFLoader;
-import weka.filters.Filter;
 
 /**
  * Test class for the GAAttributeEvaluation activity.

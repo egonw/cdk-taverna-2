@@ -37,7 +37,8 @@ public class QSARDescriptorConfigurationPanel extends
 
 	private static final long serialVersionUID = 3360691883759809971L;
 
-	private SPIRegistry<AbstractCDKActivity> cdkActivityRegistry = new SPIRegistry<AbstractCDKActivity>(AbstractCDKActivity.class);
+	private SPIRegistry<AbstractCDKActivity> cdkActivityRegistry = new SPIRegistry<AbstractCDKActivity>(
+			AbstractCDKActivity.class);
 
 	private AbstractCDKActivity activity;
 	private CDKActivityConfigurationBean configBean;
@@ -128,7 +129,8 @@ public class QSARDescriptorConfigurationPanel extends
 			buttonPanel.add(threadsLabel);
 			buttonPanel.add(this.threadsTextField);
 			this.showProgressCheckBox = new JCheckBox("Show progress?");
-			boolean showProgress = (Boolean) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS);
+			boolean showProgress = (Boolean) this.configBean
+					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS);
 			this.showProgressCheckBox.setSelected(showProgress);
 			buttonPanel.add(this.showProgressCheckBox);
 			this.add(selectionPanel, BorderLayout.CENTER);
@@ -223,7 +225,8 @@ public class QSARDescriptorConfigurationPanel extends
 		if (numberOfThreads != newValue) {
 			return true;
 		}
-		boolean showProgress = (Boolean) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS);
+		boolean showProgress = (Boolean) this.configBean
+				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_SHOW_PROGRESS);
 		if (showProgress != this.showProgressCheckBox.isSelected()) {
 			return true;
 		}
@@ -233,7 +236,8 @@ public class QSARDescriptorConfigurationPanel extends
 	@Override
 	public void noteConfiguration() {
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
-		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CHOSEN_QSARDESCRIPTORS, this.getSelectedClasses());
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_CHOSEN_QSARDESCRIPTORS,
+				this.getSelectedClasses());
 		int newValue = Integer.parseInt(this.threadsTextField.getText());
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, newValue);
 		boolean showProgress = this.showProgressCheckBox.isSelected();

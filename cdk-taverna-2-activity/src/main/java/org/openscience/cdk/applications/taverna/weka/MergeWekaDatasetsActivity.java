@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 by Andreas Truszkowski <ATruszkowski@gmx.de>
+ * Copyright (C) 2010 >- 2011 by Andreas Truszkowski <ATruszkowski@gmx.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -24,13 +24,9 @@ package org.openscience.cdk.applications.taverna.weka;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
-import org.openscience.cdk.applications.taverna.CDKTavernaException;
-import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IPortNumber;
 import org.openscience.cdk.applications.taverna.qsar.utilities.QSARVectorUtility;
 
@@ -40,19 +36,19 @@ import weka.core.Instance;
 import weka.core.Instances;
 
 /**
- * Class which represents the merge QSAR vectors activity.
+ * Class which represents the merge weka datasets activity.
  * 
  * @author Andreas Truzskowski
  * 
  */
-public class MergeWekaDattasetsActivity extends AbstractCDKActivity implements IPortNumber {
+public class MergeWekaDatasetsActivity extends AbstractCDKActivity implements IPortNumber {
 
-	public static final String MERGE_QSAR_VECTORS_ACTIVITY = "Merge Weka Datasets";
+	public static final String MERGE_WEKA_DATASETS_ACTIVITY = "Merge Weka Datasets";
 
 	/**
 	 * Creates a new instance.
 	 */
-	public MergeWekaDattasetsActivity() {
+	public MergeWekaDatasetsActivity() {
 		this.INPUT_PORTS = new String[] { "Weka Dataset", "Name" };
 		this.OUTPUT_PORTS = new String[] { "Merged Weka Dataset", "Relations Table" };
 	}
@@ -73,7 +69,6 @@ public class MergeWekaDattasetsActivity extends AbstractCDKActivity implements I
 		addOutput(this.OUTPUT_PORTS[1], 1);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void work() throws Exception {
 		// Get input
@@ -144,7 +139,7 @@ public class MergeWekaDattasetsActivity extends AbstractCDKActivity implements I
 
 	@Override
 	public String getActivityName() {
-		return MergeWekaDattasetsActivity.MERGE_QSAR_VECTORS_ACTIVITY;
+		return MergeWekaDatasetsActivity.MERGE_WEKA_DATASETS_ACTIVITY;
 	}
 
 	@Override
@@ -156,7 +151,7 @@ public class MergeWekaDattasetsActivity extends AbstractCDKActivity implements I
 
 	@Override
 	public String getDescription() {
-		return "Description: " + MergeWekaDattasetsActivity.MERGE_QSAR_VECTORS_ACTIVITY;
+		return "Description: " + MergeWekaDatasetsActivity.MERGE_WEKA_DATASETS_ACTIVITY;
 	}
 
 	@Override

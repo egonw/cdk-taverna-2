@@ -21,7 +21,8 @@ import org.openscience.cdk.applications.taverna.setup.SetupController;
 
 public class CDKServiceProvider implements ServiceDescriptionProvider {
 
-	private SPIRegistry<AbstractCDKActivity> cdkActivityRegistry = new SPIRegistry<AbstractCDKActivity>(AbstractCDKActivity.class);
+	private SPIRegistry<AbstractCDKActivity> cdkActivityRegistry = new SPIRegistry<AbstractCDKActivity>(
+			AbstractCDKActivity.class);
 
 	/**
 	 * Do the actual search for services. Return using the callBack parameter.
@@ -43,7 +44,8 @@ public class CDKServiceProvider implements ServiceDescriptionProvider {
 				service.setActivityName(cdkActivity.getActivityName());
 				service.setFolderName(cdkActivity.getFolderName());
 				// TODO set description
-				service.setDescription(null);// TODO cdkActivity.getDescription());
+				service.setDescription(null);// TODO
+												// cdkActivity.getDescription());
 				service.setAdditionalProperties(cdkActivity.getAdditionalProperties());
 				this.setActivityColour(cdkActivity);
 				results.add(service);
@@ -54,48 +56,50 @@ public class CDKServiceProvider implements ServiceDescriptionProvider {
 			// No more results will be coming
 			callBack.finished();
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_PROVIDING_SERVICES, this.getClass().getSimpleName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_PROVIDING_SERVICES,
+					this.getClass().getSimpleName(), e);
 		}
 	}
 
 	private void setActivityColour(AbstractCDKActivity cdkActivity) {
 		String name = cdkActivity.getClass().getName();
 		String colour;
-		if(name.startsWith("org.openscience.cdk.applications.taverna.classification.art2a")) {
+		if (name.startsWith("org.openscience.cdk.applications.taverna.classification.art2a")) {
 			colour = "#00EE76"; // Springgreen2
-		} else if(name.startsWith("org.openscience.cdk.applications.taverna.filter")) {
+		} else if (name.startsWith("org.openscience.cdk.applications.taverna.filter")) {
 			colour = "#EEAEEE"; // Plum2
-		} else if(name.startsWith("org.openscience.cdk.applications.taverna.io")) {
+		} else if (name.startsWith("org.openscience.cdk.applications.taverna.io")) {
 			colour = "#D44942"; // Chili
-		} else if(name.startsWith("org.openscience.cdk.applications.taverna.isomorphism")) {
+		} else if (name.startsWith("org.openscience.cdk.applications.taverna.isomorphism")) {
 			colour = "#D15FEE"; // Mediumorchid2
-		} else if(name.startsWith("org.openscience.cdk.applications.taverna.iterativeio")) {
+		} else if (name.startsWith("org.openscience.cdk.applications.taverna.iterativeio")) {
 			colour = "#CD5555"; // Indianred3
-		} else if(name.startsWith("org.openscience.cdk.applications.taverna.jchempaint")) {
+		} else if (name.startsWith("org.openscience.cdk.applications.taverna.jchempaint")) {
 			colour = "#CCFFCC"; // Offwhitegreen
-		} else if(name.startsWith("org.openscience.cdk.applications.taverna.miscellaneous")) {
+		} else if (name.startsWith("org.openscience.cdk.applications.taverna.miscellaneous")) {
 			colour = "#CCCC00"; // Ralphyellow
-		} else if(name.startsWith("org.openscience.cdk.applications.taverna.curation")) {
+		} else if (name.startsWith("org.openscience.cdk.applications.taverna.curation")) {
 			colour = "#3CB371"; // Mediumseagreen
-		} else if(name.startsWith("org.openscience.cdk.applications.taverna.qsar")) {
+		} else if (name.startsWith("org.openscience.cdk.applications.taverna.qsar")) {
 			colour = "#49E20E"; // Nerf green
-		} else if(name.startsWith("org.openscience.cdk.applications.taverna.reactionenumerator")) {
+		} else if (name.startsWith("org.openscience.cdk.applications.taverna.reactionenumerator")) {
 			colour = "#40E0D0"; // Turquoise
-		} else if(name.startsWith("org.openscience.cdk.applications.taverna.renderer")) {
+		} else if (name.startsWith("org.openscience.cdk.applications.taverna.renderer")) {
 			colour = "#F0E68C"; // Khaki
-		} else if(name.startsWith("org.openscience.cdk.applications.taverna.stringconverter")) {
+		} else if (name.startsWith("org.openscience.cdk.applications.taverna.stringconverter")) {
 			colour = "#00FFFF"; // Cyan
-		} else if(name.startsWith("org.openscience.cdk.applications.taverna.weka")) {
+		} else if (name.startsWith("org.openscience.cdk.applications.taverna.weka")) {
 			colour = "#DB2929"; // Brownmadder
-		} else if(name.startsWith("org.openscience.cdk.applications.taverna.modelling")) {
+		} else if (name.startsWith("org.openscience.cdk.applications.taverna.modelling")) {
 			colour = "#00EEEE"; // cyan 2
-		} else if(name.startsWith("org.openscience.cdk.applications.taverna.signaturescoring")) {
+		} else if (name.startsWith("org.openscience.cdk.applications.taverna.signaturescoring")) {
 			colour = "#EEEE00"; // yellow 2
 		} else {
-			colour = "#FFFFFF"; //White
+			colour = "#FFFFFF"; // White
 		}
 		ColourManager.getInstance().setPreferredColour(cdkActivity.getClass().getName(), Color.decode(colour));
 	}
+
 	/**
 	 * Clears the cache directoy.
 	 */
@@ -114,7 +118,8 @@ public class CDKServiceProvider implements ServiceDescriptionProvider {
 	}
 
 	/**
-	 * Name of service provider, appears in right click for 'Remove service provider'
+	 * Name of service provider, appears in right click for 'Remove service
+	 * provider'
 	 */
 	public String getName() {
 		return "CDK Taverna 2.0";

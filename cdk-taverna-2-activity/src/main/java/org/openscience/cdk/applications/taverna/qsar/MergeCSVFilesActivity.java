@@ -74,7 +74,7 @@ public class MergeCSVFilesActivity extends AbstractCDKActivity {
 
 	@Override
 	public void work() throws Exception {
-		// Get input 
+		// Get input
 		List<File> files = this.getInputAsFileList(this.INPUT_PORTS[0]);
 		// Do work
 		HashSet<String> descriptorNamesSet = new HashSet<String>();

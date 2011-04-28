@@ -40,7 +40,6 @@ public class GACAttributeSelectionActivity extends AbstractGAAttributeSelectionA
 		this.OUTPUT_PORTS = new String[] { "Optimized Dataset", "Attribut Setup CSV" };
 	}
 
-	
 	@Override
 	public String getFolderName() {
 		return CDKTavernaConstants.WEKA_CLASSIFICATION_FOLDER_NAME;

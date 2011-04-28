@@ -11,7 +11,7 @@ public class BasicGroupCount extends AbstractMolecularDescriptor {
 	@Override
 	public IMolecularDescriptor getDescriptor() {
 		try {
-		return new BasicGroupCountDescriptor();
+			return new BasicGroupCountDescriptor();
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_CREATING_INSTANCE_OF_DESCRIPTOR,
 					this.getClass().getSimpleName(), e);

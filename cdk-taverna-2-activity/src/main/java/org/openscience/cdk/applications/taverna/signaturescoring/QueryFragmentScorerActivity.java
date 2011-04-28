@@ -68,7 +68,7 @@ public class QueryFragmentScorerActivity extends AbstractCDKActivity {
 		List<File> np_files = this.getInputAsFileList(this.INPUT_PORTS[0]);
 		List<File> sm_files = this.getInputAsFileList(this.INPUT_PORTS[1]);
 		List<File> query_files = this.getInputAsFileList(this.INPUT_PORTS[2]);
-		// Do work               
+		// Do work
 		// Processing Natural products signature files
 		for (File file : np_files) {
 			LineNumberReader np_file_reader = new LineNumberReader(new FileReader(file));
@@ -90,7 +90,7 @@ public class QueryFragmentScorerActivity extends AbstractCDKActivity {
 				}
 			}
 		}
-		//Processing Synthetic molecules signature files
+		// Processing Synthetic molecules signature files
 		for (File file : sm_files) {
 			LineNumberReader sm_file_reader = new LineNumberReader(new FileReader(file));
 			String line;
@@ -111,7 +111,7 @@ public class QueryFragmentScorerActivity extends AbstractCDKActivity {
 				}
 			}
 		}
-		//Processing query molecule's signature files
+		// Processing query molecule's signature files
 		if (query_files == null || query_files.size() == 0) {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_FILE_CHOSEN);
 		}
@@ -163,7 +163,7 @@ public class QueryFragmentScorerActivity extends AbstractCDKActivity {
 			} else {
 				score_list.put(molecule, 0.0);
 			}
-			//result_score.add(molecule + " = " + score);
+			// result_score.add(molecule + " = " + score);
 		}
 		List<Entry<String, Double>> sorted_score_list = CollectionUtilities.sortByValue(score_list);
 		for (Entry<String, Double> entry : sorted_score_list) {

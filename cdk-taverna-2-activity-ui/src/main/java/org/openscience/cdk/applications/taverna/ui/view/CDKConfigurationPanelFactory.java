@@ -40,9 +40,9 @@ import org.openscience.cdk.applications.taverna.weka.classification.LeaveOneOutC
 import org.openscience.cdk.applications.taverna.weka.classification.SplitClassificationTrainTestsetActivity;
 import org.openscience.cdk.applications.taverna.weka.classification.WekaClassificationActivity;
 import org.openscience.cdk.applications.taverna.weka.clustering.WekaClusteringActivity;
-import org.openscience.cdk.applications.taverna.weka.regression.LeaveOneOutRAttributeSelectionActivity;
-import org.openscience.cdk.applications.taverna.weka.regression.GARAttributeSelectionActivity;
 import org.openscience.cdk.applications.taverna.weka.regression.EvaluateRegressionResultsAsPDFActivity;
+import org.openscience.cdk.applications.taverna.weka.regression.GARAttributeSelectionActivity;
+import org.openscience.cdk.applications.taverna.weka.regression.LeaveOneOutRAttributeSelectionActivity;
 import org.openscience.cdk.applications.taverna.weka.regression.SplitRegressionTrainTestsetActivity;
 import org.openscience.cdk.applications.taverna.weka.regression.WekaRegressionActivity;
 
@@ -85,7 +85,7 @@ public class CDKConfigurationPanelFactory {
 			return new SplitClassificationTrainTestsetConfigurationPanelController(activity);
 		} else if (activity instanceof GACAttributeSelectionActivity) {
 			return new GACAttributeEvaluationConfigurationPanel(activity);
-		}else if (activity instanceof WekaClassificationActivity) {
+		} else if (activity instanceof WekaClassificationActivity) {
 			return new WekaClassificationConfigurationPanelController(activity);
 		} else if (activity instanceof LeaveOneOutCAttributeSelectionActivity) {
 			return new AttributeCEvaluationConfigurationPanel(activity);

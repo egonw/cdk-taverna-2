@@ -79,8 +79,8 @@ public class ReactionEnumeratorActivity extends AbstractCDKActivity {
 		// get reactants
 		LinkedList<IAtomContainer[]> reactants = new LinkedList<IAtomContainer[]>();
 		for (int i = 0; i < numberOfPorts; i++) {
-			List<CMLChemFile> list = this.getInputAsList(ReactionEnumeratorActivity.REACTANT_PORT + " "
-					+ (i + 1), CMLChemFile.class);
+			List<CMLChemFile> list = this.getInputAsList(ReactionEnumeratorActivity.REACTANT_PORT + " " + (i + 1),
+					CMLChemFile.class);
 			IAtomContainer[] containerArray = new AtomContainer[list.size()];
 			for (int j = 0; j < list.size(); j++) {
 				try {

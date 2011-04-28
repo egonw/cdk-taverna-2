@@ -48,8 +48,8 @@ import weka.clusterers.HierarchicalClusterer;
 public class HierarchicalClustererFrame extends AbstractClusteringConfigurationFrame {
 
 	private static final long serialVersionUID = 3225727167693843163L;
-	private static final String[] LINK_TYPES = { "SINGLE", "COMPLETE", "AVERAGE", "MEAN", "CENTROID", "WARD", "ADJCOMLPETE",
-			"NEIGHBOR_JOINING" };
+	private static final String[] LINK_TYPES = { "SINGLE", "COMPLETE", "AVERAGE", "MEAN", "CENTROID", "WARD",
+			"ADJCOMLPETE", "NEIGHBOR_JOINING" };
 	private final JLabel numberOfClustersLabel = new JLabel("Number of clusters:");
 	private final JTextField minNumberOfClustersTextField = new JTextField();
 	private final JLabel lblLinkType = new JLabel("Link Type:");
@@ -68,8 +68,10 @@ public class HierarchicalClustererFrame extends AbstractClusteringConfigurationF
 		getContentPane().add(configurationPanel, BorderLayout.CENTER);
 		SpringLayout sl_configurationPanel = new SpringLayout();
 		sl_configurationPanel.putConstraint(SpringLayout.NORTH, label, 8, SpringLayout.NORTH, configurationPanel);
-		sl_configurationPanel.putConstraint(SpringLayout.WEST, label, 0, SpringLayout.EAST, minNumberOfClustersTextField);
-		sl_configurationPanel.putConstraint(SpringLayout.EAST, label, 0, SpringLayout.WEST, maxNumberOfClustersTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.WEST, label, 0, SpringLayout.EAST,
+				minNumberOfClustersTextField);
+		sl_configurationPanel.putConstraint(SpringLayout.EAST, label, 0, SpringLayout.WEST,
+				maxNumberOfClustersTextField);
 		sl_configurationPanel.putConstraint(SpringLayout.NORTH, maxNumberOfClustersTextField, 5, SpringLayout.NORTH,
 				configurationPanel);
 		sl_configurationPanel.putConstraint(SpringLayout.WEST, maxNumberOfClustersTextField, 22, SpringLayout.EAST,
@@ -79,13 +81,16 @@ public class HierarchicalClustererFrame extends AbstractClusteringConfigurationF
 		sl_configurationPanel.putConstraint(SpringLayout.EAST, minNumberOfClustersTextField, -64, SpringLayout.EAST,
 				configurationPanel);
 		sl_configurationPanel.putConstraint(SpringLayout.NORTH, comboBox, 31, SpringLayout.NORTH, configurationPanel);
-		sl_configurationPanel.putConstraint(SpringLayout.WEST, numberOfClustersLabel, 10, SpringLayout.WEST, configurationPanel);
-		sl_configurationPanel.putConstraint(SpringLayout.SOUTH, numberOfClustersLabel, -6, SpringLayout.NORTH, comboBox);
+		sl_configurationPanel.putConstraint(SpringLayout.WEST, numberOfClustersLabel, 10, SpringLayout.WEST,
+				configurationPanel);
+		sl_configurationPanel
+				.putConstraint(SpringLayout.SOUTH, numberOfClustersLabel, -6, SpringLayout.NORTH, comboBox);
 		sl_configurationPanel.putConstraint(SpringLayout.EAST, numberOfClustersLabel, -53, SpringLayout.WEST,
 				minNumberOfClustersTextField);
 		sl_configurationPanel.putConstraint(SpringLayout.WEST, minNumberOfClustersTextField, -96, SpringLayout.EAST,
 				configurationPanel);
-		sl_configurationPanel.putConstraint(SpringLayout.WEST, lblLinkType, 0, SpringLayout.WEST, numberOfClustersLabel);
+		sl_configurationPanel
+				.putConstraint(SpringLayout.WEST, lblLinkType, 0, SpringLayout.WEST, numberOfClustersLabel);
 		sl_configurationPanel.putConstraint(SpringLayout.SOUTH, lblLinkType, 0, SpringLayout.SOUTH, comboBox);
 		sl_configurationPanel.putConstraint(SpringLayout.WEST, comboBox, -175, SpringLayout.EAST, configurationPanel);
 		sl_configurationPanel.putConstraint(SpringLayout.EAST, comboBox, -10, SpringLayout.EAST, configurationPanel);
@@ -144,15 +149,18 @@ public class HierarchicalClustererFrame extends AbstractClusteringConfigurationF
 
 	@Override
 	public boolean checkValues() {
-		if (!UITools.checkTextFieldValueInt(this, "Min number of clusters", this.minNumberOfClustersTextField, 2, Integer.MAX_VALUE)
-				|| !UITools.checkTextFieldValueInt(this,"Max number of clusters", this.maxNumberOfClustersTextField, 2, Integer.MAX_VALUE)) {
+		if (!UITools.checkTextFieldValueInt(this, "Min number of clusters", this.minNumberOfClustersTextField, 2,
+				Integer.MAX_VALUE)
+				|| !UITools.checkTextFieldValueInt(this, "Max number of clusters", this.maxNumberOfClustersTextField,
+						2, Integer.MAX_VALUE)) {
 			return false;
 		}
 		int min = Integer.parseInt(this.minNumberOfClustersTextField.getText());
 		int max = Integer.parseInt(this.maxNumberOfClustersTextField.getText());
 		if (max < min) {
-			JOptionPane.showMessageDialog(this, "Max number of clusters has to be greater or equal than the min number!",
-					"Illegal Argument", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this,
+					"Max number of clusters has to be greater or equal than the min number!", "Illegal Argument",
+					JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		return true;

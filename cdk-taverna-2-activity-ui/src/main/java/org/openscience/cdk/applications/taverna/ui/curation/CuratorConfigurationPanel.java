@@ -19,7 +19,8 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
  * 
  * @author kalai
  */
-public class CuratorConfigurationPanel extends ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
+public class CuratorConfigurationPanel extends
+		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
 
 	private static final long serialVersionUID = -4113765289761095130L;
 	JTextField cutoffcount = null;
@@ -29,7 +30,8 @@ public class CuratorConfigurationPanel extends ActivityConfigurationPanel<Abstra
 		this.configBean = activity.getConfiguration();
 		JLabel label = new JLabel("Atom Count Cut-Off");
 		cutoffcount = new JTextField();
-		Integer oldvalue = (Integer) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_ATOM_COUNT_CUTOFF);
+		Integer oldvalue = (Integer) this.configBean
+				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_ATOM_COUNT_CUTOFF);
 		cutoffcount.setText(String.valueOf(oldvalue));
 		cutoffcount.setPreferredSize(new Dimension(40, 30));
 		this.add(label);
@@ -56,8 +58,8 @@ public class CuratorConfigurationPanel extends ActivityConfigurationPanel<Abstra
 	@Override
 	public void noteConfiguration() {
 		this.configBean = (CDKActivityConfigurationBean) this.cloneBean(this.configBean);
-		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_ATOM_COUNT_CUTOFF, Integer.parseInt(cutoffcount
-				.getText()));
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_ATOM_COUNT_CUTOFF,
+				Integer.parseInt(cutoffcount.getText()));
 	}
 
 	@Override

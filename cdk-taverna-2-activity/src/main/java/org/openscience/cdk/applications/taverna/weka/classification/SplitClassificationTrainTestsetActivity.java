@@ -30,7 +30,7 @@ import org.openscience.cdk.applications.taverna.weka.utilities.AbstractSplitTrai
  * @author Andreas Truzskowski
  * 
  */
-public class SplitClassificationTrainTestsetActivity extends AbstractSplitTrainTestsetActivity{
+public class SplitClassificationTrainTestsetActivity extends AbstractSplitTrainTestsetActivity {
 
 	/**
 	 * Creates a new instance.

@@ -329,7 +329,7 @@ public class ErrorLogger {
 	 * @return An instance of the ErrorLogger
 	 */
 	public synchronized static ErrorLogger getInstance() {
-		if(instance == null) {
+		if (instance == null) {
 			instance = new ErrorLogger();
 		}
 		return instance;

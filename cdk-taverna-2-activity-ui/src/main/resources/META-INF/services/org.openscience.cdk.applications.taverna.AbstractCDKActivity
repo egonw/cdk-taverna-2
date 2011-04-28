@@ -166,8 +166,8 @@ org.openscience.cdk.applications.taverna.signaturescoring.FragmentDistributionCa
 org.openscience.cdk.applications.taverna.weka.CreateWekaDatasetFromQSARVectorActivity
 org.openscience.cdk.applications.taverna.weka.ConvertWekaDatasetActivity
 org.openscience.cdk.applications.taverna.weka.WekaPredictionActivity
-org.openscience.cdk.applications.taverna.weka.CreateWekaDatasetFromCSV
-org.openscience.cdk.applications.taverna.weka.MergeWekaDattasetsActivity
+org.openscience.cdk.applications.taverna.weka.CreateWekaDatasetFromCSVActivity
+org.openscience.cdk.applications.taverna.weka.MergeWekaDatasetsActivity
 org.openscience.cdk.applications.taverna.weka.clustering.ExtractClusteringResultAsPDFActivity
 org.openscience.cdk.applications.taverna.weka.clustering.WekaClusteringActivity
 org.openscience.cdk.applications.taverna.weka.clustering.ClusteringResultConsideringDifferentOriginsAsPDF

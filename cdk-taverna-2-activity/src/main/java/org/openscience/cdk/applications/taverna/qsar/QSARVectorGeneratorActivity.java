@@ -198,8 +198,8 @@ public class QSARVectorGeneratorActivity extends AbstractCDKActivity {
 							this.getActivityName(), e);
 					continue;
 				}
-				UUID uuid = UUID.fromString((String)atomContainer.getProperty(CDKTavernaConstants.MOLECULEID));
-				vectorMap.put(uuid , descritorResultMap);
+				UUID uuid = UUID.fromString((String) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID));
+				vectorMap.put(uuid, descritorResultMap);
 				this.descriptorNames.addAll(tempDescriptorNames);
 			}
 		}

@@ -21,14 +21,7 @@
  */
 package org.openscience.cdk.applications.taverna.weka.regression;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.LineNumberReader;
-import java.io.ObjectInputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -37,9 +30,7 @@ import java.util.Map;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
-import net.sf.taverna.t2.workflowmodel.serialization.DeserializationException;
 
-import org.jfree.chart.plot.RainbowPalette;
 import org.junit.Assert;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
@@ -47,20 +38,13 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
-import org.openscience.cdk.applications.taverna.qsar.CSVToQSARVectorActivity;
 import org.openscience.cdk.applications.taverna.setup.SetupController;
-import org.openscience.cdk.applications.taverna.weka.CreateWekaDatasetFromQSARVectorActivity;
-import org.openscience.cdk.applications.taverna.weka.clustering.WekaClusteringActivity;
-import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
-import weka.clusterers.Clusterer;
 import weka.core.Instances;
-import weka.core.SerializationHelper;
 import weka.core.converters.XRFFLoader;
-import weka.filters.Filter;
 
 /**
- * Test class for the AttributeEvaluation activity.
+ * Test class for the evaluate regression results as PDF activity.
  * 
  * @author Andreas Truszkowski
  * 
@@ -68,16 +52,19 @@ import weka.filters.Filter;
 public class EvaluateRegressionResultsAsPDFActivityTest extends CDKTavernaTestCases {
 
 	private CDKActivityConfigurationBean configBean;
-
-	private AbstractCDKActivity setActivity = new CreateWekaRegressionSetActivity();
+	private File dir = null;
+	private AbstractCDKActivity setActivity = new EvaluateRegressionResultsAsPDFActivity();
 
 	public EvaluateRegressionResultsAsPDFActivityTest() {
-		super(CreateWekaRegressionSetActivity.CREATE_WEKA_REGRESSION_DATASET_ACTIVITY);
+		super(EvaluateRegressionResultsAsPDFActivity.EVALUATE_REGRESSION_RESULTS_AS_PDF_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
+		this.dir = new File(SetupController.getInstance().getWorkingDir());
 		configBean = new CDKActivityConfigurationBean();
-		configBean.setActivityName(CreateWekaRegressionSetActivity.CREATE_WEKA_REGRESSION_DATASET_ACTIVITY);
+		configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_SCATTER_PLOT_OPTIONS, "0;false");
+		configBean
+				.setActivityName(EvaluateRegressionResultsAsPDFActivity.EVALUATE_REGRESSION_RESULTS_AS_PDF_ACTIVITY);
 	}
 
 	/**
@@ -92,26 +79,22 @@ public class EvaluateRegressionResultsAsPDFActivityTest extends CDKTavernaTestCa
 		XRFFLoader loader = new XRFFLoader();
 		loader.setSource(fileXRFF);
 		Instances instances = loader.getDataSet();
-		File fileCSV = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-				+ "data" + File.separator + "weka" + File.separator + "regression.csv");
-		List<String> csv = new ArrayList<String>();
-		LineNumberReader reader = new LineNumberReader(new FileReader(fileCSV));
-		String line = null;
-		while ((line = reader.readLine()) != null) {
-			csv.add(line);
-		}
+		File input = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
+				+ File.separator + "weka" + File.separator + "regression.model");
+		File fileModel = new File(this.dir.getPath() + File.separator + "test.model");
+		FileNameGenerator.copyFile(input, fileModel);
 		// Setup input
+		List<byte[]> data = CDKObjectHandler.getBytesList(Collections.singletonList(instances));
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		Map<String, Object> inputs = new HashMap<String, Object>();
-		byte[] data = CDKObjectHandler.getBytes(instances);
-		inputs.put(this.setActivity.INPUT_PORTS[0], data);
-		inputs.put(this.setActivity.INPUT_PORTS[1], csv);
-		expectedOutputTypes.put(this.setActivity.OUTPUT_PORTS[0], byte[].class);
+		inputs.put(this.setActivity.INPUT_PORTS[0], Collections.singletonList(fileModel.getPath()));
+		inputs.put(this.setActivity.INPUT_PORTS[1], data);
+		inputs.put(this.setActivity.INPUT_PORTS[2], data);
+		expectedOutputTypes.put(this.setActivity.OUTPUT_PORTS[0], String.class);
 		Map<String, Object> outputs = ActivityInvoker
 				.invokeAsyncActivity(this.setActivity, inputs, expectedOutputTypes);
-		byte[] resultData = (byte[]) outputs.get(this.setActivity.OUTPUT_PORTS[0]);
-		Instances set = (Instances) CDKObjectHandler.getObject(resultData);
-		Assert.assertEquals(183, set.numInstances());
+		List<String> resultData = (List<String>) outputs.get(this.setActivity.OUTPUT_PORTS[0]);
+		Assert.assertEquals(2, resultData.size());
 	}
 
 	@Override
@@ -128,6 +111,7 @@ public class EvaluateRegressionResultsAsPDFActivityTest extends CDKTavernaTestCa
 	}
 
 	public void cleanUp() {
+		FileNameGenerator.deleteDir(this.dir);
 	}
 
 	/**

@@ -2,15 +2,15 @@ package org.openscience.cdk.applications.taverna.ui.weka.panels;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.BevelBorder;
-import javax.swing.AbstractAction;
-import java.awt.event.ActionEvent;
-import javax.swing.Action;
+import javax.swing.border.EmptyBorder;
 
 public class LearningDatasetClassifierFrame extends JDialog {
 
@@ -46,12 +46,15 @@ public class LearningDatasetClassifierFrame extends JDialog {
 	public JPanel getContentPanel() {
 		return contentPanel;
 	}
+
 	private class SwingAction extends AbstractAction {
 
 		private static final long serialVersionUID = -3063887830112955283L;
+
 		public SwingAction() {
 			putValue(NAME, "Close");
 		}
+
 		public void actionPerformed(ActionEvent e) {
 			dispose();
 		}

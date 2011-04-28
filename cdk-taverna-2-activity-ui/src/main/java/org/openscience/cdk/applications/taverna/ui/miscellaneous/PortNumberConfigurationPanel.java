@@ -41,7 +41,8 @@ import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
  * @author Andreas Truszkowski
  * 
  */
-public class PortNumberConfigurationPanel extends ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
+public class PortNumberConfigurationPanel extends
+		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
 
 	private static final long serialVersionUID = -3256167899077394762L;
 
@@ -61,7 +62,8 @@ public class PortNumberConfigurationPanel extends ActivityConfigurationPanel<Abs
 			this.setLayout(new GridLayout(2, 0, 1, 1));
 			JLabel label = new JLabel("Number of ports:");
 			this.add(label);
-			int numberOfPorts = (Integer) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
+			int numberOfPorts = (Integer) this.configBean
+					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_PORTS);
 			this.portTextField = new JTextField("" + numberOfPorts);
 			this.add(this.portTextField);
 			this.refreshConfiguration();

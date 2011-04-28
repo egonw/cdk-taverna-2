@@ -20,6 +20,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 package org.openscience.cdk.applications.taverna.modelling;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +45,7 @@ import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 /**
- *
+ * 
  * @author kalai
  */
 public class CoordinatesGenerator2DAcitivityTest extends CDKTavernaTestCases {
@@ -63,33 +64,33 @@ public class CoordinatesGenerator2DAcitivityTest extends CDKTavernaTestCases {
 	}
 
 	@SuppressWarnings("unchecked")
-	   public void executeAsynch() throws Exception {
-        activity.configure(configBean);
-        SmilesParser sp = new SmilesParser(DefaultChemObjectBuilder.getInstance());
-        IMolecule mol = sp.parseSmiles("O=C(N1CCN(CC1)CCCN(C)C)C3(C=2C=CC(=CC=2)C)(CCCCC3)");
+	public void executeAsynch() throws Exception {
+		activity.configure(configBean);
+		SmilesParser sp = new SmilesParser(DefaultChemObjectBuilder.getInstance());
+		IMolecule mol = sp.parseSmiles("O=C(N1CCN(CC1)CCCN(C)C)C3(C=2C=CC(=CC=2)C)(CCCCC3)");
 
-        List<CMLChemFile> chemfile = new ArrayList<CMLChemFile>();
-        chemfile.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(mol));
-        List<byte[]> dataList = CDKObjectHandler.getBytesList(chemfile);
+		List<CMLChemFile> chemfile = new ArrayList<CMLChemFile>();
+		chemfile.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(mol));
+		List<byte[]> dataList = CDKObjectHandler.getBytesList(chemfile);
 
-        Map<String, Object> inputs = new HashMap<String, Object>();
-        inputs.put(activity.INPUT_PORTS[0], dataList);
+		Map<String, Object> inputs = new HashMap<String, Object>();
+		inputs.put(activity.INPUT_PORTS[0], dataList);
 
-        Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
-        expectedOutputTypes.put(activity.OUTPUT_PORTS[0], byte[].class);
-        Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
+		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[0], byte[].class);
+		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
 
-        Assert.assertEquals("Unexpected outputs", 1, outputs.size());
+		Assert.assertEquals("Unexpected outputs", 1, outputs.size());
 
-        List<byte[]> objectDataList = (List<byte[]>) outputs.get(activity.OUTPUT_PORTS[0]);
-        List<CMLChemFile> chemFile = CDKObjectHandler.getChemFileList(objectDataList);
-        for (CMLChemFile cml : chemFile) {
-            List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(cml);
-            for (IAtomContainer atomContainer : moleculeList) {
-                assertTrue(GeometryTools.has2DCoordinates(atomContainer));
-            }
-        }
-    }
+		List<byte[]> objectDataList = (List<byte[]>) outputs.get(activity.OUTPUT_PORTS[0]);
+		List<CMLChemFile> chemFile = CDKObjectHandler.getChemFileList(objectDataList);
+		for (CMLChemFile cml : chemFile) {
+			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(cml);
+			for (IAtomContainer atomContainer : moleculeList) {
+				assertTrue(GeometryTools.has2DCoordinates(atomContainer));
+			}
+		}
+	}
 
 	public void executeTest() {
 		try {
@@ -104,11 +105,10 @@ public class CoordinatesGenerator2DAcitivityTest extends CDKTavernaTestCases {
 
 	/**
 	 * Method which returns a test suit with the name of this class
-	 *
+	 * 
 	 * @return TestSuite
 	 */
 	public static Test suite() {
 		return new TestSuite(CoordinatesGenerator2DAcitivityTest.class);
 	}
 }
-

@@ -18,28 +18,31 @@ public class ART2aClassificationConfigurationPanel extends
 	private AbstractCDKActivity activity;
 	private CDKActivityConfigurationBean configBean;
 
-	//	private File file = null;
+	// private File file = null;
 
-	//	private AbstractAction chooseFileAction = new AbstractAction() {
+	// private AbstractAction chooseFileAction = new AbstractAction() {
 	//
-	//		private static final long serialVersionUID = 2594222854083984583L;
+	// private static final long serialVersionUID = 2594222854083984583L;
 	//
-	//		public void actionPerformed(ActionEvent e) {
-	//			JFileChooser openDialog = new JFileChooser(new File(DataStreamController.getInstance().getCurrentDirectory()));
-	//			openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-	//			if (openDialog.showOpenDialog(ART2aClassificationConfigurationPanel.this) == JFileChooser.APPROVE_OPTION) {
-	//				DataStreamController.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
-	//				ART2aClassificationConfigurationPanel.this.file = openDialog.getSelectedFile();
-	//				ART2aClassificationConfigurationPanel.this.showValue();
-	//			}
-	//		}
-	//	};
+	// public void actionPerformed(ActionEvent e) {
+	// JFileChooser openDialog = new JFileChooser(new
+	// File(DataStreamController.getInstance().getCurrentDirectory()));
+	// openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	// if (openDialog.showOpenDialog(ART2aClassificationConfigurationPanel.this)
+	// == JFileChooser.APPROVE_OPTION) {
+	// DataStreamController.getInstance().setCurrentDirectory(openDialog.getCurrentDirectory().getPath());
+	// ART2aClassificationConfigurationPanel.this.file =
+	// openDialog.getSelectedFile();
+	// ART2aClassificationConfigurationPanel.this.showValue();
+	// }
+	// }
+	// };
 
-	//	private void showValue() {
-	//		this.view.getPathTextField().setText(this.file.getPath());
-	//		this.view.getPathTextField().repaint();
-	//		this.revalidate();
-	//	}
+	// private void showValue() {
+	// this.view.getPathTextField().setText(this.file.getPath());
+	// this.view.getPathTextField().repaint();
+	// this.revalidate();
+	// }
 
 	public ART2aClassificationConfigurationPanel(AbstractCDKActivity activity) {
 		this.activity = activity;
@@ -65,11 +68,11 @@ public class ART2aClassificationConfigurationPanel extends
 			boolean scaleFingerprintItems = (Boolean) this.configBean
 					.getAdditionalProperty(CDKTavernaConstants.PROPERTY_SCALE_FINGERPRINT_ITEMS);
 			this.view.getScaleFingerprintItemsCheckBox().setSelected(scaleFingerprintItems);
-			//			this.view.getPathButton().addActionListener(this.chooseFileAction);
-//			ClassLoader cld = getClass().getClassLoader();
-//			URL url = cld.getResources("icons/open.gif").nextElement();
-//			ImageIcon icon = new ImageIcon(url);
-//			this.view.getPathButton().setIcon(icon);
+			// this.view.getPathButton().addActionListener(this.chooseFileAction);
+			// ClassLoader cld = getClass().getClassLoader();
+			// URL url = cld.getResources("icons/open.gif").nextElement();
+			// ImageIcon icon = new ImageIcon(url);
+			// this.view.getPathButton().setIcon(icon);
 			this.add(this.view);
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_DURING_ACTIVITY_CONFIGURATION,
@@ -112,11 +115,12 @@ public class ART2aClassificationConfigurationPanel extends
 			return true;
 		}
 		return false;
-		//		if (this.file == null) {
-		//			return false;
-		//		}
-		//		File file = (File) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		//		return !this.file.equals(file);
+		// if (this.file == null) {
+		// return false;
+		// }
+		// File file = (File)
+		// configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+		// return !this.file.equals(file);
 	}
 
 	@Override
@@ -140,7 +144,8 @@ public class ART2aClassificationConfigurationPanel extends
 		boolean scaleFingerprintItems = this.view.getScaleFingerprintItemsCheckBox().isSelected();
 		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_SCALE_FINGERPRINT_ITEMS,
 				scaleFingerprintItems);
-		//		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE, this.file);
+		// this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE,
+		// this.file);
 	}
 
 	@Override
@@ -160,11 +165,12 @@ public class ART2aClassificationConfigurationPanel extends
 		boolean scaleFingerprintItems = (Boolean) this.configBean
 				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_SCALE_FINGERPRINT_ITEMS);
 		this.view.getScaleFingerprintItemsCheckBox().setSelected(scaleFingerprintItems);
-		//		this.file = (File) configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
-		//		if (this.file != null) {
-		//			this.view.getPathTextField().setText(this.file.getAbsolutePath());
-		//			this.view.getPathTextField().repaint();
-		//		}
+		// this.file = (File)
+		// configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_FILE);
+		// if (this.file != null) {
+		// this.view.getPathTextField().setText(this.file.getAbsolutePath());
+		// this.view.getPathTextField().repaint();
+		// }
 	}
 
 	@Override
@@ -199,12 +205,13 @@ public class ART2aClassificationConfigurationPanel extends
 			return false;
 		}
 		return true;
-		//		if (this.file != null && this.file.exists()) {
-		//			return true;
-		//		}
-		//		JOptionPane.showMessageDialog(this, "Chosen directory is not valid!", "Invalid directory", JOptionPane.ERROR_MESSAGE);
-		//		// Not valid, return false
-		//		return false;
+		// if (this.file != null && this.file.exists()) {
+		// return true;
+		// }
+		// JOptionPane.showMessageDialog(this, "Chosen directory is not valid!",
+		// "Invalid directory", JOptionPane.ERROR_MESSAGE);
+		// // Not valid, return false
+		// return false;
 	}
 
 }

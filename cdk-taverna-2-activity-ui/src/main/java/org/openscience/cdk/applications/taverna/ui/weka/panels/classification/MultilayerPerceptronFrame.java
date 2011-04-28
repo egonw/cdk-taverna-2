@@ -14,7 +14,6 @@ import javax.swing.border.BevelBorder;
 
 import org.openscience.cdk.applications.taverna.ui.UITools;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClassificationConfigurationFrame;
-import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractRegressionConfigurationFrame;
 
 import weka.classifiers.functions.MultilayerPerceptron;
 

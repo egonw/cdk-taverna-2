@@ -27,7 +27,7 @@ import java.util.UUID;
  * Helper class for storing cache informations.
  * 
  * @author Andreas
- *
+ * 
  */
 public class CacheObject {
 	public long offset;

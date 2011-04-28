@@ -59,7 +59,8 @@ public class SplitRegressionTrainTestsetConfigurationPanelController extends
 			this.configBean = this.activity.getConfiguration();
 			this.configFrames = new ArrayList<AbstractRegressionConfigurationFrame>();
 			List<String> learnerNames = new ArrayList<String>();
-			for (AbstractRegressionConfigurationFrame configFrame : this.cdkRegressionConfigFramesRegistry.getInstances()) {
+			for (AbstractRegressionConfigurationFrame configFrame : this.cdkRegressionConfigFramesRegistry
+					.getInstances()) {
 				if (configFrame.getClass().getName().startsWith(CONFIG_PACKAGE)) {
 					learnerNames.add(configFrame.getName());
 					configFrame.makeSingleOption();

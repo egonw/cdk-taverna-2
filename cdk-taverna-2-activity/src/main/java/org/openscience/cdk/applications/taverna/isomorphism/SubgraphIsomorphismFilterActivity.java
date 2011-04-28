@@ -94,7 +94,7 @@ public class SubgraphIsomorphismFilterActivity extends AbstractCDKActivity {
 		// Get input
 		List<CMLChemFile> inputList = this.getInputAsList(this.INPUT_PORTS[0], CMLChemFile.class);
 		CMLChemFile queryChemFile = this.getInputAsObject(this.INPUT_PORTS[1], CMLChemFile.class);
-		// Do work		
+		// Do work
 		List<CMLChemFile> calculatedList = new ArrayList<CMLChemFile>();
 		List<CMLChemFile> notCalculatedList = new ArrayList<CMLChemFile>();
 		IAtomContainer queryMolecule = null;

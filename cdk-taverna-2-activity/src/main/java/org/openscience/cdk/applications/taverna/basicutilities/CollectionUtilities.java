@@ -57,7 +57,7 @@ public class CollectionUtilities {
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns a sorted entry set of given map.
 	 * 

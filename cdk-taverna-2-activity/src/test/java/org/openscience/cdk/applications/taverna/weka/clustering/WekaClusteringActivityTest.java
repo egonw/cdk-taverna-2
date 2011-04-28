@@ -22,10 +22,8 @@
 package org.openscience.cdk.applications.taverna.weka.clustering;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +43,6 @@ import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator
 import org.openscience.cdk.applications.taverna.qsar.CSVToQSARVectorActivity;
 import org.openscience.cdk.applications.taverna.setup.SetupController;
 import org.openscience.cdk.applications.taverna.weka.CreateWekaDatasetFromQSARVectorActivity;
-import org.openscience.cdk.applications.taverna.weka.clustering.WekaClusteringActivity;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
 import weka.clusterers.Clusterer;
@@ -123,11 +120,11 @@ public class WekaClusteringActivityTest extends CDKTavernaTestCases {
 		WekaTools tool = new WekaTools();
 		for (int i = 0; i < 5; i++) {
 			// Load clusterer
-			ObjectInputStream reader = new ObjectInputStream(new BufferedInputStream(new FileInputStream(
-					files.get(i))));
+			ObjectInputStream reader = new ObjectInputStream(new BufferedInputStream(new FileInputStream(files.get(i))));
 			Clusterer clusterer = (Clusterer) reader.readObject();
 			reader.close();
-			// Instances ids = Filter.useFilter(dataset, WekaTools.getIDGetter(dataset));
+			// Instances ids = Filter.useFilter(dataset,
+			// WekaTools.getIDGetter(dataset));
 			Instances cleanDataset = Filter.useFilter(dataset, tool.getIDRemover(dataset));
 			// Test clusterer
 			int[] numberOfVectorsInClass = new int[clusterer.numberOfClusters()];

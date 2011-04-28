@@ -89,7 +89,8 @@ public class LoopSDFileReaderActivityTest extends CDKTavernaTestCases {
 			loops++;
 		} while (!state.equals(LoopSDFileReaderActivity.FINISHED));
 		Assert.assertEquals(3, container.size());
-		Assert.assertEquals(4, loops); // last loop contains no data. Identifies only the end of the file.
+		Assert.assertEquals(4, loops); // last loop contains no data. Identifies
+										// only the end of the file.
 	}
 
 	@Override

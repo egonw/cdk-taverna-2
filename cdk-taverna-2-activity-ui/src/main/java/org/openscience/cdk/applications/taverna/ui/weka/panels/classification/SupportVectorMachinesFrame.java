@@ -14,14 +14,13 @@ import javax.swing.border.BevelBorder;
 
 import org.openscience.cdk.applications.taverna.ui.UITools;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClassificationConfigurationFrame;
-import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractRegressionConfigurationFrame;
 
 import weka.classifiers.functions.LibSVM;
 
 public class SupportVectorMachinesFrame extends AbstractClassificationConfigurationFrame {
 
 	private static final long serialVersionUID = 5685630159412977072L;
-	private static final String[] SVM_TYPES = new String[] { "C-SVC", "nu-SVC", "one-class SVM" };
+	private static final String[] SVM_TYPES = new String[] { "C-SVC", "nu-SVC" };
 	private static final String[] KERNEL_TYPES = new String[] { "Linear: u'*v",
 			"Polynomial: (gamma*u'*v + coef0)^degree", "Radial basis function: exp(-gamma*|u-v|^2)",
 			"Sigmoid: tanh(gamma*u'*v + coef0)" };

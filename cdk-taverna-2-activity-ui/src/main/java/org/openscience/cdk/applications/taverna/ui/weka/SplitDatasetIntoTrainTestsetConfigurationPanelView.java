@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -14,7 +15,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.border.BevelBorder;
-import javax.swing.JButton;
 
 public class SplitDatasetIntoTrainTestsetConfigurationPanelView extends JPanel {
 
@@ -55,7 +55,8 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelView extends JPanel {
 
 		rdbtnNewRadioButton_1 = new JRadioButton("Cluster Representatives");
 		springLayout.putConstraint(SpringLayout.WEST, rdbtnNewRadioButton, 0, SpringLayout.WEST, rdbtnNewRadioButton_1);
-		springLayout.putConstraint(SpringLayout.SOUTH, rdbtnNewRadioButton, -6, SpringLayout.NORTH, rdbtnNewRadioButton_1);
+		springLayout.putConstraint(SpringLayout.SOUTH, rdbtnNewRadioButton, -6, SpringLayout.NORTH,
+				rdbtnNewRadioButton_1);
 		springLayout.putConstraint(SpringLayout.NORTH, rdbtnNewRadioButton_1, 39, SpringLayout.NORTH, this);
 		springLayout.putConstraint(SpringLayout.WEST, rdbtnNewRadioButton_1, 10, SpringLayout.WEST, this);
 		rdbtnNewRadioButton_1.setAction(action_1);
@@ -63,7 +64,8 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelView extends JPanel {
 		group.add(rdbtnNewRadioButton_1);
 
 		rdbtnNewRadioButton_2 = new JRadioButton("SingleGlobalMax");
-		springLayout.putConstraint(SpringLayout.NORTH, rdbtnNewRadioButton_2, 6, SpringLayout.SOUTH, rdbtnNewRadioButton_1);
+		springLayout.putConstraint(SpringLayout.NORTH, rdbtnNewRadioButton_2, 6, SpringLayout.SOUTH,
+				rdbtnNewRadioButton_1);
 		springLayout.putConstraint(SpringLayout.WEST, rdbtnNewRadioButton_2, 0, SpringLayout.WEST, rdbtnNewRadioButton);
 		springLayout.putConstraint(SpringLayout.EAST, rdbtnNewRadioButton_2, 215, SpringLayout.WEST, this);
 		rdbtnNewRadioButton_2.setAction(action_2);
@@ -97,7 +99,8 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelView extends JPanel {
 		add(lblIterations);
 
 		useBlacklistingCheckBox = new JCheckBox("Use Blacklisting. Length (in % of set size):");
-		springLayout.putConstraint(SpringLayout.NORTH, useBlacklistingCheckBox, 6, SpringLayout.SOUTH, iterationsTextField);
+		springLayout.putConstraint(SpringLayout.NORTH, useBlacklistingCheckBox, 6, SpringLayout.SOUTH,
+				iterationsTextField);
 		springLayout.putConstraint(SpringLayout.WEST, useBlacklistingCheckBox, 0, SpringLayout.WEST, lblNewLabel);
 		useBlacklistingCheckBox.setEnabled(false);
 		useBlacklistingCheckBox.setSelected(true);
@@ -138,7 +141,8 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelView extends JPanel {
 		stepsTextField.setColumns(10);
 
 		chooseBestCheckBox = new JCheckBox("Choose best");
-		springLayout.putConstraint(SpringLayout.NORTH, chooseBestCheckBox, 2, SpringLayout.SOUTH, useBlacklistingCheckBox);
+		springLayout.putConstraint(SpringLayout.NORTH, chooseBestCheckBox, 2, SpringLayout.SOUTH,
+				useBlacklistingCheckBox);
 		springLayout.putConstraint(SpringLayout.WEST, chooseBestCheckBox, 34, SpringLayout.WEST, this);
 		chooseBestCheckBox.setEnabled(false);
 		springLayout.putConstraint(SpringLayout.NORTH, lblNewLabel_2, 9, SpringLayout.SOUTH, chooseBestCheckBox);
@@ -149,7 +153,7 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelView extends JPanel {
 		springLayout.putConstraint(SpringLayout.NORTH, lowerRatioTextField, 6, SpringLayout.SOUTH, chooseBestCheckBox);
 		chooseBestCheckBox.setSelected(true);
 		add(chooseBestCheckBox);
-		
+
 		btnConfigure = new JButton("Configure");
 		btnConfigure.setEnabled(false);
 		springLayout.putConstraint(SpringLayout.NORTH, btnConfigure, -4, SpringLayout.NORTH, lblNewLabel);
@@ -157,21 +161,22 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelView extends JPanel {
 		springLayout.putConstraint(SpringLayout.SOUTH, btnConfigure, -83, SpringLayout.NORTH, stepsTextField);
 		springLayout.putConstraint(SpringLayout.EAST, btnConfigure, -12, SpringLayout.EAST, this);
 		add(btnConfigure);
-		
+
 		threadsTextField = new JTextField();
 		springLayout.putConstraint(SpringLayout.NORTH, threadsTextField, 16, SpringLayout.SOUTH, lowerRatioTextField);
 		add(threadsTextField);
 		threadsTextField.setColumns(10);
-		
+
 		lblNumberOfThreads = new JLabel("Number of threads:");
 		springLayout.putConstraint(SpringLayout.WEST, threadsTextField, 6, SpringLayout.EAST, lblNumberOfThreads);
 		springLayout.putConstraint(SpringLayout.NORTH, lblNumberOfThreads, 3, SpringLayout.NORTH, threadsTextField);
 		springLayout.putConstraint(SpringLayout.WEST, lblNumberOfThreads, 0, SpringLayout.WEST, rdbtnNewRadioButton);
 		add(lblNumberOfThreads);
-		
+
 		blLengthTextField = new JTextField();
 		blLengthTextField.setText("25.0");
-		springLayout.putConstraint(SpringLayout.NORTH, blLengthTextField, 1, SpringLayout.NORTH, useBlacklistingCheckBox);
+		springLayout.putConstraint(SpringLayout.NORTH, blLengthTextField, 1, SpringLayout.NORTH,
+				useBlacklistingCheckBox);
 		springLayout.putConstraint(SpringLayout.WEST, blLengthTextField, 6, SpringLayout.EAST, useBlacklistingCheckBox);
 		add(blLengthTextField);
 		blLengthTextField.setColumns(10);
@@ -268,12 +273,15 @@ public class SplitDatasetIntoTrainTestsetConfigurationPanelView extends JPanel {
 	public JCheckBox getChooseBestCheckBox() {
 		return chooseBestCheckBox;
 	}
+
 	public JButton getBtnConfigure() {
 		return btnConfigure;
 	}
+
 	public JTextField getThreadsTextField() {
 		return threadsTextField;
 	}
+
 	public JTextField getBlLengthTextField() {
 		return blLengthTextField;
 	}

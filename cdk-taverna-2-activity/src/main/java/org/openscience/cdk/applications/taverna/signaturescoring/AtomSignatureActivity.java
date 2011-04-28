@@ -66,7 +66,7 @@ public class AtomSignatureActivity extends AbstractCDKActivity {
 		List<CMLChemFile> chemFileList = this.getInputAsList(this.INPUT_PORTS[0], CMLChemFile.class);
 		Integer height = (Integer) this.getConfiguration().getAdditionalProperty(
 				CDKTavernaConstants.PROPERTY_ATOM_SIGNATURE_HEIGHT);
-		// Do work	
+		// Do work
 		ArrayList<String> allAtomSignatures = new ArrayList<String>();
 		for (CMLChemFile cml : chemFileList) {
 			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(cml);

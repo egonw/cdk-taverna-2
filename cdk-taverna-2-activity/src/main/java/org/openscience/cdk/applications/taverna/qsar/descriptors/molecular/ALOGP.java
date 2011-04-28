@@ -11,7 +11,7 @@ public class ALOGP extends AbstractMolecularDescriptor {
 	@Override
 	public IMolecularDescriptor getDescriptor() {
 		try {
-		return new ALOGPDescriptor();
+			return new ALOGPDescriptor();
 		} catch (Exception e) {
 			ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_CREATING_INSTANCE_OF_DESCRIPTOR,
 					this.getClass().getSimpleName(), e);

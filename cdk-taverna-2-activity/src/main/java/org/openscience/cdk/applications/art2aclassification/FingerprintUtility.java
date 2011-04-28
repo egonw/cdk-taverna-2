@@ -172,8 +172,10 @@ public class FingerprintUtility {
 
 		identifierOfEachVector = new ArrayList<Integer>();
 		rowCounter = 0;
-		// Search for columns which are not usable (Each column will be removed which contains a Doulbe.NaN value. Columns with
-		// null values will be removed if the number of null values is larger than the threshold)
+		// Search for columns which are not usable (Each column will be removed
+		// which contains a Doulbe.NaN value. Columns with
+		// null values will be removed if the number of null values is larger
+		// than the threshold)
 		while (resultSet.next()) {
 			// Search for the usable columns
 			if (getAllMolecules || useOnlyTheseVectors.contains(resultSet.getInt(identifierColumnName))) {
@@ -198,7 +200,8 @@ public class FingerprintUtility {
 			}
 		}
 		resultSet.beforeFirst();
-		// Search for vectors which contains null values or double.NaN (This should not be the case for Double.NaN) All vectors
+		// Search for vectors which contains null values or double.NaN (This
+		// should not be the case for Double.NaN) All vectors
 		// will be removed which contains more errors than the threshold
 		while (resultSet.next()) {
 			errorsInVectorCounter = 0;

@@ -32,22 +32,25 @@ import net.sf.taverna.t2.reference.impl.external.object.InlineStringReference;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
+import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
 import weka.classifiers.Classifier;
+import weka.clusterers.Clusterer;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
+import weka.core.Utils;
 import weka.filters.Filter;
 
 /**
- * Class which represents the Weka regression prediction activity.
+ * Class which represents the Weka prediction activity.
  * 
  * @author Andreas Truzskowski
  * 
  */
 public class WekaPredictionActivity extends AbstractCDKActivity {
 
-	public static final String WEKA_REGRESSION_PREDICTION_ACTIVITY = "Weka Prediction";
+	public static final String WEKA_PREDICTION_ACTIVITY = "Weka Prediction";
 
 	/**
 	 * Creates a new instance.
@@ -82,14 +85,29 @@ public class WekaPredictionActivity extends AbstractCDKActivity {
 		Instances uuids = Filter.useFilter(dataset, tools.getIDGetter(dataset));
 		dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
 		ArrayList<String> csv = new ArrayList<String>();
-		csv.add("UUID;PredictedValue;");
-		// Classify data
-		Classifier classifier = (Classifier) SerializationHelper.read(modelFile.getPath());
-		for (int i = 0; i < dataset.numInstances(); i++) {
-			String uuid = uuids.instance(i).stringValue(0);
-			double predValue = classifier.distributionForInstance(dataset.instance(i))[0];
-			String line = uuid + ";" + predValue + ";";
-			csv.add(line);
+		csv.add("UUID;Prediction;Distribution");
+		Object model = SerializationHelper.read(modelFile.getPath());
+		if (model instanceof Classifier) {
+			// Classify data
+			Classifier classifier = (Classifier) model;
+			for (int i = 0; i < dataset.numInstances(); i++) {
+				String uuid = uuids.instance(i).stringValue(0);
+				double predValue = classifier.classifyInstance(dataset.instance(i));
+				double[] dist = classifier.distributionForInstance(dataset.instance(i));
+				String line = uuid + ";" + predValue + ";" + Utils.arrayToString(dist);
+				csv.add(line);
+			}
+		} else if (model instanceof Clusterer) {
+			Clusterer clusterer = (Clusterer) model;
+			for (int i = 0; i < dataset.numInstances(); i++) {
+				String uuid = uuids.instance(i).stringValue(0);
+				int cluster = clusterer.clusterInstance(dataset.instance(i));
+				double[] dist = clusterer.distributionForInstance(dataset.instance(i));
+				String line = uuid + ";" + cluster + ";" + Utils.arrayToString(dist);
+				csv.add(line);
+			}
+		} else {
+			throw new CDKTavernaException(this.getActivityName(), "Unknown model type!");
 		}
 		// Set output
 		this.setOutputAsStringList(csv, this.OUTPUT_PORTS[0]);
@@ -97,7 +115,7 @@ public class WekaPredictionActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getActivityName() {
-		return WekaPredictionActivity.WEKA_REGRESSION_PREDICTION_ACTIVITY;
+		return WekaPredictionActivity.WEKA_PREDICTION_ACTIVITY;
 	}
 
 	@Override
@@ -109,7 +127,7 @@ public class WekaPredictionActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getDescription() {
-		return "Description: " + WekaPredictionActivity.WEKA_REGRESSION_PREDICTION_ACTIVITY;
+		return "Description: " + WekaPredictionActivity.WEKA_PREDICTION_ACTIVITY;
 	}
 
 	@Override

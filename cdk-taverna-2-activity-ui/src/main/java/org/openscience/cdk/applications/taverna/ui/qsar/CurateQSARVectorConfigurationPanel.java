@@ -29,7 +29,8 @@ public class CurateQSARVectorConfigurationPanel extends
 
 	@Override
 	public boolean isConfigurationChanged() {
-		int currentType = (Integer) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_QSAR_VECTOR_CURATION_TYPE);
+		int currentType = (Integer) this.configBean
+				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_QSAR_VECTOR_CURATION_TYPE);
 		int type;
 		if (this.view.getRdbtnCurateOnlyRows().isSelected()) {
 			type = QSARVectorUtility.CURATE_ONLY_ROWS;
@@ -68,7 +69,8 @@ public class CurateQSARVectorConfigurationPanel extends
 
 	@Override
 	public void refreshConfiguration() {
-		int type = (Integer) this.configBean.getAdditionalProperty(CDKTavernaConstants.PROPERTY_QSAR_VECTOR_CURATION_TYPE);
+		int type = (Integer) this.configBean
+				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_QSAR_VECTOR_CURATION_TYPE);
 		switch (type) {
 		case QSARVectorUtility.CURATE_ONLY_ROWS:
 			this.view.getRdbtnCurateOnlyRows().setSelected(true);

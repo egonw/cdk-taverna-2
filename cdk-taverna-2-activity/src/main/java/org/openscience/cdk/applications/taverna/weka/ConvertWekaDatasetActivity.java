@@ -21,7 +21,9 @@
  */
 package org.openscience.cdk.applications.taverna.weka;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
@@ -33,86 +35,91 @@ import weka.core.Instance;
 import weka.core.Instances;
 
 /**
- * Class which represents the create Weka prediction dataset activity.
+ * Class which represents the convert Weka dataset activity.
  * 
  * @author Andreas Truzskowski
  * 
  */
 public class ConvertWekaDatasetActivity extends AbstractCDKActivity {
 
-	public static final String CREATE_WEKA_REGRESSION_DATASET_ACTIVITY = "Convert Weka Dataset";
+	public static final String CONVERT_WEKA_DATASET_ACTIVITY = "Convert Weka Dataset";
 
 	/**
 	 * Creates a new instance.
 	 */
 	public ConvertWekaDatasetActivity() {
-		this.INPUT_PORTS = new String[] { "Weka Dataset", "Weka Base Dataset" };
-		this.OUTPUT_PORTS = new String[] { "Converted Weka Dataset" };
+		this.INPUT_PORTS = new String[] { "Weka Datasets", "Weka Base Dataset" };
+		this.OUTPUT_PORTS = new String[] { "Converted Weka Datasets" };
 	}
 
 	@Override
 	protected void addInputPorts() {
-		addInput(this.INPUT_PORTS[0], 0, true, null, byte[].class);
+		addInput(this.INPUT_PORTS[0], 1, true, null, byte[].class);
 		addInput(this.INPUT_PORTS[1], 0, true, null, byte[].class);
 	}
 
 	@Override
 	protected void addOutputPorts() {
-		addOutput(this.OUTPUT_PORTS[0], 0);
+		addOutput(this.OUTPUT_PORTS[0], 1);
 	}
 
 	@Override
 	public void work() throws Exception {
 		// Get input
-		Instances dataset = this.getInputAsObject(this.INPUT_PORTS[0], Instances.class);
-		Instances regressionSet = this.getInputAsObject(this.INPUT_PORTS[1], Instances.class);
+		List<Instances> datasets = this.getInputAsList(this.INPUT_PORTS[0], Instances.class);
+		Instances baseSet = this.getInputAsObject(this.INPUT_PORTS[1], Instances.class);
 		// Do work
-		try {
-			// Build index/attribute name map
-			HashMap<String, Integer> nameIdxMap = new HashMap<String, Integer>();
-			for (int i = 0; i < dataset.numAttributes(); i++) {
-				nameIdxMap.put(dataset.attribute(i).name(), i);
-			}
-			// Fill the regression set
-			for (int i = 0; i < dataset.numInstances(); i++) {
-				double[] values = new double[regressionSet.numAttributes()];
-				for (int j = 0; j < regressionSet.numAttributes(); j++) {
-					if(j == regressionSet.classIndex()) {
-						continue;
-					}
-					Attribute attribute = regressionSet.attribute(j);
-					Integer idx = nameIdxMap.get(attribute.name());
-					if (idx == null) {
-						throw new CDKTavernaException(this.getActivityName(),
-								CDKTavernaException.DATASETS_ARE_NOT_COMPATIBLE);
-					}
-					if (attribute.isString()) {
-						String s = dataset.instance(i).stringValue(j);
-						values[j] = regressionSet.attribute(j).addStringValue(s);
-					} else if (attribute.isNumeric()) {
-						double v = dataset.instance(i).value(j);
-						values[j] = v;
-					} else {
-						throw new CDKTavernaException(this.getActivityName(),
-								CDKTavernaException.DATASETS_ARE_NOT_COMPATIBLE);
-					}
+		ArrayList<Instances> results = new ArrayList<Instances>();
+		for (Instances dataset : datasets) {
+			try {
+				// Build index/attribute name map
+				HashMap<String, Integer> nameIdxMap = new HashMap<String, Integer>();
+				for (int i = 0; i < dataset.numAttributes(); i++) {
+					nameIdxMap.put(dataset.attribute(i).name(), i);
 				}
-				Instance instance = new Instance(1.0, values);
-				regressionSet.add(instance);
+				Instances resultSet = new Instances(baseSet, dataset.numInstances());
+				// Fill the result set
+				for (int i = 0; i < dataset.numInstances(); i++) {
+					double[] values = new double[resultSet.numAttributes()];
+					for (int j = 0; j < resultSet.numAttributes(); j++) {
+						Attribute attribute = resultSet.attribute(j);
+						Integer idx = nameIdxMap.get(attribute.name());
+						if (idx == null) {
+							throw new CDKTavernaException(this.getActivityName(),
+									CDKTavernaException.DATASETS_ARE_NOT_COMPATIBLE);
+						}
+						if (attribute.isString()) {
+							String s = dataset.instance(i).stringValue(j);
+							values[j] = resultSet.attribute(j).addStringValue(s);
+						} else if (attribute.isNumeric() || attribute.isNominal()) {
+							double v = dataset.instance(i).value(j);
+							values[j] = v;
+						} else {
+							throw new CDKTavernaException(this.getActivityName(),
+									CDKTavernaException.DATASETS_ARE_NOT_COMPATIBLE);
+						}
+					}
+					Instance instance = new Instance(1.0, values);
+					resultSet.add(instance);
+				}
+				results.add(resultSet);
+			} catch (Exception e) {
+				ErrorLogger.getInstance().writeError("Error during dataset conversion!", this.getActivityName(), e);
+				// throw new
+				// CDKTavernaException(this.getConfiguration().getActivityName(),
+				// e.getMessage());
 			}
-			// Try to fill it again
-		} catch (Exception e) {
-			ErrorLogger.getInstance()
-					.writeError("Error during regression dataset creation!", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
+		}
+		if (results.isEmpty()) {
+			throw new CDKTavernaException(this.getActivityName(), "Error during dataset conversion!");
 		}
 		// Set output
-		this.setOutputAsObject(regressionSet, this.OUTPUT_PORTS[0]);
+		this.setOutputAsObjectList(results, this.OUTPUT_PORTS[0]);
 	}
 
 	@Override
 	public String getActivityName() {
-		return ConvertWekaDatasetActivity.CREATE_WEKA_REGRESSION_DATASET_ACTIVITY;
+		return ConvertWekaDatasetActivity.CONVERT_WEKA_DATASET_ACTIVITY;
 	}
 
 	@Override
@@ -123,7 +130,7 @@ public class ConvertWekaDatasetActivity extends AbstractCDKActivity {
 
 	@Override
 	public String getDescription() {
-		return "Description: " + ConvertWekaDatasetActivity.CREATE_WEKA_REGRESSION_DATASET_ACTIVITY;
+		return "Description: " + ConvertWekaDatasetActivity.CONVERT_WEKA_DATASET_ACTIVITY;
 	}
 
 	@Override

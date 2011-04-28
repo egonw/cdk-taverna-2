@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 by Andreas Truszkowski <ATruszkowski@gmx.de>
+ * Copyright (C) 2010-2011 by Andreas Truszkowski <ATruszkowski@gmx.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -24,17 +24,12 @@ package org.openscience.cdk.applications.taverna.weka;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-import org.openscience.cdk.applications.art2aclassification.Art2aClassificator;
-import org.openscience.cdk.applications.art2aclassification.FingerprintItem;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
-import org.openscience.cdk.applications.taverna.qsar.utilities.QSARVectorUtility;
-import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
 import weka.core.Attribute;
 import weka.core.FastVector;
@@ -42,19 +37,19 @@ import weka.core.Instance;
 import weka.core.Instances;
 
 /**
- * Class which represents the create Weka dataset from QSAR vector activity.
+ * Class which represents the create Weka dataset from CSV activity.
  * 
  * @author Andreas Truzskowski
  * 
  */
-public class CreateWekaDatasetFromCSV extends AbstractCDKActivity {
+public class CreateWekaDatasetFromCSVActivity extends AbstractCDKActivity {
 
-	public static final String CREATE_WEKA_DATASET_FROM_QSAR_VECTOR_ACTIVITY = "Create Weka Dataset From CSV";
+	public static final String CREATE_WEKA_DATASET_FROM_CSV_ACTIVITY = "Create Weka Dataset From CSV";
 
 	/**
 	 * Creates a new instance.
 	 */
-	public CreateWekaDatasetFromCSV() {
+	public CreateWekaDatasetFromCSVActivity() {
 		this.INPUT_PORTS = new String[] { "CSV" };
 		this.OUTPUT_PORTS = new String[] { "Weka Dataset", "UUID ID CSV" };
 	}
@@ -109,8 +104,7 @@ public class CreateWekaDatasetFromCSV extends AbstractCDKActivity {
 				dataset.add(inst);
 			}
 		} catch (Exception e) {
-			ErrorLogger.getInstance()
-					.writeError("Error during fingerprint items creation !", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError("Error during weka dataset creation!", this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		// Set output
@@ -120,7 +114,7 @@ public class CreateWekaDatasetFromCSV extends AbstractCDKActivity {
 
 	@Override
 	public String getActivityName() {
-		return CreateWekaDatasetFromCSV.CREATE_WEKA_DATASET_FROM_QSAR_VECTOR_ACTIVITY;
+		return CreateWekaDatasetFromCSVActivity.CREATE_WEKA_DATASET_FROM_CSV_ACTIVITY;
 	}
 
 	@Override
@@ -131,7 +125,7 @@ public class CreateWekaDatasetFromCSV extends AbstractCDKActivity {
 
 	@Override
 	public String getDescription() {
-		return "Description: " + CreateWekaDatasetFromCSV.CREATE_WEKA_DATASET_FROM_QSAR_VECTOR_ACTIVITY;
+		return "Description: " + CreateWekaDatasetFromCSVActivity.CREATE_WEKA_DATASET_FROM_CSV_ACTIVITY;
 	}
 
 	@Override

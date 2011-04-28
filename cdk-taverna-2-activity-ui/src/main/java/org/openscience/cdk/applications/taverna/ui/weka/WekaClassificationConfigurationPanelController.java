@@ -18,7 +18,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClassificationConfigurationFrame;
-import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractRegressionConfigurationFrame;
 
 public class WekaClassificationConfigurationPanelController extends
 		ActivityConfigurationPanel<AbstractCDKActivity, CDKActivityConfigurationBean> {
@@ -46,7 +45,7 @@ public class WekaClassificationConfigurationPanelController extends
 			view.repaint();
 		}
 	};
-	
+
 	private ActionListener algorithmComboBoxListener = new ActionListener() {
 
 		public void actionPerformed(ActionEvent e) {
@@ -134,7 +133,7 @@ public class WekaClassificationConfigurationPanelController extends
 		}
 		return opts;
 	}
-	
+
 	private void setThreadingParam() {
 		int threads = 1;
 		int idx = this.view.getLearnerComboBox().getSelectedIndex();

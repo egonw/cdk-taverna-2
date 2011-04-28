@@ -67,7 +67,7 @@ public class CDKTavernaException extends Exception {
 	public static final String CANNOT_GENERATE_3DCOORDINATES = "Can't generate 3D coordinates!";
 	public static final String PLEASE_CONFIGURE_ACTIVITY = "Please configure activity!";
 	public static final String DATASETS_ARE_NOT_COMPATIBLE = "Datasets are not compatible!";
-	
+
 	public CDKTavernaException(String activityName, String type) {
 		super(type + " Class: " + activityName + ".");
 	}

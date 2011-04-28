@@ -93,7 +93,7 @@ public abstract class AbstractWekaLearningActivity extends AbstractCDKActivity {
 				CDKTavernaConstants.PROPERTY_LEARNER_NAME);
 		String optString = (String) this.getConfiguration().getAdditionalProperty(
 				CDKTavernaConstants.PROPERTY_LEARNER_OPTIONS);
-		if(optString == null) {
+		if (optString == null) {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PLEASE_CONFIGURE_ACTIVITY);
 		}
 		String[] options = optString.split(";");

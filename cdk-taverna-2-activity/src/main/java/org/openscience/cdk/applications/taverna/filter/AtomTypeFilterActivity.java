@@ -92,7 +92,7 @@ public class AtomTypeFilterActivity extends AbstractCDKActivity {
 	public void work() throws Exception {
 		// Get input
 		List<CMLChemFile> chemFileList = this.getInputAsList(this.INPUT_PORTS[0], CMLChemFile.class);
-		// Do work	
+		// Do work
 		List<CMLChemFile> typedList = new ArrayList<CMLChemFile>();
 		List<CMLChemFile> notTypedList = new ArrayList<CMLChemFile>();
 		IAtomContainer[] containers;

@@ -21,10 +21,10 @@ public abstract class AbstractRegressionConfigurationFrame extends JPanel {
 	public abstract boolean checkValues();
 
 	public abstract String[] getOptions();
-	
+
 	public abstract void setOptions(String[] options);
-	
+
 	public abstract void makeSingleOption();
-	
+
 	public abstract boolean useThreading();
 }

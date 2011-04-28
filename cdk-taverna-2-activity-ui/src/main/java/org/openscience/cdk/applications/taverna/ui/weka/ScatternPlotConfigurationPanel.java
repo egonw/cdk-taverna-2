@@ -1,6 +1,5 @@
 package org.openscience.cdk.applications.taverna.ui.weka;
 
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 
 import javax.swing.ButtonGroup;

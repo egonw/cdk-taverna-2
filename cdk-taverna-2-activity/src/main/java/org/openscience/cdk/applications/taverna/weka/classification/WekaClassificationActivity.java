@@ -32,7 +32,7 @@ import org.openscience.cdk.applications.taverna.weka.utilities.AbstractWekaLearn
  */
 public class WekaClassificationActivity extends AbstractWekaLearningActivity {
 
-	public static final String WEKA_LEARNING_ACTIVITY = "Weka Classification";
+	public static final String WEKA_CLASSIFICATION_ACTIVITY = "Weka Classification";
 
 	/**
 	 * Creates a new instance.
@@ -41,9 +41,10 @@ public class WekaClassificationActivity extends AbstractWekaLearningActivity {
 		this.INPUT_PORTS = new String[] { "Classification Train Datasets", "File" };
 		this.OUTPUT_PORTS = new String[] { "Classification Model Files" };
 	}
+
 	@Override
 	public String getActivityName() {
-		return WekaClassificationActivity.WEKA_LEARNING_ACTIVITY;
+		return WekaClassificationActivity.WEKA_CLASSIFICATION_ACTIVITY;
 	}
 
 	@Override

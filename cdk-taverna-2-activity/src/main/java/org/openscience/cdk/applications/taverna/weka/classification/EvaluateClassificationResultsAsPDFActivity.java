@@ -124,7 +124,7 @@ public class EvaluateClassificationResultsAsPDFActivity extends AbstractCDKActiv
 					Instances tempset = Filter.useFilter(trainset, tools.getIDRemover(trainset));
 					Evaluation trainsetEval = new Evaluation(tempset);
 					trainsetEval.evaluateModel(classifier, tempset);
-					String setname = "Training set (" + String.format("%.2f",trainsetEval.pctCorrect()) + "%)";
+					String setname = "Training set (" + String.format("%.2f", trainsetEval.pctCorrect()) + "%)";
 					this.createDataset(trainset, classifier, chartDataset, trainPercentage, setname);
 					summary += "Training set:\n\n";
 					summary += trainsetEval.toSummaryString(true);
@@ -134,8 +134,8 @@ public class EvaluateClassificationResultsAsPDFActivity extends AbstractCDKActiv
 						tempset = Filter.useFilter(testset, tools.getIDRemover(testset));
 						Evaluation testEval = new Evaluation(trainset);
 						testEval.evaluateModel(classifier, tempset);
-						setname = "Test set (" + String.format("%.2f",testEval.pctCorrect()) + "%)";
-						this.createDataset(testset, classifier, chartDataset, testPercentage,setname);
+						setname = "Test set (" + String.format("%.2f", testEval.pctCorrect()) + "%)";
+						this.createDataset(testset, classifier, chartDataset, testPercentage, setname);
 						summary += "\nTest set:\n\n";
 						summary += testEval.toSummaryString(true);
 						ratio = trainset.numInstances() / (double) (trainset.numInstances() + testset.numInstances())
@@ -155,16 +155,14 @@ public class EvaluateClassificationResultsAsPDFActivity extends AbstractCDKActiv
 					mean += trainPercentage.get(i);
 				}
 				mean /= trainPercentage.size();
-				meanClassificationChartset.addValue(mean, "Training Set", ""
-						+ fileIndex);
+				meanClassificationChartset.addValue(mean, "Training Set", "" + fileIndex);
 				mean = 0;
 				for (int i = 0; i < testPercentage.size(); i++) {
 					percentageChartSet.addValue(testPercentage.get(i), "Test Set", "" + (i + 1));
 					mean += testPercentage.get(i);
 				}
 				mean /= testPercentage.size();
-				meanClassificationChartset.addValue(mean, "Test Set", ""
-						+ fileIndex);
+				meanClassificationChartset.addValue(mean, "Test Set", "" + fileIndex);
 				chartsObjects.add(chartTool.createLineChart("Overall Percentages", "Index", "Correct Classified (%)",
 						percentageChartSet, false, true));
 				File file = FileNameGenerator.getNewFile(directory, ".pdf", "ScatterPlot");

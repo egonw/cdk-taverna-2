@@ -92,7 +92,7 @@ public class MMFF94_3DCoordinatesGeneratorActivity extends AbstractCDKActivity {
 	public void work() throws Exception {
 		// Get input
 		List<CMLChemFile> inputList = this.getInputAsList(this.INPUT_PORTS[0], CMLChemFile.class);
-		// Do work		
+		// Do work
 		List<CMLChemFile> calculatedList = new ArrayList<CMLChemFile>();
 		List<CMLChemFile> notCalculatedList = new ArrayList<CMLChemFile>();
 		ModelBuilder3D descriptor;

@@ -37,7 +37,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.setup.SetupController;
-import org.openscience.cdk.applications.taverna.weka.clustering.ExtractClusteringResultAsCSVActivity;
 
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;

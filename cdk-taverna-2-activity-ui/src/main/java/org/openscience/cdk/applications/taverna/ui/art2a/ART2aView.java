@@ -91,7 +91,8 @@ public class ART2aView extends JPanel {
 		add(scaleFingerprintItemsCheckBox);
 
 		maximumClassificationTimeTextField = new JTextField();
-		springLayout.putConstraint(SpringLayout.NORTH, maximumClassificationTimeTextField, 10, SpringLayout.NORTH, this);
+		springLayout
+				.putConstraint(SpringLayout.NORTH, maximumClassificationTimeTextField, 10, SpringLayout.NORTH, this);
 		springLayout.putConstraint(SpringLayout.WEST, maximumClassificationTimeTextField, 0, SpringLayout.EAST,
 				lblMaximumClassificationTimew);
 		springLayout.putConstraint(SpringLayout.EAST, maximumClassificationTimeTextField, 40, SpringLayout.EAST,

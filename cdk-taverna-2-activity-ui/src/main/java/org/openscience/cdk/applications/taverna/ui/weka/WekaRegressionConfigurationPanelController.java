@@ -45,7 +45,7 @@ public class WekaRegressionConfigurationPanelController extends
 			view.repaint();
 		}
 	};
-	
+
 	private ActionListener algorithmComboBoxListener = new ActionListener() {
 
 		public void actionPerformed(ActionEvent e) {
@@ -133,7 +133,7 @@ public class WekaRegressionConfigurationPanelController extends
 		}
 		return opts;
 	}
-	
+
 	private void setThreadingParam() {
 		int threads = 1;
 		int idx = this.view.getLearnerComboBox().getSelectedIndex();

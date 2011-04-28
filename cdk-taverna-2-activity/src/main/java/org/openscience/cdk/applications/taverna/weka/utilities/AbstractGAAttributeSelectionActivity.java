@@ -40,7 +40,7 @@ import weka.core.Instances;
  * @author Andreas Truzskowski
  * 
  */
-public abstract class AbstractGAAttributeSelectionActivity extends AbstractCDKActivity  {
+public abstract class AbstractGAAttributeSelectionActivity extends AbstractCDKActivity {
 
 	public double ATTR_MUTATION_RATE = 0.07;
 	public double CROSS_OVER_RATE = 0.05;

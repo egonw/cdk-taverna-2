@@ -1038,7 +1038,8 @@ public class Art2aClassificator {
 				writer.writeEndElement();
 			}
 
-			// saving the string value of the corresponding object of the fingerprint item"
+			// saving the string value of the corresponding object of the
+			// fingerprint item"
 			writer.writeStartElement("CorrespondingObjectFromFingerpring");
 			if (mObjectArray != null) {
 				for (int i = 0; i < mObjectArray.length; i++) {
@@ -2615,7 +2616,8 @@ public class Art2aClassificator {
 			}
 			// select the classes which do not contain vectors
 			List<Integer> listOfClassesWithoutVectors = new ArrayList<Integer>(mNumberOfDetectedClasses);
-			// This integer array contains the number which is needed for the calculation of the new class number
+			// This integer array contains the number which is needed for the
+			// calculation of the new class number
 			int[] calculateTheNewClassNumber = new int[mNumberOfDetectedClasses];
 			System.out.println("Check network convergents 3");
 			for (int i = 0; i < mNumberOfVectorsInClass.length; i++) {
@@ -2627,7 +2629,8 @@ public class Art2aClassificator {
 			System.out.println("Check network convergents 4");
 			if (!listOfClassesWithoutVectors.isEmpty()) {
 				// calculate the new class number
-				// new class number = oldClassNumber - (number of classes which contains no vectors AND the class number is
+				// new class number = oldClassNumber - (number of classes which
+				// contains no vectors AND the class number is
 				// smaller than the oldClassNumber)
 				System.out.println("Check network convergents 5");
 				for (int i = 0; i < mClassView.length; i++) {
@@ -2637,7 +2640,8 @@ public class Art2aClassificator {
 				for (int i = 0; i < mNumberOfDetectedClasses; i++) {
 					mClassMatrix[i - calculateTheNewClassNumber[i]] = mClassMatrix[i];
 				}
-				// reduce the number of detected classes (mNumberOfDetectedClasses - classes without vectors)
+				// reduce the number of detected classes
+				// (mNumberOfDetectedClasses - classes without vectors)
 				mNumberOfDetectedClasses = mNumberOfDetectedClasses - listOfClassesWithoutVectors.size();
 			}
 			System.out.println("Check network convergents 7");

@@ -2,17 +2,16 @@ package org.openscience.cdk.applications.taverna.ui.weka.panels.classification;
 
 import java.awt.Dimension;
 
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.SpringLayout;
+import javax.swing.border.BevelBorder;
+
 import org.openscience.cdk.applications.taverna.ui.UITools;
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClassificationConfigurationFrame;
 
-import com.sun.tools.internal.jxc.apt.Options;
-
 import weka.classifiers.trees.J48;
-import javax.swing.JCheckBox;
-import javax.swing.SpringLayout;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.border.BevelBorder;
 
 public class J48Frame extends AbstractClassificationConfigurationFrame {
 	private JCheckBox chckbxUseunpruned;
@@ -166,7 +165,7 @@ public class J48Frame extends AbstractClassificationConfigurationFrame {
 		this.chckbxUseBinarySplits.setSelected(false);
 		this.chckbxUseReducedError.setSelected(false);
 		this.chckbxUseunpruned.setSelected(false);
-		if(options.length == 0) {
+		if (options.length == 0) {
 			return;
 		}
 		String[] opts = options[0].split(" ");

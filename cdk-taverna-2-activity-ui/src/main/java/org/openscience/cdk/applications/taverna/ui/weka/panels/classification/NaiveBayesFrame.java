@@ -2,12 +2,13 @@ package org.openscience.cdk.applications.taverna.ui.weka.panels.classification;
 
 import java.awt.Dimension;
 
+import javax.swing.JCheckBox;
+import javax.swing.SpringLayout;
+import javax.swing.border.BevelBorder;
+
 import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClassificationConfigurationFrame;
 
 import weka.classifiers.bayes.NaiveBayes;
-import javax.swing.JCheckBox;
-import javax.swing.border.BevelBorder;
-import javax.swing.SpringLayout;
 
 public class NaiveBayesFrame extends AbstractClassificationConfigurationFrame {
 	private JCheckBox chckbxUseKernelDensity;
@@ -62,18 +63,18 @@ public class NaiveBayesFrame extends AbstractClassificationConfigurationFrame {
 	public void setOptions(String[] options) {
 		this.chckbxUseKernelDensity.setSelected(false);
 		this.chckbxSupervised.setSelected(false);
-		if(options.length == 0) {
+		if (options.length == 0) {
 			return;
 		}
 		String[] opt = options[0].split(" ");
-		for(int i = 0; i < opt.length; i++) {
+		for (int i = 0; i < opt.length; i++) {
 			String o = opt[i];
-			if(o.equals("-K")) {
+			if (o.equals("-K")) {
 				this.chckbxUseKernelDensity.setSelected(true);
-			} 
-			if(o.equals("-D")) {
+			}
+			if (o.equals("-D")) {
 				this.chckbxSupervised.setSelected(true);
-			} 
+			}
 		}
 	}
 

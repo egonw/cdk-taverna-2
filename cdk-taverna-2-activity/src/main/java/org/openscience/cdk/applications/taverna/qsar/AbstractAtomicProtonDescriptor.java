@@ -115,7 +115,8 @@ public abstract class AbstractAtomicProtonDescriptor extends AbstractCDKActivity
 						molecule.setProperty(CDKTavernaConstants.MOLECULEID, uuid.toString());
 					}
 					for (int j = 0; j < molecule.getAtomCount(); j++) {
-						// Calculates only the value if the atom has the symbol H
+						// Calculates only the value if the atom has the symbol
+						// H
 						if (molecule.getAtom(j).getSymbol().equals("H")) {
 							DescriptorValue value = this.descriptor.calculate(molecule.getAtom(j), molecule);
 							molecule.getAtom(j).setProperty(value.getSpecification(), value);
