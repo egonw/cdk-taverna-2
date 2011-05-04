@@ -103,6 +103,10 @@
 			<name>CDK-Taverna 2 Repository</name>
 			<url>http://www.ts-concepts.de/cdk-taverna2/maven/repository</url>
 		</repository>
+		<repository>
+			<id>ucc-repo</id>
+			<url>https://maven.ch.cam.ac.uk/m2repo</url>
+		</repository>
 	</repositories>
 	<modules>
 		<module>cdk-taverna-2-activity</module>

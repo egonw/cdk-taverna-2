@@ -48,6 +48,7 @@ public class RendererFactory {
 		try {
 			renderer = new Renderer(makeGenerators(), makeReactionGenerators(), new AWTFontManager(), null, true);
 			// any specific rendering settings defaults should go here
+			renderer.getRenderer2DModel().setShowExplicitHydrogens(false);
 			renderer.getRenderer2DModel().setShowEndCarbons(false);
 			renderer.getRenderer2DModel().setShowAromaticity(false);
 		} catch (IOException e) {
