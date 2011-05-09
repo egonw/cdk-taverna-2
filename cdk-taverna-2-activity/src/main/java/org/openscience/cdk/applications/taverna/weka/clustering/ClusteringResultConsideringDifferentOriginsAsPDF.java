@@ -190,7 +190,7 @@ public class ClusteringResultConsideringDifferentOriginsAsPDF extends AbstractCD
 						chartDataSet));
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(
-						"Error during evaluation of clustering results in file: " + files.get(i),
+						CDKTavernaException.ERROR_EVALUATING_CLUSTERING_RESULTS + files.get(i),
 						this.getActivityName(), e);
 			}
 		}

@@ -14,6 +14,9 @@ import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClassific
 import weka.classifiers.trees.J48;
 
 public class J48Frame extends AbstractClassificationConfigurationFrame {
+
+	private static final long serialVersionUID = -7120925283814388247L;
+	
 	private JCheckBox chckbxUseunpruned;
 	private JLabel lblPruningConfidenceThreshold;
 	private JTextField pruningConfidenceTextField;

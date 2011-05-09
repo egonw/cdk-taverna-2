@@ -82,13 +82,13 @@ public class CreateWekaRegressionSetActivity extends AbstractCDKActivity {
 			} else {
 				learningSet = dataset;
 			}
-			if (learningSet == null) {
-				throw new CDKTavernaException(this.getActivityName(), "Dataset could not be created!");
-			}
+
 		} catch (Exception e) {
-			ErrorLogger.getInstance()
-					.writeError("Error during regression dataset creation!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_CREATING_DATASET, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
+		}
+		if (learningSet == null) {
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.ERROR_CREATING_DATASET);
 		}
 		// Set output
 		this.setOutputAsObject(learningSet, this.OUTPUT_PORTS[0]);

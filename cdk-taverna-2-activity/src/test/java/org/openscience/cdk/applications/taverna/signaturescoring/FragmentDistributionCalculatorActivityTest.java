@@ -34,12 +34,9 @@ import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 import org.junit.Assert;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
-import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 /**
  * 
@@ -79,38 +76,40 @@ public class FragmentDistributionCalculatorActivityTest extends CDKTavernaTestCa
 
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put(activity.OUTPUT_PORTS[0], byte[].class);
-		expectedOutputTypes.put(activity.OUTPUT_PORTS[1], byte[].class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[1], String.class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[2], byte[].class);
+		expectedOutputTypes.put(activity.OUTPUT_PORTS[3], String.class);
 
 		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputTypes);
-		Assert.assertEquals("Unexpected outputs", 2, outputs.size());
+		Assert.assertEquals("Unexpected outputs", 4, outputs.size());
 
 		List<byte[]> objectDataList = (List<byte[]>) outputs.get(activity.OUTPUT_PORTS[0]);
 		List<CMLChemFile> chemFile = CDKObjectHandler.getChemFileList(objectDataList);
-		Assert.assertEquals(5, chemFile.size());
+		Assert.assertEquals(6, chemFile.size());
 		Object score = new Object();
-		Object expected_score = 0.12493873660829993;
+		Object expected_score = 0.062469368304149966;
+		List<String> signatures_scores = (ArrayList<String>) outputs.get(activity.OUTPUT_PORTS[1]);
+		for (String sign_score : signatures_scores) {
 
-		for (int i = 0; i < chemFile.size(); i++) {
-
-			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(chemFile.get(4));
-			for (IAtomContainer atomContainer : moleculeList) {
-				score = atomContainer.getProperty(CDKTavernaConstants.FRAGMENT_SCORE);
-				break;
+			String[] signs_score = sign_score.split(";");
+			for (int i = 2; i < signs_score.length; i++) {
+				String score_ = signs_score[5];
+				System.out.println(score_);
+				assertEquals(expected_score, score);
 			}
 		}
-		assertEquals(expected_score, score);
 
-		objectDataList = (List<byte[]>) outputs.get(activity.OUTPUT_PORTS[1]);
+		objectDataList = (List<byte[]>) outputs.get(activity.OUTPUT_PORTS[2]);
 		chemFile = CDKObjectHandler.getChemFileList(objectDataList);
 		Assert.assertEquals(4, chemFile.size());
+		List<String> sm_signatures_scores = (ArrayList<String>) outputs.get(activity.OUTPUT_PORTS[3]);
+		for (String sign_score : sm_signatures_scores) {
 
-		for (int i = 0; i < chemFile.size(); i++) {
-
-			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(chemFile.get(3));
-			for (IAtomContainer atomContainer : moleculeList) {
-				score = atomContainer.getProperty(CDKTavernaConstants.FRAGMENT_SCORE);
+			String[] signs_score = sign_score.split(";");
+			for (int i = 2; i < signs_score.length; i++) {
+				String score_ = signs_score[5];
+				System.out.println(score_);
 				assertEquals(expected_score, score);
-				break;
 			}
 		}
 

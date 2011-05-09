@@ -21,6 +21,8 @@
  */
 package org.openscience.cdk.applications.taverna.weka.utilities;
 
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+
 import weka.classifiers.Classifier;
 
 /**
@@ -53,7 +55,7 @@ public class GAAttributeEvaluationWorker extends Thread {
 				individual.calculateScore(classifier, this.owner.isUSE_CV(), this.owner.getFOLDS());
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			ErrorLogger.getInstance().writeError(e.getMessage(), this.getName(), e);
 		}
 		isDone = true;
 		this.owner.workerDone();

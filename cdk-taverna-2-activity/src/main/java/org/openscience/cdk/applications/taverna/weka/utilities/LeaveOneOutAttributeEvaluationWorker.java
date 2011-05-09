@@ -23,6 +23,8 @@ package org.openscience.cdk.applications.taverna.weka.utilities;
 
 import java.util.Random;
 
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
+
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
@@ -67,7 +69,7 @@ public class LeaveOneOutAttributeEvaluationWorker extends Thread {
 				this.owner.publishResult(rmse, idx);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			ErrorLogger.getInstance().writeError(e.getMessage(), this.getName(), e);
 		}
 		isDone = true;
 		this.owner.workerDone();

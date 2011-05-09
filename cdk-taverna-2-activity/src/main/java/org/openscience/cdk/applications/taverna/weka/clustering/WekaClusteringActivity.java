@@ -86,7 +86,6 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 		Instances dataset = this.getInputAsObject(this.INPUT_PORTS[0], Instances.class);
 		File targetFile = this.getInputAsFile(this.INPUT_PORTS[1]);
 		this.directory = Tools.getDirectory(targetFile);
-		String name = Tools.getFileName(targetFile);
 		String jobData = (String) this.getConfiguration().getAdditionalProperty(
 				CDKTavernaConstants.PROPERTY_CLUSTERING_JOB_DATA);
 		if (jobData == null) {
@@ -161,7 +160,7 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			ErrorLogger.getInstance().writeError(e.getMessage(), this.getActivityName());
 		}
 	}
 

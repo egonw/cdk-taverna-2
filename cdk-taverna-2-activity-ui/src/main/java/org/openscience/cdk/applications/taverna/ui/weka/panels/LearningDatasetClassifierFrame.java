@@ -14,6 +14,8 @@ import javax.swing.border.EmptyBorder;
 
 public class LearningDatasetClassifierFrame extends JDialog {
 
+	private static final long serialVersionUID = 1246076832691996334L;
+	
 	private final JPanel contentPanel = new JPanel();
 	private final Action action = new SwingAction();
 

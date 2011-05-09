@@ -67,7 +67,11 @@ public class CDKTavernaException extends Exception {
 	public static final String CANNOT_GENERATE_3DCOORDINATES = "Can't generate 3D coordinates!";
 	public static final String PLEASE_CONFIGURE_ACTIVITY = "Please configure activity!";
 	public static final String DATASETS_ARE_NOT_COMPATIBLE = "Datasets are not compatible!";
-
+	public static final String DATASET_CONVERSION_ERROR = "Error during dataset conversion!";
+	public static final String ERROR_CREATING_DATASET = "Error creating weka dataset!";
+	public static final String ERROR_MERGING_DATASETS = "Error merging datasets!";
+	public static final String ERROR_EVALUATING_CLUSTERING_RESULTS = "Error during evaluation of clustering results in file: ";
+	
 	public CDKTavernaException(String activityName, String type) {
 		super(type + " Class: " + activityName + ".");
 	}

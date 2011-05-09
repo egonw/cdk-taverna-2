@@ -78,7 +78,7 @@ public class AtomSignatureActivity extends AbstractCDKActivity {
 				UUID uuid = UUID.fromString((String) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID));
 				for (IAtom atom : atomContainer.atoms()) {
 					AtomSignature atomSignature = new AtomSignature(atom, height, atomContainer);
-					String signature = uuid.toString() + " - " + atomSignature.toCanonicalString();
+					String signature = uuid.toString() + ", " + atomSignature.toCanonicalString();
 					allAtomSignatures.add(signature);
 				}
 			}

@@ -206,7 +206,7 @@ public abstract class AbstractGAAttributeSelectionActivity extends AbstractCDKAc
 				resultAttrCSV.add(allTimeBest.getAttributeSetupCSV());
 			}
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during learning dataset creation!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(e.getMessage(), this.getActivityName());
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		// Set output

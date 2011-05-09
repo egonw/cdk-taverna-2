@@ -104,7 +104,7 @@ public class CreateWekaDatasetFromCSVActivity extends AbstractCDKActivity {
 				dataset.add(inst);
 			}
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during weka dataset creation!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_CREATING_DATASET, this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		// Set output

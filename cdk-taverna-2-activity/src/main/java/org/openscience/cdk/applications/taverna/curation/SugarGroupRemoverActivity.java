@@ -82,7 +82,10 @@ public class SugarGroupRemoverActivity extends AbstractCDKActivity {
 	public void work() throws Exception {
 		// Get input
 		String[] smilesList = { "C(C(C(C(C(C=O)O)O)O)O)O", "C(C(CC(C(CO)O)O)O)(O)=O", "C(C(C(CC(=O)O)O)O)O",
-				"C(C(C(C(C(CO)O)O)O)=O)O", "C(C(C(C(C(CO)O)O)O)O)O", "C(C(C(C(CC=O)O)O)O)O" };
+				"C(C(C(C(C(CO)O)O)O)=O)O", "C(C(C(C(C(CO)O)O)O)O)O", "C(C(C(C(CC=O)O)O)O)O","occ(o)co",
+                "OCC(O)C(O)C(O)C(O)CO","O=CC(O)C(O)C(O)C(O)CO","CC(=O)OCC(O)CO","CCCCC(O)C(=O)O","CC(=O)CC(=O)CCC(=O)O",
+                "CC(O)C(O)C(=O)O","O=C(O)CC(O)CC(=O)O","O=C(O)C(=O)C(=O)C(O)C(O)CO","CC(O)CC(=O)O","CC(CCC(=O)O)CC(=O)O",
+                "O=C(O)CCC(O)C(=O)O","O=CC(O)C(O)C(O)C(O)CO","O=C(CO)C(O)C(O)CO" };
 		List<CMLChemFile> chemFileList = this.getInputAsList(this.INPUT_PORTS[0], CMLChemFile.class);
 		// Do work
 		ArrayList<CMLChemFile> curated = new ArrayList<CMLChemFile>();

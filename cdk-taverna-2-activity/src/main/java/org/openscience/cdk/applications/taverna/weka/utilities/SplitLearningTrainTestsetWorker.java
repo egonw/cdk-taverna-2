@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.weka.classification.SplitClassificationTrainTestsetActivity;
 import org.openscience.cdk.applications.taverna.weka.regression.SplitRegressionTrainTestsetActivity;
 
@@ -204,7 +205,7 @@ public class SplitLearningTrainTestsetWorker extends Thread {
 				this.owner.publishProgress(progress, idx);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			ErrorLogger.getInstance().writeError(e.getMessage(), this.getName(), e);
 		}
 		isDone = true;
 		this.owner.workerDone();

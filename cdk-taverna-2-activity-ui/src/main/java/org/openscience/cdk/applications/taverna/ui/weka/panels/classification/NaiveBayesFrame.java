@@ -11,6 +11,9 @@ import org.openscience.cdk.applications.taverna.ui.weka.panels.AbstractClassific
 import weka.classifiers.bayes.NaiveBayes;
 
 public class NaiveBayesFrame extends AbstractClassificationConfigurationFrame {
+
+	private static final long serialVersionUID = 2952889742862925882L;
+	
 	private JCheckBox chckbxUseKernelDensity;
 	private JCheckBox chckbxSupervised;
 

@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.Molecule;
@@ -19,6 +21,7 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.applications.taverna.basicutilities.CollectionUtilities;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.signature.MoleculeFromSignatureBuilder;
@@ -40,9 +43,12 @@ public class FragmentDistributionCalculatorActivity extends AbstractCDKActivity 
 	List<CMLChemFile> NP_fragmentStructuresChemFileArray = new ArrayList<CMLChemFile>();
 	List<CMLChemFile> SM_fragmentStructuresChemFileArray = new ArrayList<CMLChemFile>();
 
+	HashMap<String, List<String>> NP_Query_signatures = new HashMap<String, List<String>>();
+	HashMap<String, List<String>> SM_Query_signatures = new HashMap<String, List<String>>();
+
 	public FragmentDistributionCalculatorActivity() {
 		this.INPUT_PORTS = new String[] { "NP_file", "SM_file" };
-		this.OUTPUT_PORTS = new String[] { "NP_Structures", "SM_Structures" };
+		this.OUTPUT_PORTS = new String[] { "NP_Structures", "NP_scores", "SM_Structures", "SM_scores" };
 	}
 
 	@Override
@@ -72,6 +78,7 @@ public class FragmentDistributionCalculatorActivity extends AbstractCDKActivity 
 				String uuid = uuid_signature[0];
 				String signature = uuid_signature[1];
 				HashSet<String> uuid_values = null;
+				// for counting number of molecules the signature has found
 				if (!NP_set.containsKey(signature)) {
 					uuid_values = new HashSet<String>();
 					uuid_values.add(uuid);
@@ -81,6 +88,16 @@ public class FragmentDistributionCalculatorActivity extends AbstractCDKActivity 
 					uuid_values = NP_set.get(signature);
 					uuid_values.add(uuid);
 					total_NP_count.addAll(uuid_values);
+				}
+				// for getting all signatures under one molecule; used for
+				// scoring
+				if (!NP_Query_signatures.containsKey(uuid)) {
+					List<String> signatures = new ArrayList<String>();
+					signatures.add(signature);
+					NP_Query_signatures.put(uuid, signatures);
+				} else {
+					List<String> signatures = NP_Query_signatures.get(uuid);
+					signatures.add(signature);
 				}
 			}
 		}
@@ -92,6 +109,7 @@ public class FragmentDistributionCalculatorActivity extends AbstractCDKActivity 
 				String uuid = uuid_signature[0];
 				String signature = uuid_signature[1];
 				HashSet<String> uuid_values = null;
+				// for counting number of molecules the signature has found
 				if (!SM_set.containsKey(signature)) {
 					uuid_values = new HashSet<String>();
 					uuid_values.add(uuid);
@@ -102,37 +120,129 @@ public class FragmentDistributionCalculatorActivity extends AbstractCDKActivity 
 					uuid_values.add(uuid);
 					total_SM_count.addAll(uuid_values);
 				}
+				// for getting all signatures under one molecule; used for
+				// scoring
+				if (!SM_Query_signatures.containsKey(uuid)) {
+					List<String> signatures = new ArrayList<String>();
+					signatures.add(signature);
+					SM_Query_signatures.put(uuid, signatures);
+				} else {
+					List<String> signatures = SM_Query_signatures.get(uuid);
+					signatures.add(signature);
+				}
 			}
 		}
-		// Calculate distribution of fragments for NP set
-		for (String signature : NP_set.keySet()) {
-			double fragment_Weight = npScorer(signature);
-			IAtomContainer fragment_container = reconstruct(signature);
-			IMolecule fragment_molecule = new Molecule(fragment_container);
-			if (fragment_molecule.getProperty(CDKTavernaConstants.FRAGMENT_SCORE) == null) {
-				fragment_molecule.setProperty(CDKTavernaConstants.FRAGMENT_SCORE, fragment_Weight);
+
+		// calculate scores for NP
+		Map<String, Double> np_score_list = new HashMap<String, Double>();
+		List<String> np_result_score = new ArrayList<String>();
+		np_result_score.add("Molecule_ID;Score");
+		for (String molecule : NP_Query_signatures.keySet()) {
+
+			List<String> fragments = NP_Query_signatures.get(molecule);
+			int molecule_size = fragments.size();
+			String molecule_id = molecule;
+			double score = 0.0;
+			for (String fragment : fragments) {
+				double fragment_Weight = npScorer(fragment);
+				score = score + fragment_Weight;
+				IAtomContainer fragment_container = reconstruct(fragment);
+				IMolecule fragment_molecule = new Molecule(fragment_container);
+
+				if (fragment_molecule.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
+					fragment_molecule.setProperty(CDKTavernaConstants.MOLECULEID, molecule_id);
+				}
+
+				if (fragment_molecule.getProperty(CDKTavernaConstants.FRAGMENT_SCORE) == null) {
+					if (fragment_Weight != 0.0 && molecule_size != 0) {
+						double normalized_fragment_score = fragment_Weight / molecule_size;
+						fragment_molecule.setProperty(CDKTavernaConstants.FRAGMENT_SCORE, normalized_fragment_score);
+
+					} else {
+						fragment_molecule.setProperty(CDKTavernaConstants.FRAGMENT_SCORE, fragment_Weight);
+					}
+				}
+				if (fragment_molecule.getProperty(CDKTavernaConstants.SIGNATURE) == null) {
+					fragment_molecule.setProperty(CDKTavernaConstants.SIGNATURE, fragment);
+				}
+				NP_fragmentStructuresChemFileArray.add(CMLChemFileWrapper
+						.wrapAtomContainerInChemModel(fragment_molecule));
+
 			}
-			if (fragment_molecule.getProperty(CDKTavernaConstants.SIGNATURE) == null) {
-				fragment_molecule.setProperty(CDKTavernaConstants.SIGNATURE, signature);
+			if (score != 0.0 && molecule_size != 0) {
+				double normalized_score = score / molecule_size;
+				np_score_list.put(molecule, normalized_score);
+			} else {
+				np_score_list.put(molecule, 0.0);
 			}
-			NP_fragmentStructuresChemFileArray.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(fragment_molecule));
+			// result_score.add(molecule + " = " + score);
+
 		}
-		// Calculate distribution of fragments for SM set
-		for (String signature : SM_set.keySet()) {
-			double fragment_Weight = npScorer(signature);
-			IAtomContainer fragment_container = reconstruct(signature);
-			IMolecule fragment_molecule = new Molecule(fragment_container);
-			if (fragment_molecule.getProperty(CDKTavernaConstants.FRAGMENT_SCORE) == null) {
-				fragment_molecule.setProperty(CDKTavernaConstants.FRAGMENT_SCORE, fragment_Weight);
-			}
-			if (fragment_molecule.getProperty(CDKTavernaConstants.SIGNATURE) == null) {
-				fragment_molecule.setProperty(CDKTavernaConstants.SIGNATURE, signature);
-			}
-			SM_fragmentStructuresChemFileArray.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(fragment_molecule));
+		List<Entry<String, Double>> np_sorted_score_list = CollectionUtilities.sortByValue(np_score_list);
+		for (Entry<String, Double> entry : np_sorted_score_list) {
+			String molecule_name = entry.getKey();
+			Double score_ = entry.getValue();
+			String molecule_score = molecule_name + ";" + score_;
+			np_result_score.add(molecule_score);
 		}
-		// Set output
+
+		// calculate scores for SM set
+		Map<String, Double> sm_score_list = new HashMap<String, Double>();
+		List<String> sm_result_score = new ArrayList<String>();
+		sm_result_score.add("Molecule_ID;Score");
+		for (String molecule : SM_Query_signatures.keySet()) {
+
+			List<String> fragments = SM_Query_signatures.get(molecule);
+			int molecule_size = fragments.size();
+			String molecule_id = molecule;
+			double score = 0.0;
+			for (String fragment : fragments) {
+				double fragment_Weight = npScorer(fragment);
+				score = score + fragment_Weight;
+				IAtomContainer fragment_container = reconstruct(fragment);
+				IMolecule fragment_molecule = new Molecule(fragment_container);
+
+				if (fragment_molecule.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
+					fragment_molecule.setProperty(CDKTavernaConstants.MOLECULEID, molecule_id);
+				}
+
+				if (fragment_molecule.getProperty(CDKTavernaConstants.FRAGMENT_SCORE) == null) {
+					if (fragment_Weight != 0.0 && molecule_size != 0) {
+						double normalized_fragment_score = fragment_Weight / molecule_size;
+						fragment_molecule.setProperty(CDKTavernaConstants.FRAGMENT_SCORE, normalized_fragment_score);
+
+					} else {
+						fragment_molecule.setProperty(CDKTavernaConstants.FRAGMENT_SCORE, fragment_Weight);
+					}
+				}
+
+				if (fragment_molecule.getProperty(CDKTavernaConstants.SIGNATURE) == null) {
+					fragment_molecule.setProperty(CDKTavernaConstants.SIGNATURE, fragment);
+				}
+				SM_fragmentStructuresChemFileArray.add(CMLChemFileWrapper
+						.wrapAtomContainerInChemModel(fragment_molecule));
+			}
+			if (score != 0.0 && molecule_size != 0) {
+				double normalized_score = score / molecule_size;
+				sm_score_list.put(molecule, normalized_score);
+			} else {
+				sm_score_list.put(molecule, 0.0);
+			}
+			// result_score.add(molecule + " = " + score);
+
+		}
+		List<Entry<String, Double>> sm_sorted_score_list = CollectionUtilities.sortByValue(sm_score_list);
+		for (Entry<String, Double> entry : sm_sorted_score_list) {
+			String molecule_name = entry.getKey();
+			Double score_ = entry.getValue();
+			String molecule_score = molecule_name + ";" + score_;
+			sm_result_score.add(molecule_score);
+		}
+
 		this.setOutputAsObjectList(NP_fragmentStructuresChemFileArray, this.OUTPUT_PORTS[0]);
-		this.setOutputAsObjectList(SM_fragmentStructuresChemFileArray, this.OUTPUT_PORTS[1]);
+		this.setOutputAsStringList(np_result_score, this.OUTPUT_PORTS[1]);
+		this.setOutputAsObjectList(SM_fragmentStructuresChemFileArray, this.OUTPUT_PORTS[2]);
+		this.setOutputAsStringList(sm_result_score, this.OUTPUT_PORTS[3]);
 	}
 
 	private double npScorer(String signature) {

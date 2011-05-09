@@ -104,14 +104,12 @@ public class ConvertWekaDatasetActivity extends AbstractCDKActivity {
 				}
 				results.add(resultSet);
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError("Error during dataset conversion!", this.getActivityName(), e);
-				// throw new
-				// CDKTavernaException(this.getConfiguration().getActivityName(),
-				// e.getMessage());
+				ErrorLogger.getInstance().writeError(CDKTavernaException.DATASET_CONVERSION_ERROR,
+						this.getActivityName(), e);
 			}
 		}
 		if (results.isEmpty()) {
-			throw new CDKTavernaException(this.getActivityName(), "Error during dataset conversion!");
+			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.DATASET_CONVERSION_ERROR);
 		}
 		// Set output
 		this.setOutputAsObjectList(results, this.OUTPUT_PORTS[0]);

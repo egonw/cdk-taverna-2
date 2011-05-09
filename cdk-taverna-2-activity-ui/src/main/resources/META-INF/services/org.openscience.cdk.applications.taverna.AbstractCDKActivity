@@ -164,6 +164,7 @@ org.openscience.cdk.applications.taverna.curation.SugarGroupRemoverActivity
 org.openscience.cdk.applications.taverna.signaturescoring.AtomSignatureActivity
 org.openscience.cdk.applications.taverna.signaturescoring.QueryFragmentScorerActivity
 org.openscience.cdk.applications.taverna.signaturescoring.FragmentDistributionCalculatorActivity
+org.openscience.cdk.applications.taverna.signaturescoring.PlotDistributionAsPDFActivity
 org.openscience.cdk.applications.taverna.weka.CreateWekaDatasetFromQSARVectorActivity
 org.openscience.cdk.applications.taverna.weka.ConvertWekaDatasetActivity
 org.openscience.cdk.applications.taverna.weka.WekaPredictionActivity

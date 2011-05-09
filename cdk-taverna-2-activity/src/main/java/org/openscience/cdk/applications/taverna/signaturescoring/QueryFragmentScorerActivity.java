@@ -138,19 +138,33 @@ public class QueryFragmentScorerActivity extends AbstractCDKActivity {
 		}
 		Map<String, Double> score_list = new HashMap<String, Double>();
 		List<String> result_score = new ArrayList<String>();
+		result_score.add("Molecule_ID;Score");
 		for (String molecule : Query_signatures.keySet()) {
 
 			List<String> fragments = Query_signatures.get(molecule);
 			int molecule_size = fragments.size();
+			String molecule_id = molecule;
 			double score = 0.0;
 			for (String fragment : fragments) {
 				double fragment_Weight = npScorer(fragment);
 				score = score + fragment_Weight;
+
 				IAtomContainer fragment_container = reconstruct(fragment);
 				IMolecule fragment_molecule = new Molecule(fragment_container);
 
+				if (fragment_molecule.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
+					fragment_molecule.setProperty(CDKTavernaConstants.MOLECULEID, molecule_id);
+				}
+
 				if (fragment_molecule.getProperty(CDKTavernaConstants.FRAGMENT_SCORE) == null) {
-					fragment_molecule.setProperty(CDKTavernaConstants.FRAGMENT_SCORE, fragment_Weight);
+					if (fragment_Weight != 0.0 && molecule_size != 0) {
+						double normalized_fragment_score = fragment_Weight / molecule_size;
+						fragment_molecule.setProperty(CDKTavernaConstants.FRAGMENT_SCORE, normalized_fragment_score);
+
+					} else {
+						fragment_molecule.setProperty(CDKTavernaConstants.FRAGMENT_SCORE, fragment_Weight);
+					}
+
 				}
 				if (fragment_molecule.getProperty(CDKTavernaConstants.SIGNATURE) == null) {
 					fragment_molecule.setProperty(CDKTavernaConstants.SIGNATURE, fragment);
@@ -169,7 +183,7 @@ public class QueryFragmentScorerActivity extends AbstractCDKActivity {
 		for (Entry<String, Double> entry : sorted_score_list) {
 			String molecule_name = entry.getKey();
 			Double score_ = entry.getValue();
-			String molecule_score = molecule_name + " = " + score_;
+			String molecule_score = molecule_name + ";" + score_;
 			result_score.add(molecule_score);
 		}
 		// Set output

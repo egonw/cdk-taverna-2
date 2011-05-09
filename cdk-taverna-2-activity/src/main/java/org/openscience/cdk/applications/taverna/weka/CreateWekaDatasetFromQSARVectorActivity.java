@@ -97,8 +97,8 @@ public class CreateWekaDatasetFromQSARVectorActivity extends AbstractCDKActivity
 			dataset = tools.createInstancesFromFingerprintArray(itemArray, descriptorNames);
 		} catch (Exception e) {
 			ErrorLogger.getInstance()
-					.writeError("Error during fingerprint items creation !", this.getActivityName(), e);
-			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
+					.writeError(CDKTavernaException.ERROR_CREATING_DATASET, this.getActivityName(), e);
+			throw new CDKTavernaException(this.getConfiguration().getActivityName(), CDKTavernaException.ERROR_CREATING_DATASET);
 		}
 		// Set output
 		this.setOutputAsObject(dataset, this.OUTPUT_PORTS[0]);

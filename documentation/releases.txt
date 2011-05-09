@@ -68,4 +68,10 @@
 0.4.0.1
 - Qickfix for writing the configfile in the temp directory instead of in the application directory
 - Added colour management for the the new activity folders.
+
+0.5 
+- Added WEKA machine learning workers for regression and classification tasks.
+  Including Attribute selection, evaluation and visualization.
+- Further improvements to the whole project
+- Many many bug fixes   
  

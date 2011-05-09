@@ -47,6 +47,7 @@ import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.renderer.xy.XYSplineRenderer;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.IntervalXYDataset;
@@ -310,6 +311,46 @@ public class ChartTool {
 		NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
 		rangeAxis.setAutoRangeIncludesZero(includeZero);
 		XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
+		renderer.setSeriesPaint(0, Color.blue);
+		renderer.setSeriesPaint(1, Color.red);
+		renderer.setSeriesPaint(2, Color.green);
+		renderer.setSeriesPaint(3, Color.darkGray);
+		renderer.setSeriesPaint(4, Color.yellow);
+		renderer.setDrawOutlines(true);
+		renderer.setUseFillPaint(true);
+		renderer.setBaseShapesVisible(drawShapes);
+		renderer.setBaseShapesFilled(true);
+		return chart;
+	}
+	
+	/**
+	 * Creates a line chart.
+	 * 
+	 * @param title
+	 * @param categoryAxisLabel
+	 *            (X-Axis label)
+	 * @param valueAxisLabel
+	 *            (Y-Axis label)
+	 * @param dataset
+	 * @param includeZero
+	 *            True when zero shall be included to the axis range.
+	 * @return JfreeChart instance.
+	 */
+	public JFreeChart createXYLineSplineChart(String title, String categoryAxisLabel, String valueAxisLabel,
+			XYDataset dataset, boolean includeZero, boolean drawShapes) {
+		JFreeChart chart = ChartFactory.createXYLineChart(title, categoryAxisLabel, valueAxisLabel, dataset,
+				this.orientation, this.drawLegend, false, false);
+		// set the background color for the chart...
+		chart.setBackgroundPaint(Color.white);
+		chart.setAntiAlias(true);
+		XYPlot plot = chart.getXYPlot();
+		ValueAxis domainAxis = plot.getDomainAxis();
+		domainAxis.setLowerMargin(0.025);
+		domainAxis.setUpperMargin(0.025);
+		NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+		rangeAxis.setAutoRangeIncludesZero(includeZero);
+		plot.setRenderer(new XYSplineRenderer(100));
+		XYSplineRenderer renderer = (XYSplineRenderer) plot.getRenderer();
 		renderer.setSeriesPaint(0, Color.blue);
 		renderer.setSeriesPaint(1, Color.red);
 		renderer.setSeriesPaint(2, Color.green);

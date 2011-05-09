@@ -118,7 +118,7 @@ public abstract class AbstractSplitTrainTestsetActivity extends AbstractCDKActiv
 				this.wait();
 			}
 		} catch (Exception e) {
-			ErrorLogger.getInstance().writeError("Error during learning dataset creation!", this.getActivityName(), e);
+			ErrorLogger.getInstance().writeError(e.getMessage(), this.getActivityName(), e);
 			throw new CDKTavernaException(this.getConfiguration().getActivityName(), e.getMessage());
 		}
 		// Set output

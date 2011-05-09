@@ -12,6 +12,9 @@ import javax.swing.SpringLayout;
 import javax.swing.border.BevelBorder;
 
 public class GAAttributeEvaluationConfigurationPanelView extends JPanel {
+
+	private static final long serialVersionUID = 8751340466382331798L;
+	
 	private JLabel lblSelectAlgorithm;
 	private JComboBox algorithmComboBox;
 	private JButton btnConfigure;

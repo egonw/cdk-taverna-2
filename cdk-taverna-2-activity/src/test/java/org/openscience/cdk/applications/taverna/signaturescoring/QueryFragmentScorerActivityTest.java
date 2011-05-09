@@ -86,9 +86,9 @@ public class QueryFragmentScorerActivityTest extends CDKTavernaTestCases {
 		List<String> signatures_scores = (ArrayList<String>) outputs.get(activity.OUTPUT_PORTS[0]);
 		for (String sign_score : signatures_scores) {
 
-			String[] signs_score = sign_score.split(" = ");
-			for (int i = 0; i < signs_score.length; i++) {
-				String score = signs_score[1];
+			String[] signs_score = sign_score.split(";");
+			for (int i = 2; i < signs_score.length; i++) {
+				String score = signs_score[3];
 				String expected_score = "0.062469368304149966";
 				assertEquals(expected_score, score);
 			}
