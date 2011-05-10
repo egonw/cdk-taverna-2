@@ -4,10 +4,10 @@
 	<parent>
 		<groupId>org.openscience.cdk.applications.taverna</groupId>
 		<artifactId>cdk-taverna2</artifactId>
-		<version>0.6-SNAPSHOT</version>
+		<version>0.5-SNAPSHOT</version>
 	</parent>
 	<artifactId>cdk-taverna-2-activity</artifactId>
-	<version>0.6-SNAPSHOT</version>
+	<version>0.5-SNAPSHOT</version>
 	<name>CDK-Taverna 2 activity</name>
 
 	<dependencies>
@@ -47,7 +47,7 @@
 		<dependency>
 			<groupId>org.openscience.cdk</groupId>
 			<artifactId>cdk</artifactId>
-			<version>1.3.7.1.git</version>
+			<version>1.3.8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openscience.cdk</groupId>
@@ -70,8 +70,8 @@
 			<version>3.6.4</version>
 		</dependency>
 		<dependency>
-			 <groupId>uk.ac.cam.ch.opsin</groupId>
-			 <artifactId>opsin-core</artifactId>
+			 <groupId>uk.ac.cam.ch</groupId>
+			 <artifactId>opsin</artifactId>
 			 <version>1.0.0</version>
 		</dependency>
 	</dependencies>

@@ -72,6 +72,7 @@
 0.5 
 - Added WEKA machine learning workers for regression and classification tasks.
   Including Attribute selection, evaluation and visualization.
+- Updated to CDK to 1.3.8
 - Further improvements to the whole project
 - Many many bug fixes   
  
