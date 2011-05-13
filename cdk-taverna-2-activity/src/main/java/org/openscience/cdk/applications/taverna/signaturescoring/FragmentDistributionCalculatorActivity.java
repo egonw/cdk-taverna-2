@@ -74,7 +74,7 @@ public class FragmentDistributionCalculatorActivity extends AbstractCDKActivity 
 			LineNumberReader np_file_reader = new LineNumberReader(new FileReader(file));
 			String line;
 			while ((line = np_file_reader.readLine()) != null) {
-				String[] uuid_signature = line.split(" - ");
+				String[] uuid_signature = line.split(";");
 				String uuid = uuid_signature[0];
 				String signature = uuid_signature[1];
 				HashSet<String> uuid_values = null;
@@ -105,7 +105,7 @@ public class FragmentDistributionCalculatorActivity extends AbstractCDKActivity 
 			LineNumberReader sm_file_reader = new LineNumberReader(new FileReader(file));
 			String line;
 			while ((line = sm_file_reader.readLine()) != null) {
-				String[] uuid_signature = line.split(" - ");
+				String[] uuid_signature = line.split(";");
 				String uuid = uuid_signature[0];
 				String signature = uuid_signature[1];
 				HashSet<String> uuid_values = null;

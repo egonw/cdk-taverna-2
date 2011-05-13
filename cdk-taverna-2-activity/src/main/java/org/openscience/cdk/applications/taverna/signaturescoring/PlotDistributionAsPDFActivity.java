@@ -97,12 +97,21 @@ public class PlotDistributionAsPDFActivity extends AbstractCDKActivity {
 				HistogramDataset histoSet = new HistogramDataset();
 				histoSet.setType(HistogramType.SCALE_AREA_TO_1);
 				LineNumberReader reader = new LineNumberReader(new FileReader(file));
-				String line = "";
-				// Skip first line
-				reader.readLine();
-				while ((line = reader.readLine()) != null) {
-					String[] parts = line.split(";");
-					values.add(Double.parseDouble(parts[1]));
+				// First line line contains the header
+				String line = reader.readLine();
+				if (line.contains("Distribution")) {
+					while ((line = reader.readLine()) != null) {
+						String[] parts = line.split(";");
+						String[] dist = parts[2].split(",");
+						double value = Double.parseDouble(dist[1]);
+						value = value * 2 - 1;
+						values.add(value);
+					}
+				} else {
+					while ((line = reader.readLine()) != null) {
+						String[] parts = line.split(";");
+						values.add(Double.parseDouble(parts[1]));
+					}
 				}
 				double[] v = new double[values.size()];
 				for (int i = 0; i < values.size(); i++) {

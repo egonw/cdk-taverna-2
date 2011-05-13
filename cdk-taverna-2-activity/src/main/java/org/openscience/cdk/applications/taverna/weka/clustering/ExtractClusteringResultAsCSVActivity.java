@@ -43,6 +43,7 @@ import weka.clusterers.Clusterer;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
+import weka.core.Utils;
 import weka.filters.Filter;
 
 /**
@@ -117,12 +118,13 @@ public class ExtractClusteringResultAsCSVActivity extends AbstractCDKActivity {
 						name + tools.getOptionsFromFile(files.get(i), name) + "_UUIDCluster");
 				writer = new PrintWriter(resultFile);
 				resultFiles.add(resultFile.getPath());
-				writer.write("UUID;Cluster_Number;\n");
+				writer.write("UUID;Cluster_Number;Distribution\n");
 				for (int j = 0; j < dataset.numInstances(); j++) {
 					Instance instance = dataset.instance(j);
 					int cluster = clusterer.clusterInstance(instance);
 					String uuid = uuids.instance(j).stringValue(0);
-					writer.write(uuid + ";" + cluster + ";\n");
+					String distribution = Utils.arrayToString(clusterer.distributionForInstance(instance));
+					writer.write(uuid + ";" + cluster + ";" + distribution + "\n");
 				}
 				writer.close();
 			} catch (Exception e) {
