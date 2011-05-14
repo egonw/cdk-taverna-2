@@ -31,6 +31,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IPortNumber;
 import org.openscience.cdk.applications.taverna.qsar.utilities.QSARVectorUtility;
+import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
 import weka.core.Attribute;
 import weka.core.FastVector;
@@ -86,36 +87,28 @@ public class MergeWekaDatasetsActivity extends AbstractCDKActivity implements IP
 		Instances dataset = null;
 		ArrayList<String> idTable = null;
 		try {
-			QSARVectorUtility qsarVectorUtility = new QSARVectorUtility();
+			WekaTools wekaTools = new WekaTools();
 			// Create descriptor names list
 			int dataSize = 0;
-			List<List<String>> descriptorNamesList = new ArrayList<List<String>>();
+			List<List<Attribute>> attributeList = new ArrayList<List<Attribute>>();
 			for (int i = 0; i < numberOfPorts; i++) {
-				ArrayList<String> descriptorNames = new ArrayList<String>();
+				ArrayList<Attribute> attributes = new ArrayList<Attribute>();
 				for (int j = 0; j < datasets[i].numAttributes(); j++) {
-					descriptorNames.add(datasets[i].attribute(j).name());
+					attributes.add(datasets[i].attribute(j));
 				}
-				descriptorNamesList.add(descriptorNames);
+				attributeList.add(attributes);
 				dataSize += datasets[i].numInstances();
 			}
 			// Create minimum set of the descriptor names
-			ArrayList<String> mergedDescriptorNames = qsarVectorUtility
-					.createMinimumDescriptorNamesList(descriptorNamesList);
-			// Create merged dataset
-			FastVector attributes = new FastVector(mergedDescriptorNames.size());
-			Attribute idAttr = new Attribute("ID", (FastVector) null);
-			attributes.addElement(idAttr);
-			for (int i = 1; i < mergedDescriptorNames.size(); i++) {
-				attributes.addElement(new Attribute(mergedDescriptorNames.get(i)));
-			}
+			FastVector attributes = wekaTools.createMinimumAttributeList(attributeList);
 			dataset = new Instances("Weka Dataset", attributes, dataSize);
 			for (int i = 0; i < numberOfPorts; i++) {
 				for (int j = 0; j < datasets[i].numInstances(); j++) {
 					double[] values = new double[dataset.numAttributes()];
 					String uuid = datasets[i].instance(j).stringValue(0);
 					values[0] = dataset.attribute(0).addStringValue(uuid);
-					for (int k = 1; k < mergedDescriptorNames.size(); k++) {
-						String name = mergedDescriptorNames.get(k);
+					for (int k = 1; k < attributes.size(); k++) {
+						String name = ((Attribute)attributes.elements(k)).name();
 						for (int l = 0; l < datasets[i].numAttributes(); l++) {
 							if (name.equals(datasets[i].attribute(l).name())) {
 								values[k] = datasets[i].instance(j).value(l);

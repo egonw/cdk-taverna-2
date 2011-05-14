@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -53,16 +54,14 @@ import weka.filters.unsupervised.attribute.Remove;
 public class WekaTools {
 
 	/**
-	 * Creates a Weka Instances dataset from given fingerprint item list and
-	 * descriptor names. The first entry is the molecule ID. The following
-	 * entries are the descriptor values.
+	 * Creates a Weka Instances dataset from given fingerprint item list and descriptor names. The first entry is the molecule ID.
+	 * The following entries are the descriptor values.
 	 * 
 	 * @param fingerprintItems
 	 * @param descriptorNames
 	 * @return The Weka Instances dataset
 	 */
-	public Instances createInstancesFromFingerprintArray(FingerprintItem[] fingerprintItems,
-			List<String> descriptorNames) {
+	public Instances createInstancesFromFingerprintArray(FingerprintItem[] fingerprintItems, List<String> descriptorNames) {
 		FastVector attributes = new FastVector(descriptorNames.size() + 1);
 		Attribute idAttr = new Attribute("ID", (FastVector) null);
 		attributes.addElement(idAttr);
@@ -86,14 +85,12 @@ public class WekaTools {
 	}
 
 	/**
-	 * Method which returns a filter to remove the identifier from given
-	 * instances. IMPORTANT: The identifier is the first attribute within the
-	 * instances
+	 * Method which returns a filter to remove the identifier from given instances. IMPORTANT: The identifier is the first
+	 * attribute within the instances
 	 * 
 	 * @param instances
 	 *            Instances which contains the format of the input instances
-	 * @return Weka remover filter which is configured to remove the identifier
-	 *         from the instance
+	 * @return Weka remover filter which is configured to remove the identifier from the instance
 	 * @throws Exception
 	 */
 	public Remove getIDRemover(Instances instances) throws Exception {
@@ -107,14 +104,12 @@ public class WekaTools {
 	}
 
 	/**
-	 * Method which returns a filter to remove the identifier from given
-	 * instances. IMPORTANT: The identifier is the first attribute within the
-	 * instances
+	 * Method which returns a filter to remove the identifier from given instances. IMPORTANT: The identifier is the first
+	 * attribute within the instances
 	 * 
 	 * @param instances
 	 *            Instances which contains the format of the input instances
-	 * @return Weka remover filter which is configured to remove the identifier
-	 *         from the instance
+	 * @return Weka remover filter which is configured to remove the identifier from the instance
 	 * @throws Exception
 	 */
 	public Remove getAttributRemover(Instances instances, int attr) throws Exception {
@@ -131,13 +126,11 @@ public class WekaTools {
 	}
 
 	/**
-	 * Method which returns a filter to remove the identifier from given
-	 * instances. IMPORTANT: Range from 1...n!
+	 * Method which returns a filter to remove the identifier from given instances. IMPORTANT: Range from 1...n!
 	 * 
 	 * @param instances
 	 *            Instances which contains the format of the input instances
-	 * @return Weka remover filter which is configured to remove the identifier
-	 *         from the instance
+	 * @return Weka remover filter which is configured to remove the identifier from the instance
 	 * @throws Exception
 	 */
 	public Remove getAttributRemover(Instances instances, List<Integer> attrs) throws Exception {
@@ -159,14 +152,12 @@ public class WekaTools {
 	}
 
 	/**
-	 * Method which returns a filter to remove the class attribute from given
-	 * instances. IMPORTANT: The class attribute is the last attribute within
-	 * the instances
+	 * Method which returns a filter to remove the class attribute from given instances. IMPORTANT: The class attribute is the
+	 * last attribute within the instances
 	 * 
 	 * @param instances
 	 *            Instances which contains the format of the input instances
-	 * @return Weka remover filter which is configured to remove the identifier
-	 *         from the instance
+	 * @return Weka remover filter which is configured to remove the identifier from the instance
 	 * @throws Exception
 	 */
 	public Remove getClassRemover(Instances instances) throws Exception {
@@ -180,13 +171,12 @@ public class WekaTools {
 	}
 
 	/**
-	 * Method which returns a filter to get the identifier from given instances.
-	 * IMPORTANT: The identifier is the first attribute within the instances
+	 * Method which returns a filter to get the identifier from given instances. IMPORTANT: The identifier is the first attribute
+	 * within the instances
 	 * 
 	 * @param instances
 	 *            Instances which contains the format of the input instances
-	 * @return Weka remover filter which is configured to get the identifier
-	 *         from the instance
+	 * @return Weka remover filter which is configured to get the identifier from the instance
 	 * @throws Exception
 	 */
 	public Remove getIDGetter(Instances instances) throws Exception {
@@ -463,5 +453,48 @@ public class WekaTools {
 			full.add(testset.instance(i));
 		}
 		return full;
+	}
+
+	/**
+	 * Creates a minimum set of attributes from given attributes list.
+	 * 
+	 * @param attributesList
+	 *            List of all attributes.
+	 * @return
+	 */
+	public FastVector createMinimumAttributeList(List<List<Attribute>> attributesList) {
+		ArrayList<String> mergedAttributeNames = new ArrayList<String>();
+		for (int i = 0; i < attributesList.size(); i++) {
+			List<String> attributeNames = new LinkedList<String>();
+			for (int j = 0; j < attributesList.get(i).size(); j++) {
+				attributeNames.add(attributesList.get(i).get(j).name());
+			}
+			if (i == 0) {
+				for (String name : attributeNames) {
+					mergedAttributeNames.add(name);
+				}
+			} else {
+				LinkedList<String> namesToRemove = new LinkedList<String>();
+				for (int j = 0; j < mergedAttributeNames.size(); j++) {
+					String name = mergedAttributeNames.get(j);
+					if (!attributeNames.contains(name)) {
+						namesToRemove.add(name);
+					}
+				}
+				for (String name : namesToRemove) {
+					mergedAttributeNames.remove(name);
+				}
+			}
+		}
+		FastVector mergedAttributes = new FastVector();
+		for (int i = 0; i < attributesList.get(0).size(); i++) {
+			for (int j = 0; j < mergedAttributeNames.size(); j++) {
+				String name = mergedAttributeNames.get(j);
+				if(attributesList.get(0).get(i).name().equals(name)) {
+					mergedAttributes.addElement(attributesList.get(0).get(i));
+				}
+			}
+		}
+		return mergedAttributes;
 	}
 }
