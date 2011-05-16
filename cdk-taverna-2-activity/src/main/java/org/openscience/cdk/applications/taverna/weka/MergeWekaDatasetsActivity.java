@@ -108,7 +108,7 @@ public class MergeWekaDatasetsActivity extends AbstractCDKActivity implements IP
 					String uuid = datasets[i].instance(j).stringValue(0);
 					values[0] = dataset.attribute(0).addStringValue(uuid);
 					for (int k = 1; k < attributes.size(); k++) {
-						String name = ((Attribute)attributes.elements(k)).name();
+						String name = ((Attribute)attributes.elementAt(k)).name();
 						for (int l = 0; l < datasets[i].numAttributes(); l++) {
 							if (name.equals(datasets[i].attribute(l).name())) {
 								values[k] = datasets[i].instance(j).value(l);
