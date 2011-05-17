@@ -41,8 +41,10 @@ import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
+import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ChartTool;
 import org.openscience.cdk.applications.taverna.basicutilities.CollectionUtilities;
+import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
@@ -68,8 +70,7 @@ public class EvaluateRegressionResultsAsPDFActivity extends AbstractCDKActivity 
 	 * Creates a new instance.
 	 */
 	public EvaluateRegressionResultsAsPDFActivity() {
-		this.INPUT_PORTS = new String[] { "Regression Model Files", "Regression Train Datasets",
-				"Regression Test Datasets" };
+		this.INPUT_PORTS = new String[] { "Regression Model Files", "Regression Train Datasets", "Regression Test Datasets" };
 		this.OUTPUT_PORTS = new String[] { "Files" };
 	}
 
@@ -161,8 +162,7 @@ public class EvaluateRegressionResultsAsPDFActivity extends AbstractCDKActivity 
 				trainset = Filter.useFilter(trainset, tools.getIDRemover(trainset));
 				double trainingSetRatio = 1.0;
 				if (testset != null) {
-					trainingSetRatio = trainset.numInstances()
-							/ (double) (trainset.numInstances() + testset.numInstances());
+					trainingSetRatio = trainset.numInstances() / (double) (trainset.numInstances() + testset.numInstances());
 				}
 				trainingSetRatios.add(trainingSetRatio * 100);
 				// Predict
@@ -176,8 +176,7 @@ public class EvaluateRegressionResultsAsPDFActivity extends AbstractCDKActivity 
 				trainEval.evaluateModel(classifier, trainset);
 				// Chart data
 				DefaultXYDataset xyDataSet = new DefaultXYDataset();
-				String trainSeries = "Training Set (RMSE: " + String.format("%.2f", trainEval.rootMeanSquaredError())
-						+ ")";
+				String trainSeries = "Training Set (RMSE: " + String.format("%.2f", trainEval.rootMeanSquaredError()) + ")";
 				XYSeries series = new XYSeries(trainSeries);
 				Double[] yTrainResidues = new Double[trainUUIDSet.numInstances()];
 				Double[] orgTrain = new Double[trainUUIDSet.numInstances()];
@@ -186,8 +185,14 @@ public class EvaluateRegressionResultsAsPDFActivity extends AbstractCDKActivity 
 					UUID uuid = UUID.fromString(trainUUIDSet.instance(k).stringValue(0));
 					orgTrain[k] = orgClassMap.get(uuid);
 					calc[k] = calcClassMap.get(uuid);
-					series.add(orgTrain[k].doubleValue(), calc[k]);
-					yTrainResidues[k] = calc[k].doubleValue() - orgTrain[k].doubleValue();
+					if (calc[k] != null && orgTrain[k] != null) {
+						series.add(orgTrain[k].doubleValue(), calc[k]);
+						yTrainResidues[k] = calc[k].doubleValue() - orgTrain[k].doubleValue();
+					} else {
+						ErrorLogger.getInstance().writeError("Can't find value for UUID: " + uuid.toString(),
+								this.getActivityName());
+						throw new CDKTavernaException(this.getActivityName(), "Can't find value for UUID: " + uuid.toString());
+					}
 				}
 				orgValues.addAll(Arrays.asList(orgTrain));
 				predictedValues.addAll(Arrays.asList(calc));
@@ -216,8 +221,7 @@ public class EvaluateRegressionResultsAsPDFActivity extends AbstractCDKActivity 
 					Evaluation testEval = new Evaluation(testset);
 					testEval.evaluateModel(classifier, testset);
 					// Chart data
-					String testSeries = "Test Set (RMSE: " + String.format("%.2f", testEval.rootMeanSquaredError())
-							+ ")";
+					String testSeries = "Test Set (RMSE: " + String.format("%.2f", testEval.rootMeanSquaredError()) + ")";
 					series = new XYSeries(testSeries);
 					Double[] yTestResidues = new Double[testUUIDSet.numInstances()];
 					Double[] orgTest = new Double[testUUIDSet.numInstances()];
@@ -226,8 +230,14 @@ public class EvaluateRegressionResultsAsPDFActivity extends AbstractCDKActivity 
 						UUID uuid = UUID.fromString(testUUIDSet.instance(k).stringValue(0));
 						orgTest[k] = orgClassMap.get(uuid);
 						calc[k] = calcClassMap.get(uuid);
-						series.add(orgTest[k].doubleValue(), calc[k].doubleValue());
-						yTestResidues[k] = calc[k].doubleValue() - orgTest[k].doubleValue();
+						if (calc[k] != null && orgTest[k] != null) {
+							series.add(orgTest[k].doubleValue(), calc[k].doubleValue());
+							yTestResidues[k] = calc[k].doubleValue() - orgTest[k].doubleValue();
+						} else {
+							ErrorLogger.getInstance().writeError("Can't find value for UUID: " + uuid.toString(),
+									this.getActivityName());
+							throw new CDKTavernaException(this.getActivityName(), "Can't find value for UUID: " + uuid.toString());
+						}
 					}
 					orgValues.addAll(Arrays.asList(orgTest));
 					predictedValues.addAll(Arrays.asList(calc));
@@ -262,13 +272,11 @@ public class EvaluateRegressionResultsAsPDFActivity extends AbstractCDKActivity 
 
 				// Create scatter plot
 				String header = classifier.getClass().getSimpleName() + "\n Training set ratio: "
-						+ String.format("%.2f", trainingSetRatios.get(j)) + "%" + "\n Model name: "
-						+ modelFile.getName();
-				chartsObjects
-						.add(chartTool.createScatterPlot(xyDataSet, header, "Original values", "Predicted values"));
+						+ String.format("%.2f", trainingSetRatios.get(j)) + "%" + "\n Model name: " + modelFile.getName();
+				chartsObjects.add(chartTool.createScatterPlot(xyDataSet, header, "Original values", "Predicted values"));
 				// Create residue plot
-				chartsObjects.add(chartTool.createResiduePlot(yResidueValues, header, "Index",
-						"(Predicted - Original)", yResidueNames));
+				chartsObjects.add(chartTool.createResiduePlot(yResidueValues, header, "Index", "(Predicted - Original)",
+						yResidueNames));
 				// Create curve
 				Double[] tmpOrg = new Double[orgValues.size()];
 				tmpOrg = orgValues.toArray(tmpOrg);
@@ -295,11 +303,10 @@ public class EvaluateRegressionResultsAsPDFActivity extends AbstractCDKActivity 
 			double meanRMSE = 0;
 			for (int i = 0; i < trainRMSE.size(); i++) {
 				if (!trainSkippedRMSE.contains(i)) {
-					dataSet.addValue(trainRMSE.get(i), "Training Set",
-							"(" + String.format("%.2f", trainingSetRatios.get(i)) + "%/" + (i + 1) + ")");
-					ratioRMSESet[i].addValue(trainRMSE.get(i), "Training Set",
-							"(" + String.format("%.2f", trainingSetRatios.get(i)) + "%/" + (i + 1) + "/" + fileIDX
-									+ ")");
+					dataSet.addValue(trainRMSE.get(i), "Training Set", "(" + String.format("%.2f", trainingSetRatios.get(i))
+							+ "%/" + (i + 1) + ")");
+					ratioRMSESet[i].addValue(trainRMSE.get(i), "Training Set", "("
+							+ String.format("%.2f", trainingSetRatios.get(i)) + "%/" + (i + 1) + "/" + fileIDX + ")");
 				}
 				meanRMSE += trainRMSE.get(i);
 			}
@@ -308,11 +315,10 @@ public class EvaluateRegressionResultsAsPDFActivity extends AbstractCDKActivity 
 			if (!testRMSE.isEmpty()) {
 				for (int i = 0; i < testRMSE.size(); i++) {
 					if (!testSkippedRMSE.contains(i)) {
-						dataSet.addValue(testRMSE.get(i), "Test Set",
-								"(" + String.format("%.2f", trainingSetRatios.get(i)) + "%/" + (i + 1) + ")");
-						ratioRMSESet[i].addValue(testRMSE.get(i), "Test Set",
-								"(" + String.format("%.2f", trainingSetRatios.get(i)) + "%/" + (i + 1) + "/" + fileIDX
-										+ ")");
+						dataSet.addValue(testRMSE.get(i), "Test Set", "(" + String.format("%.2f", trainingSetRatios.get(i))
+								+ "%/" + (i + 1) + ")");
+						ratioRMSESet[i].addValue(testRMSE.get(i), "Test Set", "("
+								+ String.format("%.2f", trainingSetRatios.get(i)) + "%/" + (i + 1) + "/" + fileIDX + ")");
 					}
 					meanRMSE += testRMSE.get(i);
 				}
@@ -322,19 +328,18 @@ public class EvaluateRegressionResultsAsPDFActivity extends AbstractCDKActivity 
 			if (!cvRMSE.isEmpty()) {
 				for (int i = 0; i < cvRMSE.size(); i++) {
 					if (!cvSkippedRMSE.contains(i)) {
-						dataSet.addValue(cvRMSE.get(i), "10-fold Cross-validation",
-								"(" + String.format("%.2f", trainingSetRatios.get(i)) + "%/" + (i + 1) + ")");
-						ratioRMSESet[i].addValue(cvRMSE.get(i), "10-fold Cross-validation",
-								"(" + String.format("%.2f", trainingSetRatios.get(i)) + "%/" + (i + 1) + "/" + fileIDX
-										+ ")");
+						dataSet.addValue(cvRMSE.get(i), "10-fold Cross-validation", "("
+								+ String.format("%.2f", trainingSetRatios.get(i)) + "%/" + (i + 1) + ")");
+						ratioRMSESet[i].addValue(cvRMSE.get(i), "10-fold Cross-validation", "("
+								+ String.format("%.2f", trainingSetRatios.get(i)) + "%/" + (i + 1) + "/" + fileIDX + ")");
 					}
 					meanRMSE += cvRMSE.get(i);
 				}
 				cvMeanRMSE.add(meanRMSE / cvRMSE.size());
 			}
-			JFreeChart rmseChart = chartTool.createLineChart(
-					"RMSE Plot\n Classifier:" + name + " " + tools.getOptionsFromFile(modelFile, name),
-					"(Training set ratio/Set Index/File index)", "RMSE", dataSet, false, true);
+			JFreeChart rmseChart = chartTool.createLineChart("RMSE Plot\n Classifier:" + name + " "
+					+ tools.getOptionsFromFile(modelFile, name), "(Training set ratio/Set Index/File index)", "RMSE", dataSet,
+					false, true);
 			chartsObjects.add(rmseChart);
 			rmseCharts.add(rmseChart);
 			// Write PDF
@@ -345,9 +350,9 @@ public class EvaluateRegressionResultsAsPDFActivity extends AbstractCDKActivity 
 		}
 		// Create set ratio RMSE plots
 		for (int i = 0; i < ratioRMSESet.length; i++) {
-			JFreeChart rmseChart = chartTool.createLineChart(
-					"Set RMSE plot\n" + "(" + String.format("%.2f", trainingSetRatios.get(i)) + "%/" + (i + 1) + ")",
-					"(Training set ratio/Index)", "RMSE", ratioRMSESet[i], false, true);
+			JFreeChart rmseChart = chartTool.createLineChart("Set RMSE plot\n" + "("
+					+ String.format("%.2f", trainingSetRatios.get(i)) + "%/" + (i + 1) + ")", "(Training set ratio/Index)",
+					"RMSE", ratioRMSESet[i], false, true);
 			rmseCharts.add(rmseChart);
 		}
 		// Create mean RMSE plot

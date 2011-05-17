@@ -103,8 +103,13 @@ public class PlotDistributionAsPDFActivity extends AbstractCDKActivity {
 					while ((line = reader.readLine()) != null) {
 						String[] parts = line.split(";");
 						String[] dist = parts[2].split(",");
-						double value = Double.parseDouble(dist[1]);
-						value = value * 2 - 1;
+						double value;
+						if (dist.length > 1) {
+							value = Double.parseDouble(dist[1]);
+							value = value * 2 - 1;
+						} else {
+							value = Double.parseDouble(dist[0]);
+						}
 						values.add(value);
 					}
 				} else {
@@ -122,17 +127,16 @@ public class PlotDistributionAsPDFActivity extends AbstractCDKActivity {
 				bins = bins > 30 ? 30 : bins;
 				histoSet.addSeries(file.getName(), v, bins);
 				allHistoSet.addSeries(file.getName(), v, bins);
-				chartObjects.add(chartTool.createXYLineSplineChart("Score Distribution", "Score",
-						"Frequency (Area scaled to 1)", histoSet, true, false));
+				chartObjects.add(chartTool.createXYLineSplineChart("Score Distribution", "Score", "Frequency (Area scaled to 1)",
+						histoSet, true, false));
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + file.getPath() + "!",
 						this.getActivityName(), e);
-				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRITE_FILE_ERROR
-						+ file.getPath() + "!");
+				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.WRITE_FILE_ERROR + file.getPath() + "!");
 			}
 		}
-		chartObjects.add(chartTool.createXYLineSplineChart("Score Distribution", "Score",
-				"Frequency (Area scaled to 1)", allHistoSet, true, false));
+		chartObjects.add(chartTool.createXYLineSplineChart("Score Distribution", "Score", "Frequency (Area scaled to 1)",
+				allHistoSet, true, false));
 		File file = FileNameGenerator.getNewFile(directory, ".pdf", "Distribution_" + name);
 		chartTool.writeChartAsPDF(file, chartObjects);
 		resultFiles.add(file.getPath());
