@@ -84,6 +84,7 @@ public abstract class AbstractGAAttributeSelectionActivity extends AbstractCDKAc
 	@Override
 	public void work() throws Exception {
 		Random rand = new Random();
+		boolean freeSelection = false;
 		// Get input
 		Instances orgDataset = this.getInputAsObject(this.INPUT_PORTS[0], Instances.class);
 		String options = (String) this.getConfiguration().getAdditionalProperty(
@@ -94,9 +95,14 @@ public abstract class AbstractGAAttributeSelectionActivity extends AbstractCDKAc
 		NUMBER_OF_INDIVIDUALS = Integer.parseInt(optionArray[2]);
 		NUMBER_OF_ITERATIONS = Integer.parseInt(optionArray[3]);
 		String[] attrOpt = optionArray[4].split(" ");
-		if (attrOpt.length < 3) {
+		if(attrOpt[0].equals("-1")) {
+			freeSelection = true;
 			MIN_ATTRIBUTES = 1;
 			MAX_ATTRIBUTES = 1;
+			STEPSIZE = 1;
+		} else if (attrOpt.length < 3) {
+			MIN_ATTRIBUTES = Integer.parseInt(attrOpt[0]);
+			MAX_ATTRIBUTES = Integer.parseInt(attrOpt[0]);
 			STEPSIZE = 1;
 		} else {
 			MIN_ATTRIBUTES = Integer.parseInt(attrOpt[0]);
@@ -119,12 +125,12 @@ public abstract class AbstractGAAttributeSelectionActivity extends AbstractCDKAc
 				// Initialize individuals
 				for (int i = 0; i < NUMBER_OF_INDIVIDUALS; i++) {
 					this.individuals[i] = new GAAttributeEvaluationGenome(orgDataset);
-					if (attrOpt.length == 3) {
+					if (!freeSelection) {
 						this.individuals[i].setAttrRestriction(numAttr);
 					}
 				}
 				GAAttributeEvaluationGenome allTimeBest = null;
-				if (attrOpt.length == 3) {
+				if (!freeSelection) {
 					ProgressLogger.getInstance().writeProgress(this.getActivityName(),
 							"Number of Attributes: " + numAttr + "\n");
 				} else {
