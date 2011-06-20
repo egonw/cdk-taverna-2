@@ -39,9 +39,12 @@ import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.basicutilities.FileNameGenerator;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
+import weka.clusterers.ClusterEvaluation;
 import weka.clusterers.Clusterer;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
+import weka.core.Utils;
 import weka.filters.Filter;
 
 /**
@@ -96,8 +99,8 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 				// Load clusterer
 				clusterer = (Clusterer) SerializationHelper.read(files.get(i).getPath());
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR,
-						this.getActivityName(), e);
+				ErrorLogger.getInstance()
+						.writeError(CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR, this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.LOADING_CLUSTERING_DATA_ERROR);
 			}
 			try {
@@ -106,8 +109,16 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 				String options = tools.getOptionsFromFile(files.get(i), name);
 				int jobID = tools.getIDFromOptions(options);
 				int[] numberOfVectorsInClass = new int[clusterer.numberOfClusters()];
-				for (int j = 0; j < dataset.numInstances(); j++) {
-					numberOfVectorsInClass[clusterer.clusterInstance(dataset.instance(j))]++;
+				// Remove class
+				Instances noClassDataset;
+				if (dataset.classIndex() >= 0) {
+					noClassDataset = Filter.useFilter(dataset, tools.getClassRemover(dataset));
+					noClassDataset.setClassIndex(-1);
+				} else {
+					noClassDataset = dataset;
+				}
+				for (int j = 0; j < noClassDataset.numInstances(); j++) {
+					numberOfVectorsInClass[clusterer.clusterInstance(noClassDataset.instance(j))]++;
 				}
 				DefaultCategoryDataset chartDataSet = new DefaultCategoryDataset();
 				for (int j = 0; j < clusterer.numberOfClusters(); j++) {
@@ -116,22 +127,33 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 				}
 				charts.add(chartTool.createBarChart(name + " - JobID: " + jobID, "(Class number/Number of Vectors)",
 						"Number of vectors", chartDataSet));
+				ClusterEvaluation eval = new ClusterEvaluation();
+				eval.setClusterer(clusterer);
+				eval.evaluateClusterer(dataset);
+				charts.add(eval.clusterResultsToString());
+				int[][] counts = new int[clusterer.numberOfClusters()][dataset.classAttribute().numValues()];
+				double[] m_clusterAssignments = eval.getClusterAssignments();
+				for (int j = 0; j < dataset.numInstances(); j++) {
+					Instance instance = dataset.instance(j);
+					if (m_clusterAssignments[j] >= 0) {
+						counts[(int) m_clusterAssignments[j]][(int) instance.classValue()]++;
+					}
+				}
+				System.out.println(Utils.arrayToString(counts));
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR,
-						this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
 			}
 			try {
 				File file = files.get(0);
 				String name = clusterer.getClass().getSimpleName();
-				file = FileNameGenerator.getNewFile(file.getParent(), ".pdf",
-						name + tools.getOptionsFromFile(files.get(i), name) + "-Result");
+				file = FileNameGenerator.getNewFile(file.getParent(), ".pdf", name + tools.getOptionsFromFile(files.get(i), name)
+						+ "-Result");
 				pdfTitle.add("Weka " + clusterer.getClass().getSimpleName() + " Clustering Result");
 				chartTool.writeChartAsPDF(file, charts);
 				resultFiles.add(file.getPath());
 			} catch (Exception e) {
-				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR,
-						this.getActivityName(), e);
+				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);
 			}
 		}

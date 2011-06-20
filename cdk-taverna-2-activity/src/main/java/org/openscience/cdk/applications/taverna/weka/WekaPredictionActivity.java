@@ -99,6 +99,11 @@ public class WekaPredictionActivity extends AbstractCDKActivity {
 			}
 		} else if (model instanceof Clusterer) {
 			Clusterer clusterer = (Clusterer) model;
+			// Remove class
+			if (dataset.classIndex() >= 0) {
+				dataset = Filter.useFilter(dataset, tools.getClassRemover(dataset));
+				dataset.setClassIndex(-1);
+			}
 			for (int i = 0; i < dataset.numInstances(); i++) {
 				String uuid = uuids.instance(i).stringValue(0);
 				int cluster = clusterer.clusterInstance(dataset.instance(i));

@@ -69,7 +69,7 @@ public class SetupDialog extends JDialog {
 		SpringLayout sl_contentPanel = new SpringLayout();
 		contentPanel.setLayout(sl_contentPanel);
 
-		JLabel lblWorkingDirectrory = new JLabel("Working Directrory:");
+		JLabel lblWorkingDirectrory = new JLabel("Working Directory:");
 		sl_contentPanel.putConstraint(SpringLayout.NORTH, lblWorkingDirectrory, 10, SpringLayout.NORTH, contentPanel);
 		sl_contentPanel.putConstraint(SpringLayout.WEST, lblWorkingDirectrory, 10, SpringLayout.WEST, contentPanel);
 		sl_contentPanel.putConstraint(SpringLayout.EAST, lblWorkingDirectrory, -10, SpringLayout.EAST, contentPanel);
@@ -113,7 +113,7 @@ public class SetupDialog extends JDialog {
 		sl_contentPanel.putConstraint(SpringLayout.EAST, chckbxCacheDatarecommended, 316, SpringLayout.WEST,
 				contentPanel);
 
-		chckbxCompessData = new JCheckBox("Compess Data");
+		chckbxCompessData = new JCheckBox("Compress Data");
 		chckbxCompessData.setSelected(true);
 		sl_panel.putConstraint(SpringLayout.NORTH, chckbxCompessData, 6, SpringLayout.SOUTH, chckbxCacheDatarecommended);
 		sl_panel.putConstraint(SpringLayout.WEST, chckbxCompessData, 0, SpringLayout.WEST, panel);

@@ -45,8 +45,7 @@ import weka.core.SerializationHelper;
 import weka.filters.Filter;
 
 /**
- * Class which implements the EM (Expectation Maximisation) clustering
- * algorithm.
+ * Class which implements the EM (Expectation Maximisation) clustering algorithm.
  * 
  * @author Andreas Truzskowski
  * 
@@ -86,8 +85,7 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 		Instances dataset = this.getInputAsObject(this.INPUT_PORTS[0], Instances.class);
 		File targetFile = this.getInputAsFile(this.INPUT_PORTS[1]);
 		this.directory = Tools.getDirectory(targetFile);
-		String jobData = (String) this.getConfiguration().getAdditionalProperty(
-				CDKTavernaConstants.PROPERTY_CLUSTERING_JOB_DATA);
+		String jobData = (String) this.getConfiguration().getAdditionalProperty(CDKTavernaConstants.PROPERTY_CLUSTERING_JOB_DATA);
 		if (jobData == null) {
 			throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.NO_CLUSTERING_DATA_AVAILABLE);
 		}
@@ -104,8 +102,7 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 			} else {
 				tempOption.add(splittedData[i]);
 			}
-			if (!tempOption.isEmpty()
-					&& (splittedData[i].startsWith("weka.clusterers") || i == splittedData.length - 1)) {
+			if (!tempOption.isEmpty() && (splittedData[i].startsWith("weka.clusterers") || i == splittedData.length - 1)) {
 				String[] option = new String[tempOption.size()];
 				option = tempOption.toArray(option);
 				jobOptions.add(option);
@@ -115,6 +112,11 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 		try {
 			WekaTools tools = new WekaTools();
 			dataset = Filter.useFilter(dataset, tools.getIDRemover(dataset));
+			// Remove class
+			if (dataset.classIndex() >= 0) {
+				dataset = Filter.useFilter(dataset, tools.getClassRemover(dataset));
+				dataset.setClassIndex(-1);
+			}
 			// Setup worker
 			this.workers = new WekaClusteringWorker[jobClustererNames.size()];
 			for (int i = 0; i < jobClustererNames.size(); i++) {
@@ -137,8 +139,7 @@ public class WekaClusteringActivity extends AbstractCDKActivity {
 	public synchronized void workerDone(Clusterer clusterer, String options) {
 		File emModelFile = null;
 		try {
-			emModelFile = FileNameGenerator.getNewFile(directory, ".model", clusterer.getClass().getSimpleName()
-					+ options);
+			emModelFile = FileNameGenerator.getNewFile(directory, ".model", clusterer.getClass().getSimpleName() + options);
 			SerializationHelper.write(emModelFile.getPath(), clusterer);
 			resultFiles.add(emModelFile.getPath());
 

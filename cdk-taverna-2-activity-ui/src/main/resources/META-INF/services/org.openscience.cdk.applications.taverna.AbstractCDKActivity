@@ -24,6 +24,8 @@ org.openscience.cdk.applications.taverna.iterativeio.IterativeSDFileReaderActivi
 org.openscience.cdk.applications.taverna.iterativeio.LoopSDFileReaderActivity
 org.openscience.cdk.applications.taverna.iterativeio.LoopRXNFileReaderActivity
 org.openscience.cdk.applications.taverna.iterativeio.ConsumeStateActivity
+org.openscience.cdk.applications.taverna.iterativeio.DataCollectorAcceptorActivity
+org.openscience.cdk.applications.taverna.iterativeio.DataCollectorEmitterActivity
 org.openscience.cdk.applications.taverna.jchempaint.JChemPaintActivity
 org.openscience.cdk.applications.taverna.miscellaneous.ReactionReactantSplitterActivity
 org.openscience.cdk.applications.taverna.miscellaneous.ReactionSplitterActivity
@@ -156,8 +158,6 @@ org.openscience.cdk.applications.taverna.stringconverter.StructureToCMLStringCon
 org.openscience.cdk.applications.taverna.stringconverter.StructureToMDLMolStringConverterActivity
 org.openscience.cdk.applications.taverna.stringconverter.StructureToMDLSDFileStringConverterActivity
 org.openscience.cdk.applications.taverna.stringconverter.StructureToSMILESConverterActivity
-org.openscience.cdk.applications.taverna.iterativeio.DataCollectorAcceptorActivity
-org.openscience.cdk.applications.taverna.iterativeio.DataCollectorEmitterActivity
 org.openscience.cdk.applications.taverna.curation.MoleculeConnectivityCheckerActivity
 org.openscience.cdk.applications.taverna.curation.CurateStrangeElementsActivity
 org.openscience.cdk.applications.taverna.curation.SugarGroupRemoverActivity
