@@ -41,7 +41,7 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
  */
 public class RemoveHydrogensActivity extends AbstractCDKActivity {
 
-	public static final String REMOVE_HYDROGENS_ACTIVITY = "Remove explicit Hydrogens";
+	public static final String REMOVE_HYDROGENS_ACTIVITY = "Remove Explicit Hydrogens";
 
 	/**
 	 * Creates a new instance.

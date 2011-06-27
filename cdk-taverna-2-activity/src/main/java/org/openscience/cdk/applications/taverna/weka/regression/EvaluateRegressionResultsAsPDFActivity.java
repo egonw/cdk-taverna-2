@@ -215,6 +215,7 @@ public class EvaluateRegressionResultsAsPDFActivity extends AbstractCDKActivity 
 					// Predict
 					for (int k = 0; k < testset.numInstances(); k++) {
 						UUID uuid = UUID.fromString(testUUIDSet.instance(k).stringValue(0));
+						orgClassMap.put(uuid, testset.instance(k).classValue());
 						calcClassMap.put(uuid, classifier.classifyInstance(testset.instance(k)));
 					}
 					// Evaluate
