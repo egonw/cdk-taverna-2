@@ -22,9 +22,7 @@
 package org.openscience.cdk.applications.taverna.weka.regression;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.LineNumberReader;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +34,7 @@ import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 import org.junit.Assert;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKActivityConfigurationBean;
+import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaTestCases;
 import org.openscience.cdk.applications.taverna.basicutilities.CDKObjectHandler;
 
@@ -48,52 +47,49 @@ import weka.core.converters.XRFFLoader;
  * @author Andreas Truszkowski
  * 
  */
-public class CreateWekaRegressionSetActivityTest extends CDKTavernaTestCases {
+public class ForwardAttributeSelectionActivityTest extends CDKTavernaTestCases {
 
 	private CDKActivityConfigurationBean configBean;
 
-	private AbstractCDKActivity setActivity = new CreateWekaRegressionSetActivity();
+	private AbstractCDKActivity evaluationActivity = new ForwardRAttributeSelectionActivity();
 
-	public CreateWekaRegressionSetActivityTest() {
-		super(CreateWekaRegressionSetActivity.CREATE_WEKA_REGRESSION_DATASET_ACTIVITY);
+	public ForwardAttributeSelectionActivityTest() {
+		super(ForwardRAttributeSelectionActivity.FORWARD_ATTRIBUTE_SELECTION_ACTIVITY);
 	}
 
 	public void makeConfigBean() throws Exception {
 		configBean = new CDKActivityConfigurationBean();
-		configBean.setActivityName(CreateWekaRegressionSetActivity.CREATE_WEKA_REGRESSION_DATASET_ACTIVITY);
+		configBean.setActivityName(ForwardRAttributeSelectionActivity.FORWARD_ATTRIBUTE_SELECTION_ACTIVITY);
 	}
 
 	/**
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
-		this.setActivity.configure(this.configBean);
+		String options = "weka.classifiers.functions.LinearRegression;-S 0 -R 0.00000008 -C ;false;10;";
+		this.evaluationActivity.configure(this.configBean);
 		// load regression data
-		File fileXRFF = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-				+ "data" + File.separator + "weka" + File.separator + "regression.xrff");
+		File file = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator + "data"
+				+ File.separator + "weka" + File.separator + "regression.xrff");
 		XRFFLoader loader = new XRFFLoader();
-		loader.setSource(fileXRFF);
+		loader.setSource(file);
 		Instances instances = loader.getDataSet();
-		File fileCSV = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-				+ "data" + File.separator + "weka" + File.separator + "regression.csv");
-		List<String> csv = new ArrayList<String>();
-		LineNumberReader reader = new LineNumberReader(new FileReader(fileCSV));
-		String line = null;
-		while ((line = reader.readLine()) != null) {
-			csv.add(line);
-		}
 		// Setup input
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS, 1);
 		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		Map<String, Object> inputs = new HashMap<String, Object>();
-		byte[] data = CDKObjectHandler.getBytes(instances);
-		inputs.put(this.setActivity.INPUT_PORTS[0], data);
-		inputs.put(this.setActivity.INPUT_PORTS[1], csv);
-		expectedOutputTypes.put(this.setActivity.OUTPUT_PORTS[0], byte[].class);
-		Map<String, Object> outputs = ActivityInvoker
-				.invokeAsyncActivity(this.setActivity, inputs, expectedOutputTypes);
-		byte[] resultData = (byte[]) outputs.get(this.setActivity.OUTPUT_PORTS[0]);
-		Instances set = (Instances) CDKObjectHandler.getObject(resultData);
-		Assert.assertEquals(183, set.numInstances());
+		this.configBean.addAdditionalProperty(CDKTavernaConstants.PROPERTY_ATTRIBUTE_SELECTION_OPTIONS, options);
+		List<byte[]> data = CDKObjectHandler.getBytesList(Collections.singletonList(instances));
+		inputs.put(this.evaluationActivity.INPUT_PORTS[0], data);
+		expectedOutputTypes.put(this.evaluationActivity.OUTPUT_PORTS[0], byte[].class);
+		expectedOutputTypes.put(this.evaluationActivity.OUTPUT_PORTS[1], String.class);
+		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(this.evaluationActivity, inputs,
+				expectedOutputTypes);
+		List<byte[]> resultData = (List<byte[]>) outputs.get(this.evaluationActivity.OUTPUT_PORTS[0]);
+		Assert.assertEquals(11, resultData.size());
+		List<String> resultString = (List<String>) outputs.get(this.evaluationActivity.OUTPUT_PORTS[1]);
+		Assert.assertEquals(11, resultString.size());
 	}
 
 	@Override
@@ -118,7 +114,7 @@ public class CreateWekaRegressionSetActivityTest extends CDKTavernaTestCases {
 	 * @return TestSuite
 	 */
 	public static Test suite() {
-		return new TestSuite(CreateWekaRegressionSetActivityTest.class);
+		return new TestSuite(ForwardAttributeSelectionActivityTest.class);
 	}
 
 }

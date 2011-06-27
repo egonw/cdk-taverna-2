@@ -1,14 +1,14 @@
-0.1
+2.0.1
 - Added basic IO activities
 - Added JChempaint activity
 - Added renderer activities
 - Added Reaction enumerator activity
 - Added QSAR activities
 
-0.1.1
+2.0.1.1
 - Fixed class loader bug  
 
-0.2
+2.0.2
 - Added IsomorphismTesterActivity/SubgraphIsomorphismFilterActivity 
 - Added QSAR vector generator
 - Updated to CDK to 1.3.5
@@ -24,7 +24,7 @@
 - Several bug fixes
 - Logging and exception handling
 
-0.3
+2.0.3
 - Added/Fixed QSAR activities 
 - Added ART-2a classification activities
 - Added Curation activities
@@ -37,7 +37,7 @@
 - Added the GetMolecularWeightDistributionFromQSARVector activity.
 - Changed exception error messages
 
-0.3.2
+2.0.3.2
 - Added the weka machine learning library
 - Added weka clustering activity
 - Added weka clustering visualisation and statistics (PDF, CSV) activities
@@ -45,17 +45,17 @@
 - Added split molecules in clusters activity
 - Reworked the chart tool
 
-0.3.3
+2.0.3.3
 - Added the merge CSV files activity
 - Reworked object serialization (now supports huge objects)
 - Added remove sugar groups worker
 - Adapted file reader activities for the command line tools
 
-0.3.4
+2.0.3.4
 - Filewriter now provide the written filenames 
 - Enabled colouring of the actvities
 
-0.4
+2.0.4
 - Reworked the I/O port data management system
 - Updated all activities with the new I/O port management
 - Added I/O port data caching to hard disk
@@ -65,14 +65,21 @@
 - Added modelling actvities (2D/3D coordinates generators)
 - Added signature scoring workers
 
-0.4.0.1
+2.0.4.0.1
 - Qickfix for writing the configfile in the temp directory instead of in the application directory
 - Added colour management for the the new activity folders.
 
-0.5 
+2.0.5 
 - Added WEKA machine learning workers for regression and classification tasks.
   Including Attribute selection, evaluation and visualization.
 - Updated to CDK to 1.3.8
 - Further improvements to the whole project
 - Many many bug fixes   
- 
+
+2.0.5.1
+- Minor bug fixes
+
+2.0.5.2
+- Added forward attribute selection algorithm
+- Added explicit hydrogen remover
+- Minor bug fixes 

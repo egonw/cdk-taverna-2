@@ -124,7 +124,7 @@ public class WekaTools {
 		removeFilter.setInputFormat(instances);
 		return removeFilter;
 	}
-
+	
 	/**
 	 * Method which returns a filter to remove the identifier from given instances. IMPORTANT: Range from 1...n!
 	 * 
@@ -134,6 +134,18 @@ public class WekaTools {
 	 * @throws Exception
 	 */
 	public Remove getAttributRemover(Instances instances, List<Integer> attrs) throws Exception {
+		return this.getAttributRemover(instances, attrs, false);
+	}
+
+	/**
+	 * Method which returns a filter to remove the identifier from given instances. IMPORTANT: Range from 1...n!
+	 * 
+	 * @param instances
+	 *            Instances which contains the format of the input instances
+	 * @return Weka remover filter which is configured to remove the identifier from the instance
+	 * @throws Exception
+	 */
+	public Remove getAttributRemover(Instances instances, List<Integer> attrs, boolean keep) throws Exception {
 
 		String attrString = "";
 		for (int n : attrs) {
@@ -143,9 +155,17 @@ public class WekaTools {
 			attrString += n + ",";
 		}
 		Remove removeFilter = new Remove();
-		String[] removerOptionArray = new String[2];
-		removerOptionArray[0] = "-R";
-		removerOptionArray[1] = "" + attrString;
+		String[] removerOptionArray;
+		if (keep) {
+			removerOptionArray = new String[3];
+			removerOptionArray[0] = "-R";
+			removerOptionArray[2] = "-V";
+			removerOptionArray[1] = "" + attrString;
+		} else {
+			removerOptionArray = new String[2];
+			removerOptionArray[0] = "-R";
+			removerOptionArray[1] = "" + attrString;
+		}
 		removeFilter.setOptions(removerOptionArray);
 		removeFilter.setInputFormat(instances);
 		return removeFilter;
@@ -490,7 +510,7 @@ public class WekaTools {
 		for (int i = 0; i < attributesList.get(0).size(); i++) {
 			for (int j = 0; j < mergedAttributeNames.size(); j++) {
 				String name = mergedAttributeNames.get(j);
-				if(attributesList.get(0).get(i).name().equals(name)) {
+				if (attributesList.get(0).get(i).name().equals(name)) {
 					mergedAttributes.addElement(attributesList.get(0).get(i));
 				}
 			}

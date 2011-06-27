@@ -35,12 +35,14 @@ import org.openscience.cdk.applications.taverna.ui.weka.WekaClassificationConfig
 import org.openscience.cdk.applications.taverna.ui.weka.WekaClusteringConfigurationPanelController;
 import org.openscience.cdk.applications.taverna.ui.weka.WekaRegressionConfigurationPanelController;
 import org.openscience.cdk.applications.taverna.weka.classification.EvaluateClassificationResultsAsPDFActivity;
+import org.openscience.cdk.applications.taverna.weka.classification.ForwardCAttributeSelectionActivity;
 import org.openscience.cdk.applications.taverna.weka.classification.GACAttributeSelectionActivity;
 import org.openscience.cdk.applications.taverna.weka.classification.LeaveOneOutCAttributeSelectionActivity;
 import org.openscience.cdk.applications.taverna.weka.classification.SplitClassificationTrainTestsetActivity;
 import org.openscience.cdk.applications.taverna.weka.classification.WekaClassificationActivity;
 import org.openscience.cdk.applications.taverna.weka.clustering.WekaClusteringActivity;
 import org.openscience.cdk.applications.taverna.weka.regression.EvaluateRegressionResultsAsPDFActivity;
+import org.openscience.cdk.applications.taverna.weka.regression.ForwardRAttributeSelectionActivity;
 import org.openscience.cdk.applications.taverna.weka.regression.GARAttributeSelectionActivity;
 import org.openscience.cdk.applications.taverna.weka.regression.LeaveOneOutRAttributeSelectionActivity;
 import org.openscience.cdk.applications.taverna.weka.regression.SplitRegressionTrainTestsetActivity;
@@ -79,7 +81,7 @@ public class CDKConfigurationPanelFactory {
 			return new ScatternPlotConfigurationPanel(activity);
 		} else if (activity instanceof GARAttributeSelectionActivity) {
 			return new GARAttributeEvaluationConfigurationPanel(activity);
-		} else if (activity instanceof LeaveOneOutRAttributeSelectionActivity) {
+		} else if (activity instanceof LeaveOneOutRAttributeSelectionActivity || activity instanceof ForwardRAttributeSelectionActivity) {
 			return new AttributeREvaluationConfigurationPanel(activity);
 		} else if (activity instanceof SplitClassificationTrainTestsetActivity) {
 			return new SplitClassificationTrainTestsetConfigurationPanelController(activity);
@@ -87,7 +89,7 @@ public class CDKConfigurationPanelFactory {
 			return new GACAttributeEvaluationConfigurationPanel(activity);
 		} else if (activity instanceof WekaClassificationActivity) {
 			return new WekaClassificationConfigurationPanelController(activity);
-		} else if (activity instanceof LeaveOneOutCAttributeSelectionActivity) {
+		} else if (activity instanceof LeaveOneOutCAttributeSelectionActivity || activity instanceof ForwardCAttributeSelectionActivity) {
 			return new AttributeCEvaluationConfigurationPanel(activity);
 		}
 		return new EmptyConfigurationPanel();

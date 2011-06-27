@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openscience.cdk.Atom;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
@@ -82,10 +83,10 @@ public class SugarGroupRemoverActivity extends AbstractCDKActivity {
 	public void work() throws Exception {
 		// Get input
 		String[] smilesList = { "C(C(C(C(C(C=O)O)O)O)O)O", "C(C(CC(C(CO)O)O)O)(O)=O", "C(C(C(CC(=O)O)O)O)O",
-				"C(C(C(C(C(CO)O)O)O)=O)O", "C(C(C(C(C(CO)O)O)O)O)O", "C(C(C(C(CC=O)O)O)O)O","occ(o)co",
-                "OCC(O)C(O)C(O)C(O)CO","O=CC(O)C(O)C(O)C(O)CO","CC(=O)OCC(O)CO","CCCCC(O)C(=O)O","CC(=O)CC(=O)CCC(=O)O",
-                "CC(O)C(O)C(=O)O","O=C(O)CC(O)CC(=O)O","O=C(O)C(=O)C(=O)C(O)C(O)CO","CC(O)CC(=O)O","CC(CCC(=O)O)CC(=O)O",
-                "O=C(O)CCC(O)C(=O)O","O=CC(O)C(O)C(O)C(O)CO","O=C(CO)C(O)C(O)CO" };
+				"C(C(C(C(C(CO)O)O)O)=O)O", "C(C(C(C(C(CO)O)O)O)O)O", "C(C(C(C(CC=O)O)O)O)O", "occ(o)co", "OCC(O)C(O)C(O)C(O)CO",
+				"O=CC(O)C(O)C(O)C(O)CO", "CC(=O)OCC(O)CO", "CCCCC(O)C(=O)O", "CC(=O)CC(=O)CCC(=O)O", "CC(O)C(O)C(=O)O",
+				"O=C(O)CC(O)CC(=O)O", "O=C(O)C(=O)C(=O)C(O)C(O)CO", "CC(O)CC(=O)O", "CC(CCC(=O)O)CC(=O)O", "O=C(O)CCC(O)C(=O)O",
+				"O=CC(O)C(O)C(O)C(O)CO", "O=C(CO)C(O)C(O)CO" };
 		List<CMLChemFile> chemFileList = this.getInputAsList(this.INPUT_PORTS[0], CMLChemFile.class);
 		// Do work
 		ArrayList<CMLChemFile> curated = new ArrayList<CMLChemFile>();
@@ -96,8 +97,7 @@ public class SugarGroupRemoverActivity extends AbstractCDKActivity {
 				sugarChains.add(sp.parseSmiles(smiles));
 			}
 		} catch (InvalidSmilesException ex) {
-			ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_WHILE_PARSING_SMILES,
-					this.getActivityName(), ex);
+			ErrorLogger.getInstance().writeError(CDKTavernaException.ERROR_WHILE_PARSING_SMILES, this.getActivityName(), ex);
 		}
 		for (CMLChemFile cml : chemFileList) {
 			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(cml);
@@ -144,20 +144,56 @@ public class SugarGroupRemoverActivity extends AbstractCDKActivity {
 	}
 
 	private boolean shouldRemoveRing(IAtomContainer ring, IAtomContainer molecule, IRingSet ringset) {
-		boolean shouldRemoveRing = true;
 		IAtomContainer sugarRing = ring;
 		IRingSet sugarRingsSet = ringset;
 		IRingSet connectedRings = null;
 		connectedRings = sugarRingsSet.getConnectedRings((IRing) ring);
+		List<IAtom> connectedAtoms = new ArrayList<IAtom>();
 		List<IBond> bonds = new ArrayList<IBond>();
+		Map<String, Integer> count_Oxy_atom = new HashMap<String, Integer>();
+
+		// get bonds to check for bond order of connected atoms in a sugar ring
 		for (IAtom atom : sugarRing.atoms()) {
 			bonds = molecule.getConnectedBondsList(atom);
 		}
-		if (IBond.Order.SINGLE.equals(BondManipulator.getMaximumBondOrder(bonds))
-				&& connectedRings.getAtomContainerCount() == 0) {
-			return shouldRemoveRing;
+
+		if (IBond.Order.SINGLE.equals(BondManipulator.getMaximumBondOrder(bonds)) && connectedRings.getAtomContainerCount() == 0) {
+
+			// get connected atoms of atoms in sugar ring to check for glycoside bond
+			for (IAtom atom : sugarRing.atoms()) {
+				List<IAtom> conn_Atoms = molecule.getConnectedAtomsList(atom);
+				connectedAtoms.addAll(conn_Atoms);
+			}
+
+			for (IAtom connected_atom : connectedAtoms) {
+				if (!sugarRing.contains(connected_atom)) {
+					if (connected_atom.getSymbol().matches((new Atom("O").getSymbol()))) {
+						if (!count_Oxy_atom.containsKey("true")) {
+							count_Oxy_atom.put("true", new Integer(1));
+						} else {
+							Integer count = count_Oxy_atom.get("true");
+							count++;
+							count_Oxy_atom.put("true", count);
+						}
+					} else {
+
+						if (!count_Oxy_atom.containsKey("false")) {
+							count_Oxy_atom.put("false", new Integer(1));
+						} else {
+							Integer count = count_Oxy_atom.get("false");
+							count++;
+							count_Oxy_atom.put("false", count);
+						}
+					}
+				}
+			}
+			Integer oxy_count = count_Oxy_atom.get("true");
+			if (oxy_count != null) {
+				return true;
+			}
+			return false;
 		} else {
-			return shouldRemoveRing = false;
+			return false;
 		}
 	}
 

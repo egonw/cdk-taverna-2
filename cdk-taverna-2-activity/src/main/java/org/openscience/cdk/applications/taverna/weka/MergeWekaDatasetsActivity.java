@@ -30,7 +30,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 import org.openscience.cdk.applications.taverna.interfaces.IPortNumber;
-import org.openscience.cdk.applications.taverna.qsar.utilities.QSARVectorUtility;
 import org.openscience.cdk.applications.taverna.weka.utilities.WekaTools;
 
 import weka.core.Attribute;

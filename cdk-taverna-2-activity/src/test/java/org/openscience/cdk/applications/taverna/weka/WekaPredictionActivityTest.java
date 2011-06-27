@@ -60,6 +60,7 @@ public class WekaPredictionActivityTest extends CDKTavernaTestCases {
 		configBean.setActivityName(WekaPredictionActivity.WEKA_PREDICTION_ACTIVITY);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void executeAsynch() throws Exception {
 		predicitonActivity.configure(configBean);
 		Map<String, Object> inputs = new HashMap<String, Object>();

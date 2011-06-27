@@ -35,9 +35,11 @@ import org.openscience.cdk.applications.taverna.AbstractCDKActivity;
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
+import org.openscience.cdk.aromaticity.CDKHueckelAromaticityDetector;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.signature.AtomSignature;
+import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 public class AtomSignatureActivity extends AbstractCDKActivity {
@@ -72,10 +74,11 @@ public class AtomSignatureActivity extends AbstractCDKActivity {
 			List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(cml);
 			for (IAtomContainer atomContainer : moleculeList) {
 				if (atomContainer.getProperty(CDKTavernaConstants.MOLECULEID) == null) {
-					throw new CDKTavernaException(this.getActivityName(),
-							CDKTavernaException.MOLECULE_NOT_TAGGED_WITH_UUID);
+					throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.MOLECULE_NOT_TAGGED_WITH_UUID);
 				}
 				UUID uuid = UUID.fromString((String) atomContainer.getProperty(CDKTavernaConstants.MOLECULEID));
+				AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(atomContainer);
+				CDKHueckelAromaticityDetector.detectAromaticity(atomContainer);
 				for (IAtom atom : atomContainer.atoms()) {
 					AtomSignature atomSignature = new AtomSignature(atom, height, atomContainer);
 					String signature = uuid.toString() + ";" + atomSignature.toCanonicalString();

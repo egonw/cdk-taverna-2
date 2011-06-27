@@ -183,6 +183,7 @@ org.openscience.cdk.applications.taverna.weka.regression.CreateWekaRegressionSet
 org.openscience.cdk.applications.taverna.weka.regression.LeaveOneOutRAttributeSelectionActivity
 org.openscience.cdk.applications.taverna.weka.regression.GARAttributeSelectionActivity
 org.openscience.cdk.applications.taverna.weka.regression.SplitRegressionTrainTestsetActivity
+org.openscience.cdk.applications.taverna.weka.regression.ForwardRAttributeSelectionActivity
 org.openscience.cdk.applications.taverna.weka.classification.CreateWekaClassificationSetActivity
 org.openscience.cdk.applications.taverna.weka.classification.WekaClassificationActivity
 org.openscience.cdk.applications.taverna.weka.classification.EvaluateClassificationResultsAsPDFActivity

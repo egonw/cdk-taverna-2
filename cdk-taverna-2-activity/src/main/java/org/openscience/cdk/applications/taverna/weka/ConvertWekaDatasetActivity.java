@@ -30,7 +30,6 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
 
-import weka.clusterers.ClusterEvaluation;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;

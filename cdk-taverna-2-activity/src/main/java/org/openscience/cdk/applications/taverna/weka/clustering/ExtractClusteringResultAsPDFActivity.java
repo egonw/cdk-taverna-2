@@ -131,15 +131,15 @@ public class ExtractClusteringResultAsPDFActivity extends AbstractCDKActivity {
 				eval.setClusterer(clusterer);
 				eval.evaluateClusterer(dataset);
 				charts.add(eval.clusterResultsToString());
-				int[][] counts = new int[clusterer.numberOfClusters()][dataset.classAttribute().numValues()];
-				double[] m_clusterAssignments = eval.getClusterAssignments();
-				for (int j = 0; j < dataset.numInstances(); j++) {
-					Instance instance = dataset.instance(j);
-					if (m_clusterAssignments[j] >= 0) {
-						counts[(int) m_clusterAssignments[j]][(int) instance.classValue()]++;
-					}
-				}
-				System.out.println(Utils.arrayToString(counts));
+//				int[][] counts = new int[clusterer.numberOfClusters()][dataset.classAttribute().numValues()];
+//				double[] m_clusterAssignments = eval.getClusterAssignments();
+//				for (int j = 0; j < dataset.numInstances(); j++) {
+//					Instance instance = dataset.instance(j);
+//					if (m_clusterAssignments[j] >= 0) {
+//						counts[(int) m_clusterAssignments[j]][(int) instance.classValue()]++;
+//					}
+//				}
+//				System.out.println(Utils.arrayToString(counts));
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.PROCESS_WEKA_RESULT_ERROR, this.getActivityName(), e);
 				throw new CDKTavernaException(this.getActivityName(), CDKTavernaException.PROCESS_WEKA_RESULT_ERROR);

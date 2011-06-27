@@ -22,6 +22,8 @@
 package org.openscience.cdk.applications.taverna.weka.utilities;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
@@ -36,16 +38,19 @@ import weka.filters.Filter;
  * @author Andreas Truzskowski
  * 
  */
-public abstract class AbstractLeaveOneOutAttributeSelectionActivity extends AbstractAttributeSelectionActivity {
+public abstract class AbstractForwardAttributeSelectionActivity extends AbstractAttributeSelectionActivity {
 
-	public static final String LEAVEONEOUT_ATTRIBUTE_SELECTION_ACTIVITY = "Leave-One-Out Attribute Selection";
+	public static final String FORWARD_ATTRIBUTE_SELECTION_ACTIVITY = "Forward Attribute Selection";
+
+	private LinkedList<Integer> availableAttr;
+	private HashSet<Integer> usedAttributes;
 
 	/**
 	 * Creates a new instance.
 	 */
-	public AbstractLeaveOneOutAttributeSelectionActivity() {
+	public AbstractForwardAttributeSelectionActivity() {
 	}
-	
+
 	@Override
 	public void work() throws Exception {
 		WekaTools tools = new WekaTools();
@@ -58,24 +63,38 @@ public abstract class AbstractLeaveOneOutAttributeSelectionActivity extends Abst
 		this.classifierOptions = optionArray[1];
 		USE_CV = Boolean.parseBoolean(optionArray[2]);
 		FOLDS = Integer.parseInt(optionArray[3]);
-		int threads = (Integer) this.getConfiguration().getAdditionalProperty(
-				CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS);
+		int threads = (Integer) this.getConfiguration()
+				.getAdditionalProperty(CDKTavernaConstants.PROPERTY_NUMBER_OF_USED_THREADS);
 		// Do work
 		ArrayList<Instances> newDatasets = new ArrayList<Instances>();
-		LinkedList<Integer> removedAttributes = new LinkedList<Integer>();
 		this.currentSet = dataset;
 		ArrayList<String> attrInfo = new ArrayList<String>();
 		ProgressLogger.getInstance().writeProgress(this.getActivityName(), "Starting work");
-		for (int i = 0; i < dataset.numAttributes() - 3; i++) {
-			// remove ID
-			this.currentSet = Filter.useFilter(this.currentSet, tools.getIDRemover(this.currentSet));
-			this.rmses = new double[currentSet.numAttributes() - 1];
-			// Calculate RMSEs
-			this.currentIndex = 0;
+		this.usedAttributes = new HashSet<Integer>();
+		// Add ID
+		this.usedAttributes.add(1);
+		// Add class
+		this.usedAttributes.add(dataset.classIndex() + 1);
+		int step = 1;
+		ArrayList<Integer> attList;
+		while (this.usedAttributes.size() < dataset.numAttributes()) {
+			// Init set
 
-			this.workers = new LeaveOneOutAttributeEvaluationWorker[threads];
+			// Init rmses
+			this.rmses = new double[dataset.numAttributes() - 2];
+			for (int j = 0; j < this.rmses.length; j++) {
+				this.rmses[j] = Double.MAX_VALUE;
+			}
+			this.availableAttr = new LinkedList<Integer>();
+			for (int j = 2; j < dataset.numAttributes(); j++) {
+				if (!this.usedAttributes.contains(j)) {
+					this.availableAttr.add(j);
+				}
+			}
+			// Calculate RMSEs
+			this.workers = new ForwardAttributeEvaluationWorker[threads];
 			for (int j = 0; j < this.workers.length; j++) {
-				this.workers[j] = new LeaveOneOutAttributeEvaluationWorker(this);
+				this.workers[j] = new ForwardAttributeEvaluationWorker(this);
 				this.workers[j].start();
 			}
 			synchronized (this) {
@@ -90,22 +109,16 @@ public abstract class AbstractLeaveOneOutAttributeSelectionActivity extends Abst
 					idx = j;
 				}
 			}
-			String name = this.currentSet.attribute(idx).name();
-			idx = dataset.attribute(name).index();
-			ProgressLogger.getInstance().writeProgress(this.getActivityName(),
-					"Step: " + (i + 1) + " - Attribute removed: " + name);
-			// range is 1..n
-			removedAttributes.add(idx + 1);
-			this.currentSet = Filter.useFilter(dataset, tools.getAttributRemover(dataset, removedAttributes));
-		}
-		// Create datasets
-		Instances set;
-		attrInfo.add("Index;RemovedAttribute;");
-		for (int i = 0; i < removedAttributes.size(); i++) {
-			String info = (i + 1) + ";" + dataset.attribute(removedAttributes.get(i) - 1).name() + ";";
+			String name = dataset.attribute(idx + 1).name();
+			ProgressLogger.getInstance().writeProgress(this.getActivityName(), "Step: " + step + " - Attribute added: " + name);
+			String info = step + ";" + name + ";";
 			attrInfo.add(info);
-			set = Filter.useFilter(dataset, tools.getAttributRemover(dataset, removedAttributes.subList(0, i + 1)));
-			newDatasets.add(set);
+			this.usedAttributes.add(idx + 2);
+			attList = new ArrayList<Integer>(this.usedAttributes);
+			Collections.sort(attList);
+			Instances newSet = Filter.useFilter(dataset, tools.getAttributRemover(dataset, attList, true));
+			newDatasets.add(newSet);
+			step++;
 		}
 		// Set output
 		this.setOutputAsObjectList(newDatasets, this.OUTPUT_PORTS[0]);
@@ -115,22 +128,25 @@ public abstract class AbstractLeaveOneOutAttributeSelectionActivity extends Abst
 	/**
 	 * @return index of the current leaved out attribute.
 	 */
-	public synchronized Integer getWork() {
-		if (this.currentIndex < this.currentSet.numAttributes() - 1) {
-			return this.currentIndex++;
-		} else {
+	public synchronized ArrayList<Integer> getWork() {
+		if (this.availableAttr.isEmpty()) {
 			return null;
+		} else {
+			Integer idx = this.availableAttr.pollFirst();
+			ArrayList<Integer> attList = new ArrayList<Integer>(this.usedAttributes);
+			attList.add(idx);
+			return attList;
 		}
 	}
-
+	
 	@Override
 	public String getDescription() {
-		return "Description: " + AbstractLeaveOneOutAttributeSelectionActivity.LEAVEONEOUT_ATTRIBUTE_SELECTION_ACTIVITY;
+		return "Description: " + AbstractForwardAttributeSelectionActivity.FORWARD_ATTRIBUTE_SELECTION_ACTIVITY;
 	}
 
 	@Override
 	public String getActivityName() {
-		return AbstractLeaveOneOutAttributeSelectionActivity.LEAVEONEOUT_ATTRIBUTE_SELECTION_ACTIVITY;
+		return AbstractForwardAttributeSelectionActivity.FORWARD_ATTRIBUTE_SELECTION_ACTIVITY;
 	}
 
 }

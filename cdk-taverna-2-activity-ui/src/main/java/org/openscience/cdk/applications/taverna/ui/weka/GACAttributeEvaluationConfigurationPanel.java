@@ -148,7 +148,7 @@ public class GACAttributeEvaluationConfigurationPanel extends
 		this.view.getIterationsTextField().setText(opt[3]);
 		String[] attrOpt = opt[4].split(" ");
 		if (attrOpt.length < 3) {
-			this.view.getMinAttrTextField().setText("-1");
+			this.view.getMinAttrTextField().setText(opt[0]);
 			this.view.getMaxAttrTextField().setText("");
 			this.view.getStepSizeTextField().setText("");
 		} else {

@@ -21,6 +21,8 @@
  */
 package org.openscience.cdk.applications.taverna.weka.utilities;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 import org.openscience.cdk.applications.taverna.basicutilities.ErrorLogger;
@@ -36,24 +38,28 @@ import weka.filters.Filter;
  * @author Andreas Truszkowski
  * 
  */
-public class LeaveOneOutAttributeEvaluationWorker extends AbstractAttributeEvaluationWorker {
+public class ForwardAttributeEvaluationWorker extends AbstractAttributeEvaluationWorker {
 
 	/**
 	 * Creates a new instance.
 	 */
-	public LeaveOneOutAttributeEvaluationWorker(AbstractLeaveOneOutAttributeSelectionActivity owner) {
+	public ForwardAttributeEvaluationWorker(AbstractForwardAttributeSelectionActivity owner) {
 		super(owner);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
 		WekaTools tools = new WekaTools();
 		try {
-			Integer idx;
-			while ((idx = (Integer) this.owner.getWork()) != null) {
+			ArrayList<Integer> attr;
+			while ((attr = (ArrayList<Integer>) this.owner.getWork()) != null) {
 				Instances currentSet = this.owner.getCurrentSet();
+				int idx = attr.get(attr.size() - 1) - 2;
+				Collections.sort(attr);
 				// Calculate score
-				Instances work = Filter.useFilter(currentSet, tools.getAttributRemover(currentSet, idx + 1));
+				Instances work = Filter.useFilter(currentSet, tools.getAttributRemover(currentSet, attr, true));
+				work = Filter.useFilter(work, tools.getIDRemover(work));
 				Classifier classifier = this.owner.getClassifier();
 				Evaluation eval = new Evaluation(work);
 				if (this.owner.isUSE_CV()) {
@@ -71,6 +77,5 @@ public class LeaveOneOutAttributeEvaluationWorker extends AbstractAttributeEvalu
 		isDone = true;
 		this.owner.workerDone();
 	}
-
 
 }
