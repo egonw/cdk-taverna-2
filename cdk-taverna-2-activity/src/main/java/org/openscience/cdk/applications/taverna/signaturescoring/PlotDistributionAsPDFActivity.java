@@ -101,12 +101,13 @@ public class PlotDistributionAsPDFActivity extends AbstractCDKActivity {
 				String line = reader.readLine();
 				if (line.contains("Distribution")) {
 					while ((line = reader.readLine()) != null) {
+						line = line.replaceAll("\"", "");
 						String[] parts = line.split(";");
 						String[] dist = parts[2].split(",");
 						double value;
 						if (dist.length > 1) {
 							value = Double.parseDouble(dist[1]);
-							value = value * 2 - 1;
+							value = Math.pow(value * 2 - 1, 7);
 						} else {
 							value = Double.parseDouble(dist[0]);
 						}
@@ -114,6 +115,7 @@ public class PlotDistributionAsPDFActivity extends AbstractCDKActivity {
 					}
 				} else {
 					while ((line = reader.readLine()) != null) {
+						line = line.replaceAll("\"", "");
 						String[] parts = line.split(";");
 						values.add(Double.parseDouble(parts[1]));
 					}
@@ -125,9 +127,10 @@ public class PlotDistributionAsPDFActivity extends AbstractCDKActivity {
 				int bins = (int) (v.length * 0.05);
 				// Limit number of bins to 30
 				bins = bins > 30 ? 30 : bins;
+				bins = bins < 15 ? 15 : bins;
 				histoSet.addSeries(file.getName(), v, bins);
 				allHistoSet.addSeries(file.getName(), v, bins);
-				chartObjects.add(chartTool.createXYLineSplineChart("Score Distribution", "Score", "Frequency (Area scaled to 1)",
+				chartObjects.add(chartTool.createXYLineChart("Score Distribution", "Score", "Frequency (Area scaled to 1)",
 						histoSet, true, false));
 			} catch (Exception e) {
 				ErrorLogger.getInstance().writeError(CDKTavernaException.WRITE_FILE_ERROR + file.getPath() + "!",

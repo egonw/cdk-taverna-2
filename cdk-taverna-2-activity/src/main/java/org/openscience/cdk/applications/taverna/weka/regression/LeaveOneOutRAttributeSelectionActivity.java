@@ -25,7 +25,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.weka.utilities.AbstractLeaveOneOutAttributeSelectionActivity;
 
 /**
- * Class which represents the heuristic attribute evaluation activity.
+ * Class which represents the leave-one-out attribute evaluation activity.
  * 
  * @author Andreas Truzskowski
  * 

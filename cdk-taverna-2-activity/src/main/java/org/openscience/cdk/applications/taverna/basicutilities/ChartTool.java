@@ -344,7 +344,7 @@ public class ChartTool {
 		chart.setBackgroundPaint(Color.white);
 		chart.setAntiAlias(true);
 		XYPlot plot = chart.getXYPlot();
-		plot.setBackgroundAlpha(0.1f);
+		plot.setBackgroundAlpha(0.4f);
 		ValueAxis domainAxis = plot.getDomainAxis();
 		domainAxis.setLowerMargin(0.025);
 		domainAxis.setUpperMargin(0.025);

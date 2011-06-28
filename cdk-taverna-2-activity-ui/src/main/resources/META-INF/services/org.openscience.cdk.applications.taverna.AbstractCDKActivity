@@ -21,6 +21,7 @@ org.openscience.cdk.applications.taverna.isomorphism.SubgraphIsomorphismFilterAc
 org.openscience.cdk.applications.taverna.iterativeio.IterativeMultiRXNFileReaderActivity
 org.openscience.cdk.applications.taverna.iterativeio.IterativeRXNFileReaderActivity
 org.openscience.cdk.applications.taverna.iterativeio.IterativeSDFileReaderActivity
+org.openscience.cdk.applications.taverna.iterativeio.IterativeXRFFFileReaderActivity
 org.openscience.cdk.applications.taverna.iterativeio.LoopSDFileReaderActivity
 org.openscience.cdk.applications.taverna.iterativeio.LoopRXNFileReaderActivity
 org.openscience.cdk.applications.taverna.iterativeio.ConsumeStateActivity
@@ -191,4 +192,5 @@ org.openscience.cdk.applications.taverna.weka.classification.EvaluateClassificat
 org.openscience.cdk.applications.taverna.weka.classification.SplitClassificationTrainTestsetActivity
 org.openscience.cdk.applications.taverna.weka.classification.GACAttributeSelectionActivity
 org.openscience.cdk.applications.taverna.weka.classification.LeaveOneOutCAttributeSelectionActivity
+org.openscience.cdk.applications.taverna.weka.classification.ForwardCAttributeSelectionActivity
 org.openscience.cdk.applications.taverna.modelling.CoordinatesGenerator2DAcitivity

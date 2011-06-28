@@ -25,7 +25,7 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.weka.utilities.AbstractForwardAttributeSelectionActivity;
 
 /**
- * Class which represents the heuristic attribute evaluation activity.
+ * Class which represents the forward attribute evaluation activity.
  * 
  * @author Andreas Truzskowski
  * 
@@ -42,7 +42,7 @@ public class ForwardCAttributeSelectionActivity extends AbstractForwardAttribute
 
 	@Override
 	public String getFolderName() {
-		return CDKTavernaConstants.WEKA_REGRESSION_FOLDER_NAME;
+		return CDKTavernaConstants.WEKA_CLASSIFICATION_FOLDER_NAME;
 	}
 
 }

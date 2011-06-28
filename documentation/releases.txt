@@ -83,3 +83,7 @@
 - Added forward attribute selection algorithm
 - Added explicit hydrogen remover
 - Minor bug fixes 
+
+2.0.5.3
+- Added the iterative XRFF reader
+- Updated to CDK to 1.3.12
