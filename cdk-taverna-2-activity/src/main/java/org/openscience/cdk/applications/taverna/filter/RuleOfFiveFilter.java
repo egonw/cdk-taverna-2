@@ -1,9 +1,7 @@
-/* $RCSfile$
- * $Author: thomaskuhn $
- * $Date: 2009-03-02 21:21:33 +0100 (Mo, 02 Mrz 2009) $
- * $Revision: 14307 $
- * 
- * Copyright (C) 2005 by Egon Willighagen <egonw@users.sf.net>
+/* Copyright (C) 2005,2008-2011  Egon Willighagen <egonw@users.sf.net>
+ *                    2008-2009  Rajarshi Guha <rajarshi@users.sf.net>
+ *                    2010-2011  Andreas Truszkowski <atruszkowski@gmx.de>
+ *                    2005-2009  Thomas Kuhn <thomas.kuhn@gnwi.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -34,11 +32,17 @@ import org.openscience.cdk.applications.taverna.CDKTavernaConstants;
 import org.openscience.cdk.applications.taverna.CDKTavernaException;
 import org.openscience.cdk.applications.taverna.CMLChemFile;
 import org.openscience.cdk.applications.taverna.basicutilities.CMLChemFileWrapper;
+import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.qsar.DescriptorValue;
+import org.openscience.cdk.qsar.IMolecularDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.HBondAcceptorCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.HBondDonorCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.RotatableBondsCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.RuleOfFiveDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.WeightDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.XLogPDescriptor;
+import org.openscience.cdk.qsar.result.DoubleResult;
 import org.openscience.cdk.qsar.result.IntegerResult;
-import org.openscience.cdk.reaction.enumerator.tools.ErrorLogger;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 /**
@@ -103,20 +107,11 @@ public class RuleOfFiveFilter extends AbstractCDKActivity {
 			for (CMLChemFile file : inputList) {
 				List<IAtomContainer> moleculeList = ChemFileManipulator.getAllAtomContainers(file);
 				for (IAtomContainer molecule : moleculeList) {
-					try {
-						DescriptorValue value = descriptor.calculate(molecule);
-						molecule.setProperty(value.getSpecification(), value);
-						if (value.getValue() instanceof IntegerResult
-								&& ((IntegerResult) value.getValue()).intValue() == 0) {
-							matchedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(molecule));
-						} else {
-							unmatchedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(molecule));
-						}
-					} catch (Exception e) {
+					boolean fail = hasOneOrMoreFails(molecule);
+					if (fail) {
 						unmatchedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(molecule));
-						ErrorLogger.getInstance().writeError(
-								"Error, calculation of the Descriptor for this molecule caused an error!",
-								this.getActivityName(), e);
+					} else {
+						matchedList.add(CMLChemFileWrapper.wrapAtomContainerInChemModel(molecule));
 					}
 				}
 			}
@@ -126,6 +121,46 @@ public class RuleOfFiveFilter extends AbstractCDKActivity {
 		// Set output
 		this.setOutputAsObjectList(matchedList, this.OUTPUT_PORTS[0]);
 		this.setOutputAsObjectList(unmatchedList, this.OUTPUT_PORTS[1]);
+	}
+
+	private boolean hasOneOrMoreFails(IAtomContainer mol) {
+        IMolecularDescriptor xlogP = new XLogPDescriptor();
+        Object[] xlogPparams = {
+        	Boolean.TRUE,
+            Boolean.TRUE,
+        };
+
+        try {
+            IMolecularDescriptor acc = new HBondAcceptorCountDescriptor();
+            Object[] hBondparams = {true};
+            acc.setParameters(hBondparams);
+            int acceptors = ((IntegerResult) acc.calculate(mol).getValue()).intValue();
+            if (acceptors > 10) return true;
+
+            IMolecularDescriptor don = new HBondDonorCountDescriptor();
+            don.setParameters(hBondparams);
+            int donors = ((IntegerResult) don.calculate(mol).getValue()).intValue();
+            if (donors > 5) return true;
+
+            IMolecularDescriptor mw = new WeightDescriptor();
+            Object[] mwparams = {""};
+            mw.setParameters(mwparams);
+            double mwvalue = ((DoubleResult) mw.calculate(mol).getValue()).doubleValue();
+            if (mwvalue > 500.0) return true;
+
+            IMolecularDescriptor rotate = new RotatableBondsCountDescriptor();
+            rotate.setParameters(hBondparams);
+            int rotatablebonds = ((IntegerResult) rotate.calculate(mol).getValue()).intValue();
+            if (rotatablebonds > 10.0) return true;
+
+            xlogP.setParameters(xlogPparams);
+            double xlogPvalue = ((DoubleResult) xlogP.calculate(mol).getValue()).doubleValue();
+            if (xlogPvalue > 5.0) return true;
+        } catch (CDKException e) {
+            return true;
+        }
+        
+        return false;
 	}
 
 }
