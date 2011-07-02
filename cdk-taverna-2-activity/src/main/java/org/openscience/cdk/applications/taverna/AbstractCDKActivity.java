@@ -340,6 +340,28 @@ public abstract class AbstractCDKActivity extends AbstractAsynchronousActivity<C
 	}
 
 	/**
+	 * Extracts data from an input port as an object.
+	 * 
+	 * @param <T>
+	 *            Object type
+	 * @param port
+	 *            The name of target port.
+	 * @return The object casted into the target type.
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	protected <T> boolean hasInputAsObject(String port, Class<T> type) throws Exception {
+		ReferenceService referenceService = this.callback.getContext().getReferenceService();
+		if (inputs.get(port) == null) return false;
+		T obj = (T) referenceService.renderIdentifier(
+			inputs.get(port),
+			type,
+			this.callback.getContext()
+		);
+		return (obj != null);
+	}
+
+	/**
 	 * Extracts data from an input port as an object list.
 	 * 
 	 * @param <T>
